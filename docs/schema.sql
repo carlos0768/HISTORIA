@@ -691,6 +691,7 @@ ALTER TABLE content_report           ENABLE ROW LEVEL SECURITY;
 --   service_role（サーバー側）だけが RLS を迂回して読み書きする。
 --   遮断器の上限値をユーザーが読めても書けても困るので、これが正しい状態である。
 --   将来この3テーブルに「ポリシーが無い」と指摘されても、追加してはならない。
+--   同じ理由で item の SELECT と response の INSERT も意図的に存在しない（下記）。
 ALTER TABLE app_setting              ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_budget                ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_spend                 ENABLE ROW LEVEL SECURITY;
@@ -716,8 +717,11 @@ CREATE POLICY app_user_select ON app_user
 -- ---- 追記専用ログ（UPDATE / DELETE のポリシーを作らない） ----
 CREATE POLICY response_select ON response
   FOR SELECT USING (user_id = (SELECT auth.uid()));
-CREATE POLICY response_insert ON response
-  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+-- ★ INSERT のポリシーを作らない（12-nonfunctional.md §6.1）。
+--   correct はサーバーが答え合わせをして決める値であり、利用者が申告する値ではない。
+--   クライアントに INSERT を許すと DevTools から correct=true を直接書けてしまい、
+--   「response が唯一の真実」（03-data-model.md §2.2）の入力源が改竄可能になる。
+--   書き込みは採点を行う Server Action（service_role）に閉じる。
 
 -- ---- ユーザーが作って編集できるもの ----
 CREATE POLICY drill_all ON drill
@@ -775,7 +779,9 @@ CREATE POLICY check_test_select ON check_test
 -- material と item は「自分のもの」＋「診断用の共有プール（item.user_id IS NULL）」を読める
 CREATE POLICY material_select ON material
   FOR SELECT USING (user_id = (SELECT auth.uid()));
-CREATE POLICY item_select ON item
-  FOR SELECT USING (user_id IS NULL OR user_id = (SELECT auth.uid()));
+-- ★ item に SELECT ポリシーを作らない（12-nonfunctional.md §6.1）。
+--   RLS は列単位の制限ができないため、SELECT を許すと answer_key・explanation・
+--   choices[].why_wrong まで解答前に読めてしまう。出題は Server Action が
+--   stem と choices の key/text だけを返し、正答は採点の応答で初めて返す。
 CREATE POLICY generation_job_select ON generation_job
   FOR SELECT USING (user_id = (SELECT auth.uid()));

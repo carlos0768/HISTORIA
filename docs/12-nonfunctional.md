@@ -124,12 +124,42 @@ RPD（生成側）を使い切った場合:
 |---|---|
 | 認証 | Supabase Auth ＋ Google ログイン。招待コード必須 |
 | 認可 | **RLS を全ユーザーデータテーブルで有効化**（`schema.sql` §13）。API 層のバグでも他人のデータが漏れない |
-| `response` の不変性 | RLS で SELECT / INSERT のポリシーのみ作り、UPDATE / DELETE を作らない |
+| `response` の不変性 | RLS で **SELECT のポリシーだけ**を作る。INSERT / UPDATE / DELETE を作らない（§6.1） |
+| **正答の秘匿と採点** | `item` に SELECT ポリシーを作らない。出題と採点は Server Action に閉じる（§6.1） |
 | APIキー | サーバー側の環境変数のみ。`NEXT_PUBLIC_` プレフィックスを付けない。クライアントから LLM を直接呼ばない |
 | 生成系エンドポイント | **全て認証必須**。無認証で叩けると URL が割れた時点で第三者にトークンを焼かれる |
 | CSP | `frame-src https://www.youtube-nocookie.com` / `img-src 'self' data: https://i.ytimg.com` |
 | `robots.txt` | 全面 `Disallow` ＋ `noindex`（`10-legal-risk.md` §3.2 G3） |
 | 依存関係 | Dependabot を有効化。`npm audit` を CI で実行 |
+
+### 6.1 正答の秘匿とサーバー採点
+
+**弱点DBの唯一の入力源は `response` である**（`03-data-model.md` §2.2）。
+ここが改竄できると、BKT も Elo も SM-2 も入力が信用できなくなり、
+ホームの残量表示・特訓の進捗率・診断結果がすべて意味を失う。
+**DevTools を開ける高校生1人で全機能が無効化される。**
+
+塞ぐべき穴は2つあり、どちらも RLS だけでは塞げない。
+
+| 穴 | なぜ RLS で塞げないか | 対処 |
+|---|---|---|
+| **正答が解答前に読める** | RLS は行単位で、**列単位の制限ができない**。`item` の SELECT を許すと `answer_key` / `explanation` / `choices[].why_wrong` まで一緒に読める | `item` に **SELECT ポリシーを作らない**。出題は Server Action が `stem` と `choices` の `key` / `text` だけを返す |
+| **`correct` を自己申告できる** | `WITH CHECK (user_id = auth.uid())` は「自分の行か」しか見ない。`correct = true` を止められない | `response` に **INSERT ポリシーを作らない**。書き込みは採点する Server Action（`service_role`）に閉じる |
+
+**採点の流れ**（クライアントは選択だけを送り、`correct` を送らない）:
+
+```
+1. 出題    Server Action → { item_id, stem, choices:[{key,text}] }   ※ answer_key を含めない
+2. 解答    クライアント  → { item_id, chosen, latency_ms }           ※ correct を含めない
+3. 採点    Server Action が item.answer_key と照合して correct を決め、response を INSERT
+4. 返却    Server Action → { correct, answer_key, explanation, why_wrong }  ※ ここで初めて正答を返す
+```
+
+`latency_ms` はクライアント由来なので改竄しうるが、`04-weakness-engine.md` は
+これを推定に使わない（表示と分析のみ）ので、被害は成立しない。
+`chosen` も改竄できるが、改竄した選択肢で採点されるだけで得にならない。
+
+**この2つのポリシーが「無い」ことは意図である。** `schema.sql` にその旨を書いてある。
 
 ## 7. 監視
 
