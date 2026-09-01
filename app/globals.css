@@ -1,6 +1,35 @@
 /* HISTORIA のスタイル。
    意匠は docs/design/litverse.css と historia-overrides.css が唯一の真実であり、
-   ここではそれを読み込む順序だけを決める。トークンを再定義しない。
-   docs/11b-design-system.md */
+   ここではそれを読み込む順序と、実機で必要になる最小限のレイアウトだけを決める。
+   トークンも既存クラスも再定義しない。docs/11b-design-system.md */
 @import '../docs/design/litverse.css';
 @import '../docs/design/historia-overrides.css';
+
+/* 下地。litverse.css は .lv-root までしか塗らないので、
+   スクロールで画面外に出た領域がブラウザ既定の白になってしまう。 */
+html { background: var(--lv-canvas); }
+body { margin: 0; background: var(--lv-canvas); }
+
+/* 実機の画面。モックの .lv-device は 340px 固定の「端末の絵」なので使わない。 */
+.hs-screen {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--lv-paper);
+}
+
+/* モックが inline style で書いていた余白（padding:28px 20px / gap:20px）を名前にする */
+.hs-pad { padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; }
+.hs-stack { display: flex; flex-direction: column; gap: var(--lv-space-2); }
+
+/* 長い KC の id やラベルで横に溢れさせない。
+   ★ overflow-x: hidden で隠さない。隠すと切れていることに気づけない。 */
+.hs-screen { overflow-wrap: anywhere; }
+.lv-list__row > * { min-width: 0; }
+.lv-list__row .lv-list__value { flex: 1; }
+
+/* 数字とラベルを横に並べる小さな見出し */
+.hs-count { display: flex; align-items: baseline; gap: var(--lv-space-2); }

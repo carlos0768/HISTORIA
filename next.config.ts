@@ -12,19 +12,7 @@ const nextConfig: NextConfig = {
           { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "frame-src https://www.youtube-nocookie.com",
-              "img-src 'self' data: https://i.ytimg.com",
-              "style-src 'self' 'unsafe-inline'",
-              "font-src 'self' data:",
-              "object-src 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-            ].join('; '),
-          },
+          // CSP は middleware.ts が nonce 付きで配る。ここには置かない（二重定義にしない）
         ],
       },
     ]

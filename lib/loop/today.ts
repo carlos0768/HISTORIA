@@ -13,6 +13,7 @@ import { newKcCard, type KcCard } from '@/lib/domain/sm2'
 
 type Row = {
   kc_id: string
+  kc_label: string
   p_know: number | null
   theta: number | null
   n_eff: number | null
@@ -43,7 +44,7 @@ async function loadCandidates(db: Sql, userId: string, now: Date): Promise<Row[]
        WHERE d.user_id = ${userId} AND d.status = 'active'
        GROUP BY dk.kc_id
     )
-    SELECT a.kc_id, a.earliest_deadline,
+    SELECT a.kc_id, kc.label AS kc_label, a.earliest_deadline,
            s.p_know, s.theta, s.n_eff, s.n_obs, s.last_seen_at,
            c.n, c.ef, c.interval_days, c.due_at, c.lapses, c.suspended, c.last_review_at,
            EXISTS (SELECT 1 FROM misconception m
@@ -60,6 +61,7 @@ async function loadCandidates(db: Sql, userId: string, now: Date): Promise<Row[]
                       AND i.format <> 'flashcard')
              AS has_non_flashcard_correct
       FROM active_kc a
+      JOIN kc ON kc.id = a.kc_id
       LEFT JOIN user_kc_state s ON s.user_id = ${userId} AND s.kc_id = a.kc_id
       LEFT JOIN kc_card       c ON c.user_id = ${userId} AND c.kc_id = a.kc_id`
 }
@@ -87,7 +89,7 @@ function toCandidate(r: Row, now: Date): QueueCandidate {
     hasNonFlashcardCorrect: r.has_non_flashcard_correct,
   })
   return {
-    kcId: r.kc_id, card, status, earliestDeadline: r.earliest_deadline,
+    kcId: r.kc_id, label: r.kc_label, card, status, earliestDeadline: r.earliest_deadline,
     mastery: m, isMisconception: r.is_misconception, isNew: r.due_at === null,
   }
 }
@@ -95,6 +97,8 @@ function toCandidate(r: Row, now: Date): QueueCandidate {
 export type Today = {
   /** ホームに出す1つの数字。特訓ごとのノルマは出さない（§5.1） */
   targetCount: number
+  /** 今日すでに解いた KC の数。ノルマから差し引く */
+  doneToday: number
   queue: QueueCandidate[]
   feasible: boolean
   shortfall: number
@@ -109,10 +113,22 @@ export async function todaysPlan(db: Sql, userId: string, now: Date, maxDaily = 
     kcId: c.kcId, card: c.card, status: c.status, earliestDeadline: c.earliestDeadline,
   }))
   const plan = dailyPlan(scheduled, now, maxDaily)
-  // 復習はノルマの外で必ず出し、新規学習だけをノルマの範囲に絞る
-  const queue = dailyQueue(candidates, now, maxDaily, plan.target)
+
+  // 今日すでに解いた KC を数える。
+  // これを引かないと、解いた分だけ新しい KC が補充され続けて
+  // 「今日やること」が 0 に到達せず、1日の終わりが定義できない。
+  const done = await db<{ n: string }[]>`
+    SELECT count(DISTINCT ik.kc_id) AS n
+      FROM response r JOIN item_kc ik ON ik.item_id = r.item_id
+     WHERE r.user_id = ${userId} AND date(r.answered_at) = date(${now})`
+  const doneToday = Number(done[0]?.n ?? 0)
+
+  // 復習はノルマの外で必ず出し、新規学習だけをノルマの残りに絞る
+  const queue = dailyQueue(candidates, now, Math.max(0, maxDaily - doneToday), Math.max(0, plan.target - doneToday))
+
   return {
     targetCount: queue.length,
+    doneToday,
     queue,
     feasible: plan.feasible,
     shortfall: plan.shortfall,
@@ -143,7 +159,7 @@ export async function drillProgressList(db: Sql, userId: string, now: Date): Pro
   for (const d of drills) {
     const rows = await db<Row[]>`
       WITH k AS (SELECT kc_id FROM drill_kc WHERE drill_id = ${d.id})
-      SELECT k.kc_id, ${d.deadline}::timestamptz AS earliest_deadline,
+      SELECT k.kc_id, kc.label AS kc_label, ${d.deadline}::timestamptz AS earliest_deadline,
              s.p_know, s.theta, s.n_eff, s.n_obs, s.last_seen_at,
              c.n, c.ef, c.interval_days, c.due_at, c.lapses, c.suspended, c.last_review_at,
              false AS is_misconception,
@@ -158,6 +174,7 @@ export async function drillProgressList(db: Sql, userId: string, now: Date): Pro
                         AND i.format <> 'flashcard')
                AS has_non_flashcard_correct
         FROM k
+        JOIN kc ON kc.id = k.kc_id
         LEFT JOIN user_kc_state s ON s.user_id = ${userId} AND s.kc_id = k.kc_id
         LEFT JOIN kc_card       c ON c.user_id = ${userId} AND c.kc_id = k.kc_id`
 

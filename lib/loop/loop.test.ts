@@ -252,6 +252,26 @@ dbSuite('閉ループ（実DB）', () => {
     expect(p1[0]!.progress).toBeCloseTo(0.5, 5)
   })
 
+  it('今日のノルマを終えると「今日やること」が 0 になる（1日の終わりが定義できる）', async () => {
+    const many = Array.from({ length: 20 }, (_, i) => `kc.test.q${i}`)
+    await createKcs(db, many, UNIT)
+    await createDrill(db, userId, many, day(40), UNIT)
+
+    const first = await todaysPlan(db, userId, T0)
+    expect(first.targetCount).toBeGreaterThan(0)
+    expect(first.doneToday).toBe(0)
+
+    // 出された分だけ解く
+    for (const q of first.queue) {
+      const it = await createItem(db, { userId, kcs: [{ kcId: q.kcId }], answerKey: 'a', now: T0 })
+      await submitAnswer(db, { userId, itemId: it, sessionKind: 'quiz', chosen: 'a', latencyMs: 4000, now: T0 })
+    }
+
+    const after = await todaysPlan(db, userId, T0)
+    expect(after.doneToday).toBe(first.queue.length)
+    expect(after.targetCount).toBe(0) // 補充され続けない
+  })
+
   it('leech（lapses>=8）になった KC はキューから外れる', async () => {
     await createDrill(db, userId, [kcA], day(60))
     for (let d = 0; d < 8; d++) {

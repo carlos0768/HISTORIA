@@ -43,6 +43,8 @@ export function repsLeft(card: KcCard, deadline: Date, today: Date): number {
 
 export type ScheduledKc = {
   kcId: string
+  /** 画面に出す名前。id は開発者向けで利用者に見せるものではない */
+  label?: string
   card: KcCard
   status: MasteryStatus
   /** その KC を含む active な特訓のうち最も早い締切 */
