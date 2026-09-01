@@ -11,17 +11,20 @@
 export const ALGO_VERSION = 1
 export const SCHED_VERSION = 1
 
-/** 出題形式。guess はこの形式から決まる定数であり、データから推定しない（§1） */
-export const ITEM_FORMATS = ['mcq4', 'short', 'truefalse', 'flashcard', 'ordering'] as const
+/**
+ * 出題形式。guess はこの形式から決まる定数であり、データから推定しない（§1）。
+ * ★ 値は docs/schema.sql の item.format の CHECK と一致させること。
+ */
+export const ITEM_FORMATS = ['mcq4', 'cloze', 'tf', 'order', 'flashcard'] as const
 export type ItemFormat = (typeof ITEM_FORMATS)[number]
 
 /** 当てずっぽうで当たる確率。選択肢数の逆数、または提案値（§9） */
 export const GUESS: Record<ItemFormat, number> = {
-  mcq4: 0.25,       // 選択肢4つの逆数
-  truefalse: 0.5,   // 選択肢2つの逆数
-  short: 0.05,
+  mcq4: 0.25,      // 四択。選択肢4つの逆数
+  tf: 0.5,         // 正誤判定。選択肢2つの逆数
+  cloze: 0.05,     // 一問一答・穴埋め
+  order: 0.05,     // 並べ替え
   flashcard: 0.02,
-  ordering: 0.05,
 }
 
 /** 知っているのに間違える確率 */
@@ -52,10 +55,10 @@ export const MISCONCEPTION_HITS = 2
 /** 形式別の想定解答時間の中央値（ms）。応答100件を超えたら実測値に切り替える（04b §4.3） */
 export const MEDIAN_LATENCY_MS: Record<ItemFormat, number> = {
   mcq4: 12_000,
-  short: 10_000,
-  truefalse: 8_000,
+  cloze: 10_000,
+  tf: 8_000,
+  order: 15_000,
   flashcard: 6_000,
-  ordering: 15_000,
 }
 /** この件数を超えたらそのユーザーの実測中央値に切り替える */
 export const LATENCY_SWITCH_N = 100

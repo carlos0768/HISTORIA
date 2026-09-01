@@ -29,7 +29,7 @@ describe('§1.1 ベイズ更新', () => {
     const s = base()
     const mcq = updateKcState(s, facts({ format: 'mcq4' })).pKnow
     const fc = updateKcState(s, facts({ format: 'flashcard' })).pKnow
-    const tf = updateKcState(s, facts({ format: 'truefalse' })).pKnow
+    const tf = updateKcState(s, facts({ format: 'tf' })).pKnow
     expect(fc).toBeGreaterThan(mcq)
     expect(mcq).toBeGreaterThan(tf)
   })
@@ -70,10 +70,10 @@ describe('§1.2 n_eff — 推測正解の割引', () => {
     expect(updateKcState(base(), facts({ format: 'flashcard' })).nEff).toBeCloseTo(0.98, 12)
   })
   it('正誤判定の正解は 0.5 しか増えない', () => {
-    expect(updateKcState(base(), facts({ format: 'truefalse' })).nEff).toBeCloseTo(0.5, 12)
+    expect(updateKcState(base(), facts({ format: 'tf' })).nEff).toBeCloseTo(0.5, 12)
   })
   it('誤答は形式によらず満額の証拠', () => {
-    for (const format of ['mcq4', 'flashcard', 'truefalse'] as const) {
+    for (const format of ['mcq4', 'flashcard', 'tf'] as const) {
       expect(updateKcState(base(), facts({ correct: false, format, latencyMs: 9000 })).nEff).toBeCloseTo(1, 12)
     }
   })

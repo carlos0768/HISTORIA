@@ -97,6 +97,8 @@ export function dailyPlan(kcs: ScheduledKc[], today: Date, maxDaily: number): Da
 export type QueueCandidate = ScheduledKc & {
   mastery: number
   isMisconception: boolean
+  /** kc_card がまだ無い KC。新規学習であり、復習ではない（§5.1 (b)） */
+  isNew: boolean
 }
 
 /** 締切が近いほど大きい。14日で 0 に落ちる線形 */
@@ -127,18 +129,39 @@ export function priority(c: QueueCandidate, today: Date): number {
  *
  * 1日の出題キューは全特訓の union で1本にする。各特訓が独立にノルマを出すと
  * 合計が1日8時間になるため。ホームに出す数字も1つだけにする。
+ *
+ * ★ 復習と新規学習で扱いを分ける。
+ *
+ *   復習（due になった kc_card）は **ノルマの外**として必ず出す。
+ *   SM-2 が「今日思い出さないと忘れる」と言っている分であり、
+ *   締切逆算のノルマが少ないからといって飛ばすと間隔反復が壊れる。
+ *
+ *   新規学習（kc_card がまだ無い KC）は **ノルマの範囲で**投入する。
+ *   ここを絞らないと初日に全 KC が投入され、翌日から due の山が崩れなくなる。
+ *
+ * どちらも合わせて MAX_DAILY で打ち切る。
+ * この区別が無いと、(a) ノルマ 0 の日に due のカードが1枚も出ない、
+ * (b) 初日に新規を投入し尽くす、のどちらかが必ず起きる。
  */
-export function dailyQueue(candidates: QueueCandidate[], today: Date, maxDaily: number): QueueCandidate[] {
-  const due = candidates.filter(
-    c =>
-      !c.card.suspended && // leech は出さない（04b §7）
-      c.card.dueAt.getTime() <= today.getTime(),
-  )
-  return due
-    .map(c => ({ c, p: priority(c, today) }))
-    .sort((a, b) => (b.p !== a.p ? b.p - a.p : a.c.kcId.localeCompare(b.c.kcId)))
-    .slice(0, maxDaily)
-    .map(x => x.c)
+export function dailyQueue(
+  candidates: QueueCandidate[],
+  today: Date,
+  maxDaily: number,
+  targetNew = maxDaily,
+): QueueCandidate[] {
+  const live = candidates.filter(c => !c.card.suspended) // leech は出さない（04b §7）
+  const byPriority = (a: QueueCandidate, b: QueueCandidate) => {
+    const d = priority(b, today) - priority(a, today)
+    return d !== 0 ? d : a.kcId.localeCompare(b.kcId)
+  }
+
+  const reviews = live
+    .filter(c => !c.isNew && c.card.dueAt.getTime() <= today.getTime())
+    .sort(byPriority)
+  const fresh = live.filter(c => c.isNew).sort(byPriority)
+
+  const room = Math.max(0, maxDaily - reviews.length)
+  return [...reviews.slice(0, maxDaily), ...fresh.slice(0, Math.min(room, Math.max(0, targetNew)))]
 }
 
 /**

@@ -110,7 +110,7 @@ describe('§3.1 1日のノルマ', () => {
 describe('§4.2 overdue の山崩し', () => {
   const cand = (id: string, o: Partial<QueueCandidate> = {}): QueueCandidate => ({
     kcId: id, card: card({ dueAt: T0 }), status: 'weak', earliestDeadline: day(30),
-    mastery: 0.5, isMisconception: false, ...o,
+    mastery: 0.5, isMisconception: false, isNew: false, ...o,
   })
 
   it('常に MAX_DAILY 件で打ち切る（初日に300問並べない）', () => {
@@ -158,6 +158,38 @@ describe('§4.2 overdue の山崩し', () => {
   it('同点なら kcId で決定的に並ぶ（再実行で順序が変わらない）', () => {
     const cs = [cand('z'), cand('a'), cand('m')]
     expect(dailyQueue(cs, T0, 80).map(c => c.kcId)).toEqual(['a', 'm', 'z'])
+  })
+
+  it('復習はノルマが 0 でも必ず出る（SM-2 が今日と言っている分）', () => {
+    const cs = [cand('r1'), cand('r2')]
+    expect(dailyQueue(cs, T0, DEFAULT_MAX_DAILY, 0)).toHaveLength(2)
+  })
+
+  it('新規学習はノルマの範囲でしか投入しない（初日に全部入れない）', () => {
+    const cs = Array.from({ length: 50 }, (_, i) => cand(`n${i}`, { isNew: true }))
+    expect(dailyQueue(cs, T0, DEFAULT_MAX_DAILY, 3)).toHaveLength(3)
+    expect(dailyQueue(cs, T0, DEFAULT_MAX_DAILY, 0)).toHaveLength(0)
+  })
+
+  it('復習が先、そのあと新規。合計は上限で打ち切る', () => {
+    const cs = [
+      ...Array.from({ length: 6 }, (_, i) => cand(`r${i}`)),
+      ...Array.from({ length: 20 }, (_, i) => cand(`n${i}`, { isNew: true })),
+    ]
+    const q = dailyQueue(cs, T0, 10, 100)
+    expect(q).toHaveLength(10)
+    expect(q.slice(0, 6).every(c => !c.isNew)).toBe(true)
+    expect(q.slice(6).every(c => c.isNew)).toBe(true)
+  })
+
+  it('復習だけで上限に達したら新規は入れない', () => {
+    const cs = [
+      ...Array.from({ length: 30 }, (_, i) => cand(`r${i}`)),
+      cand('new', { isNew: true }),
+    ]
+    const q = dailyQueue(cs, T0, 10, 100)
+    expect(q).toHaveLength(10)
+    expect(q.some(c => c.isNew)).toBe(false)
   })
 
   it('urgency は締切超過で 1、14 日以上先で 0', () => {
