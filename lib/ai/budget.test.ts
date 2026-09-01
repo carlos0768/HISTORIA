@@ -82,8 +82,8 @@ dbSuite('§7.1 遮断器（実DB）', () => {
     await res(9_990)
     await expect(res(20)).rejects.toBeInstanceOf(BudgetExceededError)
     // 拒否された予約は元帳にも載らない
-    const [{ count }] = await db<{ count: string }[]>`SELECT count(*) FROM ai_spend WHERE period = ${P}`
-    expect(Number(count)).toBe(1)
+    const rows = await db<{ count: string }[]>`SELECT count(*) FROM ai_spend WHERE period = ${P}`
+    expect(Number(rows[0]!.count)).toBe(1)
   })
 
   it('境界ちょうど（9,990 + 10 = 10,000）は通る', async () => {
