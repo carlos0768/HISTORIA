@@ -1,0 +1,611 @@
+-- =====================================================================
+-- HISTORIA — PostgreSQL スキーマ v0.2
+-- 仕様の詳細は docs/03-data-model.md および各章を参照
+--
+-- 前提: PostgreSQL 15+ / Supabase
+-- 拡張: vector (pgvector), pgroonga（日本語全文検索・Phase2）
+--
+-- 検証: psql -f docs/schema.sql
+-- =====================================================================
+
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- =====================================================================
+-- 1. マスタ（facet）        docs/02-domain-model.md §4
+-- =====================================================================
+
+-- 測定用の粗い時代グリッド。教科書の章立てとは独立（§4.1）
+CREATE TABLE era (
+  id         smallint PRIMARY KEY,
+  label      text     NOT NULL,
+  start_year int      NOT NULL,          -- 負値は紀元前
+  end_year   int      NOT NULL,
+  ord        smallint NOT NULL,
+  CHECK (end_year > start_year)
+);
+
+-- 地域の階層マスタ。grid_id は診断テスト用の粗グリッド（4値）
+CREATE TABLE region (
+  id        smallint PRIMARY KEY,
+  label     text     NOT NULL,
+  parent_id smallint REFERENCES region(id),
+  grid_id   smallint NOT NULL CHECK (grid_id BETWEEN 1 AND 4),
+  ord       smallint NOT NULL
+);
+
+CREATE TABLE person (
+  id      int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  label   text     NOT NULL UNIQUE,
+  aliases text[]   NOT NULL DEFAULT '{}',   -- 「フビライ/クビライ」等の表記ゆれ
+  era_id  smallint REFERENCES era(id)
+);
+
+-- 教科書の部・章・節。集中特訓の範囲指定と教材の生成単位（§4.4）
+CREATE TABLE syllabus_unit (
+  id        text     PRIMARY KEY,           -- 'wh.2.4.1'
+  subject   text     NOT NULL CHECK (subject IN ('world_history','general_history')),
+  parent_id text     REFERENCES syllabus_unit(id),
+  level     smallint NOT NULL CHECK (level BETWEEN 1 AND 3),  -- 1=部 2=章 3=節
+  label     text     NOT NULL,
+  ord       smallint NOT NULL
+);
+CREATE INDEX ON syllabus_unit (parent_id, ord);
+
+-- =====================================================================
+-- 2. 知識単位 KC           docs/02-domain-model.md §1, §7
+-- =====================================================================
+
+CREATE TABLE kc (
+  id              text PRIMARY KEY,          -- 'kc.islam.umayyad_vs_abbasid'
+  label           text NOT NULL,
+  kind            text NOT NULL
+                  CHECK (kind IN ('fact','distinction','causal','chronology','geo')),
+  era_id          smallint REFERENCES era(id),
+  person_id       int      REFERENCES person(id),
+  year_from       int,
+  year_to         int,
+  year_precision  text CHECK (year_precision IN ('exact','decade','century','unknown')),
+  prereq_ids      text[]  NOT NULL DEFAULT '{}',
+  exam_weight     real    NOT NULL DEFAULT 1.0 CHECK (exam_weight >= 0),
+  base_difficulty real    NOT NULL DEFAULT 0.0,
+  embedding       vector(768),
+  retired         boolean NOT NULL DEFAULT false,
+  created_at      timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX ON kc (era_id) WHERE NOT retired;
+CREATE INDEX ON kc (person_id) WHERE person_id IS NOT NULL;
+CREATE INDEX ON kc USING hnsw (embedding vector_cosine_ops);
+
+-- KC と地域は多対多。対外関係史は単一地域に属さない（§6）
+CREATE TABLE kc_region (
+  kc_id      text     NOT NULL REFERENCES kc(id) ON DELETE CASCADE,
+  region_id  smallint NOT NULL REFERENCES region(id),
+  is_primary boolean  NOT NULL DEFAULT false,
+  PRIMARY KEY (kc_id, region_id)
+);
+CREATE UNIQUE INDEX kc_region_one_primary ON kc_region (kc_id) WHERE is_primary;
+
+CREATE TABLE kc_syllabus_unit (
+  kc_id   text NOT NULL REFERENCES kc(id) ON DELETE CASCADE,
+  unit_id text NOT NULL REFERENCES syllabus_unit(id),
+  PRIMARY KEY (kc_id, unit_id)
+);
+CREATE INDEX ON kc_syllabus_unit (unit_id);
+
+-- LLM が新KCを必要としたときの提案キュー。作者承認制（§5）
+CREATE TABLE kc_proposal (
+  id            bigserial PRIMARY KEY,
+  label         text NOT NULL,
+  rationale     text,
+  nearest_kc_id text REFERENCES kc(id),
+  similarity    real,
+  proposed_by   text NOT NULL
+                CHECK (proposed_by IN ('material_gen','item_gen','user_report','author')),
+  status        text NOT NULL DEFAULT 'pending'
+                CHECK (status IN ('pending','approved','merged','rejected')),
+  created_at    timestamptz NOT NULL DEFAULT now()
+);
+
+-- KC を統合したときの写像。response の再生時に使う
+CREATE TABLE kc_merge (
+  from_id   text PRIMARY KEY REFERENCES kc(id),
+  to_id     text NOT NULL   REFERENCES kc(id),
+  merged_at timestamptz NOT NULL DEFAULT now(),
+  CHECK (from_id <> to_id)
+);
+
+-- ファクトチェック層2の正典マスタ  docs/08-ai-architecture.md §5
+CREATE TABLE canon_event (
+  id         text PRIMARY KEY,
+  label      text NOT NULL,
+  aliases    text[]   NOT NULL DEFAULT '{}',
+  year_from  int      NOT NULL,
+  year_to    int,
+  precision  text     NOT NULL CHECK (precision IN ('exact','decade','century')),
+  region_ids smallint[] NOT NULL DEFAULT '{}'
+);
+
+-- =====================================================================
+-- 3. ユーザー              docs/10-legal-risk.md §5.2
+-- =====================================================================
+
+-- Supabase では id は auth.users(id) を参照する。
+-- 単体検証のため本ファイルでは外部参照を張らない。
+CREATE TABLE app_user (
+  id                        uuid PRIMARY KEY,
+  display_name              text,
+  birth_date                date NOT NULL,
+  -- サインアップ時に算出して固定する。CHECK に CURRENT_DATE は使えないため（STABLE 関数）
+  guardian_consent_required boolean NOT NULL,
+  guardian_email            text,
+  guardian_consent_at       timestamptz,
+  consent_version           text NOT NULL,
+  consent_at                timestamptz NOT NULL,
+  invited_by                uuid REFERENCES app_user(id),
+  monthly_token_budget      int  NOT NULL DEFAULT 200000,
+  created_at                timestamptz NOT NULL DEFAULT now(),
+  CHECK (
+    NOT guardian_consent_required
+    OR (guardian_email IS NOT NULL AND guardian_consent_at IS NOT NULL)
+  )
+);
+
+-- 招待制の担保  docs/10-legal-risk.md §3.2 G1/G7
+CREATE TABLE invite_code (
+  code       text PRIMARY KEY,
+  issued_by  uuid REFERENCES app_user(id),
+  used_by    uuid REFERENCES app_user(id),
+  used_at    timestamptz,
+  expires_at timestamptz NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- 学習継続（ストリーク）  docs/11-ux.md
+CREATE TABLE user_activity (
+  user_id       uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  activity_date date NOT NULL,
+  responses     int  NOT NULL DEFAULT 0,
+  sections_read int  NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id, activity_date)
+);
+
+-- =====================================================================
+-- 4. 教材                  docs/07-content-pipeline.md
+-- =====================================================================
+
+-- 共有カタログ。user_id を持たない（§3.1）
+CREATE TABLE material (
+  id             uuid PRIMARY KEY,
+  unit_id        text NOT NULL REFERENCES syllabus_unit(id),
+  title          text NOT NULL,
+  model          text NOT NULL,
+  prompt_version text NOT NULL,
+  source         text NOT NULL DEFAULT 'ai_generated_no_external_text',
+  status         text NOT NULL DEFAULT 'draft'
+                 CHECK (status IN ('draft','approved','superseded','flagged')),
+  judge_scores   jsonb,                       -- LLM-as-judge の軸別スコア
+  supersedes_id  uuid REFERENCES material(id),
+  human_edit_log jsonb NOT NULL DEFAULT '[]'::jsonb,
+  input_tokens   int,
+  output_tokens  int,
+  cost_jpy       real,
+  generated_at   timestamptz NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX material_one_approved_per_unit
+  ON material (unit_id) WHERE status = 'approved';
+
+CREATE TABLE material_section (
+  id          uuid PRIMARY KEY,
+  material_id uuid NOT NULL REFERENCES material(id) ON DELETE CASCADE,
+  ord         smallint NOT NULL CHECK (ord BETWEEN 1 AND 7),
+  heading     text NOT NULL,
+  body_md     text NOT NULL,
+  char_count  int  NOT NULL,
+  hidden      boolean NOT NULL DEFAULT false,   -- 誤り報告で非表示にする
+  UNIQUE (material_id, ord)
+);
+
+CREATE TABLE material_section_kc (
+  section_id uuid NOT NULL REFERENCES material_section(id) ON DELETE CASCADE,
+  kc_id      text NOT NULL REFERENCES kc(id),
+  PRIMARY KEY (section_id, kc_id)
+);
+CREATE INDEX ON material_section_kc (kc_id);
+
+-- 読了は弱い学習イベント  docs/04-weakness-engine.md
+CREATE TABLE material_read (
+  id         bigserial PRIMARY KEY,
+  user_id    uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  section_id uuid NOT NULL REFERENCES material_section(id) ON DELETE CASCADE,
+  dwell_ms   int  NOT NULL,
+  scroll_pct real,
+  read_at    timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX ON material_read (user_id, section_id);
+
+-- 個人差分（200〜400字）  docs/07-content-pipeline.md §3.1
+CREATE TABLE material_personalization (
+  user_id      uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  material_id  uuid NOT NULL REFERENCES material(id) ON DELETE CASCADE,
+  body_md      text NOT NULL,
+  based_on_kcs text[] NOT NULL DEFAULT '{}',
+  generated_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, material_id)
+);
+
+-- =====================================================================
+-- 5. 設問 item             docs/06-assessment.md
+-- =====================================================================
+
+CREATE TABLE item (
+  id                      uuid PRIMARY KEY,
+  material_id             uuid REFERENCES material(id) ON DELETE SET NULL,
+  format                  text NOT NULL
+                          CHECK (format IN ('mcq4','cloze','tf','order','flashcard')),
+  stem                    text NOT NULL,
+  choices                 jsonb,             -- [{key,text,why_wrong}, ...]
+  answer_key              jsonb NOT NULL,
+  explanation             text,
+  guess_rate              real NOT NULL CHECK (guess_rate > 0 AND guess_rate < 1),
+  elo_b                   real NOT NULL DEFAULT 0.0,
+  elo_n                   int  NOT NULL DEFAULT 0,
+  generated_by            text,              -- model 名
+  prompt_version          text,
+  approved                boolean NOT NULL DEFAULT false,
+  hidden                  boolean NOT NULL DEFAULT false,
+  created_at              timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX ON item (material_id);
+CREATE INDEX ON item (format) WHERE approved AND NOT hidden;
+
+-- Q行列: item と KC の多対多
+CREATE TABLE item_kc (
+  item_id uuid NOT NULL REFERENCES item(id) ON DELETE CASCADE,
+  kc_id   text NOT NULL REFERENCES kc(id),
+  weight  real NOT NULL DEFAULT 1.0 CHECK (weight > 0),
+  PRIMARY KEY (item_id, kc_id)
+);
+CREATE INDEX ON item_kc (kc_id);
+
+-- =====================================================================
+-- 6. 集中特訓 drill        docs/05-scheduler.md
+-- =====================================================================
+
+CREATE TABLE drill (
+  id         uuid PRIMARY KEY,
+  user_id    uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  title      text NOT NULL,
+  deadline   date NOT NULL,
+  mode       text NOT NULL CHECK (mode IN ('ai_material','self_study')),
+  status     text NOT NULL DEFAULT 'active'
+             CHECK (status IN ('active','completed','abandoned')),
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX ON drill (user_id) WHERE status = 'active';
+
+CREATE TABLE drill_unit (
+  drill_id uuid NOT NULL REFERENCES drill(id) ON DELETE CASCADE,
+  unit_id  text NOT NULL REFERENCES syllabus_unit(id),
+  PRIMARY KEY (drill_id, unit_id)
+);
+
+CREATE TABLE drill_kc (
+  drill_id uuid NOT NULL REFERENCES drill(id) ON DELETE CASCADE,
+  kc_id    text NOT NULL REFERENCES kc(id),
+  PRIMARY KEY (drill_id, kc_id)
+);
+CREATE INDEX ON drill_kc (kc_id);
+
+-- 遅延評価したノルマのキャッシュ  docs/05-scheduler.md §7
+CREATE TABLE user_daily_plan (
+  user_id     uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  plan_date   date NOT NULL,
+  target      int  NOT NULL,
+  feasible    boolean NOT NULL,
+  shortfall   int  NOT NULL DEFAULT 0,
+  computed_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, plan_date)
+);
+
+-- =====================================================================
+-- 7. 学習の記録            docs/04-weakness-engine.md §4
+-- =====================================================================
+
+-- ★ 唯一の真実。UPDATE / DELETE を禁止する（RLS とアプリ層の両方で）
+CREATE TABLE response (
+  id                 bigserial PRIMARY KEY,
+  user_id            uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  item_id            uuid NOT NULL REFERENCES item(id),
+  session_kind       text NOT NULL
+                     CHECK (session_kind IN ('diagnostic','flashcard','quiz','checktest',
+                                             'video_retrieval','import')),
+  drill_id           uuid REFERENCES drill(id) ON DELETE SET NULL,
+  correct            boolean NOT NULL,
+  chosen             jsonb,
+  latency_ms         int,
+  q                  smallint CHECK (q BETWEEN 0 AND 5),
+  clamped            boolean NOT NULL DEFAULT false,
+  weight             real NOT NULL DEFAULT 1.0 CHECK (weight > 0 AND weight <= 1),
+  evidence_import_id uuid,
+  answered_at        timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX ON response (user_id, answered_at);
+CREATE INDEX ON response (user_id, item_id, answered_at DESC);
+
+-- 導出テーブル: KC 単位のマスタリー
+CREATE TABLE user_kc_state (
+  user_id          uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  kc_id            text NOT NULL REFERENCES kc(id),
+  theta            real NOT NULL DEFAULT -0.5,
+  p_know           real NOT NULL CHECK (p_know >= 0 AND p_know <= 1),
+  n_obs            int  NOT NULL DEFAULT 0,
+  n_eff            real NOT NULL DEFAULT 0,
+  last_seen_at     timestamptz,
+  first_correct_at timestamptz,
+  algo_version     smallint NOT NULL DEFAULT 1,
+  updated_at       timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, kc_id)
+);
+CREATE INDEX ON user_kc_state (user_id, p_know);
+
+-- 導出テーブル: item 単位のスケジュール（SM-2）  docs/04b-spaced-repetition.md
+CREATE TABLE card (
+  id             uuid PRIMARY KEY,
+  user_id        uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  item_id        uuid NOT NULL REFERENCES item(id) ON DELETE CASCADE,
+  n              int  NOT NULL DEFAULT 0,
+  ef             real NOT NULL DEFAULT 2.5 CHECK (ef >= 1.3),
+  interval_days  int  NOT NULL DEFAULT 0 CHECK (interval_days >= 0 AND interval_days <= 365),
+  due_at         timestamptz NOT NULL,
+  last_review_at timestamptz,
+  lapses         int  NOT NULL DEFAULT 0,
+  suspended      boolean NOT NULL DEFAULT false,
+  sched_algo     text NOT NULL DEFAULT 'sm2',
+  sched_version  smallint NOT NULL DEFAULT 1,
+  UNIQUE (user_id, item_id)
+);
+CREATE INDEX ON card (user_id, due_at) WHERE NOT suspended;
+
+-- 導出テーブル: 反復して選ばれた誤答
+CREATE TABLE misconception (
+  user_id        uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  kc_id          text NOT NULL REFERENCES kc(id),
+  distractor_key text NOT NULL,
+  hits           smallint NOT NULL DEFAULT 1,
+  last_at        timestamptz NOT NULL DEFAULT now(),
+  resolved_at    timestamptz,
+  PRIMARY KEY (user_id, kc_id, distractor_key)
+);
+
+-- 確認テストのセッション
+CREATE TABLE check_test (
+  id           uuid PRIMARY KEY,
+  user_id      uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  drill_id     uuid NOT NULL REFERENCES drill(id) ON DELETE CASCADE,
+  item_ids     uuid[] NOT NULL,
+  raw_score    smallint,
+  total        smallint NOT NULL,
+  verdict      text CHECK (verdict IN ('pass','almost','retry')),
+  progress_after real,
+  started_at   timestamptz NOT NULL DEFAULT now(),
+  finished_at  timestamptz
+);
+CREATE INDEX ON check_test (user_id, drill_id, started_at DESC);
+
+-- =====================================================================
+-- 8. 動画                  docs/09b-video.md
+-- =====================================================================
+
+CREATE TABLE channel_allowlist (
+  channel_id    text PRIMARY KEY,
+  channel_title text NOT NULL,
+  subject_scope text NOT NULL
+                CHECK (subject_scope IN ('world_history','japanese_history','both')),
+  note          text,
+  added_at      timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE video (
+  id              text PRIMARY KEY,
+  title           text NOT NULL,
+  description     text,
+  channel_id      text NOT NULL REFERENCES channel_allowlist(channel_id),
+  duration_sec    int  NOT NULL CHECK (duration_sec > 0),
+  published_at    timestamptz,
+  embeddable      boolean NOT NULL,
+  yt_rating       text,
+  status          text NOT NULL DEFAULT 'candidate'
+                  CHECK (status IN ('candidate','approved','rejected','unavailable')),
+  reject_reason   text,
+  approved_at     timestamptz,
+  last_checked_at timestamptz,
+  embedding       vector(768),
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  -- 年齢制限・埋め込み禁止の動画は approved にできない
+  CHECK (status <> 'approved' OR (embeddable AND yt_rating IS DISTINCT FROM 'ytAgeRestricted'))
+);
+CREATE INDEX ON video (status) WHERE status = 'approved';
+CREATE INDEX ON video USING hnsw (embedding vector_cosine_ops);
+
+CREATE TABLE video_kc (
+  video_id  text NOT NULL REFERENCES video(id) ON DELETE CASCADE,
+  kc_id     text NOT NULL REFERENCES kc(id),
+  start_sec int  NOT NULL DEFAULT 0 CHECK (start_sec >= 0),
+  end_sec   int,
+  relevance real NOT NULL DEFAULT 1.0 CHECK (relevance >= 0 AND relevance <= 1),
+  source    text NOT NULL DEFAULT 'embedding' CHECK (source IN ('embedding','manual')),
+  PRIMARY KEY (video_id, kc_id, start_sec),
+  CHECK (end_sec IS NULL OR end_sec > start_sec)
+);
+CREATE INDEX ON video_kc (kc_id, relevance DESC);
+
+CREATE TABLE video_view (
+  id           bigserial PRIMARY KEY,
+  user_id      uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  video_id     text NOT NULL REFERENCES video(id) ON DELETE CASCADE,
+  watched_sec  int  NOT NULL CHECK (watched_sec >= 0),
+  duration_sec int  NOT NULL,
+  viewed_at    timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX ON video_view (user_id, viewed_at DESC);
+
+-- =====================================================================
+-- 9. 過去問（Phase2。スキーマのみ先に確定）  docs/10-legal-risk.md §3.3
+-- =====================================================================
+
+CREATE TABLE past_exam (
+  id         uuid PRIMARY KEY,
+  university text NOT NULL,
+  faculty    text,
+  year       smallint NOT NULL,
+  sitting    text,
+  subject    text NOT NULL,
+  source_url text,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- ★ 1問を要素に分解する。1カラムに丸ごと入れると部分マスキングが不可能になる
+CREATE TABLE past_exam_element (
+  id            uuid PRIMARY KEY,
+  exam_id       uuid NOT NULL REFERENCES past_exam(id) ON DELETE CASCADE,
+  question_no   text NOT NULL,
+  element_kind  text NOT NULL
+                CHECK (element_kind IN ('stem','lead_text','source_material',
+                                        'figure','choices','answer')),
+  ord           smallint NOT NULL,
+  body          text,
+  rights_status text NOT NULL DEFAULT 'needs_permission'
+                CHECK (rights_status IN ('self_made','public_domain','licensed',
+                                         'needs_permission','withheld')),
+  rights_source text,
+  withheld_note text,
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  -- 権利未処理・保留の要素は本文を保持しない
+  CHECK (rights_status IN ('self_made','public_domain','licensed') OR body IS NULL)
+);
+CREATE INDEX ON past_exam_element (exam_id, question_no, ord);
+CREATE INDEX ON past_exam_element (rights_status);
+
+CREATE TABLE past_exam_kc (
+  exam_id     uuid NOT NULL REFERENCES past_exam(id) ON DELETE CASCADE,
+  question_no text NOT NULL,
+  kc_id       text NOT NULL REFERENCES kc(id),
+  PRIMARY KEY (exam_id, question_no, kc_id)
+);
+
+-- =====================================================================
+-- 10. 画像取り込み（Phase2）  docs/04-weakness-engine.md §6
+-- =====================================================================
+
+CREATE TABLE evidence_import (
+  id           uuid PRIMARY KEY,
+  user_id      uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  kind         text NOT NULL
+               CHECK (kind IN ('score_report','marked_answer_sheet','handwritten')),
+  storage_path text,                       -- 抽出後に NULL にする
+  purge_after  date NOT NULL,
+  vision_model text NOT NULL,
+  raw_json     jsonb NOT NULL,
+  status       text NOT NULL DEFAULT 'pending_review'
+               CHECK (status IN ('pending_review','confirmed','rejected','expired')),
+  created_at   timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE evidence_claim (
+  id           bigserial PRIMARY KEY,
+  import_id    uuid NOT NULL REFERENCES evidence_import(id) ON DELETE CASCADE,
+  kc_id        text REFERENCES kc(id),
+  facet_hint   jsonb,
+  claim        text NOT NULL CHECK (claim IN ('wrong','right','low_rate')),
+  chosen_key   text,
+  conf         real NOT NULL CHECK (conf >= 0 AND conf <= 1),
+  bbox         jsonb,
+  user_verdict text CHECK (user_verdict IN ('accept','reject','edit')),
+  applied_at   timestamptz
+);
+
+ALTER TABLE response
+  ADD CONSTRAINT response_evidence_import_fk
+  FOREIGN KEY (evidence_import_id) REFERENCES evidence_import(id) ON DELETE SET NULL;
+
+-- =====================================================================
+-- 11. 運用                 docs/08-ai-architecture.md §4, §5
+-- =====================================================================
+
+CREATE TABLE generation_job (
+  id            uuid PRIMARY KEY,
+  user_id       uuid REFERENCES app_user(id) ON DELETE CASCADE,
+  kind          text NOT NULL
+                CHECK (kind IN ('material','personalization','scope_parse','judge','factcheck')),
+  scope_id      text NOT NULL,
+  params_hash   text NOT NULL,
+  status        text NOT NULL DEFAULT 'queued'
+                CHECK (status IN ('queued','running','succeeded','failed','cancelled')),
+  attempts      smallint NOT NULL DEFAULT 0,
+  batch_id      text,
+  input_tokens  int,
+  output_tokens int,
+  cost_jpy      real,
+  error         text,
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  finished_at   timestamptz,
+  UNIQUE (user_id, kind, scope_id, params_hash)
+);
+
+CREATE TABLE content_report (
+  id          bigserial PRIMARY KEY,
+  user_id     uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  target_kind text NOT NULL CHECK (target_kind IN ('material_section','item')),
+  target_id   uuid NOT NULL,
+  comment     text,
+  status      text NOT NULL DEFAULT 'open'
+              CHECK (status IN ('open','confirmed','dismissed','fixed')),
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX ON content_report (status) WHERE status = 'open';
+
+-- =====================================================================
+-- 12. ビュー
+-- =====================================================================
+
+-- 弱点の根拠を引く（説明可能性）  docs/04-weakness-engine.md §4.3
+CREATE VIEW v_weakness_evidence AS
+SELECT r.user_id, ik.kc_id, r.answered_at, r.correct, r.chosen,
+       i.stem, i.format, r.session_kind, r.latency_ms
+FROM response r
+JOIN item    i  ON i.id = r.item_id
+JOIN item_kc ik ON ik.item_id = i.id;
+
+-- =====================================================================
+-- 13. RLS（Supabase）
+--     所有者のみが自分の行を読み書きできる。
+--     マスタ系（era/region/kc/material/item/video）は全認証ユーザーが読み取り可・書き込み不可。
+-- =====================================================================
+
+ALTER TABLE app_user                 ENABLE ROW LEVEL SECURITY;
+ALTER TABLE drill                    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE drill_kc                 ENABLE ROW LEVEL SECURITY;
+ALTER TABLE drill_unit               ENABLE ROW LEVEL SECURITY;
+ALTER TABLE response                 ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_kc_state            ENABLE ROW LEVEL SECURITY;
+ALTER TABLE card                     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE misconception            ENABLE ROW LEVEL SECURITY;
+ALTER TABLE check_test               ENABLE ROW LEVEL SECURITY;
+ALTER TABLE material_read            ENABLE ROW LEVEL SECURITY;
+ALTER TABLE material_personalization ENABLE ROW LEVEL SECURITY;
+ALTER TABLE video_view               ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_activity            ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_daily_plan          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE evidence_import          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE content_report           ENABLE ROW LEVEL SECURITY;
+
+-- 代表例。他の user_id を持つテーブルにも同型のポリシーを張る。
+-- ★ response は SELECT と INSERT のみ。UPDATE / DELETE のポリシーを作らない（追記専用）
+CREATE POLICY response_select ON response
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY response_insert ON response
+  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+
+CREATE POLICY drill_all ON drill
+  FOR ALL USING (user_id = (SELECT auth.uid()))
+  WITH CHECK (user_id = (SELECT auth.uid()));
