@@ -576,6 +576,55 @@ CREATE TABLE generation_job (
 -- 無料枠の RPM を守るため、running を数えて同時実行を絞る（08-ai-architecture.md §7）
 CREATE INDEX ON generation_job (status, created_at) WHERE status IN ('queued','running');
 
+-- ---------------------------------------------------------------------
+-- 支出遮断器（08-ai-architecture.md §7.1）
+-- 月の支出が上限に達したら課金呼び出しを止める。作者の決定「1万円を超えたら即停止」。
+-- ★ 金額に float を使わない。numeric で持つ。
+-- ---------------------------------------------------------------------
+
+-- 月ごとの1行。遮断の判定はこの1行の UPDATE で原子的に行う（§7.1 の関門クエリ）
+CREATE TABLE ai_budget (
+  period        date PRIMARY KEY,                    -- 月初（Asia/Tokyo）
+  cap_jpy       numeric(10,2) NOT NULL DEFAULT 10000 CHECK (cap_jpy > 0),
+  warn_jpy      numeric(10,2) NOT NULL DEFAULT 5000  CHECK (warn_jpy > 0),
+  degrade_jpy   numeric(10,2) NOT NULL DEFAULT 8000  CHECK (degrade_jpy > 0),
+  reserved_jpy  numeric(12,4) NOT NULL DEFAULT 0     CHECK (reserved_jpy >= 0),
+  settled_jpy   numeric(12,4) NOT NULL DEFAULT 0     CHECK (settled_jpy  >= 0),
+  halted        boolean NOT NULL DEFAULT false,
+  halted_at     timestamptz,
+  halted_reason text CHECK (halted_reason IN ('cap_exceeded','manual','provider_error')),
+  CHECK (warn_jpy <= degrade_jpy AND degrade_jpy <= cap_jpy),
+  -- 停止した理由と時刻が分からない停止を作らせない
+  CHECK (NOT halted OR (halted_at IS NOT NULL AND halted_reason IS NOT NULL))
+);
+
+-- 課金呼び出しの元帳。1行 = 1呼び出し。reserved（発行前）→ settled（確定）
+-- est_jpy は「上限見積り」であり actual_jpy はこれを超えない（§7.1 の前提: max_output_tokens 必須）
+CREATE TABLE ai_spend (
+  id            bigserial PRIMARY KEY,
+  period        date NOT NULL REFERENCES ai_budget(period),
+  job_id        uuid REFERENCES generation_job(id) ON DELETE SET NULL,
+  provider      text NOT NULL,
+  model         text NOT NULL,
+  purpose       text NOT NULL
+                CHECK (purpose IN ('generate','factcheck','judge','diagnostic','embed','scope_parse')),
+  state         text NOT NULL DEFAULT 'reserved'
+                CHECK (state IN ('reserved','settled','released')),
+  est_jpy       numeric(10,4) NOT NULL CHECK (est_jpy >= 0),
+  actual_jpy    numeric(10,4) CHECK (actual_jpy >= 0),
+  input_tokens  int, output_tokens int,
+  jpy_per_usd   numeric(6,2) NOT NULL,               -- 換算に使った為替。後から再計算できるように残す
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  settled_at    timestamptz,
+  -- 確定したのに金額が無い、という行を作らせない
+  CHECK (state <> 'settled' OR (actual_jpy IS NOT NULL AND settled_at IS NOT NULL)),
+  -- 見積りを超える確定は設計上ありえない。起きたら見積り式のバグなので落とす
+  CHECK (actual_jpy IS NULL OR actual_jpy <= est_jpy)
+);
+CREATE INDEX ON ai_spend (period, state);
+-- 予約したまま確定していない行の回収（プロセス異常終了で予約が漏れる。§7.1 の回収ジョブ）
+CREATE INDEX ai_spend_stale_reservation ON ai_spend (created_at) WHERE state = 'reserved';
+
 -- 管理画面から変更できるアプリ全体の設定（12-nonfunctional.md §7.1）
 -- ★ ここに置いてよいのは「変更しても過去のデータと矛盾しない値」だけ。
 --   guess / slip / mastery 閾値などの推定パラメータは置かない（04-weakness-engine.md §9）
@@ -636,7 +685,17 @@ ALTER TABLE user_daily_plan          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE evidence_import          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE content_report           ENABLE ROW LEVEL SECURITY;
 
--- ★ RLS を有効にしたテーブルには必ずポリシーを書く。
+-- ---- 運用テーブル（意図的に「全行拒否」にする。ポリシーを書かない） ----
+-- ★ ここだけは下の原則の例外である。利用者に見せる必要も書かせる必要も無い。
+--   ポリシーを1つも定義しないことで anon / authenticated からは一切読めなくなり、
+--   service_role（サーバー側）だけが RLS を迂回して読み書きする。
+--   遮断器の上限値をユーザーが読めても書けても困るので、これが正しい状態である。
+--   将来この3テーブルに「ポリシーが無い」と指摘されても、追加してはならない。
+ALTER TABLE app_setting              ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ai_budget                ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ai_spend                 ENABLE ROW LEVEL SECURITY;
+
+-- ★ RLS を有効にしたテーブルには必ずポリシーを書く（直上の運用3テーブルを除く）。
 --   ポリシーが1つも無いテーブルは「全行アクセス拒否」になり、アプリが一切動かない。
 --
 -- 方針:
