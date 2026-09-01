@@ -143,6 +143,8 @@ CREATE TABLE app_user (
   consent_at                timestamptz NOT NULL,
   invited_by                uuid REFERENCES app_user(id),
   daily_generation_quota    smallint NOT NULL DEFAULT 10,   -- 1日に生成できる教材ユニット数（08 §7）
+  -- ★ 出題の1日上限。ユーザー自身と管理画面の両方から変更できる（05-scheduler.md §9.1）
+  max_daily_items           smallint NOT NULL DEFAULT 80 CHECK (max_daily_items BETWEEN 10 AND 300),
   created_at                timestamptz NOT NULL DEFAULT now(),
   CHECK (
     NOT guardian_consent_required
@@ -183,8 +185,12 @@ CREATE TABLE material (
   model          text NOT NULL,
   prompt_version text NOT NULL,
   source         text NOT NULL DEFAULT 'ai_generated_no_external_text',
+  -- ready    : 事実確認を通過し表示できる
+  -- blocked  : 事実確認を通らなかったため配信しない（08-ai-architecture.md §5 層5）
+  -- failed   : 生成自体が失敗した（モデルの拒否・タイムアウト等）
   status         text NOT NULL DEFAULT 'generating'
-                 CHECK (status IN ('generating','ready','partial','superseded','failed')),
+                 CHECK (status IN ('generating','ready','blocked','superseded','failed')),
+  blocked_reason text,                        -- 検出された誤りの要約（作者が見る）
   judge_scores   jsonb,                       -- 開発時のベンチマークでのみ使う（§6.1）
   supersedes_id  uuid REFERENCES material(id),
   human_edit_log jsonb NOT NULL DEFAULT '[]'::jsonb,
@@ -194,7 +200,7 @@ CREATE TABLE material (
 );
 -- 1ユーザー・1単元につき、表示できる教材はちょうど1本
 CREATE UNIQUE INDEX material_one_ready_per_user_unit
-  ON material (user_id, unit_id) WHERE status IN ('ready','partial');
+  ON material (user_id, unit_id) WHERE status = 'ready';
 CREATE INDEX ON material (user_id, unit_id);
 
 CREATE TABLE material_section (
@@ -561,6 +567,17 @@ CREATE TABLE generation_job (
 );
 -- 無料枠の RPM を守るため、running を数えて同時実行を絞る（08-ai-architecture.md §7）
 CREATE INDEX ON generation_job (status, created_at) WHERE status IN ('queued','running');
+
+-- 管理画面から変更できるアプリ全体の設定（12-nonfunctional.md §7.1）
+-- ★ ここに置いてよいのは「変更しても過去のデータと矛盾しない値」だけ。
+--   guess / slip / mastery 閾値などの推定パラメータは置かない（04-weakness-engine.md §9）
+CREATE TABLE app_setting (
+  key         text PRIMARY KEY,
+  value       jsonb NOT NULL,
+  description text NOT NULL,
+  updated_by  uuid REFERENCES app_user(id),
+  updated_at  timestamptz NOT NULL DEFAULT now()
+);
 
 CREATE TABLE content_report (
   id          bigserial PRIMARY KEY,
