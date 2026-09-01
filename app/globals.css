@@ -1,0 +1,6 @@
+/* HISTORIA のスタイル。
+   意匠は docs/design/litverse.css と historia-overrides.css が唯一の真実であり、
+   ここではそれを読み込む順序だけを決める。トークンを再定義しない。
+   docs/11b-design-system.md */
+@import '../docs/design/litverse.css';
+@import '../docs/design/historia-overrides.css';

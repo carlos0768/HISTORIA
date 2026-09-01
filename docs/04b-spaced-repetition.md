@@ -159,7 +159,7 @@ SM-2 は「6段階の自己評価」を前提にしているが、本アプリ�
 
 ```python
 if correct:
-    q = 3 + round(2 * p_know_before(kc))       # <0.25→3 / 0.25-0.75→4 / >0.75→5
+    q = 3 + round(2 * p_know_before(kc))       # p<0.25→3 / 0.25<=p<0.75→4 / p>=0.75→5
     if latency_ms > 1.5 * median_latency_ms:
         q = max(3, q - 1)                      # 時間がかかった＝想起に苦労した
 else:

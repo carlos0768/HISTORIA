@@ -1,0 +1,38 @@
+{
+  "name": "historia",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.9"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:reset": "tsx scripts/db/reset.ts",
+    "db:seed": "tsx scripts/db/seed.ts",
+    "seed:validate": "node seed/validate.mjs"
+  },
+  "dependencies": {
+    "next": "16.3.4",
+    "postgres": "3.4.7",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "22.18.8",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.4",
+    "eslint": "9.39.1",
+    "eslint-config-next": "16.3.4",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vitest": "^3.2.7"
+  }
+}
