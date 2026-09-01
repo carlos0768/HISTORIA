@@ -260,8 +260,16 @@ CREATE TABLE item (
   provider         text,
   generated_by     text,                     -- model 名
   prompt_version   text,
+  -- ★ approved = 「出題してよい」。false のままの item は出題されない。
+  --   user_id 非NULL（ユーザー生成）: ファクトチェック通過時にサーバーが自動で true にする
+  --   user_id IS NULL（診断プール）  : 作者が手動レビューして true にする
+  --   誰が承認したかを approved_by に必ず残す（08-ai-architecture.md §5.3）
   approved         boolean NOT NULL DEFAULT false,
+  approved_by      text CHECK (approved_by IN ('factcheck','author')),
+  approved_at      timestamptz,
   hidden           boolean NOT NULL DEFAULT false,
+  hidden_reason    text CHECK (hidden_reason IN ('user_report','factcheck_flag','moderation')),
+  CHECK (NOT approved OR (approved_by IS NOT NULL AND approved_at IS NOT NULL)),
   created_at       timestamptz NOT NULL DEFAULT now(),
   CHECK (observed_correct <= observed_total)
 );
@@ -628,24 +636,87 @@ ALTER TABLE user_daily_plan          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE evidence_import          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE content_report           ENABLE ROW LEVEL SECURITY;
 
--- 代表例。他の user_id を持つテーブルにも同型のポリシーを張る。
--- ★ response は SELECT と INSERT のみ。UPDATE / DELETE のポリシーを作らない（追記専用）
+-- ★ RLS を有効にしたテーブルには必ずポリシーを書く。
+--   ポリシーが1つも無いテーブルは「全行アクセス拒否」になり、アプリが一切動かない。
+--
+-- 方針:
+--   SELECT  … 自分の行のみ（診断用の共有 item は全員が読める）
+--   INSERT  … ユーザーが自分で作るもの（応答・読了・視聴・特訓・誤り報告）のみ
+--   UPDATE / DELETE … 特訓の編集と削除のみ
+--   導出テーブル（user_kc_state / kc_card / misconception / user_activity /
+--   user_daily_plan / check_test）は SELECT のみ。書き込みはサーバー側
+--   （service_role）が行う。これが「response が唯一の真実」（03-data-model.md §2.2）
+--   をDB層で強制する。
+
+-- ---- 自分のアカウント（SELECT のみ。設定変更は Server Action 経由） ----
+-- 列単位の制限は RLS では書けないため、max_daily_items の変更などは
+-- service_role で動く Server Action に閉じる（guardian_consent_at 等を書き換えさせない）
+CREATE POLICY app_user_select ON app_user
+  FOR SELECT USING (id = (SELECT auth.uid()));
+
+-- ---- 追記専用ログ（UPDATE / DELETE のポリシーを作らない） ----
 CREATE POLICY response_select ON response
   FOR SELECT USING (user_id = (SELECT auth.uid()));
 CREATE POLICY response_insert ON response
   FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
 
+-- ---- ユーザーが作って編集できるもの ----
 CREATE POLICY drill_all ON drill
   FOR ALL USING (user_id = (SELECT auth.uid()))
   WITH CHECK (user_id = (SELECT auth.uid()));
 
--- material と item は「自分のもの」＋「診断用の共有プール（item.user_id IS NULL）」を読める。
--- 書き込みはサーバー側（service_role）のみ。ユーザーは教材も設問も直接作れない。
-CREATE POLICY material_select ON material
+-- drill_kc / drill_unit は user_id を持たないので drill 経由で判定する
+CREATE POLICY drill_kc_all ON drill_kc
+  FOR ALL USING (EXISTS (SELECT 1 FROM drill d
+                         WHERE d.id = drill_kc.drill_id AND d.user_id = (SELECT auth.uid())))
+  WITH CHECK (EXISTS (SELECT 1 FROM drill d
+                      WHERE d.id = drill_kc.drill_id AND d.user_id = (SELECT auth.uid())));
+CREATE POLICY drill_unit_all ON drill_unit
+  FOR ALL USING (EXISTS (SELECT 1 FROM drill d
+                         WHERE d.id = drill_unit.drill_id AND d.user_id = (SELECT auth.uid())))
+  WITH CHECK (EXISTS (SELECT 1 FROM drill d
+                      WHERE d.id = drill_unit.drill_id AND d.user_id = (SELECT auth.uid())));
+
+-- ---- ユーザーが追加できる記録（更新・削除はしない） ----
+CREATE POLICY material_read_select ON material_read
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY material_read_insert ON material_read
+  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+
+CREATE POLICY video_view_select ON video_view
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY video_view_insert ON video_view
+  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+
+CREATE POLICY content_report_select ON content_report
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY content_report_insert ON content_report
+  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+
+CREATE POLICY evidence_import_select ON evidence_import
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY evidence_import_insert ON evidence_import
+  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+
+-- ---- 導出テーブル（SELECT のみ。書き込みは service_role） ----
+CREATE POLICY user_kc_state_select ON user_kc_state
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY kc_card_select ON kc_card
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY misconception_select ON misconception
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY user_activity_select ON user_activity
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY user_daily_plan_select ON user_daily_plan
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY check_test_select ON check_test
   FOR SELECT USING (user_id = (SELECT auth.uid()));
 
+-- ---- 生成物（読むだけ。作るのはサーバー側） ----
+-- material と item は「自分のもの」＋「診断用の共有プール（item.user_id IS NULL）」を読める
+CREATE POLICY material_select ON material
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
 CREATE POLICY item_select ON item
   FOR SELECT USING (user_id IS NULL OR user_id = (SELECT auth.uid()));
-
 CREATE POLICY generation_job_select ON generation_job
   FOR SELECT USING (user_id = (SELECT auth.uid()));
