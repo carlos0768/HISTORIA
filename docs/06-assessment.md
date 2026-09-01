@@ -1,6 +1,10 @@
 # 06. 確認テスト・出題設計
 
-> 対象: HISTORIA MVP / 状態: 確定 / 最終更新: 2026-09-01
+> 対象: HISTORIA MVP / 状態: 確定（v0.3 で出題元を変更） / 最終更新: 2026-09-01
+>
+> **v0.2 からの変更**: 設問が共有カタログからユーザーごとの生成に変わった。
+> 出題は「その KC に対してそのユーザー用に生成済みの設問プール」から選ぶ
+> （`04b-spaced-repetition.md` §5）。
 
 ## 0. この文書が解く問題
 
@@ -56,16 +60,9 @@ def build_check_test(user, drill, today):
                + sample_without_replacement(strong_pool, N - round(N * 0.7))
 
     items = []
-    for kc in picked_kcs:                               # 同一KCから2問以上出さない
-        cands = [i for i in items_of(kc)
-                 if i.approved
-                 and not answered_within(user, i, days=14)]   # 逐語再認の回避
-        if not cands:
-            cands = [i for i in items_of(kc) if i.approved]   # 全部最近解いていたら妥協
-        if not cands:
-            continue
-        # 期待正答率が 0.6 に最も近い item を選ぶ（情報量が最大の帯）
-        items.append(min(cands, key=lambda i: abs(p_expected(user, kc, i) - 0.6)))
+    for kc in picked_kcs:                    # 同一KCから2問以上出さない
+        it = pick_item(user, kc)             # 04b-spaced-repetition.md §5
+        if it: items.append(it)
 
     return shuffle(items)
 ```
@@ -73,10 +70,16 @@ def build_check_test(user, drill, today):
 **弱点層だけから出さない**（0.7 : 0.3 の配分）。習得済みの層も測らないと
 「範囲を仕上げた」と言えないし、忘却の検出もできない。
 
-**`answered_within(user, item, days=14)` が本アプリ固有の重要なガードである。**
+**`pick_item()` は14日以内に解いた設問を避け、プールが尽きていれば新しい設問を生成する**
+（`04b-spaced-repetition.md` §5）。
+
 v0.1 は「教材を読む → 確認テスト」を連続した体験として設計していたが、
 教材直後に同じ内容を問うと**教材の逐語再認で正解でき、入試本番の初見問題への転移が起きない**。
-確認テストは「教材を読んだかの測定器」ではなく「知識が定着したかの測定器」でなければならない。
+
+**v0.3 で設問を毎回生成する方針にしたことで、この問題は構造的に緩和された。**
+同じ知識が毎回違う切り口で問われるため、問題文の丸暗記で正解できない。
+ただし教材と設問が同じ生成パスから出るため、
+**教材の表現がそのまま設問に写る可能性は残る**。§2.3 の時間差を併用する。
 
 ### 2.3 教材と確認テストの間に時間差を置く
 
@@ -178,6 +181,7 @@ item ─ item_kc ─ kc ─ material_section_kc ─ material_section ─ materia
 
 | 抜け道 | 対策 | 実装場所 |
 |---|---|---|
+| 同じ問題を覚えて答える | **設問が毎回変わる**（v0.3） | `04b` §5 |
 | 答えを見てから「わかった」を押す | 表示から 800ms 未満の「わかった／余裕」は `q = min(q, 3)` に丸める | `04b` §4.2 |
 | フラッシュカードだけを回す | `mastered` に客観形式での正解を必須にする | §4.1 |
 | 四択を連打して当てる | `n_eff += w·(1-g)` で証拠を割り引く | `04-weakness-engine.md` §1.2 |
@@ -248,7 +252,8 @@ distractor_explanations jsonb,             -- {"b": "アッバース朝は750年
 | 確認テストの問数 | `clip(ceil(|drill_kc| × 0.35), 10, 25)` |
 | 弱点層 : 習得層の配分 | 0.7 : 0.3 |
 | 弱点層の定義 | `mastery` 昇順で下位60% |
-| 再出題の禁止期間 | 14日 |
+| 再出題の禁止期間 | 14日（`04b` §5） |
+| 1 KC あたりの設問プール上限 | 12問（`04b` §5） |
 | 目標期待正答率 | 0.60 |
 | 教材読了 → 確認テストの待機 | 1日 |
 | 再テストの間隔 | 3日 |
