@@ -26,16 +26,36 @@ export function readSchema(opts: { pgvector: boolean }): string {
   return s
 }
 
-/** Supabase の auth.uid() をローカルで代替する。RLS ポリシーの構文を通すために要る */
+/**
+ * Supabase の auth.uid() をローカルで代替する。
+ * schema.sql の RLS ポリシーが auth.uid() を参照するので、これが無いと
+ * CREATE POLICY の時点で落ちる。
+ */
 export const AUTH_SHIM = `
 CREATE SCHEMA IF NOT EXISTS auth;
-CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$
+CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$
   SELECT nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
 $$;
 `
 
+/**
+ * auth.uid() が無ければ shim を作る。
+ *
+ * ★ pgvector の有無で判断してはいけない。CI は pgvector 入りのイメージを使うが
+ *   Supabase ではないので auth.uid() は無い。「pgvector があれば Supabase」は成り立たない。
+ * ★ CREATE OR REPLACE にしない。Supabase 上で実行したとき本物の auth.uid() を
+ *   上書きしてしまい、認証が壊れる。存在しないときだけ作る。
+ */
+export async function ensureAuthShim(db: Sql): Promise<boolean> {
+  const [row] = await db<{ present: boolean }[]>`
+    SELECT to_regprocedure('auth.uid()') IS NOT NULL AS present`
+  if (row?.present) return false
+  await db.unsafe(AUTH_SHIM)
+  return true
+}
+
 export async function applySchema(db: Sql, opts: { pgvector?: boolean; authShim?: boolean } = {}): Promise<void> {
   const pgvector = opts.pgvector ?? process.env.PGVECTOR !== 'off'
-  if (opts.authShim ?? !pgvector) await db.unsafe(AUTH_SHIM)
+  if (opts.authShim ?? true) await ensureAuthShim(db)
   await db.unsafe(readSchema({ pgvector }))
 }
