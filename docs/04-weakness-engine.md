@@ -1,6 +1,10 @@
 # 04. 弱点エンジン — 習熟度推定とアダプティブ設計
 
-> 対象: HISTORIA MVP / 状態: 確定 / 最終更新: 2026-09-01
+> 対象: HISTORIA MVP / 状態: 確定（v0.3 で Elo を縮小） / 最終更新: 2026-09-01
+>
+> **v0.2 からの変更**: 設問を毎回生成する方針になったため、
+> **Elo による item 難易度の較正を廃止**した（同じ item が二度と出ず観測が溜まらないため）。
+> 学習者の能力 θ の推定は診断テストの出題選択に必要なので残す。
 
 ## 0. この文書が解く問題
 
@@ -16,8 +20,12 @@ v0.1 は弱点保存について「**確認テストでユーザの弱点がわ�
 ## 1. 決定: BKT風ベイズ更新 ＋ Elo（パラメータは推定せず固定）
 
 **BKT の4パラメータをデータから推定するのをやめ、出題形式から決まる定数にハードコードする。**
-これで縮退問題も推定コストも消える。同時に Elo（学習者θと問題難易度bを同時更新）を回すことで、
-AI生成問題の難易度較正を運用しながら自動で行う。
+これで縮退問題も推定コストも消える。
+
+Elo は**学習者の能力 θ の更新のみ**に使う。v0.2 では item 難易度 `b` も同時更新して
+AI生成問題を較正する設計だったが、**設問を毎回生成する方針になったため廃止した**。
+同じ item が二度と出題されないので `elo_n` が溜まらず、較正が原理的に成立しない。
+θ は診断テストの出題選択（§5.2）に必要なので残す。
 
 ```
 guess (g):  四択 0.25 / 一問一答 0.05 / フラッシュカード 0.02 / 正誤判定 0.50
@@ -51,19 +59,21 @@ def on_response(user, item, correct, latency_ms):
         # --- 遭遇による学習 ---
         s.p_know = post + (1 - post) * 0.10
 
-        # --- Elo（θとbを同時更新。K は観測数で減衰＝初期は速く動き後で安定） ---
-        p_exp = g + (1 - g) * sigmoid(s.theta - item.elo_b)
-        Ku = 0.6 / (1 + 0.05 * s.n_obs)
-        Ki = 0.6 / (1 + 0.05 * item.elo_n)
-        s.theta    += w * Ku * (correct - p_exp)
-        item.elo_b -= w * Ki * (correct - p_exp)
+        # --- Elo（学習者 θ のみ更新。K は観測数で減衰＝初期は速く動き後で安定） ---
+        # item 難易度 b は較正できないため、KC の base_difficulty を代用する
+        b     = kc.base_difficulty
+        p_exp = g + (1 - g) * sigmoid(s.theta - b)
+        Ku    = 0.6 / (1 + 0.05 * s.n_obs)
+        s.theta += w * Ku * (correct - p_exp)
 
         # --- 実効証拠量（推測で当たった分を割り引く） ---
         s.n_eff += w * (1 - g) if correct else w
         s.n_obs += 1
         s.last_seen_at = now()
 
-    item.elo_n += 1
+    # 実測難易度（Elo の代替。04b §5.1）
+    item.observed_total   += 1
+    item.observed_correct += 1 if correct else 0
     return p_know_before
 ```
 
@@ -89,7 +99,7 @@ v0.1 は「弱点／そうでない」の二値を暗黙に前提していたが
 - **初見の問題を落とすのは弱点ではなく単なる未学習**
 
 ```
-retrievability(kc, t)  # 04b-spaced-repetition.md §5 の SM-2 由来の定義 0.9^(t/I)
+retrievability(kc, t)  # 04b-spaced-repetition.md §6 の SM-2 由来の定義 0.9^(t/I)
 mastery(kc, t) = p_know * retrievability(kc, t)
 
 status =
@@ -210,14 +220,40 @@ UI には必ず次の形で根拠を3件程度出す。
 v0.1 は流入経路として「AIによる自動判定か、ユーザの手動設定」を挙げていたが、
 AI自動判定の入力データが新規時点では存在しない。診断テストがこの閉路を断ち切る唯一の入口である。
 
-### 5.2 設計
+### 5.2 診断テスト専用の共有設問プール（v0.3 で追加）
 
-**出題プール**: `exam_weight` 上位のKCに紐づく `item` から、facet被覆を保証して選ぶ。
+**毎回生成にしたことで穴が開く。** 診断テストはサインアップ直後に走るが、
+その時点でそのユーザー用の設問は1問も生成されていない。
+かといってオンボーディングで2〜3分の生成待ちを課すのは致命的である。
+
+**決定: 診断テスト用の設問だけは、全ユーザー共通の固定プールにする。**
+
+```
+item.user_id IS NULL   →  共有プール（診断専用）
+item.user_id = <uuid>  →  そのユーザー用に生成された設問
+```
+
+これは「毎回生成」の例外だが、次の理由で正当化できる。
+
+| 理由 | 内容 |
+|---|---|
+| 診断は**測定器**であって学習教材ではない | 個人化する必要がない。むしろ全員に同じ物差しを当てる方が正しい |
+| **待たせない** | 生成待ちゼロで即座に始められる |
+| **人手レビューできる** | 診断の質が全ユーザーの初期値を決める。ここは品質を落とせない |
+| **Elo 較正が効く** | 同じ item が全ユーザーに出るので `elo_b` / `elo_n` が溜まる。§1 で廃止した較正が、診断プールに対してだけは成立する |
+
+規模: **12セル（3時代 × 4地域）× 各20問 = 240問**。作者が生成してレビューする（一度きり・約2人日）。
+`exam_weight` 上位のKCを被覆するように配分する。
+
+### 5.3 設計
+
+**出題プール**: 上記の共有プール（`item.user_id IS NULL`）から、facet被覆を保証して選ぶ。
 
 **選択規則**:
 ```
 next = argmax_i  facet_uncertainty(i) * 4 * p_i * (1 - p_i)
        ただし p_i = g + (1-g) * sigmoid(theta_cell(i) - item.elo_b)
+       （診断プールは共有・固定なので elo_b が較正される。§5.2）
 ```
 四択の情報量が最大になるのは `p ≈ 0.5〜0.6` 付近である。常に易問／難問ばかり出るのを防ぐ。
 
@@ -233,7 +269,7 @@ next = argmax_i  facet_uncertainty(i) * 4 * p_i * (1 - p_i)
 **伝播**: 診断で測れるのは**12セルのθ**であって個々のKCではない。
 診断終了時に、各KCの初期値を所属セル（`era_id` × `region.grid_id`）のθから与える。
 
-### 5.3 冷スタートの事前分布
+### 5.4 冷スタートの事前分布
 
 ```
 theta_0(user, cell) = -0.5                     # 診断前。やや低めに置いて過大評価を避ける
@@ -245,7 +281,7 @@ theta(kc) = theta_0(cell of kc)
 n_eff(kc) = 0                                  # ← 変えない
 ```
 
-### 5.4 診断で測っていないKCを弱点扱いしない
+### 5.5 診断で測っていないKCを弱点扱いしない
 
 `n_eff` を 0 のままにするため、診断直後の全KCは `status = 'unknown'` である。
 **診断結果は出題順の並べ替えにのみ使い、「弱点」として断定表示はしない。**
@@ -345,7 +381,7 @@ CREATE TABLE user_kc_state (
   user_id          uuid NOT NULL,
   kc_id            text NOT NULL REFERENCES kc(id),
   theta            real NOT NULL DEFAULT -0.5,
-  p_know           real NOT NULL,                     -- 冷スタート事前分布で初期化（§5.3）
+  p_know           real NOT NULL,                     -- 冷スタート事前分布で初期化（§5.4）
   n_obs            int  NOT NULL DEFAULT 0,
   n_eff            real NOT NULL DEFAULT 0,
   last_seen_at     timestamptz,
@@ -368,7 +404,7 @@ CREATE INDEX ON user_kc_state (user_id, p_know);
 | `slip` 通常 | 0.10 | 提案値 |
 | `slip` 即答誤答 | 0.25 | 提案値 |
 | `T_learn` | 0.10 | 提案値 |
-| Elo K 係数 | `0.6 / (1 + 0.05·n)` | 提案値 |
+| Elo K 係数（θ のみ） | `0.6 / (1 + 0.05·n)` | 提案値 |
 | `n_eff` unknown 閾値 | 1.5 | 提案値 |
 | `mastery` weak 閾値 | 0.60 | 提案値 |
 | `mastery` mastered 閾値 | 0.85 | 提案値 |

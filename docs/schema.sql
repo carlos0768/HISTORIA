@@ -1,5 +1,5 @@
 -- =====================================================================
--- HISTORIA — PostgreSQL スキーマ v0.2
+-- HISTORIA — PostgreSQL スキーマ v0.3
 -- 仕様の詳細は docs/03-data-model.md および各章を参照
 --
 -- 前提: PostgreSQL 15+ / Supabase
@@ -142,7 +142,7 @@ CREATE TABLE app_user (
   consent_version           text NOT NULL,
   consent_at                timestamptz NOT NULL,
   invited_by                uuid REFERENCES app_user(id),
-  monthly_token_budget      int  NOT NULL DEFAULT 200000,
+  daily_generation_quota    smallint NOT NULL DEFAULT 10,   -- 1日に生成できる教材ユニット数（08 §7）
   created_at                timestamptz NOT NULL DEFAULT now(),
   CHECK (
     NOT guardian_consent_required
@@ -173,26 +173,29 @@ CREATE TABLE user_activity (
 -- 4. 教材                  docs/07-content-pipeline.md
 -- =====================================================================
 
--- 共有カタログ。user_id を持たない（§3.1）
+-- ★ v0.3: ユーザーごとに生成する。(user_id, unit_id) で1本（§3.1）
 CREATE TABLE material (
   id             uuid PRIMARY KEY,
+  user_id        uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
   unit_id        text NOT NULL REFERENCES syllabus_unit(id),
   title          text NOT NULL,
+  provider       text NOT NULL,               -- 'gemini' | 'anthropic'
   model          text NOT NULL,
   prompt_version text NOT NULL,
   source         text NOT NULL DEFAULT 'ai_generated_no_external_text',
-  status         text NOT NULL DEFAULT 'draft'
-                 CHECK (status IN ('draft','approved','superseded','flagged')),
-  judge_scores   jsonb,                       -- LLM-as-judge の軸別スコア
+  status         text NOT NULL DEFAULT 'generating'
+                 CHECK (status IN ('generating','ready','partial','superseded','failed')),
+  judge_scores   jsonb,                       -- 開発時のベンチマークでのみ使う（§6.1）
   supersedes_id  uuid REFERENCES material(id),
   human_edit_log jsonb NOT NULL DEFAULT '[]'::jsonb,
   input_tokens   int,
   output_tokens  int,
-  cost_jpy       real,
   generated_at   timestamptz NOT NULL DEFAULT now()
 );
-CREATE UNIQUE INDEX material_one_approved_per_unit
-  ON material (unit_id) WHERE status = 'approved';
+-- 1ユーザー・1単元につき、表示できる教材はちょうど1本
+CREATE UNIQUE INDEX material_one_ready_per_user_unit
+  ON material (user_id, unit_id) WHERE status IN ('ready','partial');
+CREATE INDEX ON material (user_id, unit_id);
 
 CREATE TABLE material_section (
   id          uuid PRIMARY KEY,
@@ -201,7 +204,8 @@ CREATE TABLE material_section (
   heading     text NOT NULL,
   body_md     text NOT NULL,
   char_count  int  NOT NULL,
-  hidden      boolean NOT NULL DEFAULT false,   -- 誤り報告で非表示にする
+  hidden        boolean NOT NULL DEFAULT false,  -- 誤り報告 or ファクトチェックで非表示
+  hidden_reason text CHECK (hidden_reason IN ('user_report','factcheck_flag','moderation')),
   UNIQUE (material_id, ord)
 );
 
@@ -223,40 +227,43 @@ CREATE TABLE material_read (
 );
 CREATE INDEX ON material_read (user_id, section_id);
 
--- 個人差分（200〜400字）  docs/07-content-pipeline.md §3.1
-CREATE TABLE material_personalization (
-  user_id      uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
-  material_id  uuid NOT NULL REFERENCES material(id) ON DELETE CASCADE,
-  body_md      text NOT NULL,
-  based_on_kcs text[] NOT NULL DEFAULT '{}',
-  generated_at timestamptz NOT NULL DEFAULT now(),
-  PRIMARY KEY (user_id, material_id)
-);
-
 -- =====================================================================
 -- 5. 設問 item             docs/06-assessment.md
 -- =====================================================================
 
+-- ★ v0.3: user_id IS NULL = 診断テスト用の共有プール（04-weakness-engine.md §5.2）
+--          user_id 非NULL = そのユーザー用に生成された設問
 CREATE TABLE item (
-  id                      uuid PRIMARY KEY,
-  material_id             uuid REFERENCES material(id) ON DELETE SET NULL,
-  format                  text NOT NULL
-                          CHECK (format IN ('mcq4','cloze','tf','order','flashcard')),
-  stem                    text NOT NULL,
-  choices                 jsonb,             -- [{key,text,why_wrong}, ...]
-  answer_key              jsonb NOT NULL,
-  explanation             text,
-  guess_rate              real NOT NULL CHECK (guess_rate > 0 AND guess_rate < 1),
-  elo_b                   real NOT NULL DEFAULT 0.0,
-  elo_n                   int  NOT NULL DEFAULT 0,
-  generated_by            text,              -- model 名
-  prompt_version          text,
-  approved                boolean NOT NULL DEFAULT false,
-  hidden                  boolean NOT NULL DEFAULT false,
-  created_at              timestamptz NOT NULL DEFAULT now()
+  id               uuid PRIMARY KEY,
+  user_id          uuid REFERENCES app_user(id) ON DELETE CASCADE,
+  material_id      uuid REFERENCES material(id) ON DELETE SET NULL,
+  format           text NOT NULL
+                   CHECK (format IN ('mcq4','cloze','tf','order','flashcard')),
+  stem             text NOT NULL,
+  choices          jsonb,                    -- [{key,text,why_wrong}, ...]
+  answer_key       jsonb NOT NULL,
+  explanation      text,
+  guess_rate       real NOT NULL CHECK (guess_rate > 0 AND guess_rate < 1),
+  -- Elo は診断用の共有プール（user_id IS NULL）でのみ較正される。
+  -- ユーザーごとの設問は同じものが二度と出ないため溜まらない（04b §1.3）
+  elo_b            real NOT NULL DEFAULT 0.0,
+  elo_n            int  NOT NULL DEFAULT 0,
+  -- Elo の代替となる実測難易度（04b §5.1）
+  observed_correct int  NOT NULL DEFAULT 0,
+  observed_total   int  NOT NULL DEFAULT 0,
+  provider         text,
+  generated_by     text,                     -- model 名
+  prompt_version   text,
+  approved         boolean NOT NULL DEFAULT false,
+  hidden           boolean NOT NULL DEFAULT false,
+  created_at       timestamptz NOT NULL DEFAULT now(),
+  CHECK (observed_correct <= observed_total)
 );
 CREATE INDEX ON item (material_id);
-CREATE INDEX ON item (format) WHERE approved AND NOT hidden;
+CREATE INDEX ON item (user_id) WHERE user_id IS NOT NULL;
+-- 診断テスト用の共有プールを引くための索引
+CREATE INDEX item_diagnostic_pool ON item (format)
+  WHERE user_id IS NULL AND approved AND NOT hidden;
 
 -- Q行列: item と KC の多対多
 CREATE TABLE item_kc (
@@ -348,11 +355,11 @@ CREATE TABLE user_kc_state (
 );
 CREATE INDEX ON user_kc_state (user_id, p_know);
 
--- 導出テーブル: item 単位のスケジュール（SM-2）  docs/04b-spaced-repetition.md
-CREATE TABLE card (
-  id             uuid PRIMARY KEY,
+-- 導出テーブル: KC 単位のスケジュール（SM-2）  docs/04b-spaced-repetition.md §1.2
+-- ★ v0.3: 設問を毎回生成するため item 単位では状態が積み上がらない。KC 単位にした。
+CREATE TABLE kc_card (
   user_id        uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
-  item_id        uuid NOT NULL REFERENCES item(id) ON DELETE CASCADE,
+  kc_id          text NOT NULL REFERENCES kc(id),
   n              int  NOT NULL DEFAULT 0,
   ef             real NOT NULL DEFAULT 2.5 CHECK (ef >= 1.3),
   interval_days  int  NOT NULL DEFAULT 0 CHECK (interval_days >= 0 AND interval_days <= 365),
@@ -362,9 +369,9 @@ CREATE TABLE card (
   suspended      boolean NOT NULL DEFAULT false,
   sched_algo     text NOT NULL DEFAULT 'sm2',
   sched_version  smallint NOT NULL DEFAULT 1,
-  UNIQUE (user_id, item_id)
+  PRIMARY KEY (user_id, kc_id)
 );
-CREATE INDEX ON card (user_id, due_at) WHERE NOT suspended;
+CREATE INDEX ON kc_card (user_id, due_at) WHERE NOT suspended;
 
 -- 導出テーブル: 反復して選ばれた誤答
 CREATE TABLE misconception (
@@ -536,21 +543,24 @@ CREATE TABLE generation_job (
   id            uuid PRIMARY KEY,
   user_id       uuid REFERENCES app_user(id) ON DELETE CASCADE,
   kind          text NOT NULL
-                CHECK (kind IN ('material','personalization','scope_parse','judge','factcheck')),
+                CHECK (kind IN ('material','items_refresh','factcheck','scope_parse','judge')),
   scope_id      text NOT NULL,
   params_hash   text NOT NULL,
   status        text NOT NULL DEFAULT 'queued'
                 CHECK (status IN ('queued','running','succeeded','failed','cancelled')),
   attempts      smallint NOT NULL DEFAULT 0,
-  batch_id      text,
+  provider      text NOT NULL,
+  model         text NOT NULL,
   input_tokens  int,
   output_tokens int,
-  cost_jpy      real,
   error         text,
   created_at    timestamptz NOT NULL DEFAULT now(),
+  started_at    timestamptz,
   finished_at   timestamptz,
   UNIQUE (user_id, kind, scope_id, params_hash)
 );
+-- 無料枠の RPM を守るため、running を数えて同時実行を絞る（08-ai-architecture.md §7）
+CREATE INDEX ON generation_job (status, created_at) WHERE status IN ('queued','running');
 
 CREATE TABLE content_report (
   id          bigserial PRIMARY KEY,
@@ -588,11 +598,13 @@ ALTER TABLE drill_kc                 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE drill_unit               ENABLE ROW LEVEL SECURITY;
 ALTER TABLE response                 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_kc_state            ENABLE ROW LEVEL SECURITY;
-ALTER TABLE card                     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE kc_card                  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE misconception            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE check_test               ENABLE ROW LEVEL SECURITY;
 ALTER TABLE material_read            ENABLE ROW LEVEL SECURITY;
-ALTER TABLE material_personalization ENABLE ROW LEVEL SECURITY;
+ALTER TABLE material                 ENABLE ROW LEVEL SECURITY;
+ALTER TABLE item                     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE generation_job           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE video_view               ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_activity            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_daily_plan          ENABLE ROW LEVEL SECURITY;
@@ -609,3 +621,14 @@ CREATE POLICY response_insert ON response
 CREATE POLICY drill_all ON drill
   FOR ALL USING (user_id = (SELECT auth.uid()))
   WITH CHECK (user_id = (SELECT auth.uid()));
+
+-- material と item は「自分のもの」＋「診断用の共有プール（item.user_id IS NULL）」を読める。
+-- 書き込みはサーバー側（service_role）のみ。ユーザーは教材も設問も直接作れない。
+CREATE POLICY material_select ON material
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+
+CREATE POLICY item_select ON item
+  FOR SELECT USING (user_id IS NULL OR user_id = (SELECT auth.uid()));
+
+CREATE POLICY generation_job_select ON generation_job
+  FOR SELECT USING (user_id = (SELECT auth.uid()));

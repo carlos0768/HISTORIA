@@ -1,6 +1,10 @@
 # 05. 集中特訓スケジューラ仕様
 
-> 対象: HISTORIA MVP / 状態: 確定 / 最終更新: 2026-09-01
+> 対象: HISTORIA MVP / 状態: 確定（v0.3 で単位を KC に統一） / 最終更新: 2026-09-01
+>
+> **v0.2 からの変更**: スケジューリングの単位が `card (user, item)` から
+> `kc_card (user, kc)` に変わった（`04b-spaced-repetition.md` §1.2）。
+> これにより「KC単位で1回だけ数える」という重複計上の対処が不要になり、式が単純になった。
 
 ## 0. この文書が解く問題
 
@@ -36,12 +40,17 @@ CREATE TABLE drill_kc (
 );
 ```
 
-自前のキューを持たせない理由は `04b-spaced-repetition.md` §1 と同じである。
-「イスラーム史」と「近代ヨーロッパ」の両方が十字軍のKCを含んだ瞬間に、
-特訓ごとのキューだと**同じ問題が2回出題され、SM-2 の状態が2枚のカードに分裂して
-両方の間隔推定が壊れる**（各カードは相手の復習を知らないので、実際より短い間隔を出し続ける）。
+自前のキューを持たせない理由は次のとおりである。
+「イスラーム史」と「近代ヨーロッパ」の両方が十字軍のKCを含んだとき、特訓ごとのキューだと
+**同じ知識が2回出題され、SM-2 の状態が2つに分裂して両方の間隔推定が壊れる**
+（各々が相手の復習を知らないので、実際より短い間隔を出し続ける）。
 
-**出題は常に `card` を `due_at` 昇順で引き、drill はフィルタとしてのみ効く。**
+**スケジューリングの単位を KC にしたことで、この問題は構造的に消えた**
+（`04b-spaced-repetition.md` §1.2）。`kc_card` の主キーは `(user_id, kc_id)` であり、
+どの特訓から到達しても同じ1行を更新するため、分裂しようがない。
+
+**出題は常に `kc_card` を `due_at` 昇順で引き、drill はフィルタとしてのみ効く。**
+どの設問でその KC を問うかは、引いた後に決める（`04b-spaced-repetition.md` §5）。
 
 ## 2. 範囲の量の定量化
 
@@ -52,12 +61,11 @@ CREATE TABLE drill_kc (
 drill の範囲指定（ユーザー入力）
   → syllabus_unit の集合
   → kc_syllabus_unit 経由で KC 集合（drill_kc に確定保存）
-  → item_kc 経由で item 集合
-  → card 集合（user × item）
+  → kc_card 集合（user × kc）
 ```
 
-**分母は `card` の数ではなく「締切までに必要な復習回数の総和」である**（§3）。
-カード数で数えると、既に習得済みのカードと初見のカードが同じ重みになり、
+**分母は KC の数ではなく「締切までに必要な復習回数の総和」である**（§3）。
+KC数で数えると、既に習得済みの KC と初見の KC が同じ重みになり、
 「8割終わっているのに残量が減らない」状態になる。
 
 ## 3. 締切逆算の式
@@ -70,26 +78,27 @@ drill の範囲指定（ユーザー入力）
 BUFFER_DAYS = 3        # 締切の3日前に最後の復習を終える
 MAX_DAILY   = 80       # 1日の出題上限（提案値・要検証）
 
-def reps_left(card, deadline, today):
+def reps_left(c, deadline, today):          # c = kc_card
     I_need = (deadline - today).days - BUFFER_DAYS
-    if I_need <= 0:              return 1 if card.interval_days == 0 else 0
-    if card.interval_days >= I_need: return 0
-    if card.n == 0:  return 1 + ceil(log(I_need / 1) / log(card.ef))
-    if card.n == 1:  return 1 + ceil(log(I_need / 6) / log(card.ef))
-    return ceil(log(I_need / card.interval_days) / log(card.ef))
+    if I_need <= 0:                 return 1 if c.interval_days == 0 else 0
+    if c.interval_days >= I_need:   return 0
+    if c.n == 0:  return 1 + ceil(log(I_need / 1) / log(c.ef))
+    if c.n == 1:  return 1 + ceil(log(I_need / 6) / log(c.ef))
+    return ceil(log(I_need / c.interval_days) / log(c.ef))
 
 def remaining_reps(user, today):
-    # ★ KC単位で1回だけ数える。drill をまたいで重複計上しない
-    kcs = union(drill_kc[d] for d in active_drills(user))
+    kcs = union(drill_kc[d] for d in active_drills(user))   # union なので自然に重複が消える
     total = 0
     for kc in kcs:
         if status(user, kc) == 'mastered':
             continue
         earliest = min(d.deadline for d in active_drills(user) if kc in drill_kc[d])
-        for card in cards_of(user, kc):
-            total += reps_left(card, earliest, today)
+        total += reps_left(kc_card(user, kc), earliest, today)
     return total
 ```
+
+**v0.2 にあった「KC単位で1回だけ数える」という但し書きが不要になった。**
+スケジューリングの単位が KC そのものになったため、集合の union を取るだけで重複計上が消える。
 
 `ef` の下限が 1.3 なので `log(ef) > 0` が保証され、ゼロ除算は起きない。
 
@@ -145,7 +154,7 @@ def daily_plan(user, today):
 出題キューは常に MAX_DAILY 件で打ち切る。
 overdue カードの優先順位: overdue 日数の降順ではなく、以下のスコア降順とする。
 
-  priority(card) = 2.0 * is_misconception(kc)
+  priority(kc) = 2.0 * is_misconception(kc)
                  + 1.5 * urgency(earliest_deadline_of(kc))    # 締切が近いほど大
                  + 1.0 * (1 - mastery(kc))
                  + 0.5 * min(overdue_days / 14, 1.0)
@@ -163,10 +172,11 @@ v0.1 の「集中特訓は同時に複数取れる」を素直に実装すると
 
 ```
 daily_queue(user, today) =
-    全 active drill の KC の union に属する card のうち
-      (a) due_at <= today            … 復習
-      (b) card が存在しない item     … 新規学習
-    を priority 降順で並べ、MAX_DAILY 件で打ち切ったもの
+    全 active drill の KC の union に属する kc_card のうち
+      (a) due_at <= today                … 復習
+      (b) kc_card が存在しない KC        … 新規学習（初回は due_at = now で作る）
+    を priority 降順で並べ、MAX_DAILY 件で打ち切る。
+    各 KC について、実際に出す設問は 04b-spaced-repetition.md §5 の pick_item() で決める。
 ```
 
 ホームには「**今日やること: 42問**」と**1つの数字だけ**を出す。
@@ -175,7 +185,7 @@ daily_queue(user, today) =
 
 ### 5.2 範囲が重複した場合
 
-- `reps_left` は KC単位で1回だけ数える（§3）
+- `reps_left` は KC 単位で計算される（§3）。単位が KC なので重複計上は起きない
 - 締切は**最も早いものを採用**する（`earliest` in `remaining_reps`）
 - 特訓Aと特訓Bが同じKCを含む場合、そのKCが `mastered` になれば**両方の進捗が同時に進む**
 
@@ -254,7 +264,7 @@ cron は「**1日1通のリマインド通知**」にのみ使う。これなら
 | active な特訓が0件 | ホームは診断テストの結果に基づく「弱点KCの復習」キューを出す。空画面にしない |
 | 全KCが `mastered` | 「この範囲は仕上がっています」＋ 保持のための復習のみ（due のカードだけ） |
 | 締切を延ばした | 次回のホーム表示で `daily_plan()` が再計算され、自動的に緩む |
-| 特訓を削除した | `drill_kc` は消えるが `card` と `user_kc_state` は残る（KC層は特訓に依存しない）。学習履歴は失われない |
+| 特訓を削除した | `drill_kc` は消えるが `kc_card` と `user_kc_state` は残る（KC層は特訓に依存しない）。学習履歴は失われない |
 
 ## 9. パラメータ一覧（すべて提案値・要検証）
 
