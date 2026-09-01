@@ -25,7 +25,7 @@ v0.1 は5つの機能を並べていたが、**「そのコンテンツはどこ
 | `kc` | **800〜900** | AI が章ごとに提案 → 作者が1件ずつ承認 | 作者＋AI | **12** |
 | `person` | 約400 | KC 作成時に併せて登録 | 作者＋AI | （上記に含む） |
 | `canon_event`（正典マスタ） | **約3,000** | 年号・人物の正解値。**v0.2 の1,500件から倍増**（§下記） | 作者＋AI | **4** |
-| **診断テスト用の共有設問プール** | **240**（12セル × 20問） | AI 生成 → **作者が全件レビュー** | 作者＋AI | **2** |
+| **診断テスト用の共有設問プール** | **240**（12セル × 20問） | **課金モデル（Claude Sonnet 5）で生成**（約282円の一度きり）→ 作者が全件レビュー | 作者＋AI | **2** |
 | `channel_allowlist` | 10〜15 | 作者が手で選ぶ | 作者 | 0.5 |
 | `video` | 2,000〜3,000（候補）→ 承認 800〜1,200 | `playlistItems.list` で吸い上げ → 埋め込みで KC 対応付け → 作者承認 | 作者＋API | 3 |
 | ~~`material`（教材）~~ | — | **事前構築しない。** ユーザーが範囲を開いた時点で生成する | — | 0 |
@@ -56,6 +56,10 @@ Phase 0 で実測し、下回るならさらに追加する（`08-ai-architectur
 exam_weight 上位の KC を被覆するように配分する
 item.user_id IS NULL で保存する
 作者が全件をレビューする（診断の質が全ユーザーの初期値を決めるため）
+
+生成モデル: Claude Sonnet 5（課金・約282円の一度きり）
+  理由: 一度きりで全ユーザーの初期値を決めるため、ここは品質を落とさない。
+        金額も282円と小さい（08-ai-architecture.md §3.4）。
 ```
 
 **このプールでのみ Elo による難易度較正が成立する。** 同じ item が全ユーザーに出るため
@@ -248,7 +252,7 @@ scripts/
     01_masters.ts        -- era / region / person / syllabus_unit（CSV から投入）
     02_kc.ts             -- kc / kc_region / kc_syllabus_unit（承認済み CSV から投入）
     03_canon.ts          -- canon_event
-    04_diagnostic.ts     -- 診断テスト用の共有設問プール240問を生成（item.user_id = NULL）
+    04_diagnostic.ts     -- 診断用の共有設問プール240問を生成（課金モデル・item.user_id = NULL）
     05_judge.ts          -- LLM-as-judge による採点
     06_factcheck.ts      -- canon_event 照合 ＋ 二次ファクトチェック
     07_video.ts          -- channel_allowlist から候補収集 → 埋め込み → 対応付け
