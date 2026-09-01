@@ -31,6 +31,8 @@ v0.1（構想メモ 30行）を、着工可能な粒度まで具体化したも�
 | 09b | [YouTube動画の埋め込み](./09b-video.md) | クォータ設計 / 2クリック埋め込み / 視聴後retrieval |
 | 10 | [法務・リスク](./10-legal-risk.md) | 著作権 / `CONTENT_MODE` / 16歳未満の同意 |
 | 11 | [UX・情報設計](./11-ux.md) | ホーム再設計 / 空状態 / 教材ビューア / 学習継続 |
+| 11b | [デザインシステム](./11b-design-system.md) | **Litverse v1.0 適用** / コントラスト実測 / 画面マッピング |
+| — | [design/](./design/) | `litverse.css` / `historia-overrides.css` / 主要8画面のモック |
 | 12 | [非機能要件](./12-nonfunctional.md) | 性能目標 / コスト上限 / 監視 / セキュリティ |
 | 13 | [開発ロードマップ](./13-roadmap.md) | Phase 0〜4（MVP まで約24週） |
 | 14 | [未決事項と検証項目](./14-open-questions.md) | 作者判断が必要な6件 / 実測14件 / v0.1 からの変更点 |
@@ -44,6 +46,7 @@ v0.1（構想メモ 30行）を、着工可能な粒度まで具体化したも�
 | 予算 | **月1万円以内**（試算は約160円／月＋カタログ構築 約5,900円の一度きり） |
 | 技術スタック | Next.js (App Router) / Supabase (PostgreSQL) / Vercel / **Anthropic 直 API** |
 | 間隔反復 | **SM-2** |
+| デザイン | **Litverse Design System v1.0**（紙・墨・朱・蛍光／等幅書体／影とグラデーション禁止） |
 | MVP | 集中特訓＋教材＋確認テスト＋弱点DB＋**YouTube埋め込み** |
 | Phase2 | 過去問DB / タイムライン / Wiki用語マスタ / 模試画像の取り込み |
 
@@ -85,5 +88,7 @@ v0.1 の監査（12レンズ）で **blocker 7件・high 18件** が出た。主
 | 1 | `schema.sql` を PostgreSQL 16.13 に適用 | ✅ 40テーブル作成 |
 | 2 | 制約テスト14件（保護者同意 / 権利状態 / 動画の安全フィルタ / SM-2 の値域 / 教材の一意性 等） | ✅ 全件が意図どおり |
 | 3 | SM-2 の机上検証（3ケース） | ✅ `04b-spaced-repetition.md` §7 |
+| 4 | 主要8画面のモックを Chromium で描画 | ✅ 全画面 342×782・横方向のはみ出し0 |
+| 5 | 配色のコントラスト比を12組で実測 | ⚠️ 4組が AA 未達 → `historia-overrides.css` で修正済み |
 
 未検証の項目は [`14-open-questions.md`](./14-open-questions.md) §2・§3 にまとめてある。

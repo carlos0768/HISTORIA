@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=M+PLUS+1+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #EFE4CC; -webkit-font-smoothing: antialiased; }
+  a { color: #171512; text-decoration: underline; text-underline-offset: 3px; }
+  a:hover { color: #DC5A28; }
+  ::selection { background: #FCE04A; }
+</style>
+</helmet>
+
+<div style="background:#EFE4CC;padding:56px 48px 96px;font-family:'M PLUS 1 Code','Space Mono',ui-monospace,monospace;color:#171512">
+<div style="max-width:1380px;margin:0 auto;display:flex;flex-direction:column;gap:76px">
+
+  <header style="border:1.5px solid #171512;background:#FCF6E8;padding:40px;display:flex;flex-direction:column;gap:30px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:40px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:16px;max-width:640px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.34em;text-transform:uppercase;color:#8A7F6C">Reading App UI Kit / 読書アプリ UI キット</span>
+        <h1 style="margin:0;font:700 58px/0.98 'Space Mono',monospace;letter-spacing:-0.02em">LITVERSE<br><span style="font-family:'M PLUS 1 Code',monospace;font-size:34px;letter-spacing:.04em">デザインシステム</span></h1>
+        <p style="margin:0;font:400 13px/2 'M PLUS 1 Code',monospace;color:#5F584C;text-wrap:pretty">タイプライター用紙のような生成り色の面、髪の毛ほど細いインクの罫線、差し色はオレンジ一色と蛍光イエロー一色。文字はすべて等幅、余白はすべて 4px グリッドに乗せています。</p>
+      </div>
+      <div style="display:flex;flex-direction:column;border:1.5px solid #171512;min-width:300px">
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 14px;border-bottom:1px solid #171512;font-size:12px"><span style="color:#8A7F6C">書体</span><span style="font-weight:600">M PLUS 1 Code / Space Mono</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 14px;border-bottom:1px solid #171512;font-size:12px"><span style="color:#8A7F6C">グリッド</span><span style="font-weight:600">4pt・左右余白 16px</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 14px;border-bottom:1px solid #171512;font-size:12px"><span style="color:#8A7F6C">角丸</span><span style="font-weight:600">6px（既定）</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 14px;font-size:12px"><span style="color:#8A7F6C">線</span><span style="font-weight:600">1px #171512</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span style="border:1px solid #171512;background:#F4703C;color:#FCF6E8;padding:8px 15px;font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.12em;border-radius:4px">01 カラー</span>
+      <span style="border:1px solid #171512;padding:8px 15px;font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.12em;border-radius:4px">02 タイポグラフィ</span>
+      <span style="border:1px solid #171512;padding:8px 15px;font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.12em;border-radius:4px">03 余白と罫線</span>
+      <span style="border:1px solid #171512;padding:8px 15px;font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.12em;border-radius:4px">04 コンポーネント</span>
+      <span style="border:1px solid #171512;background:#FCE04A;padding:8px 15px;font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.12em;border-radius:4px">05 画面</span>
+    </div>
+  </header>
+
+  <section style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:18px;border-bottom:1.5px solid #171512;padding-bottom:10px">
+      <span style="font:700 13px/1 'Space Mono',monospace;letter-spacing:.2em">01</span>
+      <h2 style="margin:0;font:700 22px/1 'M PLUS 1 Code',monospace;letter-spacing:.04em">カラー</h2>
+      <span style="margin-left:auto;font:400 12px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">6 トークン／グラデーション・影は使わない</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:16px">
+      <div style="border:1.5px solid #171512;background:#FCF6E8">
+        <div style="height:104px;background:#FCF6E8;border-bottom:1px solid #171512"></div>
+        <div style="padding:12px;display:flex;flex-direction:column;gap:5px">
+          <span style="font:600 12px/1 'M PLUS 1 Code',monospace">paper／紙</span>
+          <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">#FCF6E8</span></sc-if>
+          <span style="font:400 11px/1.7 'M PLUS 1 Code',monospace;color:#5F584C">画面の下地</span>
+        </div>
+      </div>
+      <div style="border:1.5px solid #171512;background:#FCF6E8">
+        <div style="height:104px;background:#EFE4CC;border-bottom:1px solid #171512"></div>
+        <div style="padding:12px;display:flex;flex-direction:column;gap:5px">
+          <span style="font:600 12px/1 'M PLUS 1 Code',monospace">canvas／台紙</span>
+          <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">#EFE4CC</span></sc-if>
+          <span style="font:400 11px/1.7 'M PLUS 1 Code',monospace;color:#5F584C">画面の外側・区切り</span>
+        </div>
+      </div>
+      <div style="border:1.5px solid #171512;background:#FCF6E8">
+        <div style="height:104px;background:#171512;border-bottom:1px solid #171512"></div>
+        <div style="padding:12px;display:flex;flex-direction:column;gap:5px">
+          <span style="font:600 12px/1 'M PLUS 1 Code',monospace">ink／墨</span>
+          <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">#171512</span></sc-if>
+          <span style="font:400 11px/1.7 'M PLUS 1 Code',monospace;color:#5F584C">本文・罫線・枠</span>
+        </div>
+      </div>
+      <div style="border:1.5px solid #171512;background:#FCF6E8">
+        <div style="height:104px;background:#F4703C;border-bottom:1px solid #171512"></div>
+        <div style="padding:12px;display:flex;flex-direction:column;gap:5px">
+          <span style="font:600 12px/1 'M PLUS 1 Code',monospace">accent／朱</span>
+          <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">#F4703C</span></sc-if>
+          <span style="font:400 11px/1.7 'M PLUS 1 Code',monospace;color:#5F584C">主要ボタン・選択中</span>
+        </div>
+      </div>
+      <div style="border:1.5px solid #171512;background:#FCF6E8">
+        <div style="height:104px;background:#FCE04A;border-bottom:1px solid #171512"></div>
+        <div style="padding:12px;display:flex;flex-direction:column;gap:5px">
+          <span style="font:600 12px/1 'M PLUS 1 Code',monospace">marker／蛍光</span>
+          <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">#FCE04A</span></sc-if>
+          <span style="font:400 11px/1.7 'M PLUS 1 Code',monospace;color:#5F584C">訴求面・強調</span>
+        </div>
+      </div>
+      <div style="border:1.5px solid #171512;background:#FCF6E8">
+        <div style="height:104px;background:#8A7F6C;border-bottom:1px solid #171512"></div>
+        <div style="padding:12px;display:flex;flex-direction:column;gap:5px">
+          <span style="font:600 12px/1 'M PLUS 1 Code',monospace">muted／鼠</span>
+          <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">#8A7F6C</span></sc-if>
+          <span style="font:400 11px/1.7 'M PLUS 1 Code',monospace;color:#5F584C">補助文字・プレース</span>
+        </div>
+      </div>
+    </div>
+    <div style="border:1.5px solid #171512;background:#FCF6E8;padding:18px 20px;display:flex;gap:32px;flex-wrap:wrap;font:400 12px/1.8 'M PLUS 1 Code',monospace;color:#5F584C">
+      <span><strong style="color:#171512">使用比率</strong>　紙 70% ／ 墨 20% ／ 朱 7% ／ 蛍光 3%</span>
+      <span><strong style="color:#171512">禁止</strong>　影・グラデーション・第三の彩度色</span>
+      <span><strong style="color:#171512">コントラスト</strong>　墨 on 紙 = 15.8:1</span>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:18px;border-bottom:1.5px solid #171512;padding-bottom:10px">
+      <span style="font:700 13px/1 'Space Mono',monospace;letter-spacing:.2em">02</span>
+      <h2 style="margin:0;font:700 22px/1 'M PLUS 1 Code',monospace;letter-spacing:.04em">タイポグラフィ</h2>
+      <span style="margin-left:auto;font:400 12px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">和文 M PLUS 1 Code／欧文 Space Mono</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:16px">
+      <div style="border:1.5px solid #171512;background:#FCF6E8;display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:16px 20px;border-bottom:1px solid #171512">
+          <span style="font:700 30px/1.3 'Space Mono',monospace">Display / 見出し 32</span>
+          <span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">700・-2%・行間 1.3</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:16px 20px;border-bottom:1px solid #171512">
+          <span style="font:600 22px/1.4 'M PLUS 1 Code',monospace">画面タイトル 22</span>
+          <span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">600・行間 1.4</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:16px 20px;border-bottom:1px solid #171512">
+          <span style="font:600 16px/1.6 'M PLUS 1 Code',monospace">小見出し・リスト項目 16</span>
+          <span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">600・行間 1.6</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:16px 20px;border-bottom:1px solid #171512">
+          <span style="font:400 14px/1.9 'M PLUS 1 Code',monospace">本文 14 — 読書画面の標準サイズです。</span>
+          <span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">400・行間 1.9</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:16px 20px">
+          <span style="font:400 12px/1.7 'M PLUS 1 Code',monospace;color:#5F584C">キャプション 12 — 補足・メタ情報</span>
+          <span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">400・鼠色</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="border:1.5px solid #171512;background:#FCF6E8;padding:20px;display:flex;flex-direction:column;gap:12px">
+          <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">JAPANESE SPECIMEN</span>
+          <p style="margin:0;font:400 14px/2 'M PLUS 1 Code',monospace;text-wrap:pretty">あらゆる書物は、読み手の時間を少しだけ借りて成立する。アイウエオ　漢字仮名交じり　１２３４５６７８９０</p>
+          <p style="margin:0;font:700 14px/2 'M PLUS 1 Code',monospace">太字は見出しと数値のみに使う。</p>
+        </div>
+        <div style="border:1.5px solid #171512;background:#FCF6E8;padding:20px;display:flex;flex-direction:column;gap:10px">
+          <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">RULES／組版規則</span>
+          <ul style="margin:0;padding-left:1.1em;font:400 12px/1.9 'M PLUS 1 Code',monospace;color:#5F584C">
+            <li>和文の行間は 1.9〜2.0、欧文は 1.5</li>
+            <li>字間は既定 0、欧文ラベルのみ +0.12em</li>
+            <li>一画面につき書体ウェイトは 3 種まで</li>
+            <li>リンクは下線のみ、色を変えない</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:18px;border-bottom:1.5px solid #171512;padding-bottom:10px">
+      <span style="font:700 13px/1 'Space Mono',monospace;letter-spacing:.2em">03</span>
+      <h2 style="margin:0;font:700 22px/1 'M PLUS 1 Code',monospace;letter-spacing:.04em">余白・罫線・角丸</h2>
+      <span style="margin-left:auto;font:400 12px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">4 の倍数のみ</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <div style="border:1.5px solid #171512;background:#FCF6E8;padding:20px;display:flex;flex-direction:column;gap:14px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">SPACING</span>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:12px"><span style="width:36px;font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">4</span><div style="height:12px;width:4px;background:#F4703C;border:1px solid #171512"></div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="width:36px;font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">8</span><div style="height:12px;width:8px;background:#F4703C;border:1px solid #171512"></div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="width:36px;font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">12</span><div style="height:12px;width:12px;background:#F4703C;border:1px solid #171512"></div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="width:36px;font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">16</span><div style="height:12px;width:16px;background:#F4703C;border:1px solid #171512"></div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="width:36px;font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">24</span><div style="height:12px;width:24px;background:#F4703C;border:1px solid #171512"></div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="width:36px;font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">32</span><div style="height:12px;width:32px;background:#F4703C;border:1px solid #171512"></div></div>
+        </div>
+      </div>
+      <div style="border:1.5px solid #171512;background:#FCF6E8;padding:20px;display:flex;flex-direction:column;gap:14px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">STROKE／罫線</span>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;flex-direction:column;gap:6px"><span style="font:400 11px/1 'M PLUS 1 Code',monospace;color:#5F584C">1px — リスト区切り</span><div style="height:1px;background:#171512"></div></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><span style="font:400 11px/1 'M PLUS 1 Code',monospace;color:#5F584C">1.5px — カード外周</span><div style="height:1.5px;background:#171512"></div></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><span style="font:400 11px/1 'M PLUS 1 Code',monospace;color:#5F584C">1px 破線 — 補助区切り</span><div style="height:0;border-top:1px dashed #8A7F6C"></div></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><span style="font:400 11px/1 'M PLUS 1 Code',monospace;color:#5F584C">端末枠 — 1.5px + 角丸 28px</span><div style="height:1.5px;background:#171512"></div></div>
+        </div>
+      </div>
+      <div style="border:1.5px solid #171512;background:#FCF6E8;padding:20px;display:flex;flex-direction:column;gap:14px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">RADIUS／角丸</span>
+        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:52px;height:52px;border:1.5px solid #171512;border-radius:0"></div><span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">0</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:52px;height:52px;border:1.5px solid #171512;border-radius:4px"></div><span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">4</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:52px;height:52px;border:1.5px solid #171512;border-radius:6px"></div><span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">6</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:52px;height:52px;border:1.5px solid #171512;border-radius:999px"></div><span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">全</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:18px;border-bottom:1.5px solid #171512;padding-bottom:10px">
+      <span style="font:700 13px/1 'Space Mono',monospace;letter-spacing:.2em">04</span>
+      <h2 style="margin:0;font:700 22px/1 'M PLUS 1 Code',monospace;letter-spacing:.04em">コンポーネント</h2>
+      <span style="margin-left:auto;font:400 12px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">タップ領域は最小 44px</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border:1.5px solid #171512;background:#FCF6E8;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">BUTTON／ボタン</span>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button style="border:1px solid #171512;background:#F4703C;color:#FCF6E8;padding:14px 20px;border-radius:6px;font:600 14px/1 'M PLUS 1 Code',monospace;cursor:pointer" style-hover="background:#DC5A28">続ける</button>
+          <button style="border:1px solid #171512;background:transparent;color:#171512;padding:14px 20px;border-radius:6px;font:400 14px/1 'M PLUS 1 Code',monospace;cursor:pointer" style-hover="background:#EFE4CC">30日間無料で読む</button>
+          <button style="border:1px solid #171512;background:#FCE04A;color:#171512;padding:14px 20px;border-radius:6px;font:600 14px/1 'M PLUS 1 Code',monospace;cursor:pointer" style-hover="background:#F5D42E">今すぐ試す</button>
+          <div style="display:flex;gap:10px">
+            <button style="flex:1;border:1px solid #171512;background:transparent;padding:12px 14px;border-radius:6px;font:400 13px/1 'M PLUS 1 Code',monospace;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px" style-hover="background:#EFE4CC"><span style="display:inline-block;width:14px;height:14px;border:1.5px solid #171512;border-radius:3px"></span>Google で続ける</button>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button style="flex:1;border:1px solid #8A7F6C;background:#EFE4CC;color:#8A7F6C;padding:12px 14px;border-radius:6px;font:400 13px/1 'M PLUS 1 Code',monospace;cursor:not-allowed">無効状態</button>
+            <button style="flex:1;border:1px solid #171512;background:transparent;padding:12px 14px;border-radius:6px;font:400 13px/1 'M PLUS 1 Code',monospace;text-decoration:underline;text-underline-offset:3px;cursor:pointer;background:#EFE4CC">押下中</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="border:1.5px solid #171512;background:#FCF6E8;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">FIELD／入力欄</span>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="border:1px solid #171512;border-radius:6px;padding:14px 16px;font:400 13px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">メールアドレス</div>
+          <div style="border:1px solid #171512;border-radius:6px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;font:400 13px/1 'M PLUS 1 Code',monospace">
+            <span>••••••••••</span><span style="color:#8A7F6C;font-size:12px">表示</span>
+          </div>
+          <div style="border:1.5px solid #F4703C;border-radius:6px;padding:13px 15px;font:400 13px/1 'M PLUS 1 Code',monospace">入力中（フォーカス）</div>
+          <span style="font:400 11px/1.6 'M PLUS 1 Code',monospace;color:#DC5A28">※ パスワードは 8 文字以上で入力してください</span>
+          <div style="display:flex;align-items:center;gap:10px;padding-top:4px">
+            <span style="width:16px;height:16px;border:1.5px solid #171512;border-radius:3px;display:inline-block"></span>
+            <span style="font:400 12px/1.6 'M PLUS 1 Code',monospace;color:#5F584C">お知らせメールを受け取る</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:16px;height:16px;border:1.5px solid #171512;border-radius:3px;background:#F4703C;display:inline-flex;align-items:center;justify-content:center;color:#FCF6E8;font:700 10px/1 'Space Mono',monospace">✓</span>
+            <span style="font:400 12px/1.6 'M PLUS 1 Code',monospace;color:#5F584C">利用規約に同意する</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <div style="border:1.5px solid #171512;background:#FCF6E8;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">CHIP／絞り込み</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span style="border:1px solid #171512;background:#F4703C;color:#FCF6E8;padding:7px 13px;border-radius:5px;font:500 12px/1 'M PLUS 1 Code',monospace">すべて</span>
+          <span style="border:1px solid #171512;padding:7px 13px;border-radius:5px;font:400 12px/1 'M PLUS 1 Code',monospace">電子書籍</span>
+          <span style="border:1px solid #171512;padding:7px 13px;border-radius:5px;font:400 12px/1 'M PLUS 1 Code',monospace">朗読</span>
+          <span style="border:1px solid #171512;padding:7px 13px;border-radius:5px;font:400 12px/1 'M PLUS 1 Code',monospace">雑誌</span>
+          <span style="border:1px solid #171512;background:#FCE04A;padding:7px 13px;border-radius:5px;font:500 12px/1 'M PLUS 1 Code',monospace">タイトル</span>
+        </div>
+        <div style="border-top:1px dashed #8A7F6C;padding-top:14px;display:flex;flex-direction:column;gap:8px">
+          <span style="font:400 11px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">評価</span>
+          <div style="display:flex;align-items:center;gap:8px"><span style="font:400 13px/1 'Space Mono',monospace;letter-spacing:2px">★★★★★</span><span style="font:400 12px/1 'M PLUS 1 Code',monospace;color:#5F584C">(1.5万)</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="font:400 13px/1 'Space Mono',monospace;letter-spacing:2px;color:#8A7F6C">★★★☆☆</span><span style="font:400 12px/1 'M PLUS 1 Code',monospace;color:#5F584C">(312)</span></div>
+        </div>
+      </div>
+
+      <div style="border:1.5px solid #171512;background:#FCF6E8;display:flex;flex-direction:column">
+        <div style="padding:20px 20px 12px"><span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">LIST ROW／一覧行</span></div>
+        <div style="padding:15px 20px;border-top:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace">アプリの表示言語</div>
+        <div style="padding:15px 20px;border-top:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>通知</span><span style="color:#8A7F6C">オン</span></div>
+        <div style="padding:15px 20px;border-top:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace">プライバシーポリシー</div>
+        <div style="padding:15px 20px;border-top:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace">利用規約</div>
+        <div style="padding:15px 20px;border-top:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace;background:#EFE4CC">選択中の行</div>
+        <div style="padding:15px 20px;border-top:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace;color:#DC5A28">ログアウト</div>
+      </div>
+
+      <div style="border:1.5px solid #171512;background:#FCF6E8;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">BOOK CARD／書影</span>
+        <div style="display:flex;gap:14px">
+          <div style="width:74px;height:104px;border:1px solid #171512;background:#7C1F1F;display:flex;align-items:center;justify-content:center;padding:8px;text-align:center;color:#F3D8A8;font:700 9px/1.4 'M PLUS 1 Code',monospace">灯台のある町</div>
+          <div style="display:flex;flex-direction:column;gap:6px;justify-content:center">
+            <span style="font:600 13px/1.5 'M PLUS 1 Code',monospace">灯台のある町</span>
+            <span style="font:400 11px/1.5 'M PLUS 1 Code',monospace;color:#5F584C">著：西野 千尋</span>
+            <span style="font:400 11px/1.5 'M PLUS 1 Code',monospace;color:#5F584C">朗読：室井 圭</span>
+            <span style="font:400 12px/1 'Space Mono',monospace;letter-spacing:2px">★★★★☆</span>
+          </div>
+        </div>
+        <div style="border-top:1px dashed #8A7F6C;padding-top:14px;display:flex;gap:8px">
+          <div style="flex:1;border:1px solid #171512;border-radius:6px;padding:10px;text-align:center;font:400 11px/1.4 'M PLUS 1 Code',monospace">保存</div>
+          <div style="flex:1;border:1px solid #171512;border-radius:6px;padding:10px;text-align:center;font:400 11px/1.4 'M PLUS 1 Code',monospace">ダウンロード</div>
+          <div style="flex:1;border:1px solid #171512;border-radius:6px;padding:10px;text-align:center;font:400 11px/1.4 'M PLUS 1 Code',monospace">リスト追加</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border:1.5px solid #171512;background:#FCF6E8;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">NAV BAR／画面ヘッダー</span>
+        <div style="border:1px solid #171512;display:flex;align-items:center">
+          <div style="padding:14px 16px;border-right:1px solid #171512;font:400 15px/1 'Space Mono',monospace">←</div>
+          <div style="flex:1;text-align:center;font:700 15px/1 'Space Mono',monospace;letter-spacing:.16em">LITVERSE</div>
+          <div style="padding:14px 16px;border-left:1px solid #171512;font:400 15px/1 'Space Mono',monospace">↗</div>
+        </div>
+        <div style="border:1px solid #171512;display:flex;align-items:center">
+          <div style="padding:14px 16px;border-right:1px solid #171512;font:400 15px/1 'Space Mono',monospace">←</div>
+          <div style="flex:1;text-align:center;font:600 14px/1 'M PLUS 1 Code',monospace">設定</div>
+          <div style="padding:14px 16px;border-left:1px solid #171512;font:400 15px/1 'Space Mono',monospace;color:#FCF6E8">·</div>
+        </div>
+        <div style="border:1px solid #171512;display:flex;align-items:stretch">
+          <div style="flex:1;padding:13px 0;text-align:center;font:400 12px/1 'M PLUS 1 Code',monospace;background:#F4703C;color:#FCF6E8;border-right:1px solid #171512">ホーム</div>
+          <div style="flex:1;padding:13px 0;text-align:center;font:400 12px/1 'M PLUS 1 Code',monospace;border-right:1px solid #171512">さがす</div>
+          <div style="flex:1;padding:13px 0;text-align:center;font:400 12px/1 'M PLUS 1 Code',monospace;border-right:1px solid #171512">保存</div>
+          <div style="flex:1;padding:13px 0;text-align:center;font:400 12px/1 'M PLUS 1 Code',monospace">アカウント</div>
+        </div>
+      </div>
+      <div style="border:1.5px solid #171512;background:#F4703C;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#FCF6E8">PLAYER／再生バー</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <span style="font:600 13px/1 'M PLUS 1 Code',monospace;color:#FCF6E8">2倍</span>
+          <span style="width:38px;height:38px;border:1.5px solid #FCF6E8;border-radius:999px;display:flex;align-items:center;justify-content:center;font:400 11px/1 'Space Mono',monospace;color:#FCF6E8">15</span>
+          <span style="width:54px;height:54px;background:#FCF6E8;border-radius:999px;display:flex;align-items:center;justify-content:center;font:700 17px/1 'Space Mono',monospace;color:#F4703C">❙❙</span>
+          <span style="width:38px;height:38px;border:1.5px solid #FCF6E8;border-radius:999px;display:flex;align-items:center;justify-content:center;font:400 11px/1 'Space Mono',monospace;color:#FCF6E8">15</span>
+          <span style="font:600 14px/1 'Space Mono',monospace;color:#FCF6E8">▶❙</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="height:3px;background:#FCF6E8;position:relative;border-radius:2px"><span style="position:absolute;left:62%;top:-4px;width:11px;height:11px;background:#171512;border-radius:999px"></span></div>
+          <div style="display:flex;justify-content:space-between;font:400 11px/1 'Space Mono',monospace;color:#FCF6E8"><span>24:36</span><span>-16:08</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:18px;border-bottom:1.5px solid #171512;padding-bottom:10px">
+      <span style="font:700 13px/1 'Space Mono',monospace;letter-spacing:.2em">05</span>
+      <h2 style="margin:0;font:700 22px/1 'M PLUS 1 Code',monospace;letter-spacing:.04em">画面</h2>
+      <span style="margin-left:auto;font:400 12px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">375 × 780 / iPhone 相当</span>
+    </div>
+
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.1em;color:#8A7F6C">01 — アカウント作成</span>
+        <div style="width:340px;border:1.5px solid #171512;border-radius:26px;background:#FCF6E8;overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px 4px;font:600 12px/1 'Space Mono',monospace">
+            <span>9:41</span>
+            <span style="width:86px;height:22px;background:#171512;border-radius:999px"></span>
+            <span style="font-size:11px;letter-spacing:1px">▮▮▮ ⌁ ▬</span>
+          </div>
+          <div style="padding:28px 22px 26px;display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center">
+              <h3 style="margin:0;font:700 24px/1.3 'M PLUS 1 Code',monospace">アカウント作成</h3>
+              <p style="margin:0;font:400 11px/1.7 'M PLUS 1 Code',monospace;color:#5F584C">Litverse・Recognotes・Sparks が<br>ひとつの登録で使えます</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="border:1px solid #171512;border-radius:6px;padding:13px 16px;display:flex;align-items:center;gap:12px;font:400 13px/1 'M PLUS 1 Code',monospace"><span style="width:16px;height:16px;border:1.5px solid #171512;border-radius:999px"></span>Google で続ける</div>
+              <div style="border:1px solid #171512;border-radius:6px;padding:13px 16px;display:flex;align-items:center;gap:12px;font:400 13px/1 'M PLUS 1 Code',monospace"><span style="width:16px;height:16px;background:#1B58C8;border-radius:999px"></span>Facebook で続ける</div>
+              <div style="border:1px solid #171512;border-radius:6px;padding:13px 16px;display:flex;align-items:center;gap:12px;font:400 13px/1 'M PLUS 1 Code',monospace"><span style="width:16px;height:16px;background:#171512;border-radius:999px"></span>Apple で続ける</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px"><span style="flex:1;height:1px;background:#171512"></span><span style="font:400 11px/1 'M PLUS 1 Code',monospace;color:#5F584C">またはメールで登録</span><span style="flex:1;height:1px;background:#171512"></span></div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="border:1px solid #171512;border-radius:6px;padding:14px 16px;font:400 13px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">メールアドレス</div>
+              <div style="border:1px solid #171512;border-radius:6px;padding:14px 16px;display:flex;justify-content:space-between;font:400 13px/1 'M PLUS 1 Code',monospace;color:#8A7F6C"><span>パスワード</span><span>◍</span></div>
+              <span style="align-self:flex-end;font:400 11px/1 'M PLUS 1 Code',monospace;text-decoration:underline;text-underline-offset:3px">パスワードを再設定</span>
+            </div>
+            <div style="border:1px solid #171512;background:#F4703C;color:#FCF6E8;border-radius:6px;padding:15px;text-align:center;font:600 14px/1 'M PLUS 1 Code',monospace">続ける</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.1em;color:#8A7F6C">02 — ホーム</span>
+        <div style="width:340px;border:1.5px solid #171512;border-radius:26px;background:#FCF6E8;overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px 4px;font:600 12px/1 'Space Mono',monospace">
+            <span>9:41</span>
+            <span style="width:86px;height:22px;background:#171512;border-radius:999px"></span>
+            <span style="font-size:11px;letter-spacing:1px">▮▮▮ ⌁ ▬</span>
+          </div>
+          <div style="margin-top:10px;border-top:1px solid #171512;border-bottom:1px solid #171512;display:flex;align-items:center">
+            <div style="padding:13px 16px;border-right:1px solid #171512;font:400 15px/1 'Space Mono',monospace">☰</div>
+            <div style="flex:1;text-align:center;font:700 15px/1 'Space Mono',monospace;letter-spacing:.16em">LITVERSE</div>
+            <div style="padding:13px 16px;border-left:1px solid #171512;font:400 14px/1 'Space Mono',monospace">◔</div>
+          </div>
+          <div style="display:flex;gap:7px;padding:12px 14px;overflow:hidden">
+            <span style="border:1px solid #171512;background:#F4703C;color:#FCF6E8;padding:6px 11px;border-radius:5px;font:500 11px/1 'M PLUS 1 Code',monospace;white-space:nowrap">すべて</span>
+            <span style="border:1px solid #171512;padding:6px 11px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace;white-space:nowrap">電子書籍</span>
+            <span style="border:1px solid #171512;padding:6px 11px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace;white-space:nowrap">朗読</span>
+            <span style="border:1px solid #171512;padding:6px 11px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace;white-space:nowrap">雑誌</span>
+          </div>
+          <div style="margin:0 14px;border:1px solid #171512;background:#FCE04A;padding:18px 16px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center">
+            <h3 style="margin:0;font:700 19px/1.4 'M PLUS 1 Code',monospace">どこでも、いつでも。</h3>
+            <p style="margin:0;font:400 11px/1.6 'M PLUS 1 Code',monospace">読む・聴く・楽しむを、ひとつの本棚で。</p>
+            <div style="align-self:stretch;border:1px solid #171512;background:#FCF6E8;border-radius:6px;padding:12px;font:500 13px/1 'M PLUS 1 Code',monospace">30日間無料で読む</div>
+            <span style="font:400 11px/1 'M PLUS 1 Code',monospace;text-decoration:underline;text-underline-offset:3px">いつでも解約できます</span>
+          </div>
+          <div style="padding:18px 14px 10px;display:flex;justify-content:space-between;align-items:baseline">
+            <span style="font:600 15px/1 'M PLUS 1 Code',monospace">人気の作品</span>
+            <span style="font:400 11px/1 'M PLUS 1 Code',monospace;color:#5F584C;text-decoration:underline;text-underline-offset:3px">もっと見る</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 14px 16px">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="aspect-ratio:2/3;border:1px solid #171512;background:#2E4A34;color:#F3D8A8;display:flex;align-items:center;justify-content:center;padding:6px;text-align:center;font:700 9px/1.4 'M PLUS 1 Code',monospace">夜の博物館</div>
+              <span style="font:500 10px/1.4 'M PLUS 1 Code',monospace">夜の博物館</span>
+              <span style="font:400 9px/1.4 'M PLUS 1 Code',monospace;color:#8A7F6C">高崎 涼</span>
+              <span style="font:400 9px/1 'Space Mono',monospace;letter-spacing:1px">★★★★★</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="aspect-ratio:2/3;border:1px solid #171512;background:#C8452E;color:#FCF6E8;display:flex;align-items:center;justify-content:center;padding:6px;text-align:center;font:700 9px/1.4 'M PLUS 1 Code',monospace">百年の午睡</div>
+              <span style="font:500 10px/1.4 'M PLUS 1 Code',monospace">百年の午睡</span>
+              <span style="font:400 9px/1.4 'M PLUS 1 Code',monospace;color:#8A7F6C">御手洗 藍</span>
+              <span style="font:400 9px/1 'Space Mono',monospace;letter-spacing:1px">★★★★☆</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="aspect-ratio:2/3;border:1px solid #171512;background:#1F3A5F;color:#F3D8A8;display:flex;align-items:center;justify-content:center;padding:6px;text-align:center;font:700 9px/1.4 'M PLUS 1 Code',monospace">灯台のある町</div>
+              <span style="font:500 10px/1.4 'M PLUS 1 Code',monospace">灯台のある町</span>
+              <span style="font:400 9px/1.4 'M PLUS 1 Code',monospace;color:#8A7F6C">西野 千尋</span>
+              <span style="font:400 9px/1 'Space Mono',monospace;letter-spacing:1px">★★★★★</span>
+            </div>
+          </div>
+          <div style="margin-top:auto;border-top:1px solid #171512;display:flex">
+            <div style="flex:1;padding:12px 0 14px;display:flex;flex-direction:column;align-items:center;gap:5px;color:#F4703C"><span style="font:400 15px/1 'Space Mono',monospace">⌂</span><span style="font:500 9px/1 'M PLUS 1 Code',monospace">ホーム</span></div>
+            <div style="flex:1;padding:12px 0 14px;display:flex;flex-direction:column;align-items:center;gap:5px"><span style="font:400 15px/1 'Space Mono',monospace">⌕</span><span style="font:400 9px/1 'M PLUS 1 Code',monospace">さがす</span></div>
+            <div style="flex:1;padding:12px 0 14px;display:flex;flex-direction:column;align-items:center;gap:5px"><span style="font:400 15px/1 'Space Mono',monospace">❑</span><span style="font:400 9px/1 'M PLUS 1 Code',monospace">保存</span></div>
+            <div style="flex:1;padding:12px 0 14px;display:flex;flex-direction:column;align-items:center;gap:5px"><span style="font:400 15px/1 'Space Mono',monospace">☺</span><span style="font:400 9px/1 'M PLUS 1 Code',monospace">アカウント</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.1em;color:#8A7F6C">03 — 作品詳細</span>
+        <div style="width:340px;border:1.5px solid #171512;border-radius:26px;background:#FCF6E8;overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px 4px;font:600 12px/1 'Space Mono',monospace">
+            <span>9:41</span>
+            <span style="width:86px;height:22px;background:#171512;border-radius:999px"></span>
+            <span style="font-size:11px;letter-spacing:1px">▮▮▮ ⌁ ▬</span>
+          </div>
+          <div style="margin-top:10px;border-top:1px solid #171512;border-bottom:1px solid #171512;display:flex;align-items:center">
+            <div style="padding:13px 16px;border-right:1px solid #171512;font:400 15px/1 'Space Mono',monospace">←</div>
+            <div style="flex:1;text-align:center;font:700 15px/1 'Space Mono',monospace;letter-spacing:.16em">LITVERSE</div>
+            <div style="padding:13px 16px;border-left:1px solid #171512;font:400 14px/1 'Space Mono',monospace">↗</div>
+          </div>
+          <div style="padding:18px 16px;display:flex;gap:14px;border-bottom:1px solid #171512">
+            <div style="width:88px;height:124px;border:1px solid #171512;background:#7C1F1F;color:#F3D8A8;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font:700 11px/1.5 'M PLUS 1 Code',monospace">灯台のある町</div>
+            <div style="display:flex;flex-direction:column;gap:7px;justify-content:center">
+              <span style="font:700 15px/1.5 'M PLUS 1 Code',monospace">灯台のある町</span>
+              <span style="font:400 11px/1.5 'M PLUS 1 Code',monospace;color:#5F584C">著：<u>西野 千尋</u></span>
+              <span style="font:400 11px/1.5 'M PLUS 1 Code',monospace;color:#5F584C">朗読：<u>室井 圭</u></span>
+            </div>
+          </div>
+          <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid #171512">
+            <div style="border:1px solid #171512;border-radius:6px;padding:13px;text-align:center;font:400 13px/1 'M PLUS 1 Code',monospace">30日間無料で読む</div>
+            <div style="border:1px solid #171512;background:#F4703C;color:#FCF6E8;border-radius:6px;padding:13px;text-align:center;font:600 13px/1 'M PLUS 1 Code',monospace">▶ 試し聴き</div>
+          </div>
+          <div style="display:flex;border-bottom:1px solid #171512">
+            <div style="flex:1;padding:14px 0;display:flex;flex-direction:column;align-items:center;gap:6px;border-right:1px solid #171512"><span style="font:400 14px/1 'Space Mono',monospace">↓</span><span style="font:400 10px/1 'M PLUS 1 Code',monospace">ダウンロード</span></div>
+            <div style="flex:1;padding:14px 0;display:flex;flex-direction:column;align-items:center;gap:6px;border-right:1px solid #171512"><span style="font:400 14px/1 'Space Mono',monospace">❑</span><span style="font:400 10px/1 'M PLUS 1 Code',monospace">保存</span></div>
+            <div style="flex:1;padding:14px 0;display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font:400 14px/1 'Space Mono',monospace">＋</span><span style="font:400 10px/1 'M PLUS 1 Code',monospace">リストへ</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column">
+            <div style="display:flex;padding:11px 16px;border-bottom:1px solid #171512;font:400 12px/1.4 'M PLUS 1 Code',monospace"><span style="width:80px;color:#8A7F6C">評価</span><span style="letter-spacing:1px;font-family:'Space Mono',monospace">★★★★★ (1.5万)</span></div>
+            <div style="display:flex;padding:11px 16px;border-bottom:1px solid #171512;font:400 12px/1.4 'M PLUS 1 Code',monospace"><span style="width:80px;color:#8A7F6C">長さ</span><span>22 時間 56 分</span></div>
+            <div style="display:flex;padding:11px 16px;border-bottom:1px solid #171512;font:400 12px/1.4 'M PLUS 1 Code',monospace"><span style="width:80px;color:#8A7F6C">形式</span><span>オーディオブック</span></div>
+            <div style="display:flex;padding:11px 16px;border-bottom:1px solid #171512;font:400 12px/1.4 'M PLUS 1 Code',monospace"><span style="width:80px;color:#8A7F6C">出版</span><span>灯台文庫</span></div>
+            <div style="display:flex;padding:11px 16px;border-bottom:1px solid #171512;font:400 12px/1.4 'M PLUS 1 Code',monospace"><span style="width:80px;color:#8A7F6C">配信日</span><span>2024年4月22日</span></div>
+          </div>
+          <p style="margin:0;padding:16px;font:400 12px/2 'M PLUS 1 Code',monospace;color:#3A342C;text-wrap:pretty">岬の突端に立つ古い灯台と、そこに通う少女の一年を描いた長編。灯りの当番表、潮の匂い、港町の噂話——ささやかな日常の積み重ねが、やがて一つの決断へと収束していく。</p>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.1em;color:#8A7F6C">04 — 読書・再生</span>
+        <div style="width:340px;border:1.5px solid #171512;border-radius:26px;background:#FCF6E8;overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px 4px;font:600 12px/1 'Space Mono',monospace">
+            <span>9:41</span>
+            <span style="width:86px;height:22px;background:#171512;border-radius:999px"></span>
+            <span style="font-size:11px;letter-spacing:1px">▮▮▮ ⌁ ▬</span>
+          </div>
+          <div style="margin-top:10px;border-top:1px solid #171512;border-bottom:1px solid #171512;display:flex;align-items:center">
+            <div style="padding:13px 16px;border-right:1px solid #171512;font:400 15px/1 'Space Mono',monospace">←</div>
+            <div style="flex:1;text-align:center;font:600 13px/1 'M PLUS 1 Code',monospace">灯台のある町</div>
+            <div style="padding:13px 16px;border-left:1px solid #171512;font:400 15px/1 'Space Mono',monospace">⋮</div>
+          </div>
+          <div style="padding:18px 18px 8px;display:flex;flex-direction:column;gap:4px">
+            <span style="font:400 11px/1.6 'M PLUS 1 Code',monospace;color:#8A7F6C">第一章</span>
+            <span style="font:700 14px/1.6 'M PLUS 1 Code',monospace">灯りの当番</span>
+          </div>
+          <p style="margin:0;padding:8px 18px 16px;font:400 12.5px/2.05 'M PLUS 1 Code',monospace;color:#241F19;text-wrap:pretty">十月の岬は、朝のうちだけ風が凪ぐ。千尋はその時間を狙って坂を登る。手には当番表と、母から預かった鍵の束。灯台の扉は毎朝すこしだけ膨らんでいて、押すというより肩で説得するように開けるのが決まりだった。<br><br>階段は九十七段。数えなくても足が覚えている。最上階の窓から見える漁港には、まだ半分ほどの船しか戻っていない。千尋はガラスを拭き、当番表に丸をつけ、それから十分だけ何もしないでいる時間を自分に許した。</p>
+          <div style="margin:0 18px 16px;align-self:flex-start;border:1px solid #171512;background:#FCE04A;padding:8px 12px;border-radius:5px;font:600 12px/1 'M PLUS 1 Code',monospace">Aa 文字設定</div>
+          <div style="margin-top:auto;background:#F4703C;border-top:1px solid #171512;padding:18px 18px 20px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font:600 13px/1 'M PLUS 1 Code',monospace;color:#FCF6E8">2倍</span>
+              <span style="width:36px;height:36px;border:1.5px solid #FCF6E8;border-radius:999px;display:flex;align-items:center;justify-content:center;font:400 11px/1 'Space Mono',monospace;color:#FCF6E8">15</span>
+              <span style="width:52px;height:52px;background:#FCF6E8;border-radius:999px;display:flex;align-items:center;justify-content:center;font:700 16px/1 'Space Mono',monospace;color:#F4703C">❙❙</span>
+              <span style="width:36px;height:36px;border:1.5px solid #FCF6E8;border-radius:999px;display:flex;align-items:center;justify-content:center;font:400 11px/1 'Space Mono',monospace;color:#FCF6E8">15</span>
+              <span style="font:600 14px/1 'Space Mono',monospace;color:#FCF6E8">▶❙</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="height:3px;background:#FCF6E8;border-radius:2px;position:relative"><span style="position:absolute;left:60%;top:-4px;width:11px;height:11px;background:#171512;border-radius:999px"></span></div>
+              <div style="display:flex;justify-content:space-between;font:400 11px/1 'Space Mono',monospace;color:#FCF6E8"><span>24:36</span><span>-16:08</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.1em;color:#8A7F6C">05 — 設定</span>
+        <div style="width:340px;border:1.5px solid #171512;border-radius:26px;background:#FCF6E8;overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px 4px;font:600 12px/1 'Space Mono',monospace">
+            <span>9:41</span>
+            <span style="width:86px;height:22px;background:#171512;border-radius:999px"></span>
+            <span style="font-size:11px;letter-spacing:1px">▮▮▮ ⌁ ▬</span>
+          </div>
+          <div style="margin-top:10px;border-top:1px solid #171512;border-bottom:1px solid #171512;display:flex;align-items:center">
+            <div style="padding:13px 16px;border-right:1px solid #171512;font:400 15px/1 'Space Mono',monospace">←</div>
+            <div style="flex:1;text-align:center;font:700 18px/1 'M PLUS 1 Code',monospace">設定</div>
+            <div style="padding:13px 16px;font:400 15px/1 'Space Mono',monospace;color:#FCF6E8">·</div>
+          </div>
+          <div style="display:flex;flex-direction:column">
+            <div style="padding:16px;border-bottom:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace">アプリの表示言語</div>
+            <div style="padding:16px;border-bottom:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace">通知</div>
+            <div style="padding:16px;border-bottom:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace">ギフトコードの利用</div>
+            <div style="padding:16px;border-bottom:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace">法人プランを見る</div>
+            <div style="padding:16px;border-bottom:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace">プライバシーポリシー</div>
+            <div style="padding:16px;border-bottom:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace">利用規約</div>
+            <div style="padding:16px;border-bottom:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace">サブスクリプション規約</div>
+            <div style="padding:16px;border-bottom:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace">契約プランの管理</div>
+            <div style="padding:16px;border-bottom:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace;color:#DC5A28">ログアウト</div>
+          </div>
+          <div style="padding:22px 16px;display:flex;flex-direction:column;gap:12px;align-items:center">
+            <div style="align-self:stretch;border:1px solid #171512;background:#F4703C;color:#FCF6E8;border-radius:6px;padding:14px;text-align:center;font:600 13px/1 'M PLUS 1 Code',monospace">サポートに問い合わせる</div>
+            <span style="font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">バージョン 264.2.0.5566</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.1em;color:#8A7F6C">06 — 保存済み</span>
+        <div style="width:340px;border:1.5px solid #171512;border-radius:26px;background:#FCF6E8;overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px 4px;font:600 12px/1 'Space Mono',monospace">
+            <span>9:41</span>
+            <span style="width:86px;height:22px;background:#171512;border-radius:999px"></span>
+            <span style="font-size:11px;letter-spacing:1px">▮▮▮ ⌁ ▬</span>
+          </div>
+          <div style="margin-top:10px;border-bottom:1px solid #171512;display:flex;align-items:center;justify-content:space-between;padding:14px 16px">
+            <span style="font:700 22px/1 'M PLUS 1 Code',monospace">保存済み</span>
+            <span style="font:400 15px/1 'Space Mono',monospace">✎</span>
+          </div>
+          <div style="display:flex;gap:7px;padding:12px 14px">
+            <span style="border:1px solid #171512;background:#FCE04A;padding:6px 11px;border-radius:5px;font:500 11px/1 'M PLUS 1 Code',monospace">タイトル</span>
+            <span style="border:1px solid #171512;padding:6px 11px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace">フォロー中</span>
+            <span style="border:1px solid #171512;padding:6px 11px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace">リスト</span>
+          </div>
+          <div style="margin:0 14px 14px;border:1px solid #171512;background:#FCE04A;border-radius:6px;padding:12px 14px;display:flex;gap:10px;align-items:center;font:400 12px/1 'M PLUS 1 Code',monospace"><span style="font-family:'Space Mono',monospace">⌕</span>保存した本をさがす</div>
+          <div style="display:flex;flex-direction:column">
+            <div style="display:flex;gap:14px;padding:14px 16px;border-top:1px solid #171512">
+              <div style="width:64px;height:92px;border:1px solid #171512;background:#2E4A34;color:#F3D8A8;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;font:700 9px/1.4 'M PLUS 1 Code',monospace">夜の博物館</div>
+              <div style="display:flex;flex-direction:column;gap:5px;flex:1">
+                <span style="font:600 12px/1.5 'M PLUS 1 Code',monospace">夜の博物館</span>
+                <span style="font:400 10px/1.5 'M PLUS 1 Code',monospace;color:#5F584C">著：高崎 涼</span>
+                <span style="font:400 10px/1.7 'M PLUS 1 Code',monospace;color:#3A342C">閉館後の展示室で起こる、七つの小さな事件。</span>
+                <span style="font:400 10px/1 'M PLUS 1 Code',monospace;color:#8A7F6C;margin-top:auto">残り 168 ページ</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:14px;padding:14px 16px;border-top:1px solid #171512">
+              <div style="width:64px;height:92px;border:1px solid #171512;background:#C8452E;color:#FCF6E8;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;font:700 9px/1.4 'M PLUS 1 Code',monospace">百年の午睡</div>
+              <div style="display:flex;flex-direction:column;gap:5px;flex:1">
+                <span style="font:600 12px/1.5 'M PLUS 1 Code',monospace">百年の午睡</span>
+                <span style="font:400 10px/1.5 'M PLUS 1 Code',monospace;color:#5F584C">著：御手洗 藍</span>
+                <span style="font:400 10px/1.7 'M PLUS 1 Code',monospace;color:#3A342C">午睡のあいだだけ会える家族の物語。</span>
+                <span style="font:400 10px/1 'M PLUS 1 Code',monospace;color:#8A7F6C;margin-top:auto">残り 24 ページ</span>
+              </div>
+            </div>
+          </div>
+          <div style="padding:16px;display:flex;flex-direction:column;gap:10px;border-top:1px solid #171512">
+            <div style="border:1px solid #171512;background:#F4703C;color:#FCF6E8;border-radius:6px;padding:14px;text-align:center;font:600 13px/1 'M PLUS 1 Code',monospace">続きを読む</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:8px;font:400 12px/1 'M PLUS 1 Code',monospace"><span style="font-family:'Space Mono',monospace">↓</span>ダウンロード</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:18px;border-bottom:1.5px solid #171512;padding-bottom:10px">
+      <span style="font:700 13px/1 'Space Mono',monospace;letter-spacing:.2em">06</span>
+      <h2 style="margin:0;font:700 22px/1 'M PLUS 1 Code',monospace;letter-spacing:.04em">コード</h2>
+      <span style="margin-left:auto;font:400 12px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">litverse.css ／ litverse-tokens.json</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+      <div style="border:1.5px solid #171512;background:#FCF6E8;display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #171512">
+          <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">TOKENS — litverse.css</span>
+          <span style="font:400 11px/1 'M PLUS 1 Code',monospace;color:#5F584C">CSS 変数 32 個</span>
+        </div>
+        <pre style="margin:0;padding:18px;font:400 11.5px/1.85 'Space Mono',monospace;color:#241F19;white-space:pre-wrap;overflow-wrap:anywhere">:root {
+  --lv-paper:   #FCF6E8;  /* 紙 */
+  --lv-canvas:  #EFE4CC;  /* 台紙 */
+  --lv-ink:     #171512;  /* 墨 */
+  --lv-muted:   #8A7F6C;  /* 鼠 */
+  --lv-accent:  #F4703C;  /* 朱 */
+  --lv-marker:  #FCE04A;  /* 蛍光 */
+
+  --lv-space-4: 16px;     /* 4pt グリッド */
+  --lv-hairline: 1px solid var(--lv-ink);
+  --lv-border:   1.5px solid var(--lv-ink);
+  --lv-radius:   6px;
+
+  --lv-font-ja: "M PLUS 1 Code", monospace;
+  --lv-font-en: "Space Mono", monospace;
+  --lv-text-body: 400 14px/1.9 var(--lv-font-ja);
+  --lv-touch: 44px;
+}</pre>
+      </div>
+      <div style="border:1.5px solid #171512;background:#FCF6E8;display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #171512">
+          <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">USAGE — クラスの使い方</span>
+          <span style="font:400 11px/1 'M PLUS 1 Code',monospace;color:#5F584C">BEM 風・接頭辞 lv-</span>
+        </div>
+        <pre style="margin:0;padding:18px;font:400 11.5px/1.85 'Space Mono',monospace;color:#241F19;white-space:pre-wrap;overflow-wrap:anywhere">&lt;link rel="stylesheet" href="litverse.css"&gt;
+
+&lt;div class="lv-root lv-device"&gt;
+  &lt;div class="lv-navbar"&gt;
+    &lt;div class="lv-navbar__btn lv-navbar__btn--left"&gt;←&lt;/div&gt;
+    &lt;div class="lv-navbar__title"&gt;設定&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;input class="lv-field" placeholder="メールアドレス"&gt;
+
+  &lt;div class="lv-chips"&gt;
+    &lt;span class="lv-chip lv-chip--active"&gt;すべて&lt;/span&gt;
+    &lt;span class="lv-chip"&gt;朗読&lt;/span&gt;
+  &lt;/div&gt;
+
+  &lt;button class="lv-btn lv-btn--primary lv-btn--block"&gt;
+    続ける
+  &lt;/button&gt;
+&lt;/div&gt;</pre>
+      </div>
+    </div>
+    <div style="border:1.5px solid #171512;background:#FCF6E8;padding:20px 22px;display:flex;gap:40px;flex-wrap:wrap;font:400 12px/1.9 'M PLUS 1 Code',monospace;color:#5F584C">
+      <div style="display:flex;flex-direction:column;gap:4px"><strong style="color:#171512">クラス一覧</strong><span>lv-btn / lv-field / lv-check / lv-chip / lv-list__row / lv-meta__row / lv-card / lv-cover / lv-book / lv-rating / lv-navbar / lv-tabbar / lv-promo / lv-player / lv-device / lv-statusbar / lv-divider</span></div>
+      <div style="display:flex;flex-direction:column;gap:4px"><strong style="color:#171512">JSON トークン</strong><span>litverse-tokens.json — Figma Variables・Tailwind theme・Style Dictionary へそのまま流し込めます。</span></div>
+    </div>
+  </section>
+
+  <footer style="border-top:1.5px solid #171512;padding-top:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;font:400 11px/1.7 'M PLUS 1 Code',monospace;color:#8A7F6C">
+    <span>LITVERSE デザインシステム — 添付画像からのリバースエンジニアリング版（日本語対応）</span>
+    <span style="font-family:'Space Mono',monospace">v1.0 / 2026</span>
+  </footer>
+
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showHex&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;表示&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { showHex: this.props.showHex ?? true };
+  }
+}
+</script>
+</body>
+</html>

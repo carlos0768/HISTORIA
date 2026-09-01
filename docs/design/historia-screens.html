@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HISTORIA 主要画面 — Litverse 適用版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="litverse.css">
+<link rel="stylesheet" href="historia-overrides.css">
+<style>
+  body { margin:0; background:#EFE4CC; font-family:"M PLUS 1 Code",monospace; }
+  .sheet { padding:32px; }
+  .sheet__head { max-width:1400px; margin:0 auto 28px; }
+  .grid { display:flex; flex-wrap:wrap; gap:28px; max-width:1400px; margin:0 auto; align-items:flex-start; }
+  .frame { display:flex; flex-direction:column; gap:10px; }
+  .frame__cap { font:600 11px/1 "Space Mono",monospace; letter-spacing:.16em; color:#5F584C; text-transform:uppercase; }
+  .lv-device { height:780px; }
+  .scroll { flex:1; overflow:hidden; display:flex; flex-direction:column; }
+  .pad { padding:16px; display:flex; flex-direction:column; gap:16px; }
+  .pad--tight { padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .row { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="sheet__head">
+    <h1 class="lv-display" style="font-size:28px">HISTORIA — 主要画面</h1>
+    <p class="lv-caption" style="margin:6px 0 0">Litverse Design System v1.0 適用版 ／ 375×780 相当 ／ 仕様は docs/11-ux.md・docs/11b-design-system.md</p>
+  </div>
+
+  <div class="grid">
+
+  <!-- 01 サインアップ -->
+  <div class="frame">
+    <div class="frame__cap">01 — サインアップ</div>
+    <div class="lv-root lv-device">
+      <div class="lv-statusbar"><span>9:41</span><span class="lv-statusbar__notch"></span><span>▮▮▮ ⌁ ▬</span></div>
+      <div class="scroll">
+        <div class="pad" style="gap:20px;padding:28px 20px">
+          <div style="text-align:center;display:flex;flex-direction:column;gap:8px">
+            <div class="lv-wordmark">HISTORIA</div>
+            <h2 class="lv-title" style="font-size:20px">アカウント作成</h2>
+            <p class="lv-caption">歴史総合・世界史探究の学習を<br>ひとつの記録で続けられます</p>
+          </div>
+          <div class="lv-divider lv-caption" style="color:#5F584C"><span>招待制です</span></div>
+          <input class="lv-field" placeholder="招待コード" value="HIST-4K2M-9XQ">
+          <button class="lv-btn lv-btn--block">Google で続ける</button>
+          <div class="lv-divider lv-caption" style="color:#5F584C"><span>次に</span></div>
+          <div>
+            <input class="lv-field" placeholder="生年月日（2008 / 12 / 08）">
+            <p class="lv-caption" style="margin:6px 0 0">16歳未満の方は保護者の同意が必要です</p>
+          </div>
+          <label class="lv-check"><span class="lv-check__box lv-check__box--on">✓</span>利用規約とプライバシーポリシーに同意する</label>
+          <button class="lv-btn lv-btn--primary lv-btn--block">続ける</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 診断テスト -->
+  <div class="frame">
+    <div class="frame__cap">02 — 診断テスト</div>
+    <div class="lv-root lv-device">
+      <div class="lv-statusbar"><span>9:41</span><span class="lv-statusbar__notch"></span><span>▮▮▮ ⌁ ▬</span></div>
+      <div class="lv-navbar">
+        <div class="lv-navbar__btn lv-navbar__btn--left">←</div>
+        <div class="lv-navbar__title">診断テスト</div>
+        <div class="lv-navbar__btn lv-navbar__btn--right">·</div>
+      </div>
+      <div class="hs-progress">
+        <span class="hs-progress__label">8 / 24</span>
+        <div class="hs-progress__bar">
+          <span class="hs-progress__seg hs-progress__seg--done"></span><span class="hs-progress__seg hs-progress__seg--done"></span>
+          <span class="hs-progress__seg hs-progress__seg--done"></span><span class="hs-progress__seg hs-progress__seg--done"></span>
+          <span class="hs-progress__seg hs-progress__seg--done"></span><span class="hs-progress__seg hs-progress__seg--done"></span>
+          <span class="hs-progress__seg hs-progress__seg--done"></span><span class="hs-progress__seg hs-progress__seg--done"></span>
+          <span class="hs-progress__seg"></span><span class="hs-progress__seg"></span><span class="hs-progress__seg"></span><span class="hs-progress__seg"></span>
+        </div>
+        <span class="hs-progress__label">残り 約6分</span>
+      </div>
+      <div class="scroll">
+        <div class="pad">
+          <span class="lv-label">CHRONOLOGY ／ 近世・近代 × 欧米</span>
+          <p class="lv-heading" style="line-height:1.8">ウェストファリア条約が締結された年として正しいものを選べ。</p>
+          <div style="margin-top:4px">
+            <button class="hs-choice"><span class="hs-choice__key">A</span>1618年</button>
+            <button class="hs-choice"><span class="hs-choice__key">B</span>1648年</button>
+            <button class="hs-choice"><span class="hs-choice__key">C</span>1701年</button>
+            <button class="hs-choice"><span class="hs-choice__key">D</span>1713年</button>
+          </div>
+          <p class="lv-caption" style="text-align:center;margin-top:4px">わからない場合は飛ばしてかまいません</p>
+          <button class="lv-btn lv-btn--block" style="min-height:40px">わからない</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 ホーム -->
+  <div class="frame">
+    <div class="frame__cap">03 — ホーム</div>
+    <div class="lv-root lv-device">
+      <div class="lv-statusbar"><span>9:41</span><span class="lv-statusbar__notch"></span><span>▮▮▮ ⌁ ▬</span></div>
+      <div class="lv-navbar">
+        <div class="lv-navbar__btn lv-navbar__btn--left">☰</div>
+        <div class="lv-navbar__title lv-wordmark">HISTORIA</div>
+        <div class="lv-navbar__btn lv-navbar__btn--right" style="font:600 12px/1 'Space Mono',monospace">12<span style="font:400 9px/1 'M PLUS 1 Code',monospace">日</span></div>
+      </div>
+      <div class="scroll" style="overflow-y:auto">
+        <div class="pad--tight">
+          <div class="lv-promo">
+            <span class="lv-label" style="color:#171512">TODAY</span>
+            <div class="lv-display" style="font-size:40px">42<span style="font-size:16px"> 問</span></div>
+            <p class="lv-caption" style="color:#3A342C">18 問おわり ／ 残り 24 問・約 15 分</p>
+            <button class="lv-btn lv-btn--primary lv-btn--block">今日の学習を始める</button>
+          </div>
+
+          <div class="row" style="margin-top:4px">
+            <span class="lv-label">進行中の集中特訓</span>
+            <a href="#" class="lv-caption">すべて見る</a>
+          </div>
+
+          <div class="lv-card lv-card__pad" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+            <div class="row">
+              <span class="lv-heading">イスラーム世界の形成</span>
+              <span class="lv-caption">あと 12日</span>
+            </div>
+            <div class="hs-mastery">
+              <span class="lv-caption" style="min-width:3.5em">習得</span>
+              <span class="hs-mastery__track"><span class="hs-mastery__fill" style="width:38%"></span></span>
+              <span class="hs-mastery__num">38%</span>
+            </div>
+            <div class="hs-mastery">
+              <span class="lv-caption" style="min-width:3.5em">読了</span>
+              <span class="hs-mastery__track"><span class="hs-mastery__fill" style="width:67%"></span></span>
+              <span class="hs-mastery__num">8/12</span>
+            </div>
+          </div>
+
+          <div class="lv-card" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+            <div class="row">
+              <span class="lv-heading">近代ヨーロッパ</span>
+              <span class="hs-status hs-status--weak">要調整</span>
+            </div>
+            <div class="hs-mastery">
+              <span class="lv-caption" style="min-width:3.5em">習得</span>
+              <span class="hs-mastery__track"><span class="hs-mastery__fill hs-mastery__fill--weak" style="width:8%"></span></span>
+              <span class="hs-mastery__num">8%</span>
+            </div>
+            <div class="hs-alert">
+              <div class="hs-alert__title">このペースでは締切に間に合いません</div>
+              残り6日 ／ 1日あたり154問（上限80問）<br>約890問分が不足します。
+            </div>
+          </div>
+
+          <button class="lv-btn lv-btn--block" style="margin-top:4px">＋ 新しい集中特訓</button>
+        </div>
+      </div>
+      <div class="lv-tabbar">
+        <div class="lv-tabbar__item lv-tabbar__item--active"><span class="lv-tabbar__icon">⌂</span>ホーム</div>
+        <div class="lv-tabbar__item"><span class="lv-tabbar__icon">❑</span>特訓</div>
+        <div class="lv-tabbar__item"><span class="lv-tabbar__icon">◔</span>記録</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 学習（出題） -->
+  <div class="frame">
+    <div class="frame__cap">04 — 学習（出題）</div>
+    <div class="lv-root lv-device">
+      <div class="lv-statusbar"><span>9:41</span><span class="lv-statusbar__notch"></span><span>▮▮▮ ⌁ ▬</span></div>
+      <div class="lv-navbar">
+        <div class="lv-navbar__btn lv-navbar__btn--left">←</div>
+        <div class="lv-navbar__title">19 / 42</div>
+        <div class="lv-navbar__btn lv-navbar__btn--right">⋮</div>
+      </div>
+      <div class="scroll">
+        <div class="pad">
+          <span class="lv-label">DISTINCTION ／ イスラーム世界</span>
+          <p class="lv-heading" style="line-height:1.8">750年に成立し、バグダードを都としたイスラーム王朝はどれか。</p>
+          <div style="margin-top:4px">
+            <button class="hs-choice"><span class="hs-choice__key">A</span>ウマイヤ朝</button>
+            <button class="hs-choice hs-choice--correct"><span class="hs-choice__key">B</span>アッバース朝</button>
+            <button class="hs-choice"><span class="hs-choice__key">C</span>ファーティマ朝</button>
+            <button class="hs-choice"><span class="hs-choice__key">D</span>セルジューク朝</button>
+          </div>
+        </div>
+      </div>
+      <div class="lv-player">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span class="lv-label" style="color:#171512">正解</span>
+          <p style="font:400 13px/1.8 'M PLUS 1 Code',monospace;margin:0">
+            アッバース朝は750年にウマイヤ朝を倒して成立し、762年にバグダードを造営して都とした。</p>
+        </div>
+        <div class="lv-player__controls">
+          <button class="lv-btn" style="border-color:#171512;background:transparent;min-height:40px;padding:10px 16px">解説をもっと見る</button>
+          <button class="lv-btn lv-btn--marker" style="min-height:40px;padding:10px 20px">次へ →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 教材ビューア -->
+  <div class="frame">
+    <div class="frame__cap">05 — 教材ビューア</div>
+    <div class="lv-root lv-device">
+      <div class="lv-statusbar"><span>9:41</span><span class="lv-statusbar__notch"></span><span>▮▮▮ ⌁ ▬</span></div>
+      <div class="lv-navbar">
+        <div class="lv-navbar__btn lv-navbar__btn--left">←</div>
+        <div class="lv-navbar__title">イスラーム世界の形成</div>
+        <div class="lv-navbar__btn lv-navbar__btn--right">Aa</div>
+      </div>
+      <div class="hs-progress">
+        <span class="hs-progress__label">§3 / 7</span>
+        <div class="hs-progress__bar">
+          <span class="hs-progress__seg hs-progress__seg--done"></span><span class="hs-progress__seg hs-progress__seg--done"></span>
+          <span class="hs-progress__seg hs-progress__seg--done"></span><span class="hs-progress__seg"></span>
+          <span class="hs-progress__seg"></span><span class="hs-progress__seg"></span><span class="hs-progress__seg"></span>
+        </div>
+        <span class="hs-progress__label">残り 4分</span>
+      </div>
+      <div class="scroll" style="overflow-y:auto">
+        <div style="background:#FCE04A;border-bottom:1px solid #171512;padding:14px 16px;display:flex;flex-direction:column;gap:6px">
+          <span class="lv-label" style="color:#171512">あなた向けのポイント</span>
+          <p style="font:400 12px/1.8 'M PLUS 1 Code',monospace;margin:0">
+            「ウマイヤ朝／アッバース朝」の区別で3回間違えています。§3-2 と §5 を特に注意して読んでください。</p>
+        </div>
+        <div class="pad">
+          <h3 class="lv-title" style="font-size:18px">§3 アッバース朝の成立</h3>
+          <p class="lv-body">
+            ウマイヤ朝の統治はアラブ人を優遇し、非アラブ系の改宗者（マワーリー）に人頭税を課し続けた。
+            <b>この不公平が不満の温床になった</b> → イラン系マワーリーとシーア派が結びつき、
+            750年にアブー＝アル＝アッバースが挙兵してウマイヤ朝を倒した。</p>
+          <p class="lv-body">
+            新王朝は都をダマスクスからバグダードへ移した（762年）。
+            東方の交易路に近づいたことで、<b>統治の重心がアラビア半島からイラン高原側へ移る</b>。
+            これが「アラブ帝国からイスラーム帝国へ」と表現される変化である。</p>
+          <div class="hs-video">
+            <div class="hs-video__frame">
+              <div style="width:100%;height:100%;background:#EFE4CC;display:flex;align-items:center;justify-content:center;font:400 11px/1 'M PLUS 1 Code',monospace;color:#5F584C">サムネイル</div>
+              <button class="hs-video__play">▶</button>
+            </div>
+            <div class="hs-video__note">このセクションの理解を助ける動画（8分）<br>再生すると YouTube に情報が送信されます</div>
+          </div>
+          <button class="lv-btn lv-btn--primary lv-btn--block">このセクションを読み終えた</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 確認テスト結果 -->
+  <div class="frame">
+    <div class="frame__cap">06 — 確認テスト結果</div>
+    <div class="lv-root lv-device">
+      <div class="lv-statusbar"><span>9:41</span><span class="lv-statusbar__notch"></span><span>▮▮▮ ⌁ ▬</span></div>
+      <div class="lv-navbar">
+        <div class="lv-navbar__btn lv-navbar__btn--left">←</div>
+        <div class="lv-navbar__title">確認テスト 結果</div>
+        <div class="lv-navbar__btn lv-navbar__btn--right">·</div>
+      </div>
+      <div class="scroll" style="overflow-y:auto">
+        <div class="pad--tight">
+          <div class="lv-card" style="padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div class="lv-display">18<span style="font-size:18px"> / 22</span></div>
+            <span class="hs-status hs-status--shaky">もう少し（進捗 72%）</span>
+            <p class="lv-caption" style="text-align:center">あと 13% で「イスラーム世界の形成」が完了します</p>
+          </div>
+
+          <span class="lv-label">間違えた問題（4問）</span>
+
+          <div class="lv-card" style="padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+            <p style="font:400 13px/1.7 'M PLUS 1 Code',monospace;margin:0">
+              750年に成立し、バグダードを都とした王朝は。</p>
+            <div class="lv-meta__row" style="border:0;padding:0"><span class="lv-meta__key">あなた</span><span style="color:#CB420B">A ウマイヤ朝</span></div>
+            <div class="lv-meta__row" style="border:0;padding:0"><span class="lv-meta__key">正解</span><span>B アッバース朝</span></div>
+            <p class="lv-caption" style="line-height:1.8">
+              ウマイヤ朝は661〜750年。あなたはこの選択肢を <b>3回</b> 選んでいます。</p>
+            <div class="lv-chips">
+              <span class="lv-chip">▶ 解説動画</span>
+              <span class="lv-chip">❑ 教材 §3 に戻る</span>
+            </div>
+          </div>
+
+          <div class="lv-promo" style="align-items:flex-start;text-align:left">
+            <span class="lv-label" style="color:#171512">次にやること</span>
+            <p style="font:400 12px/1.8 'M PLUS 1 Code',monospace;margin:0">
+              この4項目は明日の学習キューの先頭に入りました。<br>
+              再テストは <b>9月4日</b> から受けられます。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 記録（弱点と根拠） -->
+  <div class="frame">
+    <div class="frame__cap">07 — 記録（弱点と根拠）</div>
+    <div class="lv-root lv-device">
+      <div class="lv-statusbar"><span>9:41</span><span class="lv-statusbar__notch"></span><span>▮▮▮ ⌁ ▬</span></div>
+      <div class="lv-navbar">
+        <div class="lv-navbar__btn lv-navbar__btn--left">←</div>
+        <div class="lv-navbar__title">記録</div>
+        <div class="lv-navbar__btn lv-navbar__btn--right">⌕</div>
+      </div>
+      <div class="scroll" style="overflow-y:auto">
+        <div style="padding:12px 16px 0">
+          <div class="lv-chips">
+            <span class="lv-chip lv-chip--active">弱い</span>
+            <span class="lv-chip">あやふや</span>
+            <span class="lv-chip">習得済み</span>
+            <span class="lv-chip">未測定</span>
+          </div>
+        </div>
+        <div class="pad--tight">
+          <div class="lv-card" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+            <div class="row">
+              <span class="lv-heading" style="font-size:14px">ウマイヤ朝とアッバース朝の区別</span>
+              <span class="hs-status hs-status--weak">弱い</span>
+            </div>
+            <div class="hs-mastery">
+              <span class="hs-mastery__track"><span class="hs-mastery__fill hs-mastery__fill--weak" style="width:31%"></span></span>
+              <span class="hs-mastery__num">31%</span>
+            </div>
+            <div style="border-top:1px dashed #8A7F6C;padding-top:8px;display:flex;flex-direction:column;gap:4px">
+              <span class="lv-label">この判定の根拠</span>
+              <p class="lv-caption" style="line-height:1.9;margin:0">
+                ・四択12問中9問で「アッバース朝」を <b>2回</b> 選択<br>
+                ・最後に正解してから <b>11日</b>（保持率の推定 58%）<br>
+                ・別日での正解が1回のみ</p>
+            </div>
+            <div class="lv-chips">
+              <span class="lv-chip">教材を読む</span>
+              <span class="lv-chip lv-chip--marker">今すぐ復習</span>
+            </div>
+          </div>
+
+          <div class="lv-card" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+            <div class="row">
+              <span class="lv-heading" style="font-size:14px">19世紀ヨーロッパの条約の年代順</span>
+              <span class="hs-status hs-status--weak">弱い</span>
+            </div>
+            <div class="hs-mastery">
+              <span class="hs-mastery__track"><span class="hs-mastery__fill hs-mastery__fill--weak" style="width:44%"></span></span>
+              <span class="hs-mastery__num">44%</span>
+            </div>
+          </div>
+
+          <div class="lv-list">
+            <div class="lv-list__row"><span>連続学習日数</span><span class="lv-list__value">12日（最長 24日）</span></div>
+            <div class="lv-list__row"><span>今週の解答数</span><span class="lv-list__value">284問</span></div>
+            <div class="lv-list__row"><span>測定済みの項目</span><span class="lv-list__value">312 / 880</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="lv-tabbar">
+        <div class="lv-tabbar__item"><span class="lv-tabbar__icon">⌂</span>ホーム</div>
+        <div class="lv-tabbar__item"><span class="lv-tabbar__icon">❑</span>特訓</div>
+        <div class="lv-tabbar__item lv-tabbar__item--active"><span class="lv-tabbar__icon">◔</span>記録</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 空状態 -->
+  <div class="frame">
+    <div class="frame__cap">08 — 空状態（診断直後・特訓0件）</div>
+    <div class="lv-root lv-device">
+      <div class="lv-statusbar"><span>9:41</span><span class="lv-statusbar__notch"></span><span>▮▮▮ ⌁ ▬</span></div>
+      <div class="lv-navbar">
+        <div class="lv-navbar__btn lv-navbar__btn--left">☰</div>
+        <div class="lv-navbar__title lv-wordmark">HISTORIA</div>
+        <div class="lv-navbar__btn lv-navbar__btn--right" style="font:600 12px/1 'Space Mono',monospace">1<span style="font:400 9px/1 'M PLUS 1 Code',monospace">日</span></div>
+      </div>
+      <div class="scroll" style="overflow-y:auto">
+        <div class="pad--tight">
+          <div class="lv-promo">
+            <span class="lv-label" style="color:#171512">TODAY</span>
+            <div class="lv-display" style="font-size:40px">16<span style="font-size:16px"> 問</span></div>
+            <p class="lv-caption" style="color:#3A342C">診断で弱かった範囲から出します</p>
+            <button class="lv-btn lv-btn--primary lv-btn--block">今日の学習を始める</button>
+          </div>
+
+          <span class="lv-label" style="margin-top:4px">診断の結果</span>
+          <p class="lv-caption" style="line-height:1.9;margin:0">
+            まずここから測っていきます。24問では全体の一部しか測れていないため、<br>
+            弱点の断定はしていません。</p>
+
+          <div class="lv-list">
+            <div class="lv-list__row"><span>前近代 × 西アジア・アフリカ</span><span class="lv-list__value">測定中</span></div>
+            <div class="lv-list__row"><span>近世・近代 × 欧米</span><span class="lv-list__value">測定中</span></div>
+            <div class="lv-list__row"><span>現代 × 東アジア・日本</span><span class="lv-list__value">測定中</span></div>
+          </div>
+
+          <div class="hs-empty" style="margin-top:4px">
+            <span class="lv-label">集中特訓</span>
+            <p class="lv-caption" style="margin:0">まだ集中特訓がありません。<br>範囲と締切を決めると、1日の量が自動で決まります。</p>
+            <button class="lv-btn lv-btn--marker">＋ 集中特訓を作る</button>
+          </div>
+        </div>
+      </div>
+      <div class="lv-tabbar">
+        <div class="lv-tabbar__item lv-tabbar__item--active"><span class="lv-tabbar__icon">⌂</span>ホーム</div>
+        <div class="lv-tabbar__item"><span class="lv-tabbar__icon">❑</span>特訓</div>
+        <div class="lv-tabbar__item"><span class="lv-tabbar__icon">◔</span>記録</div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</div>
+</body>
+</html>

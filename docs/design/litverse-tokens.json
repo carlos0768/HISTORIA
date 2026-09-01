@@ -1,0 +1,41 @@
+{
+  "$name": "Litverse Design System",
+  "$version": "1.0.0",
+  "$locale": "ja-JP",
+  "color": {
+    "paper":       { "value": "#FCF6E8", "ja": "紙",   "use": "画面の下地" },
+    "canvas":      { "value": "#EFE4CC", "ja": "台紙", "use": "外側・押下背景" },
+    "ink":         { "value": "#171512", "ja": "墨",   "use": "本文・罫線・枠" },
+    "inkSoft":     { "value": "#3A342C", "ja": "墨(弱)", "use": "長文本文" },
+    "sub":         { "value": "#5F584C", "ja": "補助", "use": "キャプション" },
+    "muted":       { "value": "#8A7F6C", "ja": "鼠",   "use": "補助文字・プレース" },
+    "accent":      { "value": "#F4703C", "ja": "朱",   "use": "主要ボタン・選択中" },
+    "accentPress": { "value": "#DC5A28", "ja": "朱(押下)", "use": "hover / active" },
+    "marker":      { "value": "#FCE04A", "ja": "蛍光", "use": "訴求面・強調" },
+    "markerPress": { "value": "#F5D42E", "ja": "蛍光(押下)", "use": "hover / active" }
+  },
+  "ratio": { "paper": 0.70, "ink": 0.20, "accent": 0.07, "marker": 0.03 },
+  "space": { "1": 4, "2": 8, "3": 12, "4": 16, "6": 24, "8": 32 },
+  "radius": { "sm": 4, "md": 6, "device": 26, "full": 999 },
+  "stroke": { "hairline": 1, "border": 1.5, "dashed": "1px dashed muted" },
+  "font": {
+    "ja": "\"M PLUS 1 Code\", ui-monospace, monospace",
+    "en": "\"Space Mono\", ui-monospace, monospace"
+  },
+  "text": {
+    "display": { "size": 32, "weight": 700, "leading": 1.3,  "family": "en", "tracking": "-0.02em" },
+    "title":   { "size": 22, "weight": 600, "leading": 1.4,  "family": "ja" },
+    "heading": { "size": 16, "weight": 600, "leading": 1.6,  "family": "ja" },
+    "body":    { "size": 14, "weight": 400, "leading": 1.9,  "family": "ja" },
+    "caption": { "size": 12, "weight": 400, "leading": 1.7,  "family": "ja" },
+    "label":   { "size": 11, "weight": 600, "leading": 1.0,  "family": "en", "tracking": "0.24em", "case": "upper" }
+  },
+  "touchTarget": 44,
+  "rules": [
+    "影・グラデーション・第三の彩度色は使わない",
+    "和文の行間は 1.9〜2.0、欧文は 1.5",
+    "一画面あたりウェイトは 3 種まで",
+    "リンクは下線のみ、色は変えない",
+    "余白は 4 の倍数のみ"
+  ]
+}
