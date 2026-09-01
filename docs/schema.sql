@@ -143,6 +143,8 @@ CREATE TABLE app_user (
   consent_at                timestamptz NOT NULL,
   invited_by                uuid REFERENCES app_user(id),
   daily_generation_quota    smallint NOT NULL DEFAULT 10,   -- 1日に生成できる教材ユニット数（08 §7）
+  -- ★ 出題の1日上限。ユーザー自身と管理画面の両方から変更できる（05-scheduler.md §9.1）
+  max_daily_items           smallint NOT NULL DEFAULT 80 CHECK (max_daily_items BETWEEN 10 AND 300),
   created_at                timestamptz NOT NULL DEFAULT now(),
   CHECK (
     NOT guardian_consent_required
@@ -183,8 +185,12 @@ CREATE TABLE material (
   model          text NOT NULL,
   prompt_version text NOT NULL,
   source         text NOT NULL DEFAULT 'ai_generated_no_external_text',
+  -- ready    : 事実確認を通過し表示できる
+  -- blocked  : 事実確認を通らなかったため配信しない（08-ai-architecture.md §5 層5）
+  -- failed   : 生成自体が失敗した（モデルの拒否・タイムアウト等）
   status         text NOT NULL DEFAULT 'generating'
-                 CHECK (status IN ('generating','ready','partial','superseded','failed')),
+                 CHECK (status IN ('generating','ready','blocked','superseded','failed')),
+  blocked_reason text,                        -- 検出された誤りの要約（作者が見る）
   judge_scores   jsonb,                       -- 開発時のベンチマークでのみ使う（§6.1）
   supersedes_id  uuid REFERENCES material(id),
   human_edit_log jsonb NOT NULL DEFAULT '[]'::jsonb,
@@ -194,7 +200,7 @@ CREATE TABLE material (
 );
 -- 1ユーザー・1単元につき、表示できる教材はちょうど1本
 CREATE UNIQUE INDEX material_one_ready_per_user_unit
-  ON material (user_id, unit_id) WHERE status IN ('ready','partial');
+  ON material (user_id, unit_id) WHERE status = 'ready';
 CREATE INDEX ON material (user_id, unit_id);
 
 CREATE TABLE material_section (
@@ -254,8 +260,16 @@ CREATE TABLE item (
   provider         text,
   generated_by     text,                     -- model 名
   prompt_version   text,
+  -- ★ approved = 「出題してよい」。false のままの item は出題されない。
+  --   user_id 非NULL（ユーザー生成）: ファクトチェック通過時にサーバーが自動で true にする
+  --   user_id IS NULL（診断プール）  : 作者が手動レビューして true にする
+  --   誰が承認したかを approved_by に必ず残す（08-ai-architecture.md §5.3）
   approved         boolean NOT NULL DEFAULT false,
+  approved_by      text CHECK (approved_by IN ('factcheck','author')),
+  approved_at      timestamptz,
   hidden           boolean NOT NULL DEFAULT false,
+  hidden_reason    text CHECK (hidden_reason IN ('user_report','factcheck_flag','moderation')),
+  CHECK (NOT approved OR (approved_by IS NOT NULL AND approved_at IS NOT NULL)),
   created_at       timestamptz NOT NULL DEFAULT now(),
   CHECK (observed_correct <= observed_total)
 );
@@ -562,6 +576,66 @@ CREATE TABLE generation_job (
 -- 無料枠の RPM を守るため、running を数えて同時実行を絞る（08-ai-architecture.md §7）
 CREATE INDEX ON generation_job (status, created_at) WHERE status IN ('queued','running');
 
+-- ---------------------------------------------------------------------
+-- 支出遮断器（08-ai-architecture.md §7.1）
+-- 月の支出が上限に達したら課金呼び出しを止める。作者の決定「1万円を超えたら即停止」。
+-- ★ 金額に float を使わない。numeric で持つ。
+-- ---------------------------------------------------------------------
+
+-- 月ごとの1行。遮断の判定はこの1行の UPDATE で原子的に行う（§7.1 の関門クエリ）
+CREATE TABLE ai_budget (
+  period        date PRIMARY KEY,                    -- 月初（Asia/Tokyo）
+  cap_jpy       numeric(10,2) NOT NULL DEFAULT 10000 CHECK (cap_jpy > 0),
+  warn_jpy      numeric(10,2) NOT NULL DEFAULT 5000  CHECK (warn_jpy > 0),
+  degrade_jpy   numeric(10,2) NOT NULL DEFAULT 8000  CHECK (degrade_jpy > 0),
+  reserved_jpy  numeric(12,4) NOT NULL DEFAULT 0     CHECK (reserved_jpy >= 0),
+  settled_jpy   numeric(12,4) NOT NULL DEFAULT 0     CHECK (settled_jpy  >= 0),
+  halted        boolean NOT NULL DEFAULT false,
+  halted_at     timestamptz,
+  halted_reason text CHECK (halted_reason IN ('cap_exceeded','manual','provider_error')),
+  CHECK (warn_jpy <= degrade_jpy AND degrade_jpy <= cap_jpy),
+  -- 停止した理由と時刻が分からない停止を作らせない
+  CHECK (NOT halted OR (halted_at IS NOT NULL AND halted_reason IS NOT NULL))
+);
+
+-- 課金呼び出しの元帳。1行 = 1呼び出し。reserved（発行前）→ settled（確定）
+-- est_jpy は「上限見積り」であり actual_jpy はこれを超えない（§7.1 の前提: max_output_tokens 必須）
+CREATE TABLE ai_spend (
+  id            bigserial PRIMARY KEY,
+  period        date NOT NULL REFERENCES ai_budget(period),
+  job_id        uuid REFERENCES generation_job(id) ON DELETE SET NULL,
+  provider      text NOT NULL,
+  model         text NOT NULL,
+  purpose       text NOT NULL
+                CHECK (purpose IN ('generate','factcheck','judge','diagnostic','embed','scope_parse')),
+  state         text NOT NULL DEFAULT 'reserved'
+                CHECK (state IN ('reserved','settled','released')),
+  est_jpy       numeric(10,4) NOT NULL CHECK (est_jpy >= 0),
+  actual_jpy    numeric(10,4) CHECK (actual_jpy >= 0),
+  input_tokens  int, output_tokens int,
+  jpy_per_usd   numeric(6,2) NOT NULL,               -- 換算に使った為替。後から再計算できるように残す
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  settled_at    timestamptz,
+  -- 確定したのに金額が無い、という行を作らせない
+  CHECK (state <> 'settled' OR (actual_jpy IS NOT NULL AND settled_at IS NOT NULL)),
+  -- 見積りを超える確定は設計上ありえない。起きたら見積り式のバグなので落とす
+  CHECK (actual_jpy IS NULL OR actual_jpy <= est_jpy)
+);
+CREATE INDEX ON ai_spend (period, state);
+-- 予約したまま確定していない行の回収（プロセス異常終了で予約が漏れる。§7.1 の回収ジョブ）
+CREATE INDEX ai_spend_stale_reservation ON ai_spend (created_at) WHERE state = 'reserved';
+
+-- 管理画面から変更できるアプリ全体の設定（12-nonfunctional.md §7.1）
+-- ★ ここに置いてよいのは「変更しても過去のデータと矛盾しない値」だけ。
+--   guess / slip / mastery 閾値などの推定パラメータは置かない（04-weakness-engine.md §9）
+CREATE TABLE app_setting (
+  key         text PRIMARY KEY,
+  value       jsonb NOT NULL,
+  description text NOT NULL,
+  updated_by  uuid REFERENCES app_user(id),
+  updated_at  timestamptz NOT NULL DEFAULT now()
+);
+
 CREATE TABLE content_report (
   id          bigserial PRIMARY KEY,
   user_id     uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
@@ -611,24 +685,103 @@ ALTER TABLE user_daily_plan          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE evidence_import          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE content_report           ENABLE ROW LEVEL SECURITY;
 
--- 代表例。他の user_id を持つテーブルにも同型のポリシーを張る。
--- ★ response は SELECT と INSERT のみ。UPDATE / DELETE のポリシーを作らない（追記専用）
+-- ---- 運用テーブル（意図的に「全行拒否」にする。ポリシーを書かない） ----
+-- ★ ここだけは下の原則の例外である。利用者に見せる必要も書かせる必要も無い。
+--   ポリシーを1つも定義しないことで anon / authenticated からは一切読めなくなり、
+--   service_role（サーバー側）だけが RLS を迂回して読み書きする。
+--   遮断器の上限値をユーザーが読めても書けても困るので、これが正しい状態である。
+--   将来この3テーブルに「ポリシーが無い」と指摘されても、追加してはならない。
+--   同じ理由で item の SELECT と response の INSERT も意図的に存在しない（下記）。
+ALTER TABLE app_setting              ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ai_budget                ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ai_spend                 ENABLE ROW LEVEL SECURITY;
+
+-- ★ RLS を有効にしたテーブルには必ずポリシーを書く（直上の運用3テーブルを除く）。
+--   ポリシーが1つも無いテーブルは「全行アクセス拒否」になり、アプリが一切動かない。
+--
+-- 方針:
+--   SELECT  … 自分の行のみ（診断用の共有 item は全員が読める）
+--   INSERT  … ユーザーが自分で作るもの（応答・読了・視聴・特訓・誤り報告）のみ
+--   UPDATE / DELETE … 特訓の編集と削除のみ
+--   導出テーブル（user_kc_state / kc_card / misconception / user_activity /
+--   user_daily_plan / check_test）は SELECT のみ。書き込みはサーバー側
+--   （service_role）が行う。これが「response が唯一の真実」（03-data-model.md §2.2）
+--   をDB層で強制する。
+
+-- ---- 自分のアカウント（SELECT のみ。設定変更は Server Action 経由） ----
+-- 列単位の制限は RLS では書けないため、max_daily_items の変更などは
+-- service_role で動く Server Action に閉じる（guardian_consent_at 等を書き換えさせない）
+CREATE POLICY app_user_select ON app_user
+  FOR SELECT USING (id = (SELECT auth.uid()));
+
+-- ---- 追記専用ログ（UPDATE / DELETE のポリシーを作らない） ----
 CREATE POLICY response_select ON response
   FOR SELECT USING (user_id = (SELECT auth.uid()));
-CREATE POLICY response_insert ON response
-  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+-- ★ INSERT のポリシーを作らない（12-nonfunctional.md §6.1）。
+--   correct はサーバーが答え合わせをして決める値であり、利用者が申告する値ではない。
+--   クライアントに INSERT を許すと DevTools から correct=true を直接書けてしまい、
+--   「response が唯一の真実」（03-data-model.md §2.2）の入力源が改竄可能になる。
+--   書き込みは採点を行う Server Action（service_role）に閉じる。
 
+-- ---- ユーザーが作って編集できるもの ----
 CREATE POLICY drill_all ON drill
   FOR ALL USING (user_id = (SELECT auth.uid()))
   WITH CHECK (user_id = (SELECT auth.uid()));
 
--- material と item は「自分のもの」＋「診断用の共有プール（item.user_id IS NULL）」を読める。
--- 書き込みはサーバー側（service_role）のみ。ユーザーは教材も設問も直接作れない。
-CREATE POLICY material_select ON material
+-- drill_kc / drill_unit は user_id を持たないので drill 経由で判定する
+CREATE POLICY drill_kc_all ON drill_kc
+  FOR ALL USING (EXISTS (SELECT 1 FROM drill d
+                         WHERE d.id = drill_kc.drill_id AND d.user_id = (SELECT auth.uid())))
+  WITH CHECK (EXISTS (SELECT 1 FROM drill d
+                      WHERE d.id = drill_kc.drill_id AND d.user_id = (SELECT auth.uid())));
+CREATE POLICY drill_unit_all ON drill_unit
+  FOR ALL USING (EXISTS (SELECT 1 FROM drill d
+                         WHERE d.id = drill_unit.drill_id AND d.user_id = (SELECT auth.uid())))
+  WITH CHECK (EXISTS (SELECT 1 FROM drill d
+                      WHERE d.id = drill_unit.drill_id AND d.user_id = (SELECT auth.uid())));
+
+-- ---- ユーザーが追加できる記録（更新・削除はしない） ----
+CREATE POLICY material_read_select ON material_read
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY material_read_insert ON material_read
+  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+
+CREATE POLICY video_view_select ON video_view
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY video_view_insert ON video_view
+  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+
+CREATE POLICY content_report_select ON content_report
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY content_report_insert ON content_report
+  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+
+CREATE POLICY evidence_import_select ON evidence_import
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY evidence_import_insert ON evidence_import
+  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+
+-- ---- 導出テーブル（SELECT のみ。書き込みは service_role） ----
+CREATE POLICY user_kc_state_select ON user_kc_state
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY kc_card_select ON kc_card
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY misconception_select ON misconception
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY user_activity_select ON user_activity
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY user_daily_plan_select ON user_daily_plan
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+CREATE POLICY check_test_select ON check_test
   FOR SELECT USING (user_id = (SELECT auth.uid()));
 
-CREATE POLICY item_select ON item
-  FOR SELECT USING (user_id IS NULL OR user_id = (SELECT auth.uid()));
-
+-- ---- 生成物（読むだけ。作るのはサーバー側） ----
+-- material と item は「自分のもの」＋「診断用の共有プール（item.user_id IS NULL）」を読める
+CREATE POLICY material_select ON material
+  FOR SELECT USING (user_id = (SELECT auth.uid()));
+-- ★ item に SELECT ポリシーを作らない（12-nonfunctional.md §6.1）。
+--   RLS は列単位の制限ができないため、SELECT を許すと answer_key・explanation・
+--   choices[].why_wrong まで解答前に読めてしまう。出題は Server Action が
+--   stem と choices の key/text だけを返し、正答は採点の応答で初めて返す。
 CREATE POLICY generation_job_select ON generation_job
   FOR SELECT USING (user_id = (SELECT auth.uid()));
