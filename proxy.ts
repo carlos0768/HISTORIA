@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 /**
- * CSP をリクエストごとの nonce 付きで配る
+ * CSP をリクエストごとの nonce 付きで配る（Next 16 では middleware.ts ではなく proxy.ts）
  *
  * 仕様: docs/12-nonfunctional.md §6
  *
@@ -9,7 +9,7 @@ import { NextResponse, type NextRequest } from 'next/server'
  * script-src を 'self' だけにすると**ハイドレーションが起きず画面が動かなくなる**。
  * かといって 'unsafe-inline' を許すと CSP の意味が薄れるので、nonce を使う。
  */
-export function middleware(req: NextRequest) {
+export default function proxy(req: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
   const dev = process.env.NODE_ENV === 'development'
 
