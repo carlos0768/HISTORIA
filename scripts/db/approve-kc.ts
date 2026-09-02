@@ -1,10 +1,12 @@
 /**
- * KC の承認欄を埋める
+ * 承認欄を埋める（kc.csv / canon_event.csv / person.csv）
  *
- *   npx tsx scripts/db/approve-kc.ts --all                    … 未記入を全て ○ にする
+ *   npx tsx scripts/db/approve-kc.ts --all                    … kc.csv の未記入を全て ○ に
  *   npx tsx scripts/db/approve-kc.ts --all --except a.b,c.d   … 挙げた id だけ空欄のまま残す
  *   npx tsx scripts/db/approve-kc.ts --ids a.b,c.d            … 挙げた id だけ ○ にする
  *   npx tsx scripts/db/approve-kc.ts --reject a.b             … 挙げた id を × にする
+ *   npx tsx scripts/db/approve-kc.ts --file canon_event --all … 正典イベントを承認する
+ *   npx tsx scripts/db/approve-kc.ts --file person --all      … 正典人物を承認する
  *
  * ★ 承認は作者の判断である（docs/02 §5）。この道具は「作者が下した判断を
  *   CSV へ書き写す」だけで、承認そのものを代行しない。
@@ -12,12 +14,20 @@
  *
  * ★ 列の順序と引用は csv モジュールを通さず、元の行をそのまま使って
  *   1文字目だけ差し替える。書き戻しで表記が揺れると差分が読めなくなるためである。
+ *
+ * ★ 3つの CSV はどれも先頭2列が `approve,id` なので、同じ関数で扱える。
+ *   別々の道具を作ると、片方だけ直したときに挙動が食い違う。
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { SEED_DIR } from './seed'
 
-export const KC_CSV = join(SEED_DIR, 'kc.csv')
+/** 承認欄を持つ CSV。先頭2列が approve,id であること */
+export const APPROVABLE = ['kc', 'canon_event', 'person'] as const
+export type Approvable = typeof APPROVABLE[number]
+export const csvPath = (name: Approvable): string => join(SEED_DIR, `${name}.csv`)
+
+export const KC_CSV = csvPath('kc')
 
 export type ApproveOpts = {
   all?: boolean
@@ -76,6 +86,13 @@ if (process.argv[1]?.endsWith('approve-kc.ts')) {
   const list = (v: string | undefined): Set<string> =>
     new Set((v ?? '').split(',').map(s => s.trim()).filter(Boolean))
 
+  const target = (flag('--file') ?? 'kc') as Approvable
+  if (!APPROVABLE.includes(target)) {
+    console.error(`--file は ${APPROVABLE.join(' / ')} のいずれかです（指定: "${target}"）`)
+    process.exit(1)
+  }
+  const path = csvPath(target)
+
   const opts: ApproveOpts = {
     all: argv.includes('--all'),
     ids: list(flag('--ids')),
@@ -88,15 +105,17 @@ if (process.argv[1]?.endsWith('approve-kc.ts')) {
     console.error('  npx tsx scripts/db/approve-kc.ts --all --except kc.a.b,kc.c.d')
     console.error('  npx tsx scripts/db/approve-kc.ts --ids kc.a.b')
     console.error('  npx tsx scripts/db/approve-kc.ts --reject kc.a.b')
+    console.error('  npx tsx scripts/db/approve-kc.ts --file canon_event --all')
     process.exit(1)
   }
 
-  const r = applyApprovals(readFileSync(KC_CSV, 'utf8').split('\n'), opts)
+  const r = applyApprovals(readFileSync(path, 'utf8').split('\n'), opts)
   if (r.missing.length) {
-    console.error(`次の id が seed/kc.csv にありません:\n  ${r.missing.join('\n  ')}`)
+    console.error(`次の id が seed/${target}.csv にありません:\n  ${r.missing.join('\n  ')}`)
     process.exit(1)
   }
-  writeFileSync(KC_CSV, r.lines.join('\n'))
+  writeFileSync(path, r.lines.join('\n'))
+  console.log(`seed/${target}.csv:`)
   console.log(`承認 ${r.approved} 件 / 却下 ${r.rejected} 件 / 既に判断済み ${r.kept} 件`)
   console.log('')
   console.log('次にやること:')

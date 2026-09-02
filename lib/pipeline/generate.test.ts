@@ -531,6 +531,29 @@ dbSuite('生成パイプライン（実DB）', () => {
     }
   })
 
+  it('century の正典でも year_to を見る（期間の後半を誤りにしない）', async () => {
+    // ★ 実データを書いていて見つけた。以前は year_from からの ±100 だけを見て
+    //   year_to を捨てていたので、「ローマの平和（前27〜後180）」のような期間では
+    //   後半（74〜180年）がまるごと範囲外になり、正しい年が wrong になっていた
+    await db`INSERT INTO canon_event (id, label, year_from, year_to, precision)
+             VALUES ('ce.period', 'ザヴァンドリアの平和', -27, 180, 'century')
+             ON CONFLICT (id) DO NOTHING`
+    try {
+      const at = async (y: number) => {
+        const r = await machineCheck(db, [{
+          type: 'year', text: 'x', subject: 'ザヴァンドリアの平和', yearFrom: y,
+        }])
+        return r.verdicts[0]!.status
+      }
+      expect(await at(150)).toBe('ok')     // 期間の後半。以前はここが wrong だった
+      expect(await at(-27)).toBe('ok')
+      expect(await at(180)).toBe('ok')
+      expect(await at(400)).toBe('wrong')  // 範囲＋100 を超えたら誤り
+    } finally {
+      await db`DELETE FROM canon_event WHERE id = 'ce.period'`
+    }
+  })
+
   it('照合率は分母が0なら null（0除算を0%と偽らない）', () => {
     expect(matchRate({ verdicts: [], matched: 0, matchable: 0, unreadable: 0 })).toBeNull()
     expect(matchRate({ verdicts: [], matched: 4, matchable: 5, unreadable: 2 })).toBeCloseTo(0.8)

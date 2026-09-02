@@ -132,13 +132,103 @@ const walk = (n, path) => {
 };
 for (const id of ids) walk(id, []);
 
+// ---- 9. 層2の正典（canon_event / person）----
+//
+// ★ 年号は作者が全件検算しない決定である（2026-09-02）。検算の代わりに
+//   機械でできる検査をここで厚くする。特に「他のラベルを部分文字列として含む」
+//   組は、照合が最長一致でも取り違えの温床になるので必ず目に入れる。
+const canon  = load('canon_event.csv');
+const person = load('person.csv');
+const PRECISIONS = ['exact', 'decade', 'century'];
+
+const canonIds = new Set();
+const canonNames = new Map();       // ラベル・別名 → それを名乗る id の一覧
+const addName = (name, id) => {
+  if (!name) return;
+  if (!canonNames.has(name)) canonNames.set(name, []);
+  canonNames.get(name).push(id);
+};
+
+for (const e of canon) {
+  if (!/^ce\.[a-z0-9_]+\.[a-z0-9_]+$/.test(e.id ?? '')) fail(`9: canon_event の id の書式が違う: "${e.id}"`);
+  if (canonIds.has(e.id)) fail(`9: canon_event の id が重複: ${e.id}`);
+  canonIds.add(e.id);
+
+  if (!e.label) fail(`9: canon_event に label が無い: ${e.id}`);
+  if (!PRECISIONS.includes(e.precision)) fail(`9: precision は ${PRECISIONS.join('/')}: ${e.id} = "${e.precision}"`);
+  if (e.year_from === '') fail(`9: year_from は必須: ${e.id}`);
+  else if (!/^-?\d+$/.test(e.year_from)) fail(`9: year_from が数値でない: ${e.id} = "${e.year_from}"`);
+  if (e.year_to !== '') {
+    if (!/^-?\d+$/.test(e.year_to)) fail(`9: year_to が数値でない: ${e.id} = "${e.year_to}"`);
+    else if (Number(e.year_from) > Number(e.year_to)) fail(`9: year_from > year_to: ${e.id}`);
+  }
+  // ★ 桁の打ち間違いと符号の落としを拾う。世界史の範囲を外れる年は入力誤りである
+  //   （前4000年より前は文明以前、2100年より後は未来）
+  for (const [col, v] of [['year_from', e.year_from], ['year_to', e.year_to]]) {
+    if (v === '' || !/^-?\d+$/.test(v)) continue;
+    if (Number(v) < -4000 || Number(v) > 2100) fail(`9: ${col} が世界史の範囲外（桁か符号の誤りでは）: ${e.id} = ${v}`);
+  }
+  for (const label of (e.region_ids ? e.region_ids.split(';').map(s => s.trim()).filter(Boolean) : [])) {
+    if (!regionLabels.has(label)) fail(`9: canon_event の region "${label}" が region.csv にない（${e.id}）`);
+  }
+  addName(e.label, e.id);
+  for (const a of (e.aliases ? e.aliases.split(';').map(s => s.trim()).filter(Boolean) : [])) {
+    if (a === e.label) fail(`9: aliases に label と同じ語がある: ${e.id}`);
+    addName(a, e.id);
+  }
+  if (STRICT && !['○', '×'].includes(e.approve)) fail(`9: canon_event の approve が未記入または不正: ${e.id} = "${e.approve}"`);
+}
+
+// 同じ語を2つ以上の正典が名乗っていたら、どちらに当たるかが運になる
+for (const [name, owners] of canonNames) {
+  if (owners.length > 1) fail(`9: 同じ語 "${name}" を複数の canon_event が名乗っている: ${owners.join(', ')}`);
+}
+
+// 他のラベルを完全に含む組を警告する（最長一致で拾えるが、意図した包含かを目で見る）
+const canonWarnings = [];
+const names = [...canonNames.keys()].sort((a, b) => b.length - a.length);
+for (const long of names) {
+  for (const short of names) {
+    if (short.length >= long.length) continue;
+    if (long.includes(short)) {
+      canonWarnings.push(`"${short}"（${canonNames.get(short)[0]}）が "${long}"（${canonNames.get(long)[0]}）に含まれる`);
+    }
+  }
+}
+
+const personIds = new Set();
+const personLabels = new Set();
+for (const p of person) {
+  if (!/^pe\.[a-z0-9_]+$/.test(p.id ?? '')) fail(`9: person の id の書式が違う: "${p.id}"`);
+  if (personIds.has(p.id)) fail(`9: person の id が重複: ${p.id}`);
+  personIds.add(p.id);
+  if (!p.label) fail(`9: person に label が無い: ${p.id}`);
+  // label は DB 側で UNIQUE。重複したまま流すと後勝ちで黙って1件になる
+  if (personLabels.has(p.label)) fail(`9: person の label が重複: ${p.label}`);
+  personLabels.add(p.label);
+  if (p.era_id && !eraIds.has(p.era_id)) fail(`9: person の era_id が存在しない: ${p.id} = "${p.era_id}"`);
+  for (const a of (p.aliases ? p.aliases.split(';').map(s => s.trim()).filter(Boolean) : [])) {
+    if (a === p.label) fail(`9: person の aliases に label と同じ語がある: ${p.id}`);
+  }
+  if (STRICT && !['○', '×'].includes(p.approve)) fail(`9: person の approve が未記入または不正: ${p.id} = "${p.approve}"`);
+}
+
 // ---- 結果 ----
 console.log(`era ${era.length} / region ${region.length} / syllabus_unit ${syllabus.length}（節 ${leafUnits.size}） / kc ${kc.length}`);
+console.log(`canon_event ${canon.length} / person ${person.length}`);
 console.log('kind の分布:');
 for (const k of KINDS) console.log(`  ${k.padEnd(12)} ${String(count[k]).padStart(3)}  ${pct(count[k]).toFixed(1).padStart(5)}%`);
 const covered = new Set(kc.map(k => k.unit_id));
 const uncovered = [...leafUnits].filter(u => !covered.has(u));
 console.log(`KC を持つ節: ${covered.size} / ${leafUnits.size}（未着手 ${uncovered.length}）`);
+
+// ★ 警告は落とさない。包含はしばしば正しい（「ポエニ戦争」と「第1回ポエニ戦争」）。
+//   落とすと正しい正典を消す方向に働くので、目に入れるだけにする。
+if (canonWarnings.length) {
+  console.log(`\n△ 正典のラベルに包含関係が ${canonWarnings.length} 件（最長一致で拾うが、意図した包含か確認する）`);
+  for (const w of canonWarnings.slice(0, 20)) console.log('  - ' + w);
+  if (canonWarnings.length > 20) console.log(`  … 他 ${canonWarnings.length - 20} 件`);
+}
 
 if (errors.length) {
   console.error(`\n✗ ${errors.length} 件\n` + errors.map(e => '  - ' + e).join('\n'));

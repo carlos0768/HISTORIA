@@ -17,7 +17,12 @@ export const SEED_DIR = join(ROOT, 'seed')
 export type SeedCounts = {
   era: number; region: number; syllabusUnit: number
   kc: number; kcRegion: number; kcSyllabusUnit: number
+  canonEvent: number; person: number
+  /** ★ KC の未承認件数。canon_event / person とは分けて数える。
+   *   1つにまとめると「どの CSV の承認が遅れているか」が分からなくなる */
   skippedUnapproved: number
+  skippedCanonEvent: number
+  skippedPerson: number
 }
 
 export async function seedMasters(db: Sql, dir = SEED_DIR): Promise<Pick<SeedCounts, 'era' | 'region' | 'syllabusUnit'>> {
@@ -110,8 +115,84 @@ export async function seedKc(
   }
 }
 
+/**
+ * 層2の正典マスタ（docs/08 §5 層2）
+ *
+ * ★ kc と同じ承認制にする。年号そのものが中身なので、
+ *   誤った行は「正しい教材を誤りと判定して配信を止める」向きに効く。
+ *   era / region のように「仕様で確定済み・承認不要」とは扱えない。
+ *
+ * ★ region_ids は kc.csv と同じくラベルで書き、region.csv から解決する。
+ *   CSV に生の id を書くと、region.csv の採番を変えたときに黙って壊れる。
+ */
+export async function seedCanonEvent(
+  db: Sql,
+  dir = SEED_DIR,
+  opts: { requireApproval?: boolean } = {},
+): Promise<{ canonEvent: number; skipped: number }> {
+  const requireApproval = opts.requireApproval ?? true
+  const rows = readCsv(join(dir, 'canon_event.csv'))
+  const regionId = new Map(
+    readCsv(join(dir, 'region.csv')).map(r => [r.label!, Number(r.id)]),
+  )
+
+  const approved = requireApproval ? rows.filter(r => r.approve === '○') : rows
+
+  for (const e of approved) {
+    const regions = list(e.region_ids).map(label => {
+      const id = regionId.get(label)
+      if (id === undefined) throw new Error(`canon_event.csv: region "${label}" が region.csv にありません（${e.id}）`)
+      return id
+    })
+    await db`
+      INSERT INTO canon_event (id, label, aliases, year_from, year_to, precision, region_ids)
+      VALUES (${e.id!}, ${e.label!}, ${list(e.aliases)}, ${num(e.year_from)}, ${num(e.year_to)},
+              ${e.precision!}, ${regions})
+      ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, aliases = EXCLUDED.aliases,
+        year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to,
+        precision = EXCLUDED.precision, region_ids = EXCLUDED.region_ids`
+  }
+
+  return { canonEvent: approved.length, skipped: rows.length - approved.length }
+}
+
+/**
+ * 層2の人物マスタ（docs/08 §5 層2）
+ *
+ * ★ person.id は GENERATED ALWAYS AS IDENTITY なので CSV の id は使わない。
+ *   label が UNIQUE なので、冪等性はそちらで担保する。
+ *   CSV の id 列は人が行を指すためだけの鍵である（`validate.mjs` が一意性を見る）。
+ */
+export async function seedPerson(
+  db: Sql,
+  dir = SEED_DIR,
+  opts: { requireApproval?: boolean } = {},
+): Promise<{ person: number; skipped: number }> {
+  const requireApproval = opts.requireApproval ?? true
+  const rows = readCsv(join(dir, 'person.csv'))
+  const approved = requireApproval ? rows.filter(r => r.approve === '○') : rows
+
+  for (const p of approved) {
+    await db`
+      INSERT INTO person (label, aliases, era_id)
+      VALUES (${p.label!}, ${list(p.aliases)}, ${num(p.era_id)})
+      ON CONFLICT (label) DO UPDATE SET aliases = EXCLUDED.aliases, era_id = EXCLUDED.era_id`
+  }
+
+  return { person: approved.length, skipped: rows.length - approved.length }
+}
+
 export async function seedAll(db: Sql, dir = SEED_DIR, opts: { requireApproval?: boolean } = {}): Promise<SeedCounts> {
   const m = await seedMasters(db, dir)
   const k = await seedKc(db, dir, opts)
-  return { ...m, ...k }
+  // 正典は region を解決するのでマスタの後に入れる
+  const c = await seedCanonEvent(db, dir, opts)
+  const p = await seedPerson(db, dir, opts)
+  return {
+    ...m, ...k,
+    canonEvent: c.canonEvent,
+    person: p.person,
+    skippedCanonEvent: c.skipped,
+    skippedPerson: p.skipped,
+  }
 }

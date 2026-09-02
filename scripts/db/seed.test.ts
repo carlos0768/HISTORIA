@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { Sql } from 'postgres'
 import { createTestDb, TEST_DB_URL } from '@/lib/db/test-helper'
-import { seedAll, seedKc, SEED_DIR } from './seed'
+import { seedAll, seedKc, seedCanonEvent, seedPerson, SEED_DIR } from './seed'
 import { readCsv } from './csv'
 import { parseCsv } from './csv'
 
@@ -80,6 +80,99 @@ dbSuite('seed 投入（実DB）', () => {
     const skipped = readCsv(`${SEED_DIR}/kc.csv`).slice(0, 2).map(r => r.id!)
     const found = await db<{ id: string }[]>`SELECT id FROM kc WHERE id IN ${db(skipped)}`
     expect(found).toHaveLength(0)
+  })
+
+  /**
+   * ---- 層2の正典（docs/08 §5 層2）----
+   *
+   * ★ ここも件数を数値で書かない。canon_event は起草が進むたびに増える。
+   *
+   * ★ この2件は対になっている。実データが**全件未承認**の間は、この試験の
+   *   「入る」側が0件で空回りする。だから次の試験が、承認を付けた写しで
+   *   「入る」側を示している（KC は全件承認なので逆向きに写しを作っている）。
+   *   **どちらか一方だけを消すと、承認制が壊れても気づけなくなる。**
+   */
+  it('承認済みの canon_event / person だけが入る', async () => {
+    await db`TRUNCATE canon_event, person RESTART IDENTITY CASCADE`
+    const counts = await seedAll(db, SEED_DIR)
+
+    const ce = readCsv(`${SEED_DIR}/canon_event.csv`)
+    const pe = readCsv(`${SEED_DIR}/person.csv`)
+    const ceOk = ce.filter(r => r.approve === '○')
+    const peOk = pe.filter(r => r.approve === '○')
+
+    expect(counts.canonEvent).toBe(ceOk.length)
+    expect(counts.person).toBe(peOk.length)
+    expect(counts.skippedCanonEvent).toBe(ce.length - ceOk.length)
+    expect(counts.skippedPerson).toBe(pe.length - peOk.length)
+
+    const n = async (t: string) => {
+      const r = await db<{ count: string }[]>`SELECT count(*) FROM ${db(t)}`
+      return Number(r[0]!.count)
+    }
+    expect(await n('canon_event')).toBe(ceOk.length)
+    expect(await n('person')).toBe(peOk.length)
+  })
+
+  it('承認欄が空の canon_event / person は入らない', async () => {
+    await db`TRUNCATE canon_event, person RESTART IDENTITY CASCADE`
+
+    // 承認を付けた写しを作って「入る」側を示す。実データは起草中で全件空欄なので、
+    // そのままでは「入らない」しか示せず、投入経路が壊れても気づけない
+    const dir = mkdtempSync(join(tmpdir(), 'historia-canon-'))
+    cpSync(SEED_DIR, dir, { recursive: true })
+    const approveFirst = (file: string, howMany: number) => {
+      const lines = readFileSync(join(dir, file), 'utf8').split('\n')
+      for (let i = 1; i <= howMany; i++) lines[i] = '○' + lines[i]!
+      writeFileSync(join(dir, file), lines.join('\n'))
+    }
+    approveFirst('canon_event.csv', 3)
+    approveFirst('person.csv', 2)
+
+    const c = await seedCanonEvent(db, dir)
+    const p = await seedPerson(db, dir)
+    expect(c.canonEvent).toBe(3)
+    expect(p.person).toBe(2)
+
+    // 承認していない行は1件も入っていない
+    const rest = readCsv(`${SEED_DIR}/canon_event.csv`).slice(3).map(r => r.id!)
+    const found = await db<{ id: string }[]>`SELECT id FROM canon_event WHERE id IN ${db(rest)}`
+    expect(found).toHaveLength(0)
+  })
+
+  it('canon_event は冪等（2回流しても増えない・aliases も保たれる）', async () => {
+    await db`TRUNCATE canon_event, person RESTART IDENTITY CASCADE`
+    const dir = mkdtempSync(join(tmpdir(), 'historia-canon2-'))
+    cpSync(SEED_DIR, dir, { recursive: true })
+    const lines = readFileSync(join(dir, 'canon_event.csv'), 'utf8').split('\n')
+    for (let i = 1; i <= 5; i++) lines[i] = '○' + lines[i]!
+    writeFileSync(join(dir, 'canon_event.csv'), lines.join('\n'))
+
+    await seedCanonEvent(db, dir)
+    await seedCanonEvent(db, dir)
+    const rows = await db<{ count: string }[]>`SELECT count(*) FROM canon_event`
+    expect(Number(rows[0]!.count)).toBe(5)
+
+    // aliases（text[]）と region_ids（smallint[]）が配列として入っていること
+    const withAlias = await db<{ id: string; aliases: string[]; region_ids: number[] }[]>`
+      SELECT id, aliases, region_ids FROM canon_event WHERE cardinality(aliases) > 0 LIMIT 1`
+    expect(withAlias.length).toBe(1)
+    expect(Array.isArray(withAlias[0]!.aliases)).toBe(true)
+    expect(withAlias[0]!.region_ids.length).toBeGreaterThan(0)
+  })
+
+  it('person は label が同じなら1件にまとまる（id は自動採番）', async () => {
+    await db`TRUNCATE person RESTART IDENTITY CASCADE`
+    const dir = mkdtempSync(join(tmpdir(), 'historia-person-'))
+    cpSync(SEED_DIR, dir, { recursive: true })
+    const lines = readFileSync(join(dir, 'person.csv'), 'utf8').split('\n')
+    lines[1] = '○' + lines[1]!
+    writeFileSync(join(dir, 'person.csv'), lines.join('\n'))
+
+    await seedPerson(db, dir)
+    await seedPerson(db, dir)
+    const rows = await db<{ count: string }[]>`SELECT count(*) FROM person`
+    expect(Number(rows[0]!.count)).toBe(1)
   })
 
   it('マスタは全件入る', async () => {

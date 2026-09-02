@@ -36,12 +36,18 @@ export type MachineCheckResult = {
 export const matchRate = (r: MachineCheckResult): number | null =>
   r.matchable === 0 ? null : r.matched / r.matchable
 
-/** 年号の一致とみなす幅。precision に応じて緩める */
+/**
+ * 年号の一致とみなす幅。precision に応じて範囲の外側に余裕を付ける。
+ *
+ * ★ century / decade でも year_to を必ず見る。以前は `year_from` からの
+ *   ±100 / ±10 だけを見て **year_to を捨てていた**。期間を持つ正典
+ *   （「ローマの平和 前27〜後180」など）でこれをやると、範囲の後半が
+ *   まるごと外れて**正しい年を誤りと判定する**。実データを書いていて気づいた。
+ */
 function yearMatches(claimYear: number, canonFrom: number, canonTo: number | null, precision: string): boolean {
   const to = canonTo ?? canonFrom
-  if (precision === 'century') return Math.abs(claimYear - canonFrom) <= 100
-  if (precision === 'decade') return Math.abs(claimYear - canonFrom) <= 10
-  return claimYear >= canonFrom && claimYear <= to
+  const slack = precision === 'century' ? 100 : precision === 'decade' ? 10 : 0
+  return claimYear >= canonFrom - slack && claimYear <= to + slack
 }
 
 /** claim の本文から西暦を拾う。「前18世紀」のような表記は拾わない（照合対象外にする） */

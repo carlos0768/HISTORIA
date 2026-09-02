@@ -9,14 +9,14 @@
  *   - migrate.ts は public に表があると拒否する（スキーマ適用のための道具だから）
  *
  * ★ この道具は壊さない。DROP も TRUNCATE も DELETE も書かない。
- *   seedMasters / seedKc の INSERT は全て ON CONFLICT なので、
+ *   seedAll（マスタ / KC / 正典）の INSERT は全て ON CONFLICT なので、
  *   何度流しても結果は同じになる。
  *
  * ★ SQL 本文を会話や画面に出さない。seed/sql/02_seed.sql は 400KB を超えるため、
  *   貼り付けで運ぶのは現実的でない。ここでは CSV から直接 INSERT する。
  */
 import postgres from 'postgres'
-import { seedMasters, seedKc, SEED_DIR } from './seed'
+import { seedAll, SEED_DIR } from './seed'
 
 const url = process.env.DATABASE_URL
 if (!url) {
@@ -34,17 +34,21 @@ console.log(`接続先: ${shown.host}${shown.pathname}`)
 
 const db = postgres(url, { prepare: false, max: 1, onnotice: () => {} })
 
-type Counts = { kc: string; ksu: string; kr: string; units: string }
+type Counts = { kc: string; ksu: string; kr: string; units: string; ce: string; pe: string }
 const snapshot = async (): Promise<Counts> => {
   const [r] = await db<Counts[]>`
     SELECT (SELECT count(*) FROM kc)                              AS kc,
            (SELECT count(*) FROM kc_syllabus_unit)                AS ksu,
            (SELECT count(*) FROM kc_region)                       AS kr,
-           (SELECT count(DISTINCT unit_id) FROM kc_syllabus_unit) AS units`
+           (SELECT count(DISTINCT unit_id) FROM kc_syllabus_unit) AS units,
+           (SELECT count(*) FROM canon_event)                     AS ce,
+           (SELECT count(*) FROM person)                          AS pe`
   return r!
 }
-const show = (label: string, c: Counts) =>
+const show = (label: string, c: Counts) => {
   console.log(`  ${label}: kc ${c.kc} / kc_syllabus_unit ${c.ksu} / kc_region ${c.kr} / KC を持つ節 ${c.units}`)
+  console.log(`  ${' '.repeat(label.length)}  正典: canon_event ${c.ce} / person ${c.pe}`)
+}
 
 try {
   // スキーマが無い相手に流さない。表が無いのに INSERT を始めると
@@ -67,14 +71,13 @@ try {
 
   console.log('\n投入しています…（KC 1件あたり3クエリ以上あるので少しかかります）')
   // 1トランザクションにまとめる。途中で切れても半端に入らないようにするため
-  const counts = await db.begin(async tx => {
-    const m = await seedMasters(tx as unknown as postgres.Sql, SEED_DIR)
-    const k = await seedKc(tx as unknown as postgres.Sql, SEED_DIR)
-    return { ...m, ...k }
-  })
+  const counts = await db.begin(async tx =>
+    seedAll(tx as unknown as postgres.Sql, SEED_DIR))
 
   console.log(`  時代 ${counts.era} / 地域 ${counts.region} / 章立て ${counts.syllabusUnit}`)
   console.log(`  KC ${counts.kc}（承認されず除外 ${counts.skippedUnapproved}）/ kc_region ${counts.kcRegion}`)
+  console.log(`  正典: canon_event ${counts.canonEvent}（除外 ${counts.skippedCanonEvent}）` +
+    ` / person ${counts.person}（除外 ${counts.skippedPerson}）`)
 
   const after = await snapshot()
   show('投入後', after)

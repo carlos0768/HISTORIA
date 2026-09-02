@@ -4606,10 +4606,15 @@ INSERT INTO kc_region (kc_id, region_id, is_primary) VALUES ('kc.euro.church_pow
   ON CONFLICT (kc_id, region_id) DO UPDATE SET is_primary = true;
 INSERT INTO kc_region (kc_id, region_id, is_primary) VALUES ('kc.euro.church_power', 3, false) ON CONFLICT DO NOTHING;
 
+-- 正典イベント 0 件（承認されず除外 152）
+
+-- 正典人物 0 件（承認されず除外 111）
+
 COMMIT;
 
 -- 確認用
 -- SELECT (SELECT count(*) FROM era) AS era, (SELECT count(*) FROM region) AS region,
 --        (SELECT count(*) FROM syllabus_unit) AS unit, (SELECT count(*) FROM kc) AS kc,
---        (SELECT count(*) FROM kc_region) AS kc_region;
--- 期待値: era=3 region=24 unit=117 kc=408 kc_region=891
+--        (SELECT count(*) FROM kc_region) AS kc_region,
+--        (SELECT count(*) FROM canon_event) AS canon_event, (SELECT count(*) FROM person) AS person;
+-- 期待値: era=3 region=24 unit=117 kc=408 kc_region=891 canon_event=0 person=0
