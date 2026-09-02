@@ -297,6 +297,12 @@ for (const t of item) {
       return true;
     });
     if (stray.length) fail(`10: ${t.id} の${field}に日本語以外の文字が混ざっている: ${[...new Set(stray)].join('')}`);
+
+    // ★ ラテン文字の単語も落とす。上の検査は ASCII を許すので "individual" を
+    //   すり抜けた（実際に混入させた）。年号や「4区分」の数字は通し、
+    //   2文字以上続く英字だけを見る。史料名などで必要になったら note に書く。
+    const words = (text ?? '').match(/[A-Za-z]{2,}/g);
+    if (words) fail(`10: ${t.id} の${field}に英単語が混ざっている: ${[...new Set(words)].join(', ')}`);
   }
 
   // 同じ問題文が2つあると、同じ設問を2回出すことになる
