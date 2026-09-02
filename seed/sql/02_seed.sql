@@ -5267,7 +5267,7 @@ INSERT INTO canon_event (id, label, aliases, year_from, year_to, precision, regi
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, aliases = EXCLUDED.aliases,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to,
     precision = EXCLUDED.precision, region_ids = EXCLUDED.region_ids;
-INSERT INTO canon_event (id, label, aliases, year_from, year_to, precision, region_ids) VALUES ('ce.islam.manzikert', 'マラーズギルドの戦い', ARRAY['マンジケルトの戦い']::text[], 1071, NULL, 'exact', ARRAY[11]::smallint[])
+INSERT INTO canon_event (id, label, aliases, year_from, year_to, precision, region_ids) VALUES ('ce.islam.manzikert', 'マンジケルトの戦い', ARRAY['マラズギルトの戦い']::text[], 1071, NULL, 'exact', ARRAY[11]::smallint[])
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, aliases = EXCLUDED.aliases,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to,
     precision = EXCLUDED.precision, region_ids = EXCLUDED.region_ids;
@@ -10222,11 +10222,14 @@ INSERT INTO person (label, aliases, era_id) VALUES ('サハロフ', '{}'::text[]
 INSERT INTO person (label, aliases, era_id) VALUES ('ソルジェニーツィン', '{}'::text[], 3)
   ON CONFLICT (label) DO UPDATE SET aliases = EXCLUDED.aliases, era_id = EXCLUDED.era_id;
 
+-- 共有設問 0 件（承認されず除外 408）
+
 COMMIT;
 
 -- 確認用
 -- SELECT (SELECT count(*) FROM era) AS era, (SELECT count(*) FROM region) AS region,
 --        (SELECT count(*) FROM syllabus_unit) AS unit, (SELECT count(*) FROM kc) AS kc,
 --        (SELECT count(*) FROM kc_region) AS kc_region,
---        (SELECT count(*) FROM canon_event) AS canon_event, (SELECT count(*) FROM person) AS person;
--- 期待値: era=3 region=24 unit=117 kc=408 kc_region=891 canon_event=1180 person=446
+--        (SELECT count(*) FROM canon_event) AS canon_event, (SELECT count(*) FROM person) AS person,
+--        (SELECT count(*) FROM item) AS item, (SELECT count(*) FROM item_kc) AS item_kc;
+-- 期待値: era=3 region=24 unit=117 kc=408 kc_region=891 canon_event=1180 person=446 item=0

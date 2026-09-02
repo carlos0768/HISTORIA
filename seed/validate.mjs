@@ -313,6 +313,24 @@ for (const t of item) {
   if (STRICT && !['○', '×'].includes(t.approve)) fail(`10: item の approve が未記入または不正: ${t.id} = "${t.approve}"`);
 }
 
+// ★ 正解の位置が偏っていないか。
+//   app/study/page.tsx は choices を `ORDER BY c->>'key'` で出す。**並べ替えない。**
+//   つまり CSV に書いた a〜d の位置がそのまま画面の上から下になる。
+//   起草時に「正解を先に書く」癖が出て 408 問中 407 問が a になっていた（実測）。
+//   これでは中身を知らなくても正解でき、guess_rate = 0.25 の前提が崩れて
+//   弱点推定そのものが無意味になる。位置は id のハッシュで機械的に決める。
+if (item.length >= 40) {
+  const dist = { a: 0, b: 0, c: 0, d: 0 };
+  for (const t of item) if (t.answer in dist) dist[t.answer]++;
+  for (const [k, n] of Object.entries(dist)) {
+    const share = (n / item.length) * 100;
+    if (share > 35 || share < 15) {
+      fail(`10: 正解が ${k} に偏っている（${n}/${item.length} = ${share.toFixed(1)}%）。` +
+           `画面は a〜d の順に出すので、位置の偏りはそのまま解答のヒントになる`);
+    }
+  }
+}
+
 // ★ 1つの KC に設問が無いと、その KC は永久に出題されない（出題は KC 単位）。
 const kcWithItem = new Set(item.map(t => t.kc_id));
 const kcWithoutItem = kc.filter(k => !kcWithItem.has(k.id));

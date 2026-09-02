@@ -15,7 +15,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { readCsv, orNull, num, list } from './csv'
-import { SEED_DIR as DEFAULT_SEED_DIR } from './seed'
+import { SEED_DIR as DEFAULT_SEED_DIR, ITEM_NAMESPACE, stableUuid } from './seed'
 
 /** SQL の文字列リテラル。単引用符を二重にする */
 const q = (v: string): string => `'${v.replaceAll("'", "''")}'`
@@ -164,22 +164,52 @@ for (const p of persons) {
 }
 say('')
 
+// ---- 共有設問 ----
+// ★ これが無いと、SQL を貼っただけでは1問も出題されない。
+//   KC と正典だけ入れても「今日やること」は空になる（出題は item が要る）。
+//   seedItem と同じ規則で作る: id は stableUuid で決まり、user_id は NULL（共有プール）、
+//   approved は作者の承認済みとして true。
+//
+// ★ approved_at に生成時刻を焼き込まない。焼き込むと流すたびに SQL が変わり、
+//   生成物の鮮度を見る dump-sql.test.ts が毎回落ちる。SQL の now() に任せる。
+const itemRows = readCsv(join(SEED_DIR, 'item.csv'))
+const items = itemRows.filter(r => r.approve === '○')
+const seenItemId = new Set<string>()
+say(`-- 共有設問 ${items.length} 件（承認されず除外 ${itemRows.length - items.length}）`)
+for (const t of items) {
+  const id = stableUuid(ITEM_NAMESPACE, t.id!)
+  if (seenItemId.has(id)) continue          // seed.ts の dedupe と同じ（後勝ちではなく先勝ち）
+  seenItemId.add(id)
+  const choices = (['a', 'b', 'c', 'd'] as const).map(k => ({ key: k, text: t[k]! }))
+  say(`INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,`)
+  say(`                  guess_rate, approved, approved_by, approved_at) VALUES`)
+  say(`  (${lit(id)}, NULL, 'mcq4', ${lit(t.stem!)}, ${q(JSON.stringify(choices))}::jsonb,`)
+  say(`   ${q(JSON.stringify(t.answer!))}::jsonb, ${lit(t.explanation!)}, 0.25, true, 'author', now())`)
+  say(`  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,`)
+  say(`    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,`)
+  say(`    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;`)
+  say(`INSERT INTO item_kc (item_id, kc_id, weight) VALUES (${lit(id)}, ${lit(t.kc_id!)}, 1.0)`)
+  say(`  ON CONFLICT DO NOTHING;`)
+}
+say('')
+
 say('COMMIT;')
 say('')
 say('-- 確認用')
 say(`-- SELECT (SELECT count(*) FROM era) AS era, (SELECT count(*) FROM region) AS region,`)
 say(`--        (SELECT count(*) FROM syllabus_unit) AS unit, (SELECT count(*) FROM kc) AS kc,`)
 say(`--        (SELECT count(*) FROM kc_region) AS kc_region,`)
-say(`--        (SELECT count(*) FROM canon_event) AS canon_event, (SELECT count(*) FROM person) AS person;`)
+say(`--        (SELECT count(*) FROM canon_event) AS canon_event, (SELECT count(*) FROM person) AS person,`)
+say(`--        (SELECT count(*) FROM item) AS item, (SELECT count(*) FROM item_kc) AS item_kc;`)
 say(`-- 期待値: era=${eras.length} region=${regions.length} unit=${units.length} kc=${approved.length} ` +
-  `kc_region=${kcRegionCount} canon_event=${canon.length} person=${persons.length}`)
+  `kc_region=${kcRegionCount} canon_event=${canon.length} person=${persons.length} item=${seenItemId.size}`)
 
 return {
   sql: out.join('\n') + '\n',
   counts: {
     era: eras.length, region: regions.length, syllabusUnit: units.length,
     kc: approved.length, kcRegion: kcRegionCount, skipped,
-    canonEvent: canon.length, person: persons.length,
+    canonEvent: canon.length, person: persons.length, item: seenItemId.size,
   },
 }
 }
@@ -198,6 +228,11 @@ if (process.argv[1]?.endsWith('dump-sql.ts')) {
     console.log(`  時代 ${counts.era} / 地域 ${counts.region} / 章立て ${counts.syllabusUnit} / ` +
       `KC ${counts.kc}（除外 ${counts.skipped}）/ kc_region ${counts.kcRegion}`)
     console.log(`  正典: canon_event ${counts.canonEvent} / person ${counts.person}`)
+    console.log(`  共有設問: item ${counts.item}`)
+    if (counts.item === 0) {
+      console.log('  ※ item が0件。承認欄が空のままだと1問も出題されない。')
+      console.log('    npx tsx scripts/db/approve-kc.ts --file item --all')
+    }
     console.log('')
     console.log('Supabase の SQL エディタに、この順で貼る:')
     console.log('  1. docs/schema.sql          （そのまま貼れる）')

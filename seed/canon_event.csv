@@ -164,7 +164,7 @@ approve,id,label,aliases,year_from,year_to,precision,region_ids,note
 ○,ce.islam.fatimid_found,ファーティマ朝の成立,,909,,exact,エジプト・北アフリカ,シーア派。カリフを自称
 ○,ce.islam.buyid_baghdad,ブワイフ朝のバグダード入城,,946,,exact,メソポタミア・イラン,大アミールの称号
 ○,ce.islam.seljuk_baghdad,セルジューク朝のバグダード入城,,1055,,exact,メソポタミア・イラン,スルタンの称号を得る
-○,ce.islam.manzikert,マラーズギルドの戦い,マンジケルトの戦い,1071,,exact,アナトリア・シリア,ビザンツ敗北。十字軍の遠因
+○,ce.islam.manzikert,マンジケルトの戦い,マラズギルトの戦い,1071,,exact,アナトリア・シリア,ビザンツ敗北。十字軍の遠因
 ○,ce.islam.ayyubid_found,アイユーブ朝の成立,,1169,,exact,エジプト・北アフリカ,サラディン。ファーティマ朝を倒す
 ○,ce.islam.jerusalem_recapture,サラディンのイェルサレム奪回,,1187,,exact,アナトリア・シリア,第3回十字軍を招く
 ○,ce.islam.mamluk_found,マムルーク朝の成立,,1250,,exact,エジプト・北アフリカ,アイユーブ朝の軍人奴隷

@@ -64,7 +64,7 @@ async function insertMany(
  *
  * ★ 名前空間を混ぜる。他の CSV の id と衝突させないためである。
  */
-const ITEM_NAMESPACE = 'historia.seed.item'
+export const ITEM_NAMESPACE = 'historia.seed.item'
 export function stableUuid(namespace: string, name: string): string {
   const h = createHash('md5').update(`${namespace}:${name}`).digest()
   h[6] = (h[6]! & 0x0f) | 0x30 // 版3

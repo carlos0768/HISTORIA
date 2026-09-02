@@ -10,8 +10,9 @@ KC・章立て・地域・時代は **CSV で git 管理し、作者が承認し
 | `region.csv` | 地域の階層マスタ24件 | 不要（同上） |
 | `syllabus_unit.csv` | 教科書の部・章・節 117件（うち節75） | **軽く目を通す** |
 | `kc.csv` | 知識コンポーネント 408件 | **承認済み** |
-| `canon_event.csv` | 層2の正典（年号照合）。目標 約1,200件 | **一括承認** ← いまここ |
-| `person.csv` | 層2の正典（人名照合）。目標 約400件 | **一括承認** ← いまここ |
+| `canon_event.csv` | 層2の正典（年号照合）1,180件 | **承認済み** |
+| `person.csv` | 層2の正典（人名照合）446件 | **承認済み** |
+| `item.csv` | 共有の設問 408件（KC 1件につき1問） | **一括承認** ← いまここ |
 | `validate.mjs` | 投入前の検査。依存なし | — |
 
 ---
@@ -155,7 +156,7 @@ Supabase のダッシュボード → SQL Editor に、この順で貼る。
 | # | 貼るもの | 中身 |
 |---|---|---|
 | 1 | `docs/schema.sql` | 42テーブル・RLS 42本＋ポリシー34本。**そのまま貼れる** |
-| 2 | `seed/sql/02_seed.sql` | 時代3・地域24・章立て117・KC 408・正典（承認済みのみ） |
+| 2 | `seed/sql/02_seed.sql` | 時代3・地域24・章立て117・KC 408・正典・共有設問（**承認済みのみ**） |
 
 `docs/schema.sql` に手を加えなくてよいのは、Supabase には pgvector があり
 `auth.uid()` も実在するためである（ローカル用の置換も shim も要らない）。
@@ -239,10 +240,23 @@ node seed/validate.mjs --strict   # 投入前の検査（approve 列の空欄も
 1. ~~KC 60件を承認する~~ **完了**（2026-09-02）
 2. ~~残り約340件を作る~~ **完了**（408件・75/75節）
 3. ~~408件を承認する~~ **完了**（2026-09-02・作者が一括承認）
-4. **正典（`canon_event` 約1,200件・`person` 約400件）を起草する** ← いまここ
-5. 正典を一括承認する
-6. `seedAll()` が kc / kc_region / kc_syllabus_unit / canon_event / person に展開する
-7. Phase 0 はこの承認済みデータを使う（`docs/13-roadmap.md`）
+4. ~~正典（`canon_event` / `person`）を起草する~~ **完了**（1,180件 / 446件）
+5. ~~正典を一括承認する~~ **完了**
+6. ~~共有設問 408問を起草する~~ **完了**（KC 1件につき1問・全 KC を覆った）
+7. **共有設問を一括承認する** ← いまここ
+
+   ```bash
+   npx tsx scripts/db/approve-kc.ts --file item --all   # 承認欄を ○ で埋める
+   node seed/validate.mjs --strict                      # 空欄が残っていないか見る
+   npx tsx scripts/db/dump-sql.ts                       # 02_seed.sql を作り直す
+   ```
+
+   **これをやるまで1問も出題されない。** `seedItem` も `dump-sql.ts` も
+   `approve` が `○` の行しか読まないためである（`dump-sql.ts` は
+   item が0件のとき、この手順を画面に出す）。
+
+8. `seedAll()` が kc / kc_region / kc_syllabus_unit / canon_event / person / item / item_kc に展開する
+9. Phase 0 はこの承認済みデータを使う（`docs/13-roadmap.md`）
 
 Phase 0 で「AI が出した KC を AI が使って生成し AI が検証する」構図を避けるため、
 **KC と正典だけは人間が固定した状態**で実験に入る。ここが承認制である理由である。
