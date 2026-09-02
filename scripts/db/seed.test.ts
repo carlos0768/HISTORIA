@@ -29,16 +29,27 @@ dbSuite('seed 投入（実DB）', () => {
   beforeAll(async () => { ({ db, drop } = await createTestDb('historia_seed_test')) }, 120_000)
   afterAll(async () => { await drop() })
 
-  it('承認済みの KC が入る（作者承認制 docs/02 §5）', async () => {
+  /**
+   * ★ 件数を数値で書かない。KC は起草が進むたびに増えるので、
+   *   「60件」と書いた瞬間にこの試験は内容ではなく件数を守る試験になる。
+   *   CSV から期待値を導き、承認された分だけが入ることを見る。
+   */
+  it('承認済みの KC だけが入る（作者承認制 docs/02 §5）', async () => {
     const counts = await seedAll(db, SEED_DIR)
     const csv = readCsv(`${SEED_DIR}/kc.csv`)
-    expect(csv).toHaveLength(60)
-    // 第1バッチは作者が60件すべてを承認した
-    expect(csv.every(r => r.approve === '○')).toBe(true)
-    expect(counts.kc).toBe(60)
-    expect(counts.skippedUnapproved).toBe(0)
+    const approved = csv.filter(r => r.approve === '○')
+    const pending = csv.filter(r => r.approve !== '○')
+    expect(approved.length).toBeGreaterThan(0)
+    expect(counts.kc).toBe(approved.length)
+    expect(counts.skippedUnapproved).toBe(pending.length)
     const rows = await db<{ count: string }[]>`SELECT count(*) FROM kc`
-    expect(Number(rows[0]!.count)).toBe(60)
+    expect(Number(rows[0]!.count)).toBe(approved.length)
+    // 未承認の id が1件も入っていないこと
+    if (pending.length > 0) {
+      const ids = pending.map(r => r.id!)
+      const found = await db<{ id: string }[]>`SELECT id FROM kc WHERE id IN ${db(ids)}`
+      expect(found).toHaveLength(0)
+    }
   })
 
   /**
@@ -60,8 +71,11 @@ dbSuite('seed 投入（実DB）', () => {
 
     await seedAll(db, dir)          // マスタを入れてから
     const c = await seedKc(db, dir) // 既定は requireApproval: true
-    expect(c.kc).toBe(58)
-    expect(c.skippedUnapproved).toBe(2)
+    const base = readCsv(`${SEED_DIR}/kc.csv`)
+    const approvedBefore = base.filter(r => r.approve === '○').length
+    // 写しでは承認を2件外したので、入る数はちょうど2件減る
+    expect(c.kc).toBe(approvedBefore - 2)
+    expect(c.skippedUnapproved).toBe(base.length - approvedBefore + 2)
 
     const skipped = readCsv(`${SEED_DIR}/kc.csv`).slice(0, 2).map(r => r.id!)
     const found = await db<{ id: string }[]>`SELECT id FROM kc WHERE id IN ${db(skipped)}`
@@ -86,16 +100,21 @@ dbSuite('seed 投入（実DB）', () => {
     expect(rows.map(r => [r.level, Number(r.n)])).toEqual([[1, 9], [2, 33], [3, 75]])
   })
 
-  it('承認を無視して投入すると KC 60件と対応関係が入る', async () => {
+  it('承認を無視して投入すると起草中の KC も対応関係ごと入る', async () => {
+    const csv = readCsv(`${SEED_DIR}/kc.csv`)
     const c = await seedKc(db, SEED_DIR, { requireApproval: false })
-    expect(c.kc).toBe(60)
+    expect(c.kc).toBe(csv.length)
     const q = async (t: string) => {
       const r = await db<{ count: string }[]>`SELECT count(*) FROM ${db(t)}`
       return Number(r[0]!.count)
     }
-    expect(await q('kc')).toBe(60)
-    expect(await q('kc_syllabus_unit')).toBe(60)
-    expect(await q('kc_region')).toBe(93) // primary 60 + others 33
+    expect(await q('kc')).toBe(csv.length)
+    // KC はちょうど1つの節に属する
+    expect(await q('kc_syllabus_unit')).toBe(csv.length)
+    // primary は1件ずつ、others は ; 区切り
+    const others = csv.reduce((n, r) =>
+      n + (r.region_others ? r.region_others.split(';').filter(Boolean).length : 0), 0)
+    expect(await q('kc_region')).toBe(csv.length + others)
   })
 
   it('primary region がちょうど1件（UNIQUE INDEX が効いている）', async () => {
