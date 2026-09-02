@@ -80,13 +80,13 @@ describe('§1.1 リクエストの形', () => {
     let url = ''
     const f = vi.fn(async (u: string) => { url = u; return geminiOk(validMaterial()) })
     const p = createGeminiProvider({
-      apiKey: 'K', model: 'gemini-2.5-flash', embedModel: 'text-embedding-004',
+      apiKey: 'K', model: 'gemini-3.6-flash', embedModel: 'gemini-embedding-001',
       fetchImpl: f as unknown as typeof fetch,
     })
     await p.generate({ prompt, schema: materialJsonSchema(), maxOutputTokens: 12_000 })
     expect(url).toContain('generativelanguage.googleapis.com')
     expect(url).not.toContain('aiplatform.googleapis.com')
-    expect(url).toContain('/models/gemini-2.5-flash:generateContent')
+    expect(url).toContain('/models/gemini-3.6-flash:generateContent')
   })
 
   it('鍵はヘッダで送る（URL に載せない）', async () => {

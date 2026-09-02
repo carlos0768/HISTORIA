@@ -10,9 +10,9 @@ import { createUser } from '@/lib/loop/fixture'
 import { MATERIAL_PROMPT_VERSION } from '@/lib/ai/prompt'
 
 const cfg: AiConfig = {
-  genProvider: 'gemini', genModel: 'gemini-2.5-flash',
+  genProvider: 'gemini', genModel: 'gemini-3.6-flash',
   verifyProvider: 'anthropic', verifyModel: 'claude-sonnet-5',
-  embedModel: 'text-embedding-004',
+  embedModel: 'gemini-embedding-001',
 }
 
 describe('層2 の年号抽出', () => {

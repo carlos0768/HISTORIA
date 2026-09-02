@@ -238,7 +238,12 @@ v0.1 は「AIが参照できる過去問データベース」を grounding の�
 | KC の候補絞り込み（LLM に「この中から選べ」と渡す） | `kc.label` |
 | 動画と KC の対応付け | `video.title + description` |
 
-**埋め込みモデル: Gemini の `text-embedding-004`（768次元）を使う。**
+**埋め込みモデル: Gemini の `gemini-embedding-001` を使い、768次元で受け取る。**
+
+> 2026-09-02 追記: `text-embedding-004` は API のモデル一覧から消えている（実測）。
+> 後継は `gemini-embedding-001` / `gemini-embedding-2`。
+> 次元数は `outputDimensionality` で指定する。`schema.sql` の `vector(768)` に合わせる。
+> **まだ実呼び出しで確認していない**（docs/14 M29）。
 `schema.sql` の `vector(768)` はこのモデルの次元である。
 
 明記する理由が2つある。第一に、**Anthropic には埋め込み API が無い**ので、

@@ -28,9 +28,9 @@ describe('読了の判定（docs/11）', () => {
 })
 
 const cfg: AiConfig = {
-  genProvider: 'gemini', genModel: 'gemini-2.5-flash',
+  genProvider: 'gemini', genModel: 'gemini-3.6-flash',
   verifyProvider: 'anthropic', verifyModel: 'claude-sonnet-5',
-  embedModel: 'text-embedding-004',
+  embedModel: 'gemini-embedding-001',
 }
 
 const dbSuite = TEST_DB_URL ? describe : describe.skip
