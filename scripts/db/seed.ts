@@ -8,6 +8,7 @@
  */
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { createHash } from 'node:crypto'
 import type { Sql } from 'postgres'
 import { readCsv, orNull, num, list } from './csv'
 
@@ -53,15 +54,36 @@ async function insertMany(
   }
 }
 
+/**
+ * CSV の読みやすい id から、決まった uuid を作る（RFC 4122 の版3と同じ組み立て）。
+ *
+ * ★ item.id は uuid なので、CSV に `it.greece.athens_vs_sparta.1` のような
+ *   人が読める id を書いても、そのままでは主キーにできない。
+ *   毎回 randomUUID にすると**同じ CSV を2回流すたびに設問が増える**ので、
+ *   id から決まった uuid を導く。これで ON CONFLICT (id) が効く。
+ *
+ * ★ 名前空間を混ぜる。他の CSV の id と衝突させないためである。
+ */
+const ITEM_NAMESPACE = 'historia.seed.item'
+export function stableUuid(namespace: string, name: string): string {
+  const h = createHash('md5').update(`${namespace}:${name}`).digest()
+  h[6] = (h[6]! & 0x0f) | 0x30 // 版3
+  h[8] = (h[8]! & 0x3f) | 0x80 // variant
+  const s = h.toString('hex')
+  return `${s.slice(0, 8)}-${s.slice(8, 12)}-${s.slice(12, 16)}-${s.slice(16, 20)}-${s.slice(20, 32)}`
+}
+
 export type SeedCounts = {
   era: number; region: number; syllabusUnit: number
   kc: number; kcRegion: number; kcSyllabusUnit: number
   canonEvent: number; person: number
+  item: number; itemKc: number
   /** ★ KC の未承認件数。canon_event / person とは分けて数える。
    *   1つにまとめると「どの CSV の承認が遅れているか」が分からなくなる */
   skippedUnapproved: number
   skippedCanonEvent: number
   skippedPerson: number
+  skippedItem: number
 }
 
 export async function seedMasters(db: Sql, dir = SEED_DIR): Promise<Pick<SeedCounts, 'era' | 'region' | 'syllabusUnit'>> {
@@ -229,17 +251,87 @@ export async function seedPerson(
   return { person: approved.length, skipped: rows.length - approved.length }
 }
 
+/**
+ * 共有の設問プール（`item.user_id IS NULL`）
+ *
+ * ★ なぜ手で書くか。app/study/page.tsx は
+ *   `(i.user_id = userId OR i.user_id IS NULL)` で出題を引くので、
+ *   ここに入れた設問は**日々の出題にも確認テストにも使われる**。
+ *   つまり AI の鍵が無くても勉強を始められる。
+ *   Gemini の課金開通を待つあいだ、アプリが空のままにならない。
+ *
+ * ★ 承認は作者が手で行う（schema.sql の item のコメント）。
+ *   ファクトチェックによる自動承認は user_id 非NULL の生成物だけである。
+ *   共有プールは全員に配られるので、誤りの影響が全員に及ぶ。
+ *
+ * ★ 四択だけを扱う。guess_rate は lib/loop/answer.ts の guessRateFor と
+ *   同じ 0.25 を使う（2箇所に別々の数を書かない）。
+ */
+export async function seedItem(
+  db: Sql,
+  dir = SEED_DIR,
+  opts: { requireApproval?: boolean; now?: Date } = {},
+): Promise<{ item: number; itemKc: number; skipped: number }> {
+  const requireApproval = opts.requireApproval ?? true
+  const now = opts.now ?? new Date()
+  const rows = readCsv(join(dir, 'item.csv'))
+  const approved = requireApproval ? rows.filter(r => r.approve === '○') : rows
+
+  const items = dedupe(approved.map(r => ({
+    id: stableUuid(ITEM_NAMESPACE, r.id!),
+    user_id: null,
+    format: 'mcq4',
+    stem: r.stem!,
+    // ★ db.json で包む。JSON.stringify した文字列をそのまま渡すと、
+    //   text → jsonb の暗黙変換で**もう一段 JSON に包まれ**、
+    //   配列ではなく「JSON 文字列」として保存される。
+    //   そうなると出題の SQL（jsonb_array_elements）が
+    //   「cannot get array length of a scalar」で落ちる。実際に踏んで気づいた。
+    // why_wrong は入れない。入れるなら選択肢ごとに書く必要があり、
+    // いまは explanation で誤答の理由まで説明している
+    choices: db.json((['a', 'b', 'c', 'd'] as const).map(k => ({ key: k, text: r[k]! }))),
+    answer_key: db.json(r.answer!),
+    explanation: r.explanation!,
+    guess_rate: 0.25,
+    approved: true,
+    approved_by: 'author',
+    approved_at: now,
+  })), r => r.id)
+
+  await insertMany(db, 'item', items,
+    ['id', 'user_id', 'format', 'stem', 'choices', 'answer_key', 'explanation',
+     'guess_rate', 'approved', 'approved_by', 'approved_at'],
+    d => d`ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+             answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+             approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by,
+             approved_at = EXCLUDED.approved_at`)
+
+  const links = dedupe(approved.map(r => ({
+    item_id: stableUuid(ITEM_NAMESPACE, r.id!), kc_id: r.kc_id!, weight: 1.0,
+  })), r => `${r.item_id}|${r.kc_id}`)
+
+  await insertMany(db, 'item_kc', links, ['item_id', 'kc_id', 'weight'],
+    d => d`ON CONFLICT DO NOTHING`)
+
+  return { item: items.length, itemKc: links.length, skipped: rows.length - approved.length }
+}
+
 export async function seedAll(db: Sql, dir = SEED_DIR, opts: { requireApproval?: boolean } = {}): Promise<SeedCounts> {
   const m = await seedMasters(db, dir)
   const k = await seedKc(db, dir, opts)
   // 正典は region を解決するのでマスタの後に入れる
   const c = await seedCanonEvent(db, dir, opts)
   const p = await seedPerson(db, dir, opts)
+  // 設問は KC を参照するので KC の後に入れる
+  const i = await seedItem(db, dir, opts)
   return {
     ...m, ...k,
     canonEvent: c.canonEvent,
     person: p.person,
+    item: i.item,
+    itemKc: i.itemKc,
     skippedCanonEvent: c.skipped,
     skippedPerson: p.skipped,
+    skippedItem: i.skipped,
   }
 }

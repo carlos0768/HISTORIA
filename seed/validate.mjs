@@ -198,6 +198,7 @@ for (const [name, owners] of canonNames) {
 const SHORT_NAME = 2;
 const canonWarnings = [];
 const dupWarnings = [];
+const itemWarnings = [];
 const names = [...canonNames.keys()].sort((a, b) => b.length - a.length);
 for (const long of names) {
   for (const short of names) {
@@ -247,9 +248,55 @@ for (const p of person) {
   if (STRICT && !['○', '×'].includes(p.approve)) fail(`9: person の approve が未記入または不正: ${p.id} = "${p.approve}"`);
 }
 
+// ---- 10. item（共有の設問プール） ----
+// ★ 中身の正しさは機械では見られない。だからこそ**構造の誤り**は全部ここで落とす。
+//   選択肢が3つしか無い・正解の記号が範囲外・同じ文の選択肢が2つある、といったものは
+//   出題した瞬間に「壊れている」と分かるので、DB に入れる前に止める。
+const item = load('item.csv');
+const kcIds = new Set(kc.map(k => k.id));
+const itemIds = new Set();
+const stems = new Map();
+for (const t of item) {
+  if (!/^it\.[a-z0-9_.]+$/.test(t.id ?? '')) fail(`10: item の id の書式が違う: "${t.id}"`);
+  if (itemIds.has(t.id)) fail(`10: item の id が重複: ${t.id}`);
+  itemIds.add(t.id);
+
+  if (!kcIds.has(t.kc_id)) fail(`10: item の kc_id が kc.csv にない: ${t.id} = "${t.kc_id}"`);
+  if (!t.stem) fail(`10: item に問題文が無い: ${t.id}`);
+  if (!t.explanation) fail(`10: item に解説が無い（間違えたときに何も返せない）: ${t.id}`);
+
+  const choices = ['a', 'b', 'c', 'd'].map(k => t[k]);
+  if (choices.some(c => !c)) fail(`10: item の選択肢が4つ揃っていない: ${t.id}`);
+  if (new Set(choices).size !== 4) fail(`10: item に同じ選択肢が2つある: ${t.id}`);
+  if (!['a', 'b', 'c', 'd'].includes(t.answer)) fail(`10: item の answer が a〜d でない: ${t.id} = "${t.answer}"`);
+
+  // ★ 正解だけが目立って長いと、中身を知らなくても選べてしまう。
+  //   四択の 0.25 という前提（guess_rate）が崩れ、測定が歪む。
+  const correct = t[t.answer];
+  if (correct) {
+    const others = choices.filter(c => c !== correct).map(c => c.length);
+    const longest = Math.max(...others);
+    if (correct.length > longest * 2) {
+      itemWarnings.push(`${t.id}: 正解だけが極端に長い（${correct.length} 対 最長 ${longest}）`);
+    }
+  }
+
+  // 同じ問題文が2つあると、同じ設問を2回出すことになる
+  const seen = stems.get(t.stem);
+  if (seen) fail(`10: item の問題文が重複: ${t.id} と ${seen}`);
+  stems.set(t.stem, t.id);
+
+  if (STRICT && !['○', '×'].includes(t.approve)) fail(`10: item の approve が未記入または不正: ${t.id} = "${t.approve}"`);
+}
+
+// ★ 1つの KC に設問が無いと、その KC は永久に出題されない（出題は KC 単位）。
+const kcWithItem = new Set(item.map(t => t.kc_id));
+const kcWithoutItem = kc.filter(k => !kcWithItem.has(k.id));
+
 // ---- 結果 ----
 console.log(`era ${era.length} / region ${region.length} / syllabus_unit ${syllabus.length}（節 ${leafUnits.size}） / kc ${kc.length}`);
-console.log(`canon_event ${canon.length} / person ${person.length}`);
+console.log(`canon_event ${canon.length} / person ${person.length} / item ${item.length}`);
+console.log(`設問を持つ KC: ${kcWithItem.size} / ${kc.length}（未着手 ${kcWithoutItem.length}）`);
 console.log('kind の分布:');
 for (const k of KINDS) console.log(`  ${k.padEnd(12)} ${String(count[k]).padStart(3)}  ${pct(count[k]).toFixed(1).padStart(5)}%`);
 const covered = new Set(kc.map(k => k.unit_id));
@@ -267,6 +314,12 @@ if (canonWarnings.length) {
   console.log(`\n△ 正典のラベルに包含関係が ${canonWarnings.length} 件（最長一致で拾うが、意図した包含か確認する）`);
   for (const w of canonWarnings.slice(0, 20)) console.log('  - ' + w);
   if (canonWarnings.length > 20) console.log(`  … 他 ${canonWarnings.length - 20} 件`);
+}
+
+if (itemWarnings.length) {
+  console.log(`\n△ 設問の作りに注意が要るもの ${itemWarnings.length} 件`);
+  for (const w of itemWarnings.slice(0, 20)) console.log('  - ' + w);
+  if (itemWarnings.length > 20) console.log(`  … 他 ${itemWarnings.length - 20} 件`);
 }
 
 if (errors.length) {
