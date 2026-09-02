@@ -90,6 +90,7 @@ Google を主にするには次を行う（[`03`](./docs/03-data-model.md) §7.1
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon key | 同上 |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | `npx tsx scripts/push/gen-vapid.ts` の出力 | 設定画面に通知の枠が**出ない**（押しても何も起きないボタンは置かない） |
 | `CRON_SECRET` | 長い乱数 | `/api/cron` が **404** になり、リマインドも予約の掃除も走らない |
+| `ADMIN_USER_ID` | 作者の `app_user.id`（= `auth.users.id`） | `/admin` が誰にも開けない（**404**）。既定は閉 |
 
 ### 通知（Web Push）の鍵
 
