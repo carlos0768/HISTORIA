@@ -155,8 +155,16 @@ Supabase のダッシュボード → SQL Editor に、この順で貼る。
 
 | # | 貼るもの | 中身 |
 |---|---|---|
-| 1 | `docs/schema.sql` | 42テーブル・RLS 42本＋ポリシー34本。**そのまま貼れる** |
+| 1 | `docs/schema.sql` | 44テーブル・RLS 44本＋ポリシー35本。**そのまま貼れる** |
 | 2 | `seed/sql/02_seed.sql` | 時代3・地域24・章立て117・KC 408・正典・共有設問（**承認済みのみ**） |
+
+**すでに `docs/schema.sql` を流し終えている本番へは、代わりに差分を当てる。**
+`docs/schema.sql` は `IF NOT EXISTS` を使っていないので上書きも追記もできない。
+
+| # | 貼るもの | 中身 |
+|---|---|---|
+| 1 | `seed/sql/04_phase3.sql` | 後から足した表（`push_subscription`・`ops_log`）と列（`app_user.remind_hour`）。何度流しても同じ |
+| 2 | `seed/sql/03_rls.sql` | RLS とポリシーを貼り直す。**新しい表もここで覆われる**ので、必ず 04 のあとに流す |
 
 `docs/schema.sql` に手を加えなくてよいのは、Supabase には pgvector があり
 `auth.uid()` も実在するためである（ローカル用の置換も shim も要らない）。
@@ -165,7 +173,9 @@ Supabase のダッシュボード → SQL Editor に、この順で貼る。
 CSV を直したら作り直すこと。
 
 ```bash
-npx tsx scripts/db/dump-sql.ts     # seed/sql/02_seed.sql を作り直す
+npx tsx scripts/db/dump-sql.ts       # seed/sql/02_seed.sql を作り直す
+npx tsx scripts/db/dump-rls.ts       # seed/sql/03_rls.sql を作り直す
+npx tsx scripts/db/dump-migration.ts # seed/sql/04_phase3.sql を作り直す
 ```
 
 どちらも `ON CONFLICT` で上書きするので、**何度流しても結果は同じ**である。

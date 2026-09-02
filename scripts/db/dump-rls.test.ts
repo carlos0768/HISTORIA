@@ -42,7 +42,7 @@ describe('RLS の差分 SQL', () => {
     // invite_code が読めれば招待制が崩れ、past_exam が読めれば本文が外に出る
     const withPolicy = new Set(policyStatements(schema).map(p => p.table))
     for (const t of ['invite_code', 'past_exam', 'past_exam_element', 'past_exam_kc',
-                     'item', 'item_kc', 'ai_budget', 'ai_spend', 'app_setting',
+                     'item', 'item_kc', 'ai_budget', 'ai_spend', 'app_setting', 'ops_log',
                      'kc_proposal', 'kc_merge', 'channel_allowlist']) {
       expect(withPolicy.has(t), `${t} にポリシーが増えている`).toBe(false)
     }
