@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { applyApprovals, KC_CSV } from './approve-kc'
+import { applyApprovals, csvPath, APPROVABLE, KC_CSV } from './approve-kc'
 
 const HEAD = 'approve,id,label,kind'
 const L = (a: string, id: string) => `${a},${id},ラベル,fact`
@@ -56,6 +56,24 @@ describe('KC の承認欄を書き換える', () => {
 
   it('実データに対して流しても行数が変わらない', () => {
     const lines = readFileSync(KC_CSV, 'utf8').split('\n')
+    const r = applyApprovals(lines, { all: true })
+    expect(r.lines).toHaveLength(lines.length)
+    expect(r.approved + r.kept).toBe(lines.filter((l, i) => i > 0 && l.trim() !== '').length)
+  })
+
+  // ★ 承認できる CSV が増えたとき、その1つを足し忘れると
+  //   「承認したつもりで DB に何も入らない」という静かな失敗になる。
+  //   item.csv を足したとき実際にこれが起きかけた（seedItem は approve が ○ の行しか読まない）。
+  it('承認できる CSV は先頭2列が approve,id である', () => {
+    for (const name of APPROVABLE) {
+      const head = readFileSync(csvPath(name), 'utf8').split('\n')[0]!
+      expect(head.startsWith('approve,id,'), `${name}.csv の見出し: ${head}`).toBe(true)
+    }
+  })
+
+  it('item.csv も同じ道具で承認できる（設問だけ別扱いにしない）', () => {
+    expect(APPROVABLE).toContain('item')
+    const lines = readFileSync(csvPath('item'), 'utf8').split('\n')
     const r = applyApprovals(lines, { all: true })
     expect(r.lines).toHaveLength(lines.length)
     expect(r.approved + r.kept).toBe(lines.filter((l, i) => i > 0 && l.trim() !== '').length)

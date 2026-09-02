@@ -1,5 +1,5 @@
 /**
- * 承認欄を埋める（kc.csv / canon_event.csv / person.csv）
+ * 承認欄を埋める（kc.csv / canon_event.csv / person.csv / item.csv）
  *
  *   npx tsx scripts/db/approve-kc.ts --all                    … kc.csv の未記入を全て ○ に
  *   npx tsx scripts/db/approve-kc.ts --all --except a.b,c.d   … 挙げた id だけ空欄のまま残す
@@ -7,6 +7,7 @@
  *   npx tsx scripts/db/approve-kc.ts --reject a.b             … 挙げた id を × にする
  *   npx tsx scripts/db/approve-kc.ts --file canon_event --all … 正典イベントを承認する
  *   npx tsx scripts/db/approve-kc.ts --file person --all      … 正典人物を承認する
+ *   npx tsx scripts/db/approve-kc.ts --file item --all        … 共有設問を承認する
  *
  * ★ 承認は作者の判断である（docs/02 §5）。この道具は「作者が下した判断を
  *   CSV へ書き写す」だけで、承認そのものを代行しない。
@@ -15,7 +16,7 @@
  * ★ 列の順序と引用は csv モジュールを通さず、元の行をそのまま使って
  *   1文字目だけ差し替える。書き戻しで表記が揺れると差分が読めなくなるためである。
  *
- * ★ 3つの CSV はどれも先頭2列が `approve,id` なので、同じ関数で扱える。
+ * ★ どの CSV も先頭2列が `approve,id` なので、同じ関数で扱える。
  *   別々の道具を作ると、片方だけ直したときに挙動が食い違う。
  */
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -23,7 +24,7 @@ import { join } from 'node:path'
 import { SEED_DIR } from './seed'
 
 /** 承認欄を持つ CSV。先頭2列が approve,id であること */
-export const APPROVABLE = ['kc', 'canon_event', 'person'] as const
+export const APPROVABLE = ['kc', 'canon_event', 'person', 'item'] as const
 export type Approvable = typeof APPROVABLE[number]
 export const csvPath = (name: Approvable): string => join(SEED_DIR, `${name}.csv`)
 
