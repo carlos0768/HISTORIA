@@ -14,6 +14,45 @@ import { readCsv, orNull, num, list } from './csv'
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 export const SEED_DIR = join(ROOT, 'seed')
 
+/**
+ * 1行ずつ INSERT しない。
+ *
+ * ★ seedAll は era 3 + region 24 + 節 117 + KC 408（＋節 408・地域 891）
+ *   + canon_event 1,180 + person 446 を入れる。1行1往復だと **約3,500往復**になり、
+ *   手元で約3秒、CI では約6倍で20秒前後かかる。
+ *   `冪等: 2回流しても件数が増えない` は seedAll を2回呼ぶので 30 秒の上限を超え、
+ *   **試験が時間切れで落ちた**（2026-09-02・PR #17）。
+ *   さらに悪いことに、時間切れになった試験の書き込みが次の試験に漏れて
+ *   別の試験まで巻き添えで落ちる。
+ *
+ * ★ 直し方として「上限を伸ばす」を採らない。遅いこと自体が原因なので、
+ *   まとめて入れて往復を減らす。500行ずつに切るのは Postgres の
+ *   パラメータ上限（65535）に将来ぶつからないようにするため。
+ *
+ * ★ 同じ鍵の行が1つの INSERT に2つあると Postgres が
+ *   「ON CONFLICT DO UPDATE command cannot affect row a second time」で落ちる。
+ *   1行ずつ入れていたときは後の行が前の行を上書きしていたので、
+ *   **同じ意味になるよう鍵で畳んでから**（後勝ち）渡す。
+ */
+const CHUNK = 500
+
+const dedupe = <T>(rows: T[], key: (r: T) => string): T[] => {
+  const m = new Map<string, T>()
+  for (const r of rows) m.set(key(r), r)   // 後勝ち。1行ずつ入れていたときと同じ
+  return [...m.values()]
+}
+
+/** rows を columns の順で束ねて INSERT する。tail は ON CONFLICT 以降 */
+async function insertMany(
+  db: Sql, table: string, rows: Record<string, unknown>[], columns: string[],
+  tail: (db: Sql) => ReturnType<Sql>,
+): Promise<void> {
+  for (let i = 0; i < rows.length; i += CHUNK) {
+    const part = rows.slice(i, i + CHUNK)
+    await db`INSERT INTO ${db(table)} ${db(part, ...columns)} ${tail(db)}`
+  }
+}
+
 export type SeedCounts = {
   era: number; region: number; syllabusUnit: number
   kc: number; kcRegion: number; kcSyllabusUnit: number
@@ -27,37 +66,39 @@ export type SeedCounts = {
 
 export async function seedMasters(db: Sql, dir = SEED_DIR): Promise<Pick<SeedCounts, 'era' | 'region' | 'syllabusUnit'>> {
   const eras = readCsv(join(dir, 'era.csv'))
-  for (const e of eras) {
-    await db`
-      INSERT INTO era (id, label, start_year, end_year, ord)
-      VALUES (${num(e.id)}, ${e.label!}, ${num(e.start_year)}, ${num(e.end_year)}, ${num(e.ord)})
-      ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, start_year = EXCLUDED.start_year,
-        end_year = EXCLUDED.end_year, ord = EXCLUDED.ord`
-  }
+  await insertMany(db, 'era',
+    dedupe(eras.map(e => ({
+      id: num(e.id), label: e.label!, start_year: num(e.start_year),
+      end_year: num(e.end_year), ord: num(e.ord),
+    })), r => String(r.id)),
+    ['id', 'label', 'start_year', 'end_year', 'ord'],
+    d => d`ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, start_year = EXCLUDED.start_year,
+             end_year = EXCLUDED.end_year, ord = EXCLUDED.ord`)
 
   // 親を先に入れる必要があるので、親を持たない行から順に入れる
   const regions = readCsv(join(dir, 'region.csv'))
   const byLabel = new Map(regions.map(r => [r.label!, r]))
   const ordered = [...regions].sort((a, b) => Number(!!orNull(a.parent_label)) - Number(!!orNull(b.parent_label)))
-  for (const r of ordered) {
-    const parent = orNull(r.parent_label)
-    const parentId = parent ? num(byLabel.get(parent)?.id) : null
-    if (parent && parentId === null) throw new Error(`region.csv: 親 "${parent}" が見つかりません（${r.label}）`)
-    await db`
-      INSERT INTO region (id, label, parent_id, grid_id, ord)
-      VALUES (${num(r.id)}, ${r.label!}, ${parentId}, ${num(r.grid_id)}, ${num(r.ord)})
-      ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, parent_id = EXCLUDED.parent_id,
-        grid_id = EXCLUDED.grid_id, ord = EXCLUDED.ord`
-  }
+  await insertMany(db, 'region',
+    dedupe(ordered.map(r => {
+      const parent = orNull(r.parent_label)
+      const parentId = parent ? num(byLabel.get(parent)?.id) : null
+      if (parent && parentId === null) throw new Error(`region.csv: 親 "${parent}" が見つかりません（${r.label}）`)
+      return { id: num(r.id), label: r.label!, parent_id: parentId, grid_id: num(r.grid_id), ord: num(r.ord) }
+    }), r => String(r.id)),
+    ['id', 'label', 'parent_id', 'grid_id', 'ord'],
+    d => d`ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, parent_id = EXCLUDED.parent_id,
+             grid_id = EXCLUDED.grid_id, ord = EXCLUDED.ord`)
 
   const units = readCsv(join(dir, 'syllabus_unit.csv'))
-  for (const u of [...units].sort((a, b) => Number(a.level) - Number(b.level))) {
-    await db`
-      INSERT INTO syllabus_unit (id, subject, parent_id, level, label, ord)
-      VALUES (${u.id!}, ${u.subject!}, ${orNull(u.parent_id)}, ${num(u.level)}, ${u.label!}, ${num(u.ord)})
-      ON CONFLICT (id) DO UPDATE SET subject = EXCLUDED.subject, parent_id = EXCLUDED.parent_id,
-        level = EXCLUDED.level, label = EXCLUDED.label, ord = EXCLUDED.ord`
-  }
+  await insertMany(db, 'syllabus_unit',
+    dedupe([...units].sort((a, b) => Number(a.level) - Number(b.level)).map(u => ({
+      id: u.id!, subject: u.subject!, parent_id: orNull(u.parent_id),
+      level: num(u.level), label: u.label!, ord: num(u.ord),
+    })), r => r.id),
+    ['id', 'subject', 'parent_id', 'level', 'label', 'ord'],
+    d => d`ON CONFLICT (id) DO UPDATE SET subject = EXCLUDED.subject, parent_id = EXCLUDED.parent_id,
+             level = EXCLUDED.level, label = EXCLUDED.label, ord = EXCLUDED.ord`)
 
   return { era: eras.length, region: regions.length, syllabusUnit: units.length }
 }
@@ -74,42 +115,48 @@ export async function seedKc(
   )
 
   const approved = requireApproval ? rows.filter(r => r.approve === '○') : rows
-  let kcRegion = 0
 
+  // ★ 地域は primary を先に並べる。同じ (kc, region) が primary と others の
+  //   両方に出てきたとき、後勝ちの畳み込みで others が勝つと primary が消える。
+  //   1行ずつ入れていたときは others 側が ON CONFLICT DO NOTHING だったので
+  //   primary が残っていた。その挙動を保つため、primary を**後**に置く。
+  const regions: { kc_id: string; region_id: number; is_primary: boolean }[] = []
   for (const k of approved) {
-    await db`
-      INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight)
-      VALUES (${k.id!}, ${k.label!}, ${k.kind!}, ${num(k.era_id)}, ${num(k.year_from)}, ${num(k.year_to)},
-              ${orNull(k.year_precision)}, ${list(k.prereq_ids)}, ${num(k.exam_weight) ?? 1})
-      ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
-        year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-        prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight`
-
-    await db`
-      INSERT INTO kc_syllabus_unit (kc_id, unit_id) VALUES (${k.id!}, ${k.unit_id!})
-      ON CONFLICT DO NOTHING`
-
-    // primary は1件だけ。kc_region_one_primary の UNIQUE INDEX がこれを保証する
-    const primary = regionId.get(k.region_primary!)
-    if (primary === undefined) throw new Error(`kc.csv: region_primary "${k.region_primary}" が region.csv にありません（${k.id}）`)
-    await db`
-      INSERT INTO kc_region (kc_id, region_id, is_primary) VALUES (${k.id!}, ${primary}, true)
-      ON CONFLICT (kc_id, region_id) DO UPDATE SET is_primary = true`
-    kcRegion++
-
     for (const label of list(k.region_others)) {
       const rid = regionId.get(label)
       if (rid === undefined) throw new Error(`kc.csv: region_others "${label}" が region.csv にありません（${k.id}）`)
-      await db`
-        INSERT INTO kc_region (kc_id, region_id, is_primary) VALUES (${k.id!}, ${rid}, false)
-        ON CONFLICT DO NOTHING`
-      kcRegion++
+      regions.push({ kc_id: k.id!, region_id: rid, is_primary: false })
     }
+    // primary は1件だけ。kc_region_one_primary の UNIQUE INDEX がこれを保証する
+    const primary = regionId.get(k.region_primary!)
+    if (primary === undefined) throw new Error(`kc.csv: region_primary "${k.region_primary}" が region.csv にありません（${k.id}）`)
+    regions.push({ kc_id: k.id!, region_id: primary, is_primary: true })
   }
+  const uniqueRegions = dedupe(regions, r => `${r.kc_id}|${r.region_id}`)
+
+  await insertMany(db, 'kc',
+    dedupe(approved.map(k => ({
+      id: k.id!, label: k.label!, kind: k.kind!, era_id: num(k.era_id),
+      year_from: num(k.year_from), year_to: num(k.year_to),
+      year_precision: orNull(k.year_precision), prereq_ids: list(k.prereq_ids),
+      exam_weight: num(k.exam_weight) ?? 1,
+    })), r => r.id),
+    ['id', 'label', 'kind', 'era_id', 'year_from', 'year_to', 'year_precision', 'prereq_ids', 'exam_weight'],
+    d => d`ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
+             year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
+             prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight`)
+
+  await insertMany(db, 'kc_syllabus_unit',
+    dedupe(approved.map(k => ({ kc_id: k.id!, unit_id: k.unit_id! })), r => `${r.kc_id}|${r.unit_id}`),
+    ['kc_id', 'unit_id'],
+    d => d`ON CONFLICT DO NOTHING`)
+
+  await insertMany(db, 'kc_region', uniqueRegions, ['kc_id', 'region_id', 'is_primary'],
+    d => d`ON CONFLICT (kc_id, region_id) DO UPDATE SET is_primary = EXCLUDED.is_primary`)
 
   return {
     kc: approved.length,
-    kcRegion,
+    kcRegion: uniqueRegions.length,
     kcSyllabusUnit: approved.length,
     skippedUnapproved: rows.length - approved.length,
   }
@@ -138,20 +185,20 @@ export async function seedCanonEvent(
 
   const approved = requireApproval ? rows.filter(r => r.approve === '○') : rows
 
-  for (const e of approved) {
-    const regions = list(e.region_ids).map(label => {
-      const id = regionId.get(label)
-      if (id === undefined) throw new Error(`canon_event.csv: region "${label}" が region.csv にありません（${e.id}）`)
-      return id
-    })
-    await db`
-      INSERT INTO canon_event (id, label, aliases, year_from, year_to, precision, region_ids)
-      VALUES (${e.id!}, ${e.label!}, ${list(e.aliases)}, ${num(e.year_from)}, ${num(e.year_to)},
-              ${e.precision!}, ${regions})
-      ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, aliases = EXCLUDED.aliases,
-        year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to,
-        precision = EXCLUDED.precision, region_ids = EXCLUDED.region_ids`
-  }
+  await insertMany(db, 'canon_event',
+    dedupe(approved.map(e => ({
+      id: e.id!, label: e.label!, aliases: list(e.aliases),
+      year_from: num(e.year_from), year_to: num(e.year_to), precision: e.precision!,
+      region_ids: list(e.region_ids).map(label => {
+        const id = regionId.get(label)
+        if (id === undefined) throw new Error(`canon_event.csv: region "${label}" が region.csv にありません（${e.id}）`)
+        return id
+      }),
+    })), r => r.id),
+    ['id', 'label', 'aliases', 'year_from', 'year_to', 'precision', 'region_ids'],
+    d => d`ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, aliases = EXCLUDED.aliases,
+             year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to,
+             precision = EXCLUDED.precision, region_ids = EXCLUDED.region_ids`)
 
   return { canonEvent: approved.length, skipped: rows.length - approved.length }
 }
@@ -172,12 +219,12 @@ export async function seedPerson(
   const rows = readCsv(join(dir, 'person.csv'))
   const approved = requireApproval ? rows.filter(r => r.approve === '○') : rows
 
-  for (const p of approved) {
-    await db`
-      INSERT INTO person (label, aliases, era_id)
-      VALUES (${p.label!}, ${list(p.aliases)}, ${num(p.era_id)})
-      ON CONFLICT (label) DO UPDATE SET aliases = EXCLUDED.aliases, era_id = EXCLUDED.era_id`
-  }
+  await insertMany(db, 'person',
+    dedupe(approved.map(p => ({
+      label: p.label!, aliases: list(p.aliases), era_id: num(p.era_id),
+    })), r => r.label),
+    ['label', 'aliases', 'era_id'],
+    d => d`ON CONFLICT (label) DO UPDATE SET aliases = EXCLUDED.aliases, era_id = EXCLUDED.era_id`)
 
   return { person: approved.length, skipped: rows.length - approved.length }
 }
