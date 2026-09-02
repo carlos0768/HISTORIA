@@ -6,7 +6,8 @@
 import postgres from 'postgres'
 import { applySchema } from './schema'
 import { seedMasters, seedKc, SEED_DIR } from './seed'
-import { createUser, createDrill, createItem } from '@/lib/loop/fixture'
+import { createUser, createItem } from '@/lib/loop/fixture'
+import { createDrill } from '@/lib/pipeline/drill'
 
 const url = process.env.DATABASE_URL
 if (!url) throw new Error('DATABASE_URL が未設定です')
@@ -34,9 +35,12 @@ const kcs = await db<{ id: string; label: string }[]>`
     JOIN kc_syllabus_unit ku ON ku.kc_id = k.id
    WHERE ku.unit_id LIKE 'wh.2.1.%' ORDER BY k.id`
 
+// 範囲は3節ぶん入れる。教材の状態が単元ごとに並ぶことを画面で確認するため
 const deadline = new Date(now.getTime() + 21 * 86400000)
-await createDrill(db, userId, kcs.map(k => k.id), deadline, 'wh.2.1.1')
-await db`UPDATE drill SET title = '古代オリエントと地中海世界'`
+await createDrill(db, {
+  userId, title: '古代オリエントと地中海世界',
+  unitIds: ['wh.2.1.1', 'wh.2.1.2', 'wh.2.1.3'], deadline,
+})
 
 for (const k of kcs) {
   await createItem(db, { userId, kcs: [{ kcId: k.id }], answerKey: 'a', now })

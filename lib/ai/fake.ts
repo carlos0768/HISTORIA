@@ -44,7 +44,7 @@ export function createFakeProvider(name: string, opts: FakeOptions = {}): Provid
   return {
     name,
 
-    async generate<T>(args: GenerateArgs<T>): Promise<GenerateResult<T>> {
+    async generate<T>(args: GenerateArgs): Promise<GenerateResult<T>> {
       if (opts.failGeneration) throw new Error('fake: 生成に失敗しました')
 
       const kcs = kcsFromPrompt(args.prompt.user)

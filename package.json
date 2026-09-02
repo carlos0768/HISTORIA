@@ -14,8 +14,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:reset": "tsx scripts/db/reset.ts",
-    "db:seed": "tsx scripts/db/seed.ts",
+    "db:dev-seed": "tsx scripts/db/dev-seed.ts",
     "seed:validate": "node seed/validate.mjs"
   },
   "dependencies": {

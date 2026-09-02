@@ -21,7 +21,9 @@ export default function proxy(req: NextRequest) {
     // 意匠は docs/design/litverse.css が Google Fonts を @import している。
     // 自前配信（next/font）に切り替えるかは M15（初回転送量の実測）と合わせて判断する。
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    'font-src https://fonts.gstatic.com data:',
+    // 'self' が要る。開発オーバーレイの字体が同一オリジンから来るほか、
+    // 将来 next/font で自前配信に切り替えたときに黙って落ちないようにするため。
+    "font-src 'self' https://fonts.gstatic.com data:",
     // 動画は nocookie ドメインのみ（docs/09b §5）
     'frame-src https://www.youtube-nocookie.com',
     "img-src 'self' data: https://i.ytimg.com",

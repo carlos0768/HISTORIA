@@ -59,7 +59,7 @@ export function createGeminiProvider(o: GeminiOptions): Provider {
   return {
     name: 'gemini',
 
-    async generate<T>(args: GenerateArgs<T>): Promise<GenerateResult<T>> {
+    async generate<T>(args: GenerateArgs): Promise<GenerateResult<T>> {
       const res = await call(`/models/${o.model}:generateContent`, {
         systemInstruction: { parts: [{ text: args.prompt.system }] },
         contents: [{ role: 'user', parts: [{ text: args.prompt.user }] }],

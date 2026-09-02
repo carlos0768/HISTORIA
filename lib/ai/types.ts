@@ -37,7 +37,7 @@ export type RenderedPrompt = {
   promptVersion: string
 }
 
-export type GenerateArgs<T> = {
+export type GenerateArgs = {
   /**
    * 差し込み済みのプロンプト。
    * ★ 組み立ては renderMaterialPrompt だけが行う。そこで匿名化を検査している（§4.2）。
@@ -72,7 +72,7 @@ export type VerifyResult = { verdicts: Verdict[]; usage: Usage; model: string }
 
 export type Provider = {
   name: string
-  generate<T>(args: GenerateArgs<T>): Promise<GenerateResult<T>>
+  generate<T>(args: GenerateArgs): Promise<GenerateResult<T>>
   verify(claims: Claim[], maxOutputTokens: number): Promise<VerifyResult>
   embed(texts: string[]): Promise<{ vectors: number[][]; usage: Usage; model: string }>
 }

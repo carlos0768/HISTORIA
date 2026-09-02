@@ -33,3 +33,32 @@ body { margin: 0; background: var(--lv-canvas); }
 
 /* 数字とラベルを横に並べる小さな見出し */
 .hs-count { display: flex; align-items: baseline; gap: var(--lv-space-2); }
+
+/* ---- 範囲選択の木（app/drills/new） ---- */
+/* 意匠は litverse のトークンだけを使う。新しい色や影は足さない。 */
+.hs-tree__toggle {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--lv-space-2);
+  width: 100%; padding: 0; border: 0; background: none; cursor: pointer; text-align: left;
+  color: var(--lv-ink); min-height: var(--lv-touch);
+}
+.hs-tree__chapter { display: flex; flex-direction: column; border-top: var(--lv-hairline); }
+.hs-tree__row {
+  display: flex; align-items: center; gap: var(--lv-space-2);
+  width: 100%; min-height: var(--lv-touch); padding: 10px 0;
+  border: 0; background: none; cursor: pointer; text-align: left; color: var(--lv-ink);
+  font: 400 13px/1.5 var(--lv-font-ja);
+}
+.hs-tree__row:disabled { color: var(--lv-muted); cursor: default; }
+.hs-tree__row--leaf { padding-left: var(--lv-space-3); }
+.hs-tree__row .lv-list__value { flex: 1; }
+
+/* ---- 教材の状態（app/units.tsx） ---- */
+.hs-unit {
+  display: flex; flex-direction: column; gap: var(--lv-space-2);
+  padding: 10px 0; border-top: var(--lv-hairline);
+}
+
+/* ---- 教材の本文（app/material/[id]） ---- */
+.hs-prose { display: flex; flex-direction: column; gap: var(--lv-space-3); }
+.hs-prose .lv-body { margin: 0; }
+.hs-prose__list { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }

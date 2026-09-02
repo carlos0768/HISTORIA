@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { tryDb, demoUserId } from '@/lib/db/optional'
 import { todaysPlan, drillProgressList } from '@/lib/loop/today'
+import { drillMaterials } from '@/lib/loop/material'
+import { UnitMaterials } from './units'
 import { Screen, Card, TwoBars, Alert, Empty, StatusChip } from '@/components/ui'
 import { DEFAULT_MAX_DAILY } from '@/lib/domain/scheduler'
 
@@ -29,6 +31,8 @@ export default async function Home() {
     todaysPlan(db, userId, now, DEFAULT_MAX_DAILY),
     drillProgressList(db, userId, now),
   ])
+  // 特訓ごとに、範囲の単元と教材の状態を引く（生成中・配信不可を隠さない）
+  const materials = await Promise.all(drills.map(d => drillMaterials(db, userId, d.drillId)))
 
   return (
     <Screen title="HISTORIA">
@@ -58,9 +62,17 @@ export default async function Home() {
       )}
 
       <div className="hs-stack">
-        <span className="lv-label">集中特訓</span>
-        {drills.length === 0 && <Empty><p className="lv-body">まだ特訓がありません。</p></Empty>}
-        {drills.map(d => {
+        <div className="lv-list__row">
+          <span className="lv-label">集中特訓</span>
+          <Link className="lv-chip" href="/drills/new">範囲を選んで作る</Link>
+        </div>
+        {drills.length === 0 && (
+          <Empty>
+            <p className="lv-body">まだ特訓がありません。</p>
+            <p className="lv-caption">教科書の章立てから範囲を選ぶと、今日やることが決まります。</p>
+          </Empty>
+        )}
+        {drills.map((d, di) => {
           const daysLeft = Math.ceil((d.deadline.getTime() - now.getTime()) / 86_400_000)
           return (
             <Card key={d.drillId}>
@@ -74,6 +86,7 @@ export default async function Home() {
                 materialsRead={d.materialsRead} materialsTotal={d.materialsTotal}
               />
               {d.state === 'overdue' && <p className="lv-caption">新しい締切を設定しますか？</p>}
+              <UnitMaterials units={materials[di] ?? []} />
             </Card>
           )
         })}

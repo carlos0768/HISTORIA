@@ -37,7 +37,7 @@ type Row = {
  * active な特訓の KC を union で1本に集める（§5.1）。
  * 各特訓が独立にノルマを出すと合計が1日8時間になるため、キューは1本にする。
  */
-async function loadCandidates(db: Sql, userId: string, now: Date): Promise<Row[]> {
+async function loadCandidates(db: Sql, userId: string): Promise<Row[]> {
   return db<Row[]>`
     WITH active_kc AS (
       SELECT dk.kc_id, min(d.deadline)::timestamptz AS earliest_deadline
@@ -108,7 +108,7 @@ export type Today = {
 }
 
 export async function todaysPlan(db: Sql, userId: string, now: Date, maxDaily = DEFAULT_MAX_DAILY): Promise<Today> {
-  const rows = await loadCandidates(db, userId, now)
+  const rows = await loadCandidates(db, userId)
   const candidates = rows.map(r => toCandidate(r, now))
   const scheduled: ScheduledKc[] = candidates.map(c => ({
     kcId: c.kcId, card: c.card, status: c.status, earliestDeadline: c.earliestDeadline,

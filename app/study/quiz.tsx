@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Link from 'next/link'
 import { submit } from './actions'
 
 export type Choice = { key: string; text: string }
@@ -27,7 +28,7 @@ export function Quiz({ items }: { items: QuizItem[] }) {
     return (
       <div className="hs-empty">
         <p className="lv-title">今日の分は終わりです</p>
-        <a className="lv-btn" href="/">ホームへ</a>
+        <Link className="lv-btn" href="/">ホームへ</Link>
       </div>
     )
   }
