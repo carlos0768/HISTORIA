@@ -1,19 +1,22 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { REGION_SHAPES, regionShape } from './regions'
-import { LAND_PATH, MAP_LAT, MAP_LON, project, MAP_WIDTH, MAP_HEIGHT } from './basemap'
+import { REGION_SHAPES, regionShape, unknownCountryCodes } from './regions'
+import {
+  COUNTRY_PATHS, COUNTRY_NAMES, GRATICULE_PATH, EQUATOR_PATH,
+  MAP_LAT, MAP_LON, project, MAP_WIDTH, MAP_HEIGHT,
+} from './basemap'
 import { SEED_DIR } from '@/scripts/db/seed'
 import { parseCsv } from '@/scripts/db/csv'
 
 const seedRegions = parseCsv(readFileSync(join(SEED_DIR, 'region.csv'), 'utf8'))
 
 describe('地図の地域表', () => {
-  it('seed/region.csv と id・名前が一致する（ずれると別の場所を指す）', () => {
+  it('seed/region.csv と id・名前が一致する（ずれると地図が別の場所を指す）', () => {
     expect(REGION_SHAPES).toHaveLength(seedRegions.length)
     for (const r of seedRegions) {
       const shape = regionShape(Number(r.id))
-      expect(shape, `id=${r.id} (${r.label}) の枠がありません`).toBeDefined()
+      expect(shape, `id=${r.id} (${r.label}) がありません`).toBeDefined()
       expect(shape!.label).toBe(r.label)
     }
   })
@@ -25,33 +28,35 @@ describe('地図の地域表', () => {
     }
   })
 
-  it('枠が west<east / south<north になっている', () => {
+  it('すべての地域が国を持つ（空の地域は地図に何も出ない）', () => {
     for (const s of REGION_SHAPES) {
-      const [w, so, e, n] = s.box
-      expect(w, `${s.label}: 経度`).toBeLessThan(e)
-      expect(so, `${s.label}: 緯度`).toBeLessThan(n)
+      expect(s.countries.length, `${s.label} の国が0件`).toBeGreaterThan(0)
     }
   })
 
-  it('枠が図の範囲に収まっている', () => {
-    for (const s of REGION_SHAPES) {
-      const [w, so, e, n] = s.box
-      expect(w).toBeGreaterThanOrEqual(MAP_LON[0])
-      expect(e).toBeLessThanOrEqual(MAP_LON[1])
-      expect(so).toBeGreaterThanOrEqual(MAP_LAT[0])
-      expect(n).toBeLessThanOrEqual(MAP_LAT[1])
-    }
+  it('基図に存在しない国コードを指していない', () => {
+    expect(unknownCountryCodes()).toEqual([])
   })
 
-  it('子の枠が親の枠に収まっている', () => {
+  it('親地域が子の和集合になっている', () => {
     const byLabel = new Map(REGION_SHAPES.map(s => [s.label, s]))
+    const kids = new Map<string, string[]>()
     for (const r of seedRegions.filter(x => x.parent_label)) {
-      const child = byLabel.get(r.label!)!
-      const parent = byLabel.get(r.parent_label!)!
-      expect(child.box[0], `${child.label} ⊂ ${parent.label}`).toBeGreaterThanOrEqual(parent.box[0])
-      expect(child.box[1], `${child.label} ⊂ ${parent.label}`).toBeGreaterThanOrEqual(parent.box[1])
-      expect(child.box[2], `${child.label} ⊂ ${parent.label}`).toBeLessThanOrEqual(parent.box[2])
-      expect(child.box[3], `${child.label} ⊂ ${parent.label}`).toBeLessThanOrEqual(parent.box[3])
+      kids.set(r.parent_label!, [...(kids.get(r.parent_label!) ?? []), r.label!])
+    }
+    for (const [parent, children] of kids) {
+      const want = new Set(children.flatMap(c => byLabel.get(c)!.countries))
+      expect(new Set(byLabel.get(parent)!.countries), `${parent}`).toEqual(want)
+    }
+  })
+
+  it('葉の地域どうしで国が重複しない（同じ国が2色に塗られない）', () => {
+    const seen = new Map<string, string>()
+    for (const s of REGION_SHAPES.filter(x => !x.isParent)) {
+      for (const c of s.countries) {
+        expect(seen.get(c), `${COUNTRY_NAMES[c]} が ${seen.get(c)} と ${s.label} に重複`).toBeUndefined()
+        seen.set(c, s.label)
+      }
     }
   })
 })
@@ -67,17 +72,36 @@ describe('基図', () => {
     expect(project(0, -90).y).toBe(MAP_HEIGHT)
   })
 
-  it('陸地のパスが閉じた輪の連なりになっている', () => {
-    expect(LAND_PATH.startsWith('M')).toBe(true)
-    const rings = LAND_PATH.split('M').filter(Boolean)
-    expect(rings.length).toBeGreaterThan(50)
-    expect(rings.every(r => r.endsWith('Z'))).toBe(true)
-    // 座標が figures の範囲に収まっていること
-    for (const n of LAND_PATH.matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)) {
+  it('国のパスが閉じた輪の連なりで、図の範囲に収まる', () => {
+    const codes = Object.keys(COUNTRY_PATHS)
+    expect(codes.length).toBeGreaterThan(150)
+    for (const [code, d] of Object.entries(COUNTRY_PATHS)) {
+      expect(d.startsWith('M'), code).toBe(true)
+      expect(d.split('M').filter(Boolean).every(r => r.endsWith('Z')), code).toBe(true)
+    }
+    for (const n of Object.values(COUNTRY_PATHS).join('').matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)) {
       expect(Number(n[1])).toBeGreaterThanOrEqual(0)
       expect(Number(n[1])).toBeLessThanOrEqual(MAP_WIDTH)
       expect(Number(n[2])).toBeGreaterThanOrEqual(0)
       expect(Number(n[2])).toBeLessThanOrEqual(MAP_HEIGHT)
     }
+  })
+
+  it('日付変更線をまたぐ横断線が残っていない', () => {
+    let crossing = 0
+    for (const d of Object.values(COUNTRY_PATHS)) {
+      for (const ring of d.split('M').filter(Boolean)) {
+        const pts = ring.replace(/Z$/, '').split('L').map(s => s.split(',').map(Number))
+        for (let i = 1; i < pts.length; i++) {
+          if (Math.abs(pts[i]![0]! - pts[i - 1]![0]!) > MAP_WIDTH / 2) crossing++
+        }
+      }
+    }
+    expect(crossing).toBe(0)
+  })
+
+  it('経緯線と赤道が引かれている', () => {
+    expect(GRATICULE_PATH.split('M').filter(Boolean).length).toBeGreaterThan(10)
+    expect(EQUATOR_PATH).toContain(`L${MAP_WIDTH},`)
   })
 })

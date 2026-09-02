@@ -3,7 +3,11 @@
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { Markdown } from '@/components/markdown'
-import { WorldMap } from '@/components/world-map'
+import dynamic from 'next/dynamic'
+
+// 基図は約80KBある。geo の KC があるセクションを開いたときだけ読む。
+// 全教材ページに載せると、地図を一度も見ない読者にも毎回送ることになる
+const WorldMap = dynamic(() => import('@/components/world-map').then(m => m.WorldMap))
 import { markRead } from './actions'
 
 export type SectionProps = {

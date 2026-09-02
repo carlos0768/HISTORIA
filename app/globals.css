@@ -4,6 +4,7 @@
    トークンも既存クラスも再定義しない。docs/11b-design-system.md */
 @import '../docs/design/litverse.css';
 @import '../docs/design/historia-overrides.css';
+@import '../docs/design/litverse-map.css';
 
 /* 下地。litverse.css は .lv-root までしか塗らないので、
    スクロールで画面外に出た領域がブラウザ既定の白になってしまう。 */
@@ -63,34 +64,3 @@ body { margin: 0; background: var(--lv-canvas); }
 .hs-prose .lv-body { margin: 0; }
 .hs-prose__list { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
 
-/* ---- 学習用の世界地図（components/world-map.tsx） ---- */
-.hs-map { margin: 0; display: flex; flex-direction: column; gap: var(--lv-space-2); }
-.hs-map__svg {
-  width: 100%; height: auto; display: block;
-  border: var(--lv-hairline); border-radius: var(--lv-radius-sm);
-  background: var(--lv-canvas);
-}
-.hs-map__land { fill: var(--lv-paper); stroke: var(--lv-ink); stroke-width: .35; }
-/* 強調は朱の枠。塗り潰すと下の海岸線が読めなくなる */
-.hs-map__zone { fill: rgba(244,112,60,.22); stroke: var(--lv-accent-press); stroke-width: 1; }
-/* 地名は図に載せない。番号で凡例に繋ぐ（隣接する地域では文字が必ず重なる） */
-.hs-map__pin { fill: var(--lv-accent-press); }
-.hs-map__pinnum {
-  fill: var(--lv-paper); font: 700 4.4px/1 var(--lv-font-en); text-anchor: middle;
-}
-.hs-map__cap {
-  font: 400 11px/1.7 var(--lv-font-ja); color: var(--lv-sub);
-  display: flex; flex-direction: column; gap: var(--lv-space-1);
-}
-.hs-map__legend {
-  list-style: none; margin: 0; padding: 0;
-  display: flex; flex-wrap: wrap; gap: var(--lv-space-1) var(--lv-space-3);
-}
-.hs-map__legend li { display: flex; align-items: center; gap: 5px; color: var(--lv-ink); }
-.hs-map__key {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 15px; height: 15px; border-radius: 999px;
-  background: var(--lv-accent-press); color: var(--lv-paper);
-  font: 700 9px/1 var(--lv-font-en);
-}
-.hs-map__note { color: var(--lv-muted); }
