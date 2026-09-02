@@ -25,8 +25,9 @@ await admin.end({ timeout: 5 })
 const db = postgres(url, { prepare: false, max: 4, onnotice: () => {} })
 await applySchema(db, { pgvector: process.env.PGVECTOR !== 'off' })
 await seedMasters(db, SEED_DIR)
-// 承認前の KC でも画面確認はしたいので、開発用に限り承認を無視する
-await seedKc(db, SEED_DIR, { requireApproval: false })
+// 60件は承認済みなので既定（requireApproval: true）でよい。
+// ここで承認を無視すると、承認を落としたときに開発環境だけが気づけなくなる
+await seedKc(db, SEED_DIR)
 
 const now = new Date()
 const userId = await createUser(db, now)

@@ -1,4 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { mkdtempSync, cpSync, readFileSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import type { Sql } from 'postgres'
 import { createTestDb, TEST_DB_URL } from '@/lib/db/test-helper'
 import { seedAll, seedKc, SEED_DIR } from './seed'
@@ -26,14 +29,43 @@ dbSuite('seed 投入（実DB）', () => {
   beforeAll(async () => { ({ db, drop } = await createTestDb('historia_seed_test')) }, 120_000)
   afterAll(async () => { await drop() })
 
-  it('承認されていない KC は入らない（作者承認制 docs/02 §5）', async () => {
+  it('承認済みの KC が入る（作者承認制 docs/02 §5）', async () => {
     const counts = await seedAll(db, SEED_DIR)
     const csv = readCsv(`${SEED_DIR}/kc.csv`)
-    // いまは approve 列が空なので1件も入らないのが正しい
-    expect(counts.kc).toBe(csv.filter(r => r.approve === '○').length)
-    expect(counts.skippedUnapproved).toBe(csv.length - counts.kc)
+    expect(csv).toHaveLength(60)
+    // 第1バッチは作者が60件すべてを承認した
+    expect(csv.every(r => r.approve === '○')).toBe(true)
+    expect(counts.kc).toBe(60)
+    expect(counts.skippedUnapproved).toBe(0)
     const rows = await db<{ count: string }[]>`SELECT count(*) FROM kc`
-    expect(Number(rows[0]!.count)).toBe(counts.kc)
+    expect(Number(rows[0]!.count)).toBe(60)
+  })
+
+  /**
+   * 承認制そのものの検査。
+   * 実データが全件承認になったので、seed/kc.csv では「入らない」側を示せない。
+   * 承認欄を落とした写しを作って、そちらで確かめる。
+   */
+  it('承認欄が空の KC は入らない', async () => {
+    // このスイートは1つの DB を共有する。前のテストが入れた60件を消してから見る
+    await db`TRUNCATE kc, kc_region, kc_syllabus_unit RESTART IDENTITY CASCADE`
+
+    const dir = mkdtempSync(join(tmpdir(), 'historia-seed-'))
+    cpSync(SEED_DIR, dir, { recursive: true })
+    const lines = readFileSync(join(dir, 'kc.csv'), 'utf8').split('\n')
+    // 先頭2件の承認を外す
+    lines[1] = lines[1]!.replace(/^○,/, ',')
+    lines[2] = lines[2]!.replace(/^○,/, ',')
+    writeFileSync(join(dir, 'kc.csv'), lines.join('\n'))
+
+    await seedAll(db, dir)          // マスタを入れてから
+    const c = await seedKc(db, dir) // 既定は requireApproval: true
+    expect(c.kc).toBe(58)
+    expect(c.skippedUnapproved).toBe(2)
+
+    const skipped = readCsv(`${SEED_DIR}/kc.csv`).slice(0, 2).map(r => r.id!)
+    const found = await db<{ id: string }[]>`SELECT id FROM kc WHERE id IN ${db(skipped)}`
+    expect(found).toHaveLength(0)
   })
 
   it('マスタは全件入る', async () => {
