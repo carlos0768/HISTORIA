@@ -29,10 +29,10 @@ export type AiConfig = {
 export function readConfig(env: NodeJS.ProcessEnv = process.env): AiConfig {
   return {
     genProvider: env.GEN_PROVIDER ?? 'gemini',
-    genModel: env.GEN_MODEL ?? 'gemini-2.5-flash',
+    genModel: env.GEN_MODEL ?? 'gemini-3.6-flash',
     verifyProvider: env.VERIFY_PROVIDER ?? 'anthropic',
     verifyModel: env.VERIFY_MODEL ?? 'claude-sonnet-5',
-    embedModel: env.EMBED_MODEL ?? 'text-embedding-004',
+    embedModel: env.EMBED_MODEL ?? 'gemini-embedding-001',
     geminiApiKey: env.GEMINI_API_KEY || undefined,
     anthropicApiKey: env.ANTHROPIC_API_KEY || undefined,
   }
@@ -55,9 +55,14 @@ export function assertConfig(cfg: AiConfig): void {
 /** USD / MTok。docs/08 §3.4 */
 export const PRICES: Record<string, Price> = {
   'claude-sonnet-5': { inputPerMTok: 2, outputPerMTok: 10 },
-  // 無料枠。0 でも元帳には載せる（迂回路を作らないため）
-  'gemini-2.5-flash': { inputPerMTok: 0, outputPerMTok: 0 },
-  'text-embedding-004': { inputPerMTok: 0, outputPerMTok: 0 },
+  // ★ Gemini の単価をここに書かない。
+  //   docs/08 は「無料枠だから0円」を前提にしていたが、2026-09-02 の実測では
+  //   gemini-2.5-flash が新規利用者に 404、他のモデルは
+  //   「前払いクレジットが尽きた」の 429 を返した。
+  //   **この鍵からは無料枠の存在を確認できていない**（docs/14 M28）。
+  //   0 と書くと estimateJpy が 0 を返し、遮断器が生成を1円も数えなくなる。
+  //   実際に課金されていた場合、元帳が空のまま支出だけが進む。
+  //   単価を実測できるまでは、下の未知モデルの見積り（高め）に落ちるままにする。
 }
 
 const priceOf = (model: string): Price =>

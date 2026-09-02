@@ -19,10 +19,33 @@ import {
 import { guessRateFor } from '@/lib/loop/answer'
 import { machineCheck, type MachineCheckResult } from './factcheck'
 
-/** 教材1本の出力トークン上限。遮断器の見積りの分母になる（docs/08 §7.1・§3.3） */
-export const MATERIAL_MAX_OUTPUT_TOKENS = 12_000
-/** 検証の出力トークン上限 */
-export const VERIFY_MAX_OUTPUT_TOKENS = 1_500
+/**
+ * 教材1本の出力トークン上限。遮断器の見積りの分母になる（docs/08 §7.1・§3.3）。
+ *
+ * ★ ここは「実際に出うる最大」でなければならない。理由が2つある。
+ *   1. 足りないと finishReason が MAX_TOKENS になり、gemini.ts が例外を投げて
+ *      生成が毎回失敗する。12,000 は docs/08 §3.3 自身の見積り 12,168 を下回っていた
+ *   2. 遮断器の不変条件（settled + reserved <= cap）は、この値が本当の天井である
+ *      ことに依存している。天井でない値を入れると保証が崩れる
+ *
+ * 上げてもコストは増えない。settle は実測の usage で確定するためである
+ * （reserve が大きくなるぶん同時実行の余裕が減るだけ）。
+ *
+ * 内訳（docs/08 §3.3 の 12,168 を、受け入れ範囲の最大構成まで伸ばしたもの）:
+ *   本文 3,500 → 4,500字（docs/07 §2 の上限）  +約1,000
+ *   フラッシュカード 12 → 14枚                  +約120
+ *   四択 8 → 10問                               +約600
+ *   claims 20 → 40件（スキーマの上限）          +約1,200
+ *   合計 約15,100 に余裕を足して 16,000
+ */
+export const MATERIAL_MAX_OUTPUT_TOKENS = 16_000
+
+/**
+ * 検証の出力トークン上限。
+ * claims 最大40件 × (index + status + 理由およそ60字) ≈ 3,600。余裕を足して 4,000。
+ * 1,500 では24件を超えたあたりで打ち切られ、検証が失敗する。
+ */
+export const VERIFY_MAX_OUTPUT_TOKENS = 4_000
 /** 文字数が範囲外だったときの作り直し回数。無料枠を無限に食わせない */
 export const MAX_LENGTH_RETRIES = 1
 

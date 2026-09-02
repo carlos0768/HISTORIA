@@ -10,9 +10,9 @@ import { createUser, createKcs } from '@/lib/loop/fixture'
 import type { AnonymizedContext } from './types'
 
 const cfg = (o: Partial<AiConfig> = {}): AiConfig => ({
-  genProvider: 'gemini', genModel: 'gemini-2.5-flash',
+  genProvider: 'gemini', genModel: 'gemini-3.6-flash',
   verifyProvider: 'anthropic', verifyModel: 'claude-sonnet-5',
-  embedModel: 'text-embedding-004', ...o,
+  embedModel: 'gemini-embedding-001', ...o,
 })
 
 describe('§6 プロバイダ設定', () => {
@@ -127,7 +127,7 @@ dbSuite('クライアント（実DB）', () => {
     expect(r.usage.outputTokens).toBeGreaterThan(0)
   })
 
-  it('すべての呼び出しが元帳に載る（無料枠の分も。迂回路を作らない）', async () => {
+  it('すべての呼び出しが元帳に載る（生成も検証も埋め込みも。迂回路を作らない）', async () => {
     const c = createClient(cfg())
     await c.generate({ db, prompt, schema: {}, maxOutputTokens: 12_000, now: NOW })
     await c.verify({ db, claims: [{ type: 'year', text: 'x' }], maxOutputTokens: 400, now: NOW })
@@ -138,10 +138,23 @@ dbSuite('クライアント（実DB）', () => {
     expect(rows.every(r => r.state === 'settled')).toBe(true)
   })
 
-  it('無料枠のモデルは 0 円で確定する', async () => {
+  /**
+   * 以前は「無料枠のモデルは 0 円で確定する」を固定していた。
+   * だが 0 円だと遮断器から生成が見えなくなる。無料枠の存在は
+   * 2026-09-02 の実測で確認できていない（docs/14 M28）ので、
+   * 単価が分かるまでは未知モデルとして高めに見積もる側に倒してある。
+   */
+  it('単価の分からないモデルも元帳に載り、遮断器から見える', async () => {
     const c = createClient(cfg())
     await c.generate({ db, prompt, schema: {}, maxOutputTokens: 12_000, now: NOW })
-    expect((await budgetStatus(db, NOW)).usedJpy).toBe(0)
+    const s = await budgetStatus(db, NOW)
+    expect(s.usedJpy).toBeGreaterThan(0)
+
+    const [row] = await db<{ provider: string; state: string; est_jpy: string }[]>`
+      SELECT provider, state, est_jpy FROM ai_spend WHERE purpose = 'generate' ORDER BY id DESC LIMIT 1`
+    expect(row!.provider).toBe('gemini')
+    expect(row!.state).toBe('settled')
+    expect(Number(row!.est_jpy)).toBeGreaterThan(0)
   })
 
   it('課金モデルの検証は元帳に金額が載る', async () => {

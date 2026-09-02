@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { Markdown } from '@/components/markdown'
+import { WorldMap } from '@/components/world-map'
 import { markRead } from './actions'
 
 export type SectionProps = {
@@ -14,6 +15,7 @@ export type SectionProps = {
   hidden: boolean
   hiddenReason: string | null
   kcLabels: string[]
+  geoRegionIds: number[]
   read: boolean
   requiredMs: number
   estimatedMs: number
@@ -133,6 +135,11 @@ function SectionPane({
             </div>
           ) : (
             <Markdown source={section.bodyMd} />
+          )}
+
+          {/* 位置・版図の KC があるセクションだけ地図を出す */}
+          {!section.hidden && section.geoRegionIds.length > 0 && (
+            <WorldMap highlight={section.geoRegionIds} />
           )}
 
           {section.kcLabels.length > 0 && (
