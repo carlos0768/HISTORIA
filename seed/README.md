@@ -107,6 +107,44 @@ KC を持つ節: 15 / 75
 （山川『詳説世界史』世探704 を想定）と突き合わせて、ずれていたら教えてほしい。
 KC は節に紐づくので、ここがずれると範囲指定がずれる。
 
+## 5b. Supabase に入れる
+
+**2つの方法がある。どちらでも結果は同じになる。**
+
+### 方法A: SQL を貼る（Node も接続文字列も要らない）
+
+Supabase のダッシュボード → SQL Editor に、この順で貼る。
+
+| # | 貼るもの | 中身 |
+|---|---|---|
+| 1 | `docs/schema.sql` | 42テーブル・23 RLS ポリシー。**そのまま貼れる** |
+| 2 | `seed/sql/02_seed.sql` | 時代3・地域24・章立て117・KC 60（承認済みのみ） |
+
+`docs/schema.sql` に手を加えなくてよいのは、Supabase には pgvector があり
+`auth.uid()` も実在するためである（ローカル用の置換も shim も要らない）。
+
+`02_seed.sql` は CSV から生成している。**手で編集しない。**
+CSV を直したら作り直すこと。
+
+```bash
+npx tsx scripts/db/dump-sql.ts     # seed/sql/02_seed.sql を作り直す
+```
+
+どちらも `ON CONFLICT` で上書きするので、**何度流しても結果は同じ**である。
+最後にコメントで書いてある確認用の SELECT を流すと、件数が期待どおりか分かる。
+
+### 方法B: 手元から流す（`DATABASE_URL` が要る）
+
+```bash
+export DATABASE_URL='postgresql://postgres:【パスワード】@db.【ref】.supabase.co:5432/postgres'
+npx tsx scripts/db/migrate.ts                  # 確認だけ。何も書き換えない
+npx tsx scripts/db/migrate.ts --apply --seed   # 実行
+```
+
+接続文字列は **Direct connection**（Transaction pooler ではない）を使う。
+繋がらないときは Session pooler。アプリ実行時の `DATABASE_URL` はこれとは別で、
+そちらは Transaction pooler を使う（`docs/12` §4）。
+
 ## 6. 検査
 
 ```bash
