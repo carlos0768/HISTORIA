@@ -4,7 +4,8 @@ import { createTestDb, TEST_DB_URL } from '@/lib/db/test-helper'
 import { seedMasters, seedKc, SEED_DIR } from '@/scripts/db/seed'
 import { createClient, type AiConfig } from '@/lib/ai/client'
 import { ensureBudgetRow, budgetStatus, periodOf } from '@/lib/ai/budget'
-import { generateMaterial, paramsHash, MATERIAL_MAX_OUTPUT_TOKENS } from './generate'
+import { generateMaterial, paramsHash, MATERIAL_MAX_OUTPUT_TOKENS, VERIFY_MAX_OUTPUT_TOKENS } from './generate'
+import { MAX_CHARS } from '@/lib/ai/schema'
 import { machineCheck, extractYear } from './factcheck'
 import { createUser } from '@/lib/loop/fixture'
 import { MATERIAL_PROMPT_VERSION } from '@/lib/ai/prompt'
@@ -23,6 +24,33 @@ describe('層2 の年号抽出', () => {
   it('「前18世紀」のような表記は拾わない（誤照合を作らない）', () => {
     expect(extractYear('ハンムラビ法典は前18世紀')).toBeNull()
     expect(extractYear('年号を含まない主張')).toBeNull()
+  })
+})
+
+/**
+ * 出力上限が「実際に出うる最大」を下回っていると、
+ * finishReason が MAX_TOKENS になって毎回失敗する。
+ * docs/08 §3.3 の見積りと docs/07 §2 の受け入れ範囲から下限を導いて固定する。
+ */
+describe('出力トークンの上限', () => {
+  it('教材の上限が docs/08 §3.3 の見積り（12,168）を上回る', () => {
+    expect(MATERIAL_MAX_OUTPUT_TOKENS).toBeGreaterThan(12_168)
+  })
+
+  it('受け入れ範囲の最大構成でも収まる', () => {
+    // docs/08 §3.3 の 12,168 は 本文3,500字 / FC12枚 / 四択8問 / claims20件 の構成
+    const base = 12_168
+    const extra =
+      (MAX_CHARS - 3_500) +      // 本文が上限まで伸びたぶん（日本語はおよそ1字1トークン）
+      (14 - 12) * 60 +           // フラッシュカードの増分
+      (10 - 8) * 300 +           // 四択の増分（選択肢4つ＋誤答の説明＋解説）
+      (40 - 20) * 60             // claims の増分
+    expect(MATERIAL_MAX_OUTPUT_TOKENS).toBeGreaterThanOrEqual(base + extra)
+  })
+
+  it('検証の上限が claims 最大40件の判定を収められる', () => {
+    // 1件あたり index + status + 理由およそ60字
+    expect(VERIFY_MAX_OUTPUT_TOKENS).toBeGreaterThanOrEqual(40 * 90)
   })
 })
 
