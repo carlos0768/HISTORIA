@@ -228,3 +228,99 @@ LLM の可観測性ツール（Langfuse 等）は MVP では導入しない。
 
 **日本語のみ。** 対象が日本の大学受験生であり、多言語化の要件はない。
 文言をハードコードしてよい（i18n ライブラリを入れない）。
+
+## 10. PWA とオフライン（2026-09-02 追加）
+
+作者の指示で足した要件であり、v0.3 までの文書には記述が無かった。
+**実装（`public/sw.js` ／ `app/manifest.ts`）と同時にここへ書き起こす。**
+
+### 10.1 何をオフラインで動かすか
+
+| | オフライン | 理由 |
+|---|---|---|
+| 教材を**読む** | **できる** | `material_section` の本文。電車で読むのが本来の使い方 |
+| 記録・弱点を見る | できる（最後に見た状態） | 読み取りだけ |
+| **問題を解く** | **させない** | 下記 |
+
+**出題をオフラインで動かすには `answer_key` を端末に置くことになる。**
+§6.1 は「正答は解答前にクライアントへ渡さない」「採点は Server Action（`service_role`）が
+`item.answer_key` と照合して `correct` を決める」と定めており、これは `item` に
+SELECT ポリシーを作らない設計（`schema.sql` §13）と一体である。
+端末に正答を置いた時点で、**DevTools を開ける高校生1人で弱点DBの入力が無意味になる**。
+
+「解答をキューに貯めて復帰時に採点する」ことは技術的には可能で、設計も壊さない。
+だが**即時フィードバックの無い出題は retrieval practice として成立しない**
+（`04-weakness-engine.md` は解答直後の正誤提示を前提に `p_know` を更新する）。
+したがってオフラインでは出題そのものを出さず、`/offline` へ流す。
+
+### 10.2 キャッシュの方針
+
+**既定は「保存しない」である。** 保存するものを列挙する。
+逆（既定で保存し、危ないものを除く）にすると、画面を1つ足したときに黙って混ざる。
+
+| キャッシュ | 中身 | 方針 |
+|---|---|---|
+| `historia-shell-*` | `/offline`・アイコン | インストール時に先読み。失敗は握る（`cache.addAll` は1つ落ちると SW ごと有効化されない） |
+| `historia-static-*` | `/_next/static/*` | キャッシュ優先。内容ハッシュ付きで不変・個人の内容を含まない。80件で打ち切る |
+| `historia-pages-*` | `/material/*`・`/records` **のみ** | **ネットワーク優先**。個人の内容を含むので消去の対象 |
+
+**`/study` と `/checktest`（結果を含む）は絶対に保存しない。**
+確認テストの結果画面は解答済みの正答と解説を描画しているため、
+保存すると §6.1 の意図が端末側で崩れる。
+**過去問を含む画面を作るときも、ここに足す**（`10-legal-risk.md` G4 は
+「コピー・ダウンロード導線を置かない」としており、端末に本文の複製が残るのはその趣旨に反する）。
+
+**ネットワーク優先にした理由。** 当初の計画は stale-while-revalidate だったが採らなかった。
+SWR は「まず保存済みを出す」ので、共用端末で**前の利用者の頁が一瞬出る**。
+ネットワーク優先なら、繋がっているときは必ず今の内容が出て、繋がっていないときだけ保存済みに落ちる。
+オフラインで読めるという目的は、どちらでも同じく達成できる。
+
+### 10.3 共用端末に他人の内容を残さない
+
+引き金は「ログアウト」だけではない。**session 切れ**でも同じ危険がある。
+保護された経路は未認証だと **404 になる**（`10-legal-risk.md` §3.2 G2）ので、
+**404 を消去の合図として使う**。これでログアウト・session 切れ・別人が開いた、のどれでも
+`historia-pages-*` が消える。
+
+設定画面（`11-ux.md` §10 の画面12）ができたら、そこからは
+`postMessage({type:'purge'})` で明示的にも呼べる。SW 側は実装済みである。
+
+### 10.4 CSP との噛み合わせ（`proxy.ts`）
+
+- `worker-src 'self'` と `manifest-src 'self'` を**明示的に書く**。
+  未指定でも `default-src` に落ちて動くが、意図が読めない
+- **登録にインライン `<script>` を使わない。** クライアント境界
+  （`app/sw-register.tsx`）にすれば、その JS は Next が nonce 付きで読み込むので
+  `'strict-dynamic'` をそのまま通る。nonce を自分で配線する必要はない
+- **`/offline` は `force-dynamic` にする。** CSP が `'strict-dynamic'` + nonce なので、
+  ビルド時に生成した静的ページには nonce が入らず、自分のスクリプトが弾かれる。
+  Service Worker は応答を CSP ヘッダごと保存するため、キャッシュから出しても対応は保たれる
+- `public/sw.js` は Next のビルドを通らない。**素の JS で書き、TypeScript にしない**
+
+### 10.5 招待制との関係
+
+`/sw.js`・`/manifest.webmanifest`・アイコンはいずれも `proxy.ts` の matcher に入っており、
+**未認証では 404 になる**。招待されていない人が「ホーム画面に追加」しても中身は取れない。
+これは不具合ではなく G2 の帰結である。登録は失敗を握りつぶし、ログイン後の描画で成功する。
+
+`robots` の `noindex`（G3）とは両立する。manifest は検索とは無関係で、
+インストールしたときの見た目だけを決める。
+
+### 10.6 iOS
+
+iOS Safari は manifest を見ない。ホーム画面に足したときの見た目は
+`metadata.appleWebApp`（`capable` / `title` / `statusBarStyle`）と
+`app/apple-icon.png`（180×180）で決まる。実際に出ているタグを確認した：
+
+```
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-icon.png?..." sizes="180x180" type="image/png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="HISTORIA">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#FCF6E8">
+```
+
+★ `capable: true` から出るのは **`mobile-web-app-capable`** であって、
+古い `apple-mobile-web-app-capable` ではない。iOS 15.4 以降はこちらを見る。
+それより古い iOS を相手にするなら、自分でタグを足すことになる（いまは足していない）。
