@@ -1,19 +1,22 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { REGION_SHAPES, regionShape } from './regions'
-import { LAND_PATH, MAP_LAT, MAP_LON, project, MAP_WIDTH, MAP_HEIGHT } from './basemap'
+import { REGION_SHAPES, regionShape, unknownCountryCodes } from './regions'
+import {
+  COUNTRY_PATHS, COUNTRY_NAMES, MICRO_PINS,
+  GRATICULE_PATH, SPHERE_PATH, BORDERS_PATH, MAP_WIDTH, MAP_HEIGHT,
+} from './basemap'
 import { SEED_DIR } from '@/scripts/db/seed'
 import { parseCsv } from '@/scripts/db/csv'
 
 const seedRegions = parseCsv(readFileSync(join(SEED_DIR, 'region.csv'), 'utf8'))
 
 describe('地図の地域表', () => {
-  it('seed/region.csv と id・名前が一致する（ずれると別の場所を指す）', () => {
+  it('seed/region.csv と id・名前が一致する（ずれると地図が別の場所を指す）', () => {
     expect(REGION_SHAPES).toHaveLength(seedRegions.length)
     for (const r of seedRegions) {
       const shape = regionShape(Number(r.id))
-      expect(shape, `id=${r.id} (${r.label}) の枠がありません`).toBeDefined()
+      expect(shape, `id=${r.id} (${r.label}) がありません`).toBeDefined()
       expect(shape!.label).toBe(r.label)
     }
   })
@@ -25,59 +28,83 @@ describe('地図の地域表', () => {
     }
   })
 
-  it('枠が west<east / south<north になっている', () => {
+  it('すべての地域が国を持つ（空の地域は地図に何も出ない）', () => {
     for (const s of REGION_SHAPES) {
-      const [w, so, e, n] = s.box
-      expect(w, `${s.label}: 経度`).toBeLessThan(e)
-      expect(so, `${s.label}: 緯度`).toBeLessThan(n)
+      expect(s.countries.length, `${s.label} の国が0件`).toBeGreaterThan(0)
     }
   })
 
-  it('枠が図の範囲に収まっている', () => {
-    for (const s of REGION_SHAPES) {
-      const [w, so, e, n] = s.box
-      expect(w).toBeGreaterThanOrEqual(MAP_LON[0])
-      expect(e).toBeLessThanOrEqual(MAP_LON[1])
-      expect(so).toBeGreaterThanOrEqual(MAP_LAT[0])
-      expect(n).toBeLessThanOrEqual(MAP_LAT[1])
-    }
+  it('基図に存在しない国コードを指していない', () => {
+    expect(unknownCountryCodes()).toEqual([])
   })
 
-  it('子の枠が親の枠に収まっている', () => {
+  it('親地域が子の和集合になっている', () => {
     const byLabel = new Map(REGION_SHAPES.map(s => [s.label, s]))
+    const kids = new Map<string, string[]>()
     for (const r of seedRegions.filter(x => x.parent_label)) {
-      const child = byLabel.get(r.label!)!
-      const parent = byLabel.get(r.parent_label!)!
-      expect(child.box[0], `${child.label} ⊂ ${parent.label}`).toBeGreaterThanOrEqual(parent.box[0])
-      expect(child.box[1], `${child.label} ⊂ ${parent.label}`).toBeGreaterThanOrEqual(parent.box[1])
-      expect(child.box[2], `${child.label} ⊂ ${parent.label}`).toBeLessThanOrEqual(parent.box[2])
-      expect(child.box[3], `${child.label} ⊂ ${parent.label}`).toBeLessThanOrEqual(parent.box[3])
+      kids.set(r.parent_label!, [...(kids.get(r.parent_label!) ?? []), r.label!])
+    }
+    for (const [parent, children] of kids) {
+      const want = new Set(children.flatMap(c => byLabel.get(c)!.countries))
+      expect(new Set(byLabel.get(parent)!.countries), `${parent}`).toEqual(want)
+    }
+  })
+
+  it('葉の地域どうしで国が重複しない（同じ国が2色に塗られない）', () => {
+    const seen = new Map<string, string>()
+    for (const s of REGION_SHAPES.filter(x => !x.isParent)) {
+      for (const c of s.countries) {
+        expect(seen.get(c), `${COUNTRY_NAMES[c]} が ${seen.get(c)} と ${s.label} に重複`).toBeUndefined()
+        seen.set(c, s.label)
+      }
     }
   })
 })
 
 describe('基図', () => {
-  it('投影が図の四隅に対応する', () => {
-    expect(project(MAP_LON[0], MAP_LAT[1])).toEqual({ x: 0, y: 0 })
-    expect(project(MAP_LON[1], MAP_LAT[0])).toEqual({ x: MAP_WIDTH, y: MAP_HEIGHT })
+  const inBounds = (d: string) => {
+    for (const n of d.matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)) {
+      if (Number(n[1]) < -1 || Number(n[1]) > MAP_WIDTH + 1) return false
+      if (Number(n[2]) < -1 || Number(n[2]) > MAP_HEIGHT + 1) return false
+    }
+    return true
+  }
+
+  it('国のパスが閉じた輪の連なりで、図の範囲に収まる', () => {
+    const codes = Object.keys(COUNTRY_PATHS)
+    expect(codes.length).toBeGreaterThan(150)
+    for (const [code, d] of Object.entries(COUNTRY_PATHS)) {
+      expect(d.startsWith('M'), code).toBe(true)
+      expect(d.split('M').filter(Boolean).every(r => r.endsWith('Z')), code).toBe(true)
+      expect(inBounds(d), `${code} が図からはみ出している`).toBe(true)
+    }
   })
 
-  it('範囲外の緯度は端に丸める（図からはみ出さない）', () => {
-    expect(project(0, 90).y).toBe(0)
-    expect(project(0, -90).y).toBe(MAP_HEIGHT)
+  it('球の輪郭・経緯線・国境が引かれ、図の範囲に収まる', () => {
+    expect(SPHERE_PATH.length).toBeGreaterThan(100)
+    expect(GRATICULE_PATH.split('M').filter(Boolean).length).toBeGreaterThan(10)
+    expect(BORDERS_PATH.length).toBeGreaterThan(1000)
+    for (const [name, d] of [['球', SPHERE_PATH], ['経緯線', GRATICULE_PATH], ['国境', BORDERS_PATH]] as const) {
+      expect(inBounds(d), `${name} が図からはみ出している`).toBe(true)
+    }
   })
 
-  it('陸地のパスが閉じた輪の連なりになっている', () => {
-    expect(LAND_PATH.startsWith('M')).toBe(true)
-    const rings = LAND_PATH.split('M').filter(Boolean)
-    expect(rings.length).toBeGreaterThan(50)
-    expect(rings.every(r => r.endsWith('Z'))).toBe(true)
-    // 座標が figures の範囲に収まっていること
-    for (const n of LAND_PATH.matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)) {
-      expect(Number(n[1])).toBeGreaterThanOrEqual(0)
-      expect(Number(n[1])).toBeLessThanOrEqual(MAP_WIDTH)
-      expect(Number(n[2])).toBeGreaterThanOrEqual(0)
-      expect(Number(n[2])).toBeLessThanOrEqual(MAP_HEIGHT)
+  it('極小国の点が図の中にあり、国土と重複しない', () => {
+    expect(MICRO_PINS.length).toBeGreaterThan(20)
+    for (const p of MICRO_PINS) {
+      expect(p.x).toBeGreaterThanOrEqual(0)
+      expect(p.x).toBeLessThanOrEqual(MAP_WIDTH)
+      expect(p.y).toBeGreaterThanOrEqual(0)
+      expect(p.y).toBeLessThanOrEqual(MAP_HEIGHT)
+      // 国土で描けているものを点にしない（二重に出る）
+      expect(COUNTRY_PATHS[p.id], `${COUNTRY_NAMES[p.id]} が国土と点の両方にある`).toBeUndefined()
+    }
+  })
+
+  it('マルタ・バーレーン・シンガポールが点で出る（110m の国土では消える大きさ）', () => {
+    const pinned = new Set(MICRO_PINS.map(p => p.id))
+    for (const code of ['470', '048', '702']) {
+      expect(pinned.has(code), `${COUNTRY_NAMES[code]} の点がありません`).toBe(true)
     }
   })
 })
