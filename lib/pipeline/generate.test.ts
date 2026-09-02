@@ -6,7 +6,7 @@ import { createClient, type AiConfig } from '@/lib/ai/client'
 import { ensureBudgetRow, budgetStatus, periodOf } from '@/lib/ai/budget'
 import { generateMaterial, paramsHash, MATERIAL_MAX_OUTPUT_TOKENS, VERIFY_MAX_OUTPUT_TOKENS } from './generate'
 import { MAX_CHARS } from '@/lib/ai/schema'
-import { machineCheck, extractYear } from './factcheck'
+import { machineCheck, extractYear, matchRate } from './factcheck'
 import { createUser } from '@/lib/loop/fixture'
 import { MATERIAL_PROMPT_VERSION } from '@/lib/ai/prompt'
 
@@ -436,15 +436,104 @@ dbSuite('生成パイプライン（実DB）', () => {
 
   // ---- docs/08 §5 層2 ----
 
-  it('canon_event が空なので層2は照合0件になる（この状態を握りつぶさない）', async () => {
+  /**
+   * ★ ここは以前「canon_event が空なので照合0件になる」を確かめていた。
+   *   それは**現状を写しただけ**で、正典を seed した瞬間に落ちる試験だった。
+   *   確かめたいのは「正典に無い主張を、無いと言えること」なので、
+   *   **seed に絶対に載らない架空のラベル**を使う。
+   */
+  it('正典に無い主張は unmatched になり、握りつぶさない', async () => {
     const r = await machineCheck(db, [
-      { type: 'year', text: 'ウェストファリア条約は1648年' },
+      { type: 'year', text: 'ザヴァンドリア協定は1648年', subject: 'ザヴァンドリア協定' },
       { type: 'causal', text: '因果の主張' },
     ])
-    expect(r.matchable).toBe(1)
+    expect(r.matchable).toBe(1)          // year の1件だけが分母
     expect(r.matched).toBe(0)
     expect(r.verdicts[0]!.status).toBe('unmatched')
     expect(r.verdicts[0]!.reason).toContain('canon_event')
+    expect(r.verdicts[1]!.status).toBe('unmatched')   // causal は対象外
+  })
+
+  it('年を読み取れない主張は分母に入れない（正典を足しても照合できないため）', async () => {
+    const r = await machineCheck(db, [
+      { type: 'year', text: '前18世紀にハンムラビ法典が定められた' },
+    ])
+    expect(r.matchable).toBe(0)          // ← 分母から外す
+    expect(r.unreadable).toBe(1)
+    expect(r.verdicts[0]!.reason).toContain('年を読み取れない')
+  })
+
+  it('subject があれば本文全体ではなく subject で照合する', async () => {
+    await db`INSERT INTO canon_event (id, label, year_from, precision)
+             VALUES ('ce.t30', '三十年戦争', 1618, 'exact') ON CONFLICT (id) DO NOTHING`
+    try {
+      // 本文には「三十年戦争」が入っているが、主張しているのは条約の年である。
+      // subject を見なければ三十年戦争の正典に当たり、1648 が誤りとされてしまう
+      const r = await machineCheck(db, [{
+        type: 'year',
+        text: '三十年戦争を終わらせたザヴァンドリア協定は1648年に結ばれた',
+        subject: 'ザヴァンドリア協定',
+      }])
+      expect(r.verdicts[0]!.status).toBe('unmatched')
+      expect(r.verdicts[0]!.canonId).toBeUndefined()
+    } finally {
+      await db`DELETE FROM canon_event WHERE id = 'ce.t30'`
+    }
+  })
+
+  it('短いラベルが長いラベルを食わない（最長一致・毎回同じ正典に当たる）', async () => {
+    await db`INSERT INTO canon_event (id, label, year_from, precision) VALUES
+             ('ce.short', 'ザヴァンドリア', 1600, 'exact'),
+             ('ce.long',  'ザヴァンドリア協定', 1648, 'exact')
+             ON CONFLICT (id) DO NOTHING`
+    try {
+      const claim = { type: 'year' as const, text: 'ザヴァンドリア協定は1648年', subject: 'ザヴァンドリア協定' }
+      const a = await machineCheck(db, [claim])
+      const b = await machineCheck(db, [claim])
+      expect(a.verdicts[0]!.canonId).toBe('ce.long')   // 短い方に当たると 1600 年で wrong になる
+      expect(a.verdicts[0]!.status).toBe('ok')
+      expect(b.verdicts[0]!.canonId).toBe(a.verdicts[0]!.canonId)  // 決定的
+    } finally {
+      await db`DELETE FROM canon_event WHERE id IN ('ce.short','ce.long')`
+    }
+  })
+
+  it('claim の year_from を本文の抽出より優先する', async () => {
+    await db`INSERT INTO canon_event (id, label, year_from, precision)
+             VALUES ('ce.yf', 'ザヴァンドリア協定', 1648, 'exact') ON CONFLICT (id) DO NOTHING`
+    try {
+      // 本文には年が書かれていない。構造化された year_from だけが手がかり
+      const r = await machineCheck(db, [{
+        type: 'year', text: 'ザヴァンドリア協定が結ばれた',
+        subject: 'ザヴァンドリア協定', yearFrom: 1648,
+      }])
+      expect(r.verdicts[0]!.status).toBe('ok')
+      expect(r.matched).toBe(1)
+    } finally {
+      await db`DELETE FROM canon_event WHERE id = 'ce.yf'`
+    }
+  })
+
+  it('誤りの理由から、当たった正典の id を辿れる', async () => {
+    // ★ 年号は一括承認で入れており検算していない。誤っているのが教材ではなく
+    //   正典の側でありうるので、どの行に当たったかが分からないと直せない
+    await db`INSERT INTO canon_event (id, label, year_from, precision)
+             VALUES ('ce.trace', 'ザヴァンドリア協定', 1648, 'exact') ON CONFLICT (id) DO NOTHING`
+    try {
+      const r = await machineCheck(db, [{
+        type: 'year', text: 'ザヴァンドリア協定は1658年', subject: 'ザヴァンドリア協定',
+      }])
+      expect(r.verdicts[0]!.status).toBe('wrong')
+      expect(r.verdicts[0]!.reason).toContain('ce.trace')
+      expect(r.verdicts[0]!.canonId).toBe('ce.trace')
+    } finally {
+      await db`DELETE FROM canon_event WHERE id = 'ce.trace'`
+    }
+  })
+
+  it('照合率は分母が0なら null（0除算を0%と偽らない）', () => {
+    expect(matchRate({ verdicts: [], matched: 0, matchable: 0, unreadable: 0 })).toBeNull()
+    expect(matchRate({ verdicts: [], matched: 4, matchable: 5, unreadable: 2 })).toBeCloseTo(0.8)
   })
 
   it('canon_event があれば年号のずれを課金なしで捕まえる', async () => {
