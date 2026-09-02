@@ -85,15 +85,19 @@ async function unitFacts(db: Sql, unitId: string): Promise<UnitFacts> {
 export async function generateMaterial(
   db: Sql,
   ai: Client,
-  args: { userId: string; unitId: string; now: Date },
+  /** force: 冪等の短絡を飛ばして作り直す。blocked から抜ける唯一の道である */
+  args: { userId: string; unitId: string; now: Date; force?: boolean },
 ): Promise<GenerateOutcome> {
   const ctx = await buildGenerationContext(db, args.userId, args.unitId)
   const facts = await unitFacts(db, args.unitId)
   const hash = paramsHash(args.unitId, MATERIAL_PROMPT_VERSION, ctx.weakKcs.map(k => k.kcId))
   const emptyCheck: MachineCheckResult = { verdicts: [], matched: 0, matchable: 0 }
 
-  // 冪等: 同じ鍵の成功済みジョブがあれば作り直さない。リロード連打で二重生成しない
-  const done = await db<{ id: string }[]>`
+  // 冪等: 同じ鍵の成功済みジョブがあれば作り直さない。リロード連打で二重生成しない。
+  //
+  // ★ force のときだけ短絡を飛ばす。ここを飛ばせないと、いちど blocked になった単元は
+  //   params_hash が変わるまで永久に blocked のままになり、作者にも学習者にも直す手が無い。
+  const done = args.force ? [] : await db<{ id: string }[]>`
     SELECT id FROM generation_job
      WHERE user_id = ${args.userId} AND kind = 'material'
        AND scope_id = ${args.unitId} AND params_hash = ${hash} AND status = 'succeeded'`
@@ -110,13 +114,17 @@ export async function generateMaterial(
     }
   }
 
-  const jobId = randomUUID()
-  await db`
+  // ★ 衝突したときは既存行の id が生き残る。ここで RETURNING を取らずに
+  //   新しい UUID を持ち回ると、ai_spend.job_id が存在しない行を指して外部キーで落ちる。
+  //   同じ範囲を作り直すたびに（失敗後の再実行・force）必ず踏む。
+  const [job] = await db<{ id: string }[]>`
     INSERT INTO generation_job (id, user_id, kind, scope_id, params_hash, status, provider, model, started_at)
-    VALUES (${jobId}, ${args.userId}, 'material', ${args.unitId}, ${hash}, 'running',
+    VALUES (${randomUUID()}, ${args.userId}, 'material', ${args.unitId}, ${hash}, 'running',
             ${ai.config.genProvider}, ${ai.config.genModel}, ${args.now})
     ON CONFLICT (user_id, kind, scope_id, params_hash)
-    DO UPDATE SET status = 'running', attempts = generation_job.attempts + 1, started_at = ${args.now}`
+    DO UPDATE SET status = 'running', attempts = generation_job.attempts + 1, started_at = ${args.now}
+    RETURNING id`
+  const jobId = job!.id
 
   const fail = async (reason: string): Promise<GenerateOutcome> => {
     await db`UPDATE generation_job SET status = 'failed', error = ${reason}, finished_at = ${args.now}

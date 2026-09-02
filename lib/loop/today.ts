@@ -10,6 +10,7 @@ import { dailyQueue, dailyPlan, drillProgress, drillState, DEFAULT_MAX_DAILY,
          type QueueCandidate, type ScheduledKc } from '@/lib/domain/scheduler'
 import { mastery, masteryStatus, type KcState, type MasteryStatus } from '@/lib/domain/weakness'
 import { newKcCard, type KcCard } from '@/lib/domain/sm2'
+import { requiredDwellExpr } from './material'
 
 type Row = {
   kc_id: string
@@ -185,10 +186,11 @@ export async function drillProgressList(db: Sql, userId: string, now: Date): Pro
     const mat = await db<{ total: string; read: string }[]>`
       SELECT count(*) AS total,
              count(*) FILTER (WHERE NOT EXISTS (
-               SELECT 1 FROM material_section ms
-                WHERE ms.material_id = m.id
+               SELECT 1 FROM material_section s
+                WHERE s.material_id = m.id
                   AND NOT EXISTS (SELECT 1 FROM material_read mr
-                                   WHERE mr.section_id = ms.id AND mr.user_id = ${userId})
+                                   WHERE mr.section_id = s.id AND mr.user_id = ${userId}
+                                     AND mr.dwell_ms >= ${requiredDwellExpr(db)})
              )) AS read
         FROM material m
        WHERE m.user_id = ${userId} AND m.status = 'ready'

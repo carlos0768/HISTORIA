@@ -173,6 +173,45 @@ dbSuite('生成パイプライン（実DB）', () => {
     expect(Number(mats[0]!.n)).toBe(1)
   })
 
+  it('失敗したジョブを同じ範囲で再実行できる（job_id を取り違えない）', async () => {
+    // 1回目は文字数で失敗する。generation_job は残り、status = 'failed' になる
+    const short = createClient(cfg, { charCount: 800 })
+    expect((await generateMaterial(db, short, { userId, unitId: UNIT, now: NOW })).status).toBe('failed')
+
+    // 2回目は ON CONFLICT DO UPDATE になる。既存行の id を使わないと
+    // ai_spend.job_id が存在しない行を指して外部キーで落ちる
+    const r = await generateMaterial(db, createClient(cfg), { userId, unitId: UNIT, now: NOW })
+    expect(r.status).toBe('ready')
+
+    const jobs = await db<{ id: string; attempts: number; status: string }[]>`
+      SELECT id, attempts, status FROM generation_job WHERE user_id = ${userId}`
+    expect(jobs).toHaveLength(1)
+    expect(jobs[0]!.status).toBe('succeeded')
+    expect(jobs[0]!.attempts).toBe(1)
+
+    const spend = await db<{ job_id: string | null }[]>`
+      SELECT job_id FROM ai_spend WHERE period = ${periodOf(NOW)} AND job_id IS NOT NULL`
+    expect(spend.length).toBeGreaterThan(0)
+    expect(spend.every(x => x.job_id === jobs[0]!.id)).toBe(true)
+  })
+
+  it('force で冪等の短絡を飛ばして作り直せる（blocked から抜ける唯一の道）', async () => {
+    const bad = createClient(cfg, { wrongClaims: ['ウェストファリア条約は1658年'] })
+    expect((await generateMaterial(db, bad, { userId, unitId: UNIT, now: NOW })).status).toBe('blocked')
+
+    // force 無しは blocked のまま返る（冪等）
+    expect((await generateMaterial(db, createClient(cfg), { userId, unitId: UNIT, now: NOW })).status)
+      .toBe('blocked')
+
+    const again = await generateMaterial(db, createClient(cfg), { userId, unitId: UNIT, now: NOW, force: true })
+    expect(again.status).toBe('ready')
+
+    // 配信できる教材は単元につき1本のまま
+    const ready = await db<{ n: string }[]>`
+      SELECT count(*) AS n FROM material WHERE user_id = ${userId} AND status = 'ready'`
+    expect(Number(ready[0]!.n)).toBe(1)
+  })
+
   it('generation_job にトークン数が記録される', async () => {
     const ai = createClient(cfg)
     await generateMaterial(db, ai, { userId, unitId: UNIT, now: NOW })
