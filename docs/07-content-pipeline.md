@@ -249,7 +249,21 @@ exam_weight が高いものは優先してください。
 - 表は問い、裏は答え。答えは30字以内。
 - 「〜について説明せよ」のような自己採点できない問いを作らない。
 - 1枚1項目。複数の事実を1枚に詰めない。
+
+# 検証用の主張リスト（claims）
+**あなたが書いた本文から、事実として検証できる主張を 12〜24 件抜き出してください。**
+このリストは別の検証者が1件ずつ事実確認するために使います。
+ここに挙げなかった主張は誰にも検証されないまま読者に届きます。
+
+（kind の一覧と書き方の規則は prompts/material_v2.md を参照）
 ```
+
+**この節は v1 に存在しなかった。** その結果 `claims` を指示しないまま出力させており、
+モデルが空配列を返すと層2は照合対象0件、層3は呼ばれず、
+`wrong` が空のまま `status = 'ready'` になっていた。
+**5層防御が沈黙のうちに0層になる経路**である（実装で確認済み）。
+`material_v2` で指示を追加し、スキーマに `minItems` を入れ、
+パイプラインにも「claims が空なら配信しない」を置いた。
 
 ### 5.3 構造化出力スキーマ
 
@@ -321,6 +335,8 @@ Gemini API の構造化出力（`responseMimeType: 'application/json'` ＋ `resp
     "claims": {
       "description": "本文中の検証可能な主張。ファクトチェックに使う（08-ai-architecture.md §5）",
       "type": "array",
+      "minItems": 6,
+      "maxItems": 40,
       "items": {
         "type": "object", "additionalProperties": false,
         "required": ["kind", "text", "section_ord"],

@@ -63,17 +63,20 @@ export function createFakeProvider(name: string, opts: FakeOptions = {}): Provid
         }
       })
 
+      // 実物と同じ件数を出す。スキーマの下限（6件）を満たさないと
+      // 自分の出力の検査で落ちる。フェイクも同じ契約で動かすためである
+      const kinds = ['year', 'person', 'event', 'causal', 'place'] as const
       const claims = [
         ...(opts.wrongClaims ?? []).map((text, i) => ({
           kind: 'year' as const,
           text,
           section_ord: (i % 7) + 1,
         })),
-        {
-          kind: 'causal' as const,
-          text: `${label(0)}に関する因果の主張`,
-          section_ord: 1,
-        },
+        ...Array.from({ length: 12 }, (_, i) => ({
+          kind: kinds[i % kinds.length]!,
+          text: `${label(i)}に関する主張${i + 1}`,
+          section_ord: (i % 7) + 1,
+        })),
       ]
 
       const value: MaterialOutput = {

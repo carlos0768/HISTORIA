@@ -60,7 +60,13 @@ export const MaterialOutput = z.object({
   sections: z.array(MaterialSection).length(7),
   flashcards: z.array(Flashcard).min(10).max(14),
   mcqs: z.array(Mcq).min(6).max(10),
-  claims: z.array(GeneratedClaim),
+  /**
+   * ★ 下限が要る。空配列を許すと層2・層3 が素通りし、
+   *   未検証の教材が ready として配信される（v1 で実際にそうなっていた）。
+   *   プロンプトは 12〜24件を求める。下限はそれより緩くして、
+   *   数件足りないだけで無料枠のリクエストを捨てないようにする。
+   */
+  claims: z.array(GeneratedClaim).min(6).max(40),
 })
 
 export type MaterialOutput = z.infer<typeof MaterialOutput>

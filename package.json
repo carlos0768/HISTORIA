@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "db:migrate": "tsx scripts/db/migrate.ts",
     "db:dev-seed": "tsx scripts/db/dev-seed.ts",
     "seed:validate": "node seed/validate.mjs"
   },

@@ -89,7 +89,7 @@ describe('§5.2 差し込み', () => {
   })
 
   it('prompt_version を返す（material.prompt_version に記録する）', () => {
-    expect(r.promptVersion).toBe('material_v1')
+    expect(r.promptVersion).toBe('material_v2')
   })
 
   it('親単元が無くても落ちない', () => {

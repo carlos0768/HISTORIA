@@ -121,6 +121,57 @@ dbSuite('生成パイプライン（実DB）', () => {
     expect(Number(ready[0]!.n)).toBe(0)
   })
 
+  /**
+   * v1 のプロンプトは claims を一度も指示していなかった。
+   * モデルが空配列を返すと層2は0件、層3は呼ばれず、ready として配信されていた。
+   * 5層防御が沈黙のうちに0層になる経路である。
+   */
+  it('claims が空の教材は配信しない（未検証のまま通さない）', async () => {
+    const ai = createClient(cfg)
+    // プロバイダを迂回して claims を空にする。スキーマ検査の裏をかいた状態を作る
+    const noClaims = {
+      ...ai,
+      generate: async <T,>() => ({
+        value: {
+          title: '主張の無い教材',
+          sections: Array.from({ length: 7 }, (_, i) => ({
+            ord: i + 1, heading: `§${i + 1}`, body_md: 'あ'.repeat(500), kc_ids: [],
+          })),
+          flashcards: Array.from({ length: 10 }, (_, i) => ({
+            front: `問${i}`, back: '答', kc_ids: [],
+          })),
+          mcqs: Array.from({ length: 6 }, (_, i) => ({
+            stem: `設問${i}`,
+            choices: (['a', 'b', 'c', 'd'] as const).map(k => ({ key: k, text: k, why_wrong: k === 'a' ? '' : '誤り' })),
+            answer_key: 'a' as const, explanation: '解説', kc_ids: [],
+          })),
+          claims: [],
+        } as unknown as T,
+        usage: { inputTokens: 600, outputTokens: 2000 },
+        model: 'test',
+      }),
+    }
+    const r = await generateMaterial(db, noClaims as typeof ai, { userId, unitId: UNIT, now: NOW })
+    expect(r.status).toBe('failed')
+    if (r.status !== 'failed') return
+    expect(r.reason).toContain('検証用の主張が1件も出力されませんでした')
+
+    // 教材も設問も1件も残らない
+    const m = await db<{ n: string }[]>`SELECT count(*) AS n FROM material WHERE user_id = ${userId}`
+    expect(Number(m[0]!.n)).toBe(0)
+    const items = await db<{ n: string }[]>`SELECT count(*) AS n FROM item WHERE user_id = ${userId}`
+    expect(Number(items[0]!.n)).toBe(0)
+  })
+
+  it('claims が少なすぎる生成物はスキーマで弾かれる（層1の入口で止める）', async () => {
+    const { MaterialOutput } = await import('@/lib/ai/schema')
+    const few = { claims: [{ kind: 'year', text: 'x', section_ord: 1 }] }
+    const r = MaterialOutput.safeParse(few)
+    expect(r.success).toBe(false)
+    // 空配列も通らないこと。ここが v1 の穴だった
+    expect(MaterialOutput.safeParse({ ...few, claims: [] }).success).toBe(false)
+  })
+
   it('検証そのものが失敗したら配信しない（未検証を通さない）', async () => {
     const ai = createClient(cfg)
     // 検証プロバイダを落とす
