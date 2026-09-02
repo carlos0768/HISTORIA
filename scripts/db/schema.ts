@@ -72,10 +72,17 @@ export const SUPABASE_ROLES_SHIM = `
 DO $$
 BEGIN
   -- 並行してテスト用DBを作るとロール作成が競合する。ロールはクラスタ共有なので
-  -- duplicate_object は握りつぶして良い（欲しいのは「存在すること」だけ）
-  BEGIN CREATE ROLE anon          NOLOGIN NOINHERIT; EXCEPTION WHEN duplicate_object THEN NULL; END;
-  BEGIN CREATE ROLE authenticated NOLOGIN NOINHERIT; EXCEPTION WHEN duplicate_object THEN NULL; END;
-  BEGIN CREATE ROLE service_role  NOLOGIN NOINHERIT BYPASSRLS; EXCEPTION WHEN duplicate_object THEN NULL; END;
+  -- 「既にある」系の失敗は握りつぶして良い（欲しいのは「存在すること」だけ）。
+  --
+  -- ★ duplicate_object だけでは足りない。CREATE ROLE が先に見るのは
+  --   pg_authid の一意索引なので、**本当に同時**だと unique_violation (23505) が飛ぶ。
+  --   「開始前から在った」= duplicate_object (42710) / 「今まさに他が作った」= unique_violation。
+  --   前者しか捕まえていなかったため CI が確率的に落ちていた（2026-09-02・実測）。
+  --   なお一意索引の待ち合わせで相手の COMMIT まで待つので、
+  --   unique_violation を捕まえた時点でロールは必ず存在する。
+  BEGIN CREATE ROLE anon          NOLOGIN NOINHERIT; EXCEPTION WHEN duplicate_object OR unique_violation THEN NULL; END;
+  BEGIN CREATE ROLE authenticated NOLOGIN NOINHERIT; EXCEPTION WHEN duplicate_object OR unique_violation THEN NULL; END;
+  BEGIN CREATE ROLE service_role  NOLOGIN NOINHERIT BYPASSRLS; EXCEPTION WHEN duplicate_object OR unique_violation THEN NULL; END;
 END $$;
 
 GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
@@ -98,7 +105,8 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA auth
  *   肝心の ALTER DEFAULT PRIVILEGES を飛ばしてしまう。ロールはクラスタ共有、
  *   既定権限はデータベース単位なので、片方だけ残るのが普通に起きる。
  *   本物の Supabase だけが持つ supabase_admin で判定する。
- * ★ shim 自体は何度流しても同じ（DO で duplicate_object を握りつぶし、
+ * ★ shim 自体は何度流しても同じで、同時に流しても同じ
+ *   （DO で duplicate_object と unique_violation の両方を握りつぶし、
  *   GRANT と ALTER DEFAULT PRIVILEGES は元々冪等）。
  */
 export async function ensureSupabaseRoles(db: Sql): Promise<boolean> {
