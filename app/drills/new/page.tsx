@@ -1,7 +1,8 @@
 import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { unitTree } from '@/lib/pipeline/drill'
-import { Screen, Empty } from '@/components/ui'
+import { Screen } from '@/components/ui'
+import { NotReady } from '@/components/not-ready'
 import { RangePicker } from './picker'
 
 export const dynamic = 'force-dynamic'
@@ -19,10 +20,7 @@ export default async function NewDrill() {
   if (!db || !userId) {
     return (
       <Screen title="範囲を選ぶ" tab="drills">
-        <Empty>
-          <p className="lv-body">データベースに接続していません。</p>
-          <p className="lv-caption"><code>DATABASE_URL</code> と <code>DEMO_USER_ID</code> が要ります。</p>
-        </Empty>
+        <NotReady />
       </Screen>
     )
   }

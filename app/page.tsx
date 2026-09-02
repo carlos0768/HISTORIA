@@ -5,6 +5,7 @@ import { todaysPlan, drillProgressList } from '@/lib/loop/today'
 import { drillMaterials } from '@/lib/loop/material'
 import { UnitMaterials } from './units'
 import { Screen, Card, TwoBars, Alert, Empty, StatusChip } from '@/components/ui'
+import { NotReady } from '@/components/not-ready'
 import { DEFAULT_MAX_DAILY } from '@/lib/domain/scheduler'
 
 export const dynamic = 'force-dynamic'
@@ -16,13 +17,7 @@ export default async function Home() {
   if (!db || !userId) {
     return (
       <Screen title="HISTORIA" tab="home">
-        <Empty>
-          <p className="lv-body">データベースに接続していません。</p>
-          <p className="lv-caption">
-            <code>DATABASE_URL</code> と <code>DEMO_USER_ID</code> を設定すると、
-            今日やることが表示されます。
-          </p>
-        </Empty>
+        <NotReady />
       </Screen>
     )
   }

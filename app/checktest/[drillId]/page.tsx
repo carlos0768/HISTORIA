@@ -3,6 +3,7 @@ import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { buildCheckTest } from '@/lib/loop/checktest'
 import { Screen, Empty } from '@/components/ui'
+import { NotReady } from '@/components/not-ready'
 import { CheckTest } from './test'
 import type { Choice } from '@/app/study/quiz'
 
@@ -27,7 +28,7 @@ export default async function CheckTestPage({ params }: { params: Promise<{ dril
   if (!db || !userId) {
     return (
       <Screen title="確認テスト" tab="drills">
-        <Empty><p className="lv-body">データベースに接続していません。</p></Empty>
+        <NotReady />
       </Screen>
     )
   }

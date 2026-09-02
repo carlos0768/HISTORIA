@@ -4,6 +4,7 @@ import { currentUserId } from '@/lib/auth/dal'
 import { drillProgressList } from '@/lib/loop/today'
 import { canRetest, RETEST_COOLDOWN_DAYS } from '@/lib/domain/assessment'
 import { Screen, Card, TwoBars, Empty } from '@/components/ui'
+import { NotReady } from '@/components/not-ready'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,7 +24,7 @@ export default async function Drills() {
   if (!db || !userId) {
     return (
       <Screen title="特訓" tab="drills">
-        <Empty><p className="lv-body">データベースに接続していません。</p></Empty>
+        <NotReady />
       </Screen>
     )
   }
