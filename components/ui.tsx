@@ -8,15 +8,77 @@
  * ★ .lv-device はモックの「端末の絵」なので実機では使わない。.lv-root を使う。
  */
 import type { ReactNode } from 'react'
+import Link from 'next/link'
 import type { MasteryStatus } from '@/lib/domain/weakness'
 
-export function Screen({ title, children }: { title: string; children: ReactNode }) {
+/**
+ * フッタの3タブ（docs/11-ux.md §9）。
+ *
+ * ★ ここに載せる行き先は**必ず実在させる**。行き止まりのタブを出すと、
+ *   利用者は「壊れている」と判断してアプリごと使うのをやめる。
+ */
+export const TABS = [
+  { key: 'home', href: '/', label: 'ホーム', icon: '⌂' },
+  { key: 'drills', href: '/drills', label: '特訓', icon: '◆' },
+  { key: 'records', href: '/records', label: '記録', icon: '▤' },
+] as const
+
+export type TabKey = typeof TABS[number]['key']
+
+/**
+ * 1画面。
+ *
+ * ★ `tab` を渡した画面だけに導線が付く。認証まわり（招待コード・ログイン・生年月日）は
+ *   ログイン前なので渡さない。渡すと未登録の人にアプリの構造が見える。
+ *
+ * ★ `aside` は 1440px 以上でだけ現れる資料面（設計系の三分割の右 320px）。
+ *   モバイルでは**そもそも並べない**ので、中身の描画費用もかからない。
+ */
+export function Screen({
+  title, children, tab, aside,
+}: {
+  title: string
+  children: ReactNode
+  tab?: TabKey
+  aside?: ReactNode
+}) {
+  if (!tab) {
+    return (
+      <div className="lv-root hs-screen">
+        <header className="lv-navbar"><span className="lv-navbar__title">{title}</span></header>
+        <div className="hs-pad">{children}</div>
+      </div>
+    )
+  }
   return (
-    <div className="lv-root hs-screen">
-      <header className="lv-navbar">
-        <span className="lv-navbar__title">{title}</span>
-      </header>
-      <div className="hs-pad">{children}</div>
+    <div className="lv-root hs-screen hs-shell">
+      <nav className="hs-shell__side" aria-label="メニュー">
+        <span className="hs-side__label">学習</span>
+        {TABS.map(t => (
+          <Link key={t.key} href={t.href}
+                className={`hs-side__item${t.key === tab ? ' hs-side__item--active' : ''}`}
+                aria-current={t.key === tab ? 'page' : undefined}>
+            {t.label}
+          </Link>
+        ))}
+      </nav>
+
+      <div className="hs-shell__main">
+        <header className="lv-navbar"><span className="lv-navbar__title">{title}</span></header>
+        <div className="hs-pad">{children}</div>
+        <nav className="lv-tabbar" aria-label="メニュー">
+          {TABS.map(t => (
+            <Link key={t.key} href={t.href}
+                  className={`lv-tabbar__item${t.key === tab ? ' lv-tabbar__item--active' : ''}`}
+                  aria-current={t.key === tab ? 'page' : undefined}>
+              <span className="lv-tabbar__icon" aria-hidden="true">{t.icon}</span>
+              {t.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
+
+      {aside && <aside className="hs-shell__aside">{aside}</aside>}
     </div>
   )
 }

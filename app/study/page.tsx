@@ -12,7 +12,7 @@ export default async function Study() {
   const userId = await currentUserId()
   if (!db || !userId) {
     return (
-      <Screen title="今日やること">
+      <Screen title="今日やること" tab="home">
         <Empty><p className="lv-body">データベースに接続していません。</p></Empty>
       </Screen>
     )
@@ -46,7 +46,7 @@ export default async function Study() {
     .map(r => ({ id: r.id, stem: r.stem, choices: r.choices!, kcLabel: r.kc_label }))
 
   return (
-    <Screen title="今日やること">
+    <Screen title="今日やること" tab="home">
       {items.length === 0 ? (
         <Empty>
           <p className="lv-body">出題できる設問がまだありません。</p>
