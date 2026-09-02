@@ -15,6 +15,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "db:migrate": "tsx scripts/db/migrate.ts",
+    "db:dump-sql": "tsx scripts/db/dump-sql.ts",
+    "db:dump-rls": "tsx scripts/db/dump-rls.ts",
+    "db:verify-rls": "tsx scripts/db/verify-rls.ts",
     "db:dev-seed": "tsx scripts/db/dev-seed.ts",
     "seed:validate": "node seed/validate.mjs"
   },

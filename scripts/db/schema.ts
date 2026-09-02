@@ -54,8 +54,68 @@ export async function ensureAuthShim(db: Sql): Promise<boolean> {
   return true
 }
 
+/**
+ * Supabase の3ロールと、その**既定権限**をローカルで再現する。
+ *
+ * ★ ロールを作るだけでは足りない。権限まで真似ないと意味が無い。
+ *   Supabase は public スキーマに ALTER DEFAULT PRIVILEGES を仕掛けており、
+ *   あとから作った表に anon / authenticated 向けの ALL が自動で付く。
+ *   素の PostgreSQL は逆で、GRANT しない限り誰も触れない。
+ *   ここを再現しないと「手元では RLS が無くても誰も読めない」ように見え、
+ *   本番だけ anon キーで読み書きできる、という食い違いが試験をすり抜ける。
+ *   実際 2026-09-02 に本番で見つけた穴（19表が RLS 無効＝anon が DELETE 可能）は
+ *   この食い違いのせいで手元の 343 件の試験を素通りしていた。
+ *
+ * ★ 既にあるロールには触れない。Supabase 上で流したとき本物を壊さないため。
+ */
+export const SUPABASE_ROLES_SHIM = `
+DO $$
+BEGIN
+  -- 並行してテスト用DBを作るとロール作成が競合する。ロールはクラスタ共有なので
+  -- duplicate_object は握りつぶして良い（欲しいのは「存在すること」だけ）
+  BEGIN CREATE ROLE anon          NOLOGIN NOINHERIT; EXCEPTION WHEN duplicate_object THEN NULL; END;
+  BEGIN CREATE ROLE authenticated NOLOGIN NOINHERIT; EXCEPTION WHEN duplicate_object THEN NULL; END;
+  BEGIN CREATE ROLE service_role  NOLOGIN NOINHERIT BYPASSRLS; EXCEPTION WHEN duplicate_object THEN NULL; END;
+END $$;
+
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+GRANT USAGE ON SCHEMA auth   TO anon, authenticated, service_role;
+
+-- これから作る表・列・シーケンス・関数に既定で ALL を付ける（Supabase と同じ）
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+  GRANT ALL ON TABLES    TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+  GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA auth
+  GRANT EXECUTE ON FUNCTIONS TO anon, authenticated, service_role;
+`
+
+/**
+ * Supabase でなければ、3ロールと既定権限を用意する。
+ *
+ * ★ 判定に authenticated の有無を使ってはいけない。
+ *   手元で一度でも CREATE ROLE authenticated を打つと「もうある」と見なされ、
+ *   肝心の ALTER DEFAULT PRIVILEGES を飛ばしてしまう。ロールはクラスタ共有、
+ *   既定権限はデータベース単位なので、片方だけ残るのが普通に起きる。
+ *   本物の Supabase だけが持つ supabase_admin で判定する。
+ * ★ shim 自体は何度流しても同じ（DO で duplicate_object を握りつぶし、
+ *   GRANT と ALTER DEFAULT PRIVILEGES は元々冪等）。
+ */
+export async function ensureSupabaseRoles(db: Sql): Promise<boolean> {
+  const [row] = await db<{ real: boolean }[]>`
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'supabase_admin') AS real`
+  if (row?.real) return false
+  await db.unsafe(SUPABASE_ROLES_SHIM)
+  return true
+}
+
 export async function applySchema(db: Sql, opts: { pgvector?: boolean; authShim?: boolean } = {}): Promise<void> {
   const pgvector = opts.pgvector ?? process.env.PGVECTOR !== 'off'
-  if (opts.authShim ?? true) await ensureAuthShim(db)
+  // ★ 順番が効く。auth スキーマ → ロールと既定権限 → 表、の順でなければ
+  //   ALTER DEFAULT PRIVILEGES が表に効かない（既定権限は「後から作る物」にしか付かない）。
+  if (opts.authShim ?? true) {
+    await ensureAuthShim(db)
+    await ensureSupabaseRoles(db)
+  }
   await db.unsafe(readSchema({ pgvector }))
 }
