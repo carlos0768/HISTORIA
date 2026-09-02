@@ -2,6 +2,7 @@ import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { todaysPlan } from '@/lib/loop/today'
 import { Screen, Empty } from '@/components/ui'
+import { NotReady } from '@/components/not-ready'
 import { Quiz, type QuizItem } from './quiz'
 import { DEFAULT_MAX_DAILY } from '@/lib/domain/scheduler'
 
@@ -13,7 +14,7 @@ export default async function Study() {
   if (!db || !userId) {
     return (
       <Screen title="今日やること" tab="home">
-        <Empty><p className="lv-body">データベースに接続していません。</p></Empty>
+        <NotReady />
       </Screen>
     )
   }

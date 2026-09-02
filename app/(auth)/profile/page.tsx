@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { Screen, Empty } from '@/components/ui'
+import { NotReady } from '@/components/not-ready'
 import { verifySession } from '@/lib/auth/dal'
 import { authEnabled } from '@/lib/auth/supabase'
 import { tryDb } from '@/lib/db/optional'
@@ -34,7 +35,7 @@ export default async function ProfilePage() {
   if (!db) {
     return (
       <Screen title="登録">
-        <Empty><p className="lv-body">データベースに接続していません。</p></Empty>
+        <NotReady />
       </Screen>
     )
   }

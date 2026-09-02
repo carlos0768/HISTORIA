@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation'
 import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { materialView } from '@/lib/loop/material'
-import { Screen, Empty, Alert } from '@/components/ui'
+import { Screen, Alert } from '@/components/ui'
+import { NotReady } from '@/components/not-ready'
 import { Reader } from './reader'
 
 export const dynamic = 'force-dynamic'
@@ -16,7 +17,7 @@ export default async function MaterialPage({ params }: { params: Promise<{ id: s
   if (!db || !userId) {
     return (
       <Screen title="教材" tab="drills">
-        <Empty><p className="lv-body">データベースに接続していません。</p></Empty>
+        <NotReady />
       </Screen>
     )
   }

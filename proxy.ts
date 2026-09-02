@@ -73,6 +73,11 @@ export default async function proxy(req: NextRequest) {
     'frame-src https://www.youtube-nocookie.com',
     "img-src 'self' data: https://i.ytimg.com",
     "connect-src 'self'",
+    // ★ 明示する。未指定でも default-src に落ちて動くが、
+    //   Service Worker を登録するという意図が読めない（docs/12 §10）。
+    //   manifest-src も同じ理由で書く。
+    "worker-src 'self'",
+    "manifest-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",

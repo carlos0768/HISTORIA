@@ -3,6 +3,7 @@ import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { weakKcs, streak } from '@/lib/loop/records'
 import { Screen, Card, Empty, StatusChip, MasteryBar } from '@/components/ui'
+import { NotReady } from '@/components/not-ready'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,9 +21,7 @@ export default async function Records() {
   if (!db || !userId) {
     return (
       <Screen title="記録" tab="records">
-        <Empty>
-          <p className="lv-body">データベースに接続していません。</p>
-        </Empty>
+        <NotReady />
       </Screen>
     )
   }

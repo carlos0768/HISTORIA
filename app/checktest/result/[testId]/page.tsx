@@ -3,6 +3,7 @@ import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { RETEST_COOLDOWN_DAYS, type Verdict } from '@/lib/domain/assessment'
 import { Screen, Card, Empty, MasteryBar } from '@/components/ui'
+import { NotReady } from '@/components/not-ready'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,7 +46,7 @@ export default async function Result({ params }: { params: Promise<{ testId: str
   if (!db || !userId) {
     return (
       <Screen title="確認テストの結果" tab="drills">
-        <Empty><p className="lv-body">データベースに接続していません。</p></Empty>
+        <NotReady />
       </Screen>
     )
   }

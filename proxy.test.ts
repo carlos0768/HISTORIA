@@ -91,6 +91,17 @@ describe('proxy（未認証の遮断）', () => {
     })
   })
 
+  /**
+   * ★ worker-src が無くても Service Worker は登録できる（default-src に落ちるため）。
+   *   だからこそ試験で留めておく。CSP を締めたときに黙って PWA が死ぬのを防ぐ。
+   */
+  it('CSP が Service Worker と manifest を許している（docs/12 §10）', async () => {
+    loggedIn()
+    const csp = (await proxy(req('/'))).headers.get('Content-Security-Policy')!
+    expect(csp).toContain("worker-src 'self'")
+    expect(csp).toContain("manifest-src 'self'")
+  })
+
   it('CSP は毎回ちがう nonce を出す', async () => {
     loggedIn()
     const a = (await proxy(req('/'))).headers.get('Content-Security-Policy')!
