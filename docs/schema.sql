@@ -375,7 +375,10 @@ CREATE TABLE kc_card (
   user_id        uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
   kc_id          text NOT NULL REFERENCES kc(id),
   n              int  NOT NULL DEFAULT 0,
-  ef             real NOT NULL DEFAULT 2.5 CHECK (ef >= 1.3),
+  -- ★ 1.3::real と書くこと。1.3 は float4 で表現できず 1.2999999523... に丸められるため、
+  --   SM-2 が下限にクリップした値（JS の 1.3）を入れると `ef >= 1.3`（numeric 比較）は必ず落ちる。
+  --   ease hell に入ったカードが1枚も保存できなくなる（docs/04b §8 ケース2）。
+  ef             real NOT NULL DEFAULT 2.5 CHECK (ef >= 1.3::real),
   interval_days  int  NOT NULL DEFAULT 0 CHECK (interval_days >= 0 AND interval_days <= 365),
   due_at         timestamptz NOT NULL,
   last_review_at timestamptz,
