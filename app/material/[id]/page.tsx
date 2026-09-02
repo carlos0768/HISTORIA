@@ -5,6 +5,7 @@ import { currentUserId } from '@/lib/auth/dal'
 import { materialView } from '@/lib/loop/material'
 import { Screen, Alert } from '@/components/ui'
 import { NotReady } from '@/components/not-ready'
+import { FakeWarning } from '@/components/fake-warning'
 import { Reader } from './reader'
 
 export const dynamic = 'force-dynamic'
@@ -56,6 +57,8 @@ export default async function MaterialPage({ params }: { params: Promise<{ id: s
 
   return (
     <Screen title={m.unitLabel} tab="drills">
+      {/* ★ 本文より前に出す。読んでから言われても遅い */}
+      <FakeWarning provider={m.provider} />
       <Reader
         title={m.title}
         totalChars={m.totalChars}

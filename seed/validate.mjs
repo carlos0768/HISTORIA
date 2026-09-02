@@ -198,6 +198,7 @@ for (const [name, owners] of canonNames) {
 const SHORT_NAME = 2;
 const canonWarnings = [];
 const dupWarnings = [];
+const itemWarnings = [];
 const names = [...canonNames.keys()].sort((a, b) => b.length - a.length);
 for (const long of names) {
   for (const short of names) {
@@ -247,9 +248,79 @@ for (const p of person) {
   if (STRICT && !['○', '×'].includes(p.approve)) fail(`9: person の approve が未記入または不正: ${p.id} = "${p.approve}"`);
 }
 
+// ---- 10. item（共有の設問プール） ----
+// ★ 中身の正しさは機械では見られない。だからこそ**構造の誤り**は全部ここで落とす。
+//   選択肢が3つしか無い・正解の記号が範囲外・同じ文の選択肢が2つある、といったものは
+//   出題した瞬間に「壊れている」と分かるので、DB に入れる前に止める。
+const item = load('item.csv');
+const kcIds = new Set(kc.map(k => k.id));
+const itemIds = new Set();
+const stems = new Map();
+for (const t of item) {
+  if (!/^it\.[a-z0-9_.]+$/.test(t.id ?? '')) fail(`10: item の id の書式が違う: "${t.id}"`);
+  if (itemIds.has(t.id)) fail(`10: item の id が重複: ${t.id}`);
+  itemIds.add(t.id);
+
+  if (!kcIds.has(t.kc_id)) fail(`10: item の kc_id が kc.csv にない: ${t.id} = "${t.kc_id}"`);
+  if (!t.stem) fail(`10: item に問題文が無い: ${t.id}`);
+  if (!t.explanation) fail(`10: item に解説が無い（間違えたときに何も返せない）: ${t.id}`);
+
+  const choices = ['a', 'b', 'c', 'd'].map(k => t[k]);
+  if (choices.some(c => !c)) fail(`10: item の選択肢が4つ揃っていない: ${t.id}`);
+  if (new Set(choices).size !== 4) fail(`10: item に同じ選択肢が2つある: ${t.id}`);
+  if (!['a', 'b', 'c', 'd'].includes(t.answer)) fail(`10: item の answer が a〜d でない: ${t.id} = "${t.answer}"`);
+
+  // ★ 正解だけが目立って長いと、中身を知らなくても選べてしまう。
+  //   四択の 0.25 という前提（guess_rate）が崩れ、測定が歪む。
+  const correct = t[t.answer];
+  if (correct) {
+    const others = choices.filter(c => c !== correct).map(c => c.length);
+    const longest = Math.max(...others);
+    if (correct.length > longest * 2) {
+      itemWarnings.push(`${t.id}: 正解だけが極端に長い（${correct.length} 対 最長 ${longest}）`);
+    }
+  }
+
+  // ★ 日本語の文章に別の言語の文字が紛れ込むのを落とす。
+  //   起草中に "única"（スペイン語）と "교회"（ハングル）を実際に混入させた。
+  //   人が読めば一目で分かるが、400件を目視で洗うのは現実的でない。
+  //   許すのは日本語・英数字・記号・ギリシア文字（史料名などに出る）まで。
+  for (const [field, text] of Object.entries({ 問題文: t.stem, 解説: t.explanation, a: t.a, b: t.b, c: t.c, d: t.d })) {
+    const stray = [...(text ?? '')].filter(ch => {
+      const cp = ch.codePointAt(0);
+      if (cp < 0x0250) return false;                       // ASCII とラテン拡張
+      if (cp >= 0x0370 && cp <= 0x03ff) return false;      // ギリシア文字
+      if (cp >= 0x2000 && cp <= 0x303f) return false;      // 記号・約物
+      if (cp >= 0x3040 && cp <= 0x30ff) return false;      // かな
+      if (cp >= 0x4e00 && cp <= 0x9fff) return false;      // 漢字
+      if (cp >= 0xff00 && cp <= 0xffef) return false;      // 全角の英数と記号
+      return true;
+    });
+    if (stray.length) fail(`10: ${t.id} の${field}に日本語以外の文字が混ざっている: ${[...new Set(stray)].join('')}`);
+
+    // ★ ラテン文字の単語も落とす。上の検査は ASCII を許すので "individual" を
+    //   すり抜けた（実際に混入させた）。年号や「4区分」の数字は通し、
+    //   2文字以上続く英字だけを見る。史料名などで必要になったら note に書く。
+    const words = (text ?? '').match(/[A-Za-z]{2,}/g);
+    if (words) fail(`10: ${t.id} の${field}に英単語が混ざっている: ${[...new Set(words)].join(', ')}`);
+  }
+
+  // 同じ問題文が2つあると、同じ設問を2回出すことになる
+  const seen = stems.get(t.stem);
+  if (seen) fail(`10: item の問題文が重複: ${t.id} と ${seen}`);
+  stems.set(t.stem, t.id);
+
+  if (STRICT && !['○', '×'].includes(t.approve)) fail(`10: item の approve が未記入または不正: ${t.id} = "${t.approve}"`);
+}
+
+// ★ 1つの KC に設問が無いと、その KC は永久に出題されない（出題は KC 単位）。
+const kcWithItem = new Set(item.map(t => t.kc_id));
+const kcWithoutItem = kc.filter(k => !kcWithItem.has(k.id));
+
 // ---- 結果 ----
 console.log(`era ${era.length} / region ${region.length} / syllabus_unit ${syllabus.length}（節 ${leafUnits.size}） / kc ${kc.length}`);
-console.log(`canon_event ${canon.length} / person ${person.length}`);
+console.log(`canon_event ${canon.length} / person ${person.length} / item ${item.length}`);
+console.log(`設問を持つ KC: ${kcWithItem.size} / ${kc.length}（未着手 ${kcWithoutItem.length}）`);
 console.log('kind の分布:');
 for (const k of KINDS) console.log(`  ${k.padEnd(12)} ${String(count[k]).padStart(3)}  ${pct(count[k]).toFixed(1).padStart(5)}%`);
 const covered = new Set(kc.map(k => k.unit_id));
@@ -267,6 +338,12 @@ if (canonWarnings.length) {
   console.log(`\n△ 正典のラベルに包含関係が ${canonWarnings.length} 件（最長一致で拾うが、意図した包含か確認する）`);
   for (const w of canonWarnings.slice(0, 20)) console.log('  - ' + w);
   if (canonWarnings.length > 20) console.log(`  … 他 ${canonWarnings.length - 20} 件`);
+}
+
+if (itemWarnings.length) {
+  console.log(`\n△ 設問の作りに注意が要るもの ${itemWarnings.length} 件`);
+  for (const w of itemWarnings.slice(0, 20)) console.log('  - ' + w);
+  if (itemWarnings.length > 20) console.log(`  … 他 ${itemWarnings.length - 20} 件`);
 }
 
 if (errors.length) {

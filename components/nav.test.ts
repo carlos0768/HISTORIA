@@ -26,4 +26,14 @@ describe('タブの行き先', () => {
   it('行き先が重複していない', () => {
     expect(new Set(TABS.map(t => t.href)).size).toBe(TABS.length)
   })
+
+  /**
+   * ★ 設定をタブに足さない。docs/11 §9 は3タブと定めている。
+   *   足すとモバイルのフッタが4つになり、意匠の前提（1つあたりの幅）が崩れる。
+   *   デスクトップのサイドバーと記録タブの末尾から入る。
+   */
+  it('設定はタブではないが、画面は実在する', () => {
+    expect(TABS.map(t => t.href)).not.toContain('/settings')
+    expect(existsSync(join(ROOT, 'app', 'settings/page.tsx'))).toBe(true)
+  })
 })

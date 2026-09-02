@@ -46,6 +46,11 @@ export type MaterialView = {
   status: MaterialStatus
   blockedReason: string | null
   generatedAt: Date
+  /**
+   * ★ 実際に使われたプロバイダ。鍵が無いと `fake:gemini` になる。
+   *   これが無いと「鍵を入れ忘れて作ったでたらめな教材」を後から見分けられない。
+   */
+  provider: string | null
   sections: SectionView[]
   totalChars: number
   readCount: number
@@ -60,9 +65,10 @@ export async function materialView(db: Sql, userId: string, materialId: string):
   const [m] = await db<{
     id: string; unit_id: string; unit_label: string; title: string
     status: MaterialStatus; blocked_reason: string | null; generated_at: Date
+    provider: string | null
   }[]>`
     SELECT m.id, m.unit_id, u.label AS unit_label, m.title,
-           m.status, m.blocked_reason, m.generated_at
+           m.status, m.blocked_reason, m.generated_at, m.provider
       FROM material m JOIN syllabus_unit u ON u.id = m.unit_id
      WHERE m.id = ${materialId} AND (m.user_id = ${userId} OR m.user_id IS NULL)`
   if (!m) return null
@@ -72,7 +78,7 @@ export async function materialView(db: Sql, userId: string, materialId: string):
     return {
       id: m.id, unitId: m.unit_id, unitLabel: m.unit_label, title: m.title,
       status: m.status, blockedReason: m.blocked_reason, generatedAt: m.generated_at,
-      sections: [], totalChars: 0, readCount: 0,
+      provider: m.provider, sections: [], totalChars: 0, readCount: 0,
     }
   }
 
@@ -115,6 +121,7 @@ export async function materialView(db: Sql, userId: string, materialId: string):
   return {
     id: m.id, unitId: m.unit_id, unitLabel: m.unit_label, title: m.title,
     status: m.status, blockedReason: m.blocked_reason, generatedAt: m.generated_at,
+    provider: m.provider,
     sections,
     totalChars: sections.reduce((n, s) => n + s.charCount, 0),
     readCount: sections.filter(s => s.read).length,

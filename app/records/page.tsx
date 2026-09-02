@@ -87,6 +87,10 @@ export default async function Records() {
           ))}
         </>
       )}
+
+      {/* ★ 設定への入口。タブは3つのままにする（docs/11 §9）ので、
+           モバイルはここから入る。デスクトップはサイドバーにも出ている */}
+      <Link className="lv-btn lv-btn--block" href="/settings">設定</Link>
     </Screen>
   )
 }

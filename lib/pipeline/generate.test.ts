@@ -102,6 +102,18 @@ dbSuite('生成パイプライン（実DB）', () => {
     const secs = await db<{ n: string }[]>`SELECT count(*) AS n FROM material_section WHERE material_id = ${r.materialId}`
     expect(Number(secs[0]!.n)).toBe(7)
 
+    /**
+     * ★ 鍵が無いときは「使いたかった名前」ではなく「実際に使われた名前」を残す。
+     *   ここが 'gemini' に戻ると、鍵を入れ忘れて作ったでたらめな教材を
+     *   後から見分けられなくなり、画面の警告も出なくなる。
+     */
+    const p = await db<{ provider: string }[]>`
+      SELECT provider FROM material WHERE id = ${r.materialId}`
+    expect(p[0]!.provider).toBe('fake:gemini')
+    const ip = await db<{ provider: string }[]>`
+      SELECT DISTINCT provider FROM item WHERE material_id = ${r.materialId}`
+    expect(ip.map(x => x.provider)).toEqual(['fake:gemini'])
+
     // 四択6問 + フラッシュカード10枚
     const items = await db<{ format: string; n: string }[]>`
       SELECT format, count(*) AS n FROM item WHERE material_id = ${r.materialId} GROUP BY format ORDER BY format`

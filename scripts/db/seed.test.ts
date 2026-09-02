@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { Sql } from 'postgres'
 import { createTestDb, TEST_DB_URL } from '@/lib/db/test-helper'
-import { seedAll, seedKc, seedCanonEvent, seedPerson, SEED_DIR } from './seed'
+import { seedAll, seedKc, seedCanonEvent, seedPerson, seedItem, SEED_DIR } from './seed'
 import { readCsv } from './csv'
 import { parseCsv } from './csv'
 
@@ -179,6 +179,75 @@ dbSuite('seed 投入（実DB）', () => {
     await seedPerson(db, dir)
     const rows = await db<{ count: string }[]>`SELECT count(*) FROM person`
     expect(Number(rows[0]!.count)).toBe(1)
+  })
+
+  /**
+   * ★ 共有の設問プール。app/study/page.tsx は
+   *   `(i.user_id = userId OR i.user_id IS NULL)` で引くので、
+   *   ここに入れた設問は AI の鍵が無くても出題される。
+   */
+  it('共有の設問が出題の形で入る（四択・承認済み・KC に紐づく）', async () => {
+    // ★ このスイートは1つの DB を共有し、前の試験が KC を削った写しを入れている。
+    //   設問は KC を参照するので、実データの KC を入れ直してから見る
+    await db`TRUNCATE item_kc, item RESTART IDENTITY CASCADE`
+    await seedKc(db, SEED_DIR)
+    const r = await seedItem(db, SEED_DIR, { requireApproval: false })
+    expect(r.item).toBeGreaterThan(0)
+    expect(r.itemKc).toBe(r.item)
+
+    const [n] = await db<{ item: string; shared: string; approved: string }[]>`
+      SELECT count(*) AS item,
+             count(*) FILTER (WHERE user_id IS NULL) AS shared,
+             count(*) FILTER (WHERE approved AND approved_by = 'author') AS approved
+        FROM item`
+    expect(Number(n!.shared)).toBe(r.item)
+    expect(Number(n!.approved)).toBe(r.item)
+  })
+
+  /**
+   * ★ choices は jsonb の**配列**でなければならない。
+   *   JSON.stringify した文字列をそのまま渡すと jsonb のスカラー文字列になり、
+   *   出題の SQL（jsonb_array_elements）が実行時に落ちる。実際に踏んだ。
+   */
+  it('choices が jsonb 配列で、出題の引き方が通る', async () => {
+    await db`TRUNCATE item_kc, item RESTART IDENTITY CASCADE`
+    await seedKc(db, SEED_DIR)
+    await seedItem(db, SEED_DIR, { requireApproval: false })
+
+    const [t] = await db<{ kind: string; n: number; answer: string }[]>`
+      SELECT jsonb_typeof(choices) AS kind, jsonb_array_length(choices) AS n,
+             answer_key #>> '{}' AS answer
+        FROM item LIMIT 1`
+    expect(t!.kind).toBe('array')
+    expect(t!.n).toBe(4)
+    expect(['a', 'b', 'c', 'd']).toContain(t!.answer)
+
+    // app/study/page.tsx と同じ引き方
+    const rows = await db<{ choices: { key: string; text: string }[] }[]>`
+      SELECT (SELECT jsonb_agg(jsonb_build_object('key', c->>'key', 'text', c->>'text') ORDER BY c->>'key')
+                FROM jsonb_array_elements(i.choices) c) AS choices
+        FROM item i WHERE i.approved AND NOT i.hidden AND i.user_id IS NULL LIMIT 1`
+    expect(rows[0]!.choices).toHaveLength(4)
+    expect(rows[0]!.choices[0]!.key).toBe('a')
+  })
+
+  it('承認欄が空の設問は入らない', async () => {
+    await db`TRUNCATE item_kc, item RESTART IDENTITY CASCADE`
+    await seedKc(db, SEED_DIR)
+    const r = await seedItem(db, SEED_DIR)   // requireApproval: true
+    const [n] = await db<{ n: string }[]>`SELECT count(*) AS n FROM item`
+    expect(Number(n!.n)).toBe(r.item)
+  })
+
+  /** ★ 同じ CSV を2回流しても設問が増えない（id が uuid でも冪等である） */
+  it('冪等: 設問を2回流しても増えない', async () => {
+    await db`TRUNCATE item_kc, item RESTART IDENTITY CASCADE`
+    await seedKc(db, SEED_DIR)
+    await seedItem(db, SEED_DIR, { requireApproval: false })
+    const [a] = await db<{ n: string }[]>`SELECT count(*) AS n FROM item`
+    await seedItem(db, SEED_DIR, { requireApproval: false })
+    const [b] = await db<{ n: string }[]>`SELECT count(*) AS n FROM item`
+    expect(b!.n).toBe(a!.n)
   })
 
   it('マスタは全件入る', async () => {

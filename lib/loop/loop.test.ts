@@ -4,7 +4,7 @@ import { createTestDb, TEST_DB_URL } from '@/lib/db/test-helper'
 import { seedMasters, SEED_DIR } from '@/scripts/db/seed'
 import { submitAnswer, isCorrect } from './answer'
 import { todaysPlan, drillProgressList } from './today'
-import { createUser, createKcs, createDrill, createItem } from './fixture'
+import { createUser, createKcs, createDrill, createItem, createMaterial } from './fixture'
 
 describe('採点', () => {
   it('四択は選択肢キーの一致', () => {
@@ -250,6 +250,21 @@ dbSuite('閉ループ（実DB）', () => {
     const p1 = await drillProgressList(db, userId, day(6))
     expect(p1[0]!.masteredCount).toBe(1)
     expect(p1[0]!.progress).toBeCloseTo(0.5, 5)
+  })
+
+  /**
+   * ★ 節を1つも持たない教材を読了と数えない。
+   *   `NOT EXISTS (未読の節)` は**空集合に対して真**になるので、
+   *   節が無い教材が「全部読んだ」と判定されていた。
+   *   生成が途中で落ちた行や手で入れた行で読了 100% と出る（開発 DB で実測）。
+   */
+  it('節が1つも無い教材は読了と数えない', async () => {
+    await createDrill(db, userId, [kcA], day(60), UNIT)
+    await createMaterial(db, { userId, unitId: UNIT })   // 節を作らない
+
+    const p = await drillProgressList(db, userId, T0)
+    expect(p[0]!.materialsTotal).toBe(1)
+    expect(p[0]!.materialsRead).toBe(0)
   })
 
   it('今日のノルマを終えると「今日やること」が 0 になる（1日の終わりが定義できる）', async () => {

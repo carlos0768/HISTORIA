@@ -185,13 +185,20 @@ export async function drillProgressList(db: Sql, userId: string, now: Date): Pro
     // material_read は material ではなく material_section を参照している。
     const mat = await db<{ total: string; read: string }[]>`
       SELECT count(*) AS total,
-             count(*) FILTER (WHERE NOT EXISTS (
-               SELECT 1 FROM material_section s
-                WHERE s.material_id = m.id
-                  AND NOT EXISTS (SELECT 1 FROM material_read mr
-                                   WHERE mr.section_id = s.id AND mr.user_id = ${userId}
-                                     AND mr.dwell_ms >= ${requiredDwellExpr(db)})
-             )) AS read
+             count(*) FILTER (
+               -- ★ 節が1つも無い教材を読了と数えない。
+               --   NOT EXISTS (未読の節) は**空集合に対して真**になるので、
+               --   節を持たない教材が「全部読んだ」と判定されていた。
+               --   本番の ready な教材は必ず節を持つが、
+               --   生成が途中で落ちた行や手で入れた行で読了 100% と出る（実測）。
+               WHERE EXISTS (SELECT 1 FROM material_section s WHERE s.material_id = m.id)
+                 AND NOT EXISTS (
+                   SELECT 1 FROM material_section s
+                    WHERE s.material_id = m.id
+                      AND NOT EXISTS (SELECT 1 FROM material_read mr
+                                       WHERE mr.section_id = s.id AND mr.user_id = ${userId}
+                                         AND mr.dwell_ms >= ${requiredDwellExpr(db)})
+                 )) AS read
         FROM material m
        WHERE (m.user_id = ${userId} OR m.user_id IS NULL) AND m.status = 'ready'
          AND m.unit_id IN (SELECT unit_id FROM drill_unit WHERE drill_id = ${d.id})`

@@ -42,7 +42,15 @@ export function createFakeProvider(name: string, opts: FakeOptions = {}): Provid
   const wrongRate = opts.wrongRate ?? 0
 
   return {
-    name,
+    /**
+     * ★ 名前に `fake:` を付ける。ここが「後から見て偽物と分かる」唯一の手掛かりになる。
+     *
+     *   以前は実物と同じ名前（'gemini'）を名乗っていたため、
+     *   material.provider にも 'gemini' と記録され、**鍵を入れ忘れて作った
+     *   でたらめな教材を、後から見分ける方法が無かった**。
+     *   受験勉強でこれは最悪の失敗の仕方をする（嘘を覚えて気づかない）。
+     */
+    name: `fake:${name}`,
 
     async generate<T>(args: GenerateArgs): Promise<GenerateResult<T>> {
       if (opts.failGeneration) throw new Error('fake: 生成に失敗しました')
