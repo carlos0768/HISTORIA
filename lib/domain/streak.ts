@@ -23,12 +23,10 @@ export const PROTECT_PER_MONTH = 2
 export const MAX_BRIDGE_DAYS = 2
 
 const DAY_MS = 86_400_000
-const JST_OFFSET_MS = 9 * 60 * 60 * 1000
 
-/** Asia/Tokyo の暦日を 'YYYY-MM-DD' で返す */
-export function jstDate(d: Date): string {
-  return new Date(d.getTime() + JST_OFFSET_MS).toISOString().slice(0, 10)
-}
+// 日本時間の扱いは lib/domain/jst.ts に集めた。ここからは再輸出だけする
+// （既存の import 元を変えないため。lib/loop/answer.ts などが streak から取っている）
+export { jstDate } from './jst'
 
 /** 'YYYY-MM-DD' を、日数の足し引きができる数値にする（UTC 正午基準で夏時間の影響を受けない） */
 const stamp = (day: string): number => Date.parse(`${day}T00:00:00Z`)

@@ -19,7 +19,13 @@ import { createServerClient } from '@supabase/ssr'
  *   公衆送信性を下げるのが目的なので、ログイン画面の存在すら見せない。
  *   招待された人には /invite の URL を作者が直接渡す。
  */
-const PUBLIC_PATHS = ['/invite', '/login', '/auth/callback']
+const PUBLIC_PATHS = [
+  '/invite', '/login', '/auth/callback',
+  // ★ 定時実行。Vercel Cron は session を持たないので、ここを通さないと
+  //   cron 自身が 404 になる。代わりに CRON_SECRET で閉じている
+  //   （app/api/cron/route.ts。秘密が未設定なら 404 に落ちる＝既定は閉）。
+  '/api/cron',
+]
 
 const isPublic = (path: string): boolean =>
   PUBLIC_PATHS.some(p => path === p || path.startsWith(`${p}/`))

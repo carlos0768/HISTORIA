@@ -72,6 +72,15 @@ type Harness = {
   handle: (r: Req) => Promise<Res | undefined>
   message: (data: unknown) => Promise<void>
   install: () => Promise<void>
+  /** 通知（docs/11 §7）。payload は push サービスから来る生の中身 */
+  push: (payload: unknown) => Promise<void>
+  notificationClick: (data: unknown) => Promise<void>
+  shown: { title: string; options: Record<string, unknown> }[]
+  /** 通知を押した結果ひらいた／焦点を当てた先 */
+  navigated: string[]
+  opened: string[]
+  /** 既に開いている窓を用意する */
+  openWindows: (urls: string[]) => void
 }
 
 function load(): Harness {
@@ -81,11 +90,28 @@ function load(): Harness {
   let responder: (r: Req) => Res = () => res('ok')
   let down = false
 
+  const shown: { title: string; options: Record<string, unknown> }[] = []
+  const navigated: string[] = []
+  const opened: string[] = []
+  let windows: { url: string; focused: boolean }[] = []
+
   const self = {
     location: { origin: ORIGIN },
     addEventListener: (t: string, fn: (e: unknown) => void) => void listeners.set(t, fn),
     skipWaiting: async () => {},
-    clients: { claim: async () => {} },
+    registration: {
+      showNotification: async (title: string, options: Record<string, unknown>) =>
+        void shown.push({ title, options }),
+    },
+    clients: {
+      claim: async () => {},
+      matchAll: async () => windows.map(w => ({
+        url: w.url,
+        focus: async () => { w.focused = true },
+        navigate: async (u: string) => { navigated.push(u) },
+      })),
+      openWindow: async (u: string) => { opened.push(u) },
+    },
   }
   const fetchStub = async (r: Req) => {
     fetches.push(r.url)
@@ -111,6 +137,25 @@ function load(): Harness {
       await fire('activate', {})
     },
     message: async data => { await fire('message', { data }) },
+    shown, navigated, opened,
+    openWindows: urls => { windows = urls.map(url => ({ url, focused: false })) },
+    push: async payload => {
+      // ★ 本物の PushEvent と同じ形にする。data.json() は中身が JSON でなければ投げる
+      const data = payload === undefined ? null : {
+        json: () => {
+          if (typeof payload === 'string') return JSON.parse(payload)
+          return payload
+        },
+      }
+      await fire('push', { data })
+    },
+    notificationClick: async data => {
+      let closed = false
+      await fire('notificationclick', {
+        notification: { data, close: () => { closed = true } },
+      })
+      expect(closed).toBe(true)
+    },
     handle: async request => {
       let captured: Promise<Res> | undefined
       await listeners.get('fetch')!({
@@ -274,6 +319,98 @@ describe('Service Worker', () => {
       fresh.caches.store.set('historia-shell-v0', new Map())
       await fresh.install()
       expect([...fresh.caches.store.keys()].filter(n => n.endsWith('-v0'))).toEqual([])
+    })
+  })
+
+  /**
+   * 通知（docs/11-ux.md §7・docs/12-nonfunctional.md §10）
+   *
+   * ★ ここも本文の読み取りではなく、実際に push の handler を起こして
+   *   showNotification に何が渡ったかを見る。
+   */
+  describe('リマインドの通知', () => {
+    it('届いた内容をそのまま通知にする', async () => {
+      await sw.push({ title: 'HISTORIA', body: '今日の復習が 12 件あります。', url: '/study' })
+      expect(sw.shown).toHaveLength(1)
+      expect(sw.shown[0]!.title).toBe('HISTORIA')
+      expect(sw.shown[0]!.options.body).toBe('今日の復習が 12 件あります。')
+      expect(sw.shown[0]!.options.data).toEqual({ url: '/study' })
+    })
+
+    /**
+     * ★ 溜めない。届かなかった夜のぶんが翌朝まとめて3通並ぶと、
+     *   通知そのものが読まれなくなる。同じ tag で置き換える
+     */
+    it('通知は積み上がらない（tag を固定する）', async () => {
+      await sw.push({ title: 'HISTORIA', body: '1通目', url: '/study' })
+      await sw.push({ title: 'HISTORIA', body: '2通目', url: '/study' })
+      expect(sw.shown.map(n => n.options.tag)).toEqual(['historia-remind', 'historia-remind'])
+      // 置き換えのたびに鳴らさない
+      expect(sw.shown[1]!.options.renotify).toBeUndefined()
+    })
+
+    it('中身が壊れていても通知は出す（来ていることは分かるようにする）', async () => {
+      await sw.push('これは JSON ではない')
+      expect(sw.shown).toHaveLength(1)
+      expect(sw.shown[0]!.options.body).toBe('今日の学習がまだ残っています')
+    })
+
+    it('payload が無くても通知は出す', async () => {
+      await sw.push(undefined)
+      expect(sw.shown).toHaveLength(1)
+      expect(sw.shown[0]!.title).toBe('HISTORIA')
+    })
+
+    /**
+     * ★ 開く先を自分の生成元に閉じる。payload は push サービスを経由して届く。
+     *   VAPID で送信者は検証されるが、url をそのまま信じる設計にはしない。
+     *   `https://…` を通してしまうと、通知1つで任意の場所へ連れて行ける。
+     */
+    it('外部の URL は通さない（/ 始まりだけ）', async () => {
+      await sw.push({ title: 'x', body: 'y', url: 'https://example.com/phish' })
+      expect(sw.shown[0]!.options.data).toEqual({ url: '/study' })
+    })
+
+    it('プロトコル相対の URL も通さない', async () => {
+      await sw.push({ title: 'x', body: 'y', url: '//example.com/phish' })
+      // ★ '//…' は '/' 始まりなので素朴な検査は通ってしまう。
+      //   通ってしまう場合はここが落ちる
+      expect(sw.shown[0]!.options.data).toEqual({ url: '/study' })
+    })
+  })
+
+  describe('通知を押したとき', () => {
+    it('開いている窓があればそれを使う（同じ画面を何枚も開かない）', async () => {
+      sw.openWindows([`${ORIGIN}/records`])
+      await sw.notificationClick({ url: '/study' })
+      expect(sw.navigated).toEqual(['/study'])
+      expect(sw.opened).toEqual([])
+    })
+
+    it('窓が無ければ新しく開く', async () => {
+      sw.openWindows([])
+      await sw.notificationClick({ url: '/study' })
+      expect(sw.opened).toEqual(['/study'])
+    })
+
+    it('他の生成元の窓は使わない', async () => {
+      sw.openWindows(['https://example.com/'])
+      await sw.notificationClick({ url: '/study' })
+      expect(sw.navigated).toEqual([])
+      expect(sw.opened).toEqual(['/study'])
+    })
+
+    it('data が無くても /study へ行く', async () => {
+      sw.openWindows([])
+      await sw.notificationClick(undefined)
+      expect(sw.opened).toEqual(['/study'])
+    })
+
+    // ★ push handler が通した値しか来ないはずだが、「はずだ」に頼らない
+    it('data に外部の URL が入っていても外へ出ない', async () => {
+      sw.openWindows([])
+      await sw.notificationClick({ url: '//example.com/phish' })
+      expect(sw.opened).toEqual(['/study'])
     })
   })
 })

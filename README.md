@@ -88,6 +88,26 @@ Google を主にするには次を行う（[`03`](./docs/03-data-model.md) §7.1
 | `DATABASE_URL` | Supabase の **Transaction pooler**（下記） | 全画面が「データベースに接続していません」 |
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://<project>.supabase.co` | 認証が無効になり、未認証でも404にならない |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon key | 同上 |
+| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | `npx tsx scripts/push/gen-vapid.ts` の出力 | 設定画面に通知の枠が**出ない**（押しても何も起きないボタンは置かない） |
+| `CRON_SECRET` | 長い乱数 | `/api/cron` が **404** になり、リマインドも予約の掃除も走らない |
+
+### 通知（Web Push）の鍵
+
+```
+npx tsx scripts/push/gen-vapid.ts
+```
+
+出力を Vercel の環境変数に貼る。**ファイルには書き出さない**（`.env` ごと
+コミットされる事故を仕組みで防ぐため、標準出力にしか出さない）。
+
+- `VAPID_SUBJECT` は `mailto:` か `https://` で始める（RFC 8292 §2.1）。違うと無効扱いになる
+- 鍵を**作り直すと既存の購読は全部無効になる**。そのときは `push_subscription` を空にして、
+  各自に設定画面から登録し直してもらう
+- `CRON_SECRET` が未設定なら `/api/cron` は誰も通さない（**既定は閉**）。
+  Vercel Cron は `Authorization: Bearer <CRON_SECRET>` を自動で付ける
+- 配信は **1日1回・日本時間20時**（`vercel.json` の `crons`。Hobby の上限）。
+  設定画面の「通知してよい時刻」は「これ以降なら送ってよい」の意味になる。
+  有料プランで毎時に変えると、コードを変えずに時刻どおりに届く
 
 ### `DATABASE_URL` は Transaction pooler にする
 
