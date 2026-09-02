@@ -2,7 +2,7 @@
 
 import { sql } from '@/lib/db/client'
 import { submitAnswer, type SessionKind } from '@/lib/loop/answer'
-import { demoUserId } from '@/lib/db/optional'
+import { currentUserId } from '@/lib/auth/dal'
 
 /**
  * 解答を受け取って採点する。
@@ -18,7 +18,7 @@ export async function submit(input: {
   sessionKind?: SessionKind
   drillId?: string | null
 }) {
-  const userId = demoUserId()
+  const userId = await currentUserId()
   if (!userId) throw new Error('ユーザーが特定できません')
   const r = await submitAnswer(sql(), {
     userId,

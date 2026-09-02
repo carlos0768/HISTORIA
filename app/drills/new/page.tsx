@@ -1,4 +1,5 @@
-import { tryDb, demoUserId } from '@/lib/db/optional'
+import { tryDb } from '@/lib/db/optional'
+import { currentUserId } from '@/lib/auth/dal'
 import { unitTree } from '@/lib/pipeline/drill'
 import { Screen, Empty } from '@/components/ui'
 import { RangePicker } from './picker'
@@ -13,7 +14,7 @@ function defaultDeadline(): string {
 
 export default async function NewDrill() {
   const db = tryDb()
-  const userId = demoUserId()
+  const userId = await currentUserId()
 
   if (!db || !userId) {
     return (

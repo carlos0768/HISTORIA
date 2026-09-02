@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { tryDb, demoUserId } from '@/lib/db/optional'
+import { tryDb } from '@/lib/db/optional'
+import { currentUserId } from '@/lib/auth/dal'
 import { materialView } from '@/lib/loop/material'
 import { Screen, Empty, Alert } from '@/components/ui'
 import { Reader } from './reader'
@@ -10,7 +11,7 @@ export const dynamic = 'force-dynamic'
 export default async function MaterialPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const db = tryDb()
-  const userId = demoUserId()
+  const userId = await currentUserId()
 
   if (!db || !userId) {
     return (
