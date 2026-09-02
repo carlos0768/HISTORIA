@@ -6,6 +6,8 @@ import { drillMaterials } from '@/lib/loop/material'
 import { UnitMaterials } from './units'
 import { Screen, Card, TwoBars, Alert, Empty, StatusChip } from '@/components/ui'
 import { NotReady } from '@/components/not-ready'
+import { FakeNotice } from '@/components/fake-warning'
+import { readConfig } from '@/lib/ai/client'
 import { DEFAULT_MAX_DAILY } from '@/lib/domain/scheduler'
 
 export const dynamic = 'force-dynamic'
@@ -30,8 +32,14 @@ export default async function Home() {
   // 特訓ごとに、範囲の単元と教材の状態を引く（生成中・配信不可を隠さない）
   const materials = await Promise.all(drills.map(d => drillMaterials(db, userId, d.drillId)))
 
+  // ★ 作る前に言う。鍵が無いと resolveProvider が黙ってフェイクに落ちるので、
+  //   作ってから気づくと、でたらめな本文を読んだあとになる
+  const cfg = readConfig()
+  const usingFake = !cfg.geminiApiKey || !cfg.anthropicApiKey
+
   return (
     <Screen title="HISTORIA" tab="home">
+      {usingFake && <FakeNotice />}
       {/* ホームに出す数字は1つだけ。特訓ごとのノルマは出さない（docs/05 §5.1） */}
       <Card>
         <span className="lv-label">今日やること</span>

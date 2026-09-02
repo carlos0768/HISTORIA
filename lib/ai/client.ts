@@ -96,6 +96,15 @@ export type EmbedCall = { db: Sql; texts: string[]; now: Date }
 export type Client = {
   config: AiConfig
   usingFake: boolean
+  /**
+   * 実際に使われたプロバイダの名前。フェイクなら `fake:gemini` になる。
+   *
+   * ★ `config.genProvider` を記録に使わない。あれは「使いたいもの」であって
+   *   「使われたもの」ではない。鍵が無ければフェイクに落ちるので、
+   *   設定値を書くと嘘の記録が残る。
+   */
+  genProviderName: string
+  verifyProviderName: string
   generate<T>(a: GenerateCall): Promise<GenerateResult<T>>
   verify(a: VerifyCall): Promise<VerifyResult>
   embed(a: EmbedCall): Promise<{ vectors: number[][]; model: string }>
@@ -133,6 +142,8 @@ export function createClient(cfg: AiConfig = readConfig(), fake: FakeOptions = {
   return {
     config: cfg,
     usingFake,
+    genProviderName: gen.name,
+    verifyProviderName: ver.name,
 
     async generate<T>(a: GenerateCall) {
       // 型だけでなく実行時にも個人識別情報の混入を止める（§4.2）。

@@ -218,7 +218,7 @@ export async function generateMaterial(
   const [job] = await db<{ id: string }[]>`
     INSERT INTO generation_job (id, user_id, kind, scope_id, params_hash, status, provider, model, started_at)
     VALUES (${randomUUID()}, ${args.userId}, 'material', ${args.unitId}, ${hash}, 'running',
-            ${ai.config.genProvider}, ${ai.config.genModel}, ${args.now})
+            ${ai.genProviderName}, ${ai.config.genModel}, ${args.now})
     ON CONFLICT (user_id, kind, scope_id, params_hash)
     DO UPDATE SET status = 'running', attempts = generation_job.attempts + 1, started_at = ${args.now}
     RETURNING id`
@@ -328,7 +328,7 @@ export async function generateMaterial(
       INSERT INTO material (id, user_id, unit_id, title, provider, model, prompt_version,
                             status, blocked_reason, input_tokens, output_tokens, generated_at)
       VALUES (${materialId}, ${owner}, ${args.unitId}, ${material.title},
-              ${ai.config.genProvider}, ${ai.config.genModel}, ${MATERIAL_PROMPT_VERSION},
+              ${ai.genProviderName}, ${ai.config.genModel}, ${MATERIAL_PROMPT_VERSION},
               ${blocked ? 'blocked' : 'ready'}, ${blockedReason},
               ${usedTokens.inputTokens}, ${usedTokens.outputTokens}, ${args.now})`
 
@@ -352,7 +352,7 @@ export async function generateMaterial(
                           approved, approved_by, approved_at, created_at)
         VALUES (${itemId}, ${args.userId}, ${materialId}, 'mcq4', ${q.stem},
                 ${tx.json(q.choices as never)}, ${tx.json(q.answer_key as never)}, ${q.explanation},
-                ${guessRateFor('mcq4')}, ${ai.config.genProvider}, ${ai.config.genModel},
+                ${guessRateFor('mcq4')}, ${ai.genProviderName}, ${ai.config.genModel},
                 ${MATERIAL_PROMPT_VERSION},
                 ${!blocked}, ${blocked ? null : 'factcheck'}, ${blocked ? null : args.now}, ${args.now})`
       for (const kcId of q.kc_ids) {
@@ -369,7 +369,7 @@ export async function generateMaterial(
                           approved, approved_by, approved_at, created_at)
         VALUES (${itemId}, ${args.userId}, ${materialId}, 'flashcard', ${f.front},
                 ${tx.json(f.back as never)}, NULL,
-                ${guessRateFor('flashcard')}, ${ai.config.genProvider}, ${ai.config.genModel},
+                ${guessRateFor('flashcard')}, ${ai.genProviderName}, ${ai.config.genModel},
                 ${MATERIAL_PROMPT_VERSION},
                 ${!blocked}, ${blocked ? null : 'factcheck'}, ${blocked ? null : args.now}, ${args.now})`
       for (const kcId of f.kc_ids) {
