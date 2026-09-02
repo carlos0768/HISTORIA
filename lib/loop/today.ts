@@ -193,7 +193,7 @@ export async function drillProgressList(db: Sql, userId: string, now: Date): Pro
                                      AND mr.dwell_ms >= ${requiredDwellExpr(db)})
              )) AS read
         FROM material m
-       WHERE m.user_id = ${userId} AND m.status = 'ready'
+       WHERE (m.user_id = ${userId} OR m.user_id IS NULL) AND m.status = 'ready'
          AND m.unit_id IN (SELECT unit_id FROM drill_unit WHERE drill_id = ${d.id})`
 
     out.push({

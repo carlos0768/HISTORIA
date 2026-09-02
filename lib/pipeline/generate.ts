@@ -11,7 +11,7 @@ import { randomUUID, createHash } from 'node:crypto'
 import type { Sql } from 'postgres'
 import type { Client } from '@/lib/ai/client'
 import type { Claim } from '@/lib/ai/types'
-import { buildGenerationContext } from '@/lib/ai/redact'
+import { buildGenerationContext, isDefaultContext } from '@/lib/ai/redact'
 import { renderMaterialPrompt, MATERIAL_PROMPT_VERSION, type UnitFacts } from '@/lib/ai/prompt'
 import {
   MaterialOutput, materialJsonSchema, bodyCharCount, isCharCountOutOfRange, MIN_CHARS, MAX_CHARS,
@@ -105,6 +105,64 @@ async function unitFacts(db: Sql, unitId: string): Promise<UnitFacts> {
  * ★ 事実確認を通らなかったユニットは**まるごと配信しない**（作者判断 Q4）。
  *   部分的に伏せる案は採らない。伏せた部分を前提にした記述が本文に残るため。
  */
+/**
+ * 共有教材の設問を、その教材を読む利用者に複製する。
+ *
+ * ★ 設問を共有しない理由: item.user_id IS NULL は「診断用の共有プール」を意味し、
+ *   Elo の較正はそこでのみ行われる（docs/04b・schema の item のコメント）。
+ *   生成物をそこに混ぜると較正の前提が壊れる。
+ * ★ 複製は SQL だけで済む。高いのは生成であって行ではない。
+ * ★ 承認の状態も引き継ぐ。共有教材は事実確認を通っているので approved である。
+ */
+export async function copyItemsToUser(
+  db: Sql, materialId: string, userId: string, now: Date,
+): Promise<number> {
+  const [already] = await db<{ n: string }[]>`
+    SELECT count(*) AS n FROM item WHERE material_id = ${materialId} AND user_id = ${userId}`
+  if (Number(already?.n ?? 0) > 0) return Number(already!.n)
+
+  // ★ 内容で重複を除かない。同じ問い文のフラッシュカードが正当に複数あるため、
+  //   畳むと設問が減る。「誰か1人ぶんをそのまま写す」が正しい。
+  const [donor] = await db<{ user_id: string }[]>`
+    SELECT user_id FROM item
+     WHERE material_id = ${materialId} AND user_id IS NOT NULL
+     ORDER BY created_at, id LIMIT 1`
+  if (!donor) return 0
+
+  const rows = await db<{
+    id: string; format: string; stem: string; choices: unknown; answer_key: unknown
+    explanation: string | null; guess_rate: number; provider: string | null
+    generated_by: string | null; prompt_version: string | null
+    approved: boolean; approved_by: string | null
+  }[]>`
+    SELECT id, format, stem, choices, answer_key, explanation, guess_rate,
+           provider, generated_by, prompt_version, approved, approved_by
+      FROM item WHERE material_id = ${materialId} AND user_id = ${donor.user_id}
+     ORDER BY created_at, id`
+  if (rows.length === 0) return 0
+
+  await db.begin(async tx => {
+    for (const r of rows) {
+      const itemId = randomUUID()
+      await tx`
+        INSERT INTO item (id, user_id, material_id, format, stem, choices, answer_key,
+                          explanation, guess_rate, provider, generated_by, prompt_version,
+                          approved, approved_by, approved_at, created_at)
+        VALUES (${itemId}, ${userId}, ${materialId}, ${r.format}, ${r.stem},
+                ${r.choices === null ? null : tx.json(r.choices as never)},
+                ${r.answer_key === null ? null : tx.json(r.answer_key as never)},
+                ${r.explanation}, ${r.guess_rate}, ${r.provider}, ${r.generated_by},
+                ${r.prompt_version}, ${r.approved}, ${r.approved_by},
+                ${r.approved ? now : null}, ${now})`
+      await tx`
+        INSERT INTO item_kc (item_id, kc_id, weight)
+        SELECT ${itemId}, kc_id, weight FROM item_kc WHERE item_id = ${r.id}
+        ON CONFLICT DO NOTHING`
+    }
+  })
+  return rows.length
+}
+
 export async function generateMaterial(
   db: Sql,
   ai: Client,
@@ -116,6 +174,21 @@ export async function generateMaterial(
   const hash = paramsHash(args.unitId, MATERIAL_PROMPT_VERSION, ctx.weakKcs.map(k => k.kcId))
   const emptyCheck: MachineCheckResult = { verdicts: [], matched: 0, matchable: 0 }
 
+  // この利用者の弱点に寄せる必要があるか。無ければ共有教材で足りる
+  const shareable = isDefaultContext(ctx)
+
+  // ★ 共有教材があれば作らない。生成1回ぶんの課金が丸ごと消える。
+  //   個別化の必要が出た利用者（shareable = false）は自分用に作り直す。
+  if (shareable && !args.force) {
+    const [shared] = await db<{ id: string }[]>`
+      SELECT id FROM material
+       WHERE user_id IS NULL AND unit_id = ${args.unitId} AND status = 'ready'`
+    if (shared) {
+      const itemCount = await copyItemsToUser(db, shared.id, args.userId, args.now)
+      return { status: 'ready', materialId: shared.id, chars: 0, itemCount, check: emptyCheck }
+    }
+  }
+
   // 冪等: 同じ鍵の成功済みジョブがあれば作り直さない。リロード連打で二重生成しない。
   //
   // ★ force のときだけ短絡を飛ばす。ここを飛ばせないと、いちど blocked になった単元は
@@ -125,9 +198,11 @@ export async function generateMaterial(
      WHERE user_id = ${args.userId} AND kind = 'material'
        AND scope_id = ${args.unitId} AND params_hash = ${hash} AND status = 'succeeded'`
   if (done.length > 0) {
+    // 共有教材として保存した場合もここに来る。user_id で絞ると自分の分が無く、
+    // 「成功済みなのに教材が無い」状態になって作り直しが走ってしまう
     const m = await db<{ id: string; status: string; blocked_reason: string | null }[]>`
       SELECT id, status, blocked_reason FROM material
-       WHERE user_id = ${args.userId} AND unit_id = ${args.unitId}
+       WHERE (user_id = ${args.userId} OR user_id IS NULL) AND unit_id = ${args.unitId}
          AND status IN ('ready', 'blocked') ORDER BY generated_at DESC LIMIT 1`
     const hit = m[0]
     if (hit) {
@@ -225,6 +300,9 @@ export async function generateMaterial(
   ]
 
   // ---- 保存 ----
+  // 個別化されていない文脈から作った教材は共有にする（user_id IS NULL）。
+  // 次の利用者は生成せずにこれを読む。
+  const owner: string | null = shareable ? null : args.userId
   const materialId = randomUUID()
   const blocked = wrong.length > 0
   const blockedReason = blocked
@@ -232,16 +310,17 @@ export async function generateMaterial(
     : null
 
   await db.begin(async tx => {
-    // 同じ単元の ready は1本だけ（material_one_ready_per_user_unit）
+    // 同じ単元の ready は1本だけ（共有・個別それぞれに一意索引がある）
     if (!blocked) {
       await tx`UPDATE material SET status = 'superseded'
-                WHERE user_id = ${args.userId} AND unit_id = ${args.unitId} AND status = 'ready'`
+                WHERE unit_id = ${args.unitId} AND status = 'ready'
+                  AND user_id IS NOT DISTINCT FROM ${owner}`
     }
 
     await tx`
       INSERT INTO material (id, user_id, unit_id, title, provider, model, prompt_version,
                             status, blocked_reason, input_tokens, output_tokens, generated_at)
-      VALUES (${materialId}, ${args.userId}, ${args.unitId}, ${material.title},
+      VALUES (${materialId}, ${owner}, ${args.unitId}, ${material.title},
               ${ai.config.genProvider}, ${ai.config.genModel}, ${MATERIAL_PROMPT_VERSION},
               ${blocked ? 'blocked' : 'ready'}, ${blockedReason},
               ${usedTokens.inputTokens}, ${usedTokens.outputTokens}, ${args.now})`

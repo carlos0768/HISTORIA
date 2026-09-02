@@ -20,6 +20,29 @@ export function toBand(mastery: number): MasteryBand {
 /** 教材の目標文字数。docs/07 §2（3,500字 ±15%） */
 export const TARGET_CHARS = 3500
 
+/**
+ * 学習の記録がまだ無い利用者の p_know。user_kc_state が無い KC に使う。
+ * この値だけで作られた文脈は、誰に対しても同じになる。
+ */
+export const UNSEEN_P_KNOW = 0.25
+
+/**
+ * この文脈が「誰の弱点にも寄っていない」か。
+ *
+ * ★ 共有教材（material.user_id IS NULL）にしてよいかの判定である。
+ *   初回生成の時点では p_know も misconception も空なので、
+ *   band は全て既定値、confusedWith は無し、並び順は exam_weight だけで決まる。
+ *   つまり**誰に対しても同じプロンプトが組み立たる**。
+ *   人数分作れば生成費だけが人数倍になり、得るものが無い。
+ *
+ * ★ 学習が進んだ利用者でも、たまたま全 KC が既定の帯なら同じ教材になる。
+ *   その場合に共有版を作るのは正しい（内容が同じなのだから）。
+ */
+export function isDefaultContext(ctx: AnonymizedContext): boolean {
+  const defaultBand = toBand(UNSEEN_P_KNOW)
+  return ctx.weakKcs.every(k => k.band === defaultBand && !k.confusedWith)
+}
+
 export async function buildGenerationContext(
   db: Sql,
   userId: string,
@@ -42,7 +65,7 @@ export async function buildGenerationContext(
       JOIN kc_syllabus_unit ksu ON ksu.kc_id = k.id AND ksu.unit_id = ${unitId}
       LEFT JOIN user_kc_state s ON s.user_id = ${userId} AND s.kc_id = k.id
      WHERE NOT k.retired
-     ORDER BY coalesce(s.p_know, 0.25) ASC, k.exam_weight DESC
+     ORDER BY coalesce(s.p_know, ${UNSEEN_P_KNOW}) ASC, k.exam_weight DESC
      LIMIT ${limit}`
 
   return {
@@ -53,7 +76,7 @@ export async function buildGenerationContext(
       kcId: r.kc_id,
       label: r.label,
       kind: r.kind,
-      band: toBand(r.p_know ?? 0.25),
+      band: toBand(r.p_know ?? UNSEEN_P_KNOW),
       ...(r.confused && r.confused.length > 0 ? { confusedWith: r.confused } : {}),
     })),
     targetCharCount: opts.targetCharCount ?? TARGET_CHARS,
