@@ -30,15 +30,25 @@ export type AnonymizedContext = {
   targetCharCount: number
 }
 
+/** 組み立て済みのプロンプト。lib/ai/prompt.ts の renderMaterialPrompt が作る */
+export type RenderedPrompt = {
+  system: string
+  user: string
+  promptVersion: string
+}
+
 export type GenerateArgs<T> = {
-  context: AnonymizedContext
+  /**
+   * 差し込み済みのプロンプト。
+   * ★ 組み立ては renderMaterialPrompt だけが行う。そこで匿名化を検査している（§4.2）。
+   */
+  prompt: RenderedPrompt
   schema: object
   /**
    * ★ 省略できない。支出遮断器の見積りは「入力＋maxOutputTokens」を上限として
    *   計算するため、未指定だと上限が定義できず不変条件が崩れる（§7.1）。
    */
   maxOutputTokens: number
-  promptVersion: string
 }
 
 /** 教材が主張している検証可能な事実（§5 層1） */

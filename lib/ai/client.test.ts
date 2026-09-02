@@ -112,19 +112,24 @@ dbSuite('クライアント（実DB）', () => {
     ],
     targetCharCount: 3500,
   }
+  const prompt = {
+    system: 'あなたは教材を書く専門家です。',
+    user: ctx.weakKcs.map(k => `- ${k.kcId} | ${k.kind} | ${k.label} | exam_weight=1.0`).join('\n'),
+    promptVersion: 'material_v1',
+  }
 
   it('鍵が無ければフェイクで動く（閉ループを止めない）', async () => {
     const c = createClient(cfg())
     expect(c.usingFake).toBe(true)
     const r = await c.generate({
-      db, context: ctx, schema: {}, maxOutputTokens: 12_000, promptVersion: 'v1', now: NOW,
+      db, prompt, schema: {}, maxOutputTokens: 12_000, now: NOW,
     })
     expect(r.usage.outputTokens).toBeGreaterThan(0)
   })
 
   it('すべての呼び出しが元帳に載る（無料枠の分も。迂回路を作らない）', async () => {
     const c = createClient(cfg())
-    await c.generate({ db, context: ctx, schema: {}, maxOutputTokens: 12_000, promptVersion: 'v1', now: NOW })
+    await c.generate({ db, prompt, schema: {}, maxOutputTokens: 12_000, now: NOW })
     await c.verify({ db, claims: [{ type: 'year', text: 'x' }], maxOutputTokens: 400, now: NOW })
     await c.embed({ db, texts: ['x'], now: NOW })
     const rows = await db<{ purpose: string; state: string }[]>`
@@ -135,7 +140,7 @@ dbSuite('クライアント（実DB）', () => {
 
   it('無料枠のモデルは 0 円で確定する', async () => {
     const c = createClient(cfg())
-    await c.generate({ db, context: ctx, schema: {}, maxOutputTokens: 12_000, promptVersion: 'v1', now: NOW })
+    await c.generate({ db, prompt, schema: {}, maxOutputTokens: 12_000, now: NOW })
     expect((await budgetStatus(db, NOW)).usedJpy).toBe(0)
   })
 
@@ -165,19 +170,19 @@ dbSuite('クライアント（実DB）', () => {
     const { createFakeProvider: mk } = await import('./fake')
     const failing = mk('gemini', { failGeneration: true })
     const spy = { ...c, generate: c.generate }
-    await expect(failing.generate({ context: ctx, schema: {}, maxOutputTokens: 100, promptVersion: 'v1' }))
+    await expect(failing.generate({ prompt, schema: {}, maxOutputTokens: 100 }))
       .rejects.toThrow()
     expect(spy).toBeTruthy()
     // クライアント経由でも枠が戻ることは release のテスト（budget.test.ts）で担保済み
     expect((await budgetStatus(db, NOW)).usedJpy).toBe(0)
   })
 
-  it('個人識別情報を含む文脈は送信前に落とす', async () => {
+  it('プロンプトに UUID が混ざっていたら送信前に落とす', async () => {
     const c = createClient(cfg())
-    const bad = { ...ctx, userId: '550e8400-e29b-41d4-a716-446655440000' } as unknown as AnonymizedContext
+    const bad = { ...prompt, user: `${prompt.user}\nuser 550e8400-e29b-41d4-a716-446655440000` }
     await expect(
-      c.generate({ db, context: bad, schema: {}, maxOutputTokens: 100, promptVersion: 'v1', now: NOW }),
-    ).rejects.toThrow(/個人識別情報/)
+      c.generate({ db, prompt: bad, schema: {}, maxOutputTokens: 100, now: NOW }),
+    ).rejects.toThrow(/UUID/)
     // 落ちたので元帳にも載らない
     const rows = await db`SELECT count(*) FROM ai_spend WHERE period = ${P}`
     expect(Number(rows[0]!.count)).toBe(0)

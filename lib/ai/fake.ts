@@ -29,12 +29,15 @@ export function createFakeProvider(name: string, opts: FakeOptions = {}): Provid
 
     async generate<T>(args: GenerateArgs<T>): Promise<GenerateResult<T>> {
       if (opts.failGeneration) throw new Error('fake: 生成に失敗しました')
-      const ctx = args.context
+      // 実物と同じ引数で動く。中身の作り方だけが違う
+      const kcIds = [...args.prompt.user.matchAll(/^- (kc\.[a-z0-9_.]+) \| ([a-z]+) \| ([^|]+) \|/gm)]
+        .map(m => ({ kcId: m[1]!, kind: m[2]!, label: m[3]!.trim() }))
+      const ctx = { weakKcs: kcIds, unitLabel: '（フェイク）', targetCharCount: 3500 }
       const sections = ctx.weakKcs.slice(0, 5).map((kc, i) => ({
         ord: i + 1,
         heading: `${kc.label}`,
         body_md: `${kc.label}についての解説。`.repeat(
-          Math.max(1, Math.floor(args.context.targetCharCount / 5 / 12)),
+          Math.max(1, Math.floor(ctx.targetCharCount / 5 / 12)),
         ),
         kc_ids: [kc.kcId],
       }))

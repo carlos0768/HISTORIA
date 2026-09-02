@@ -19,6 +19,7 @@
     "seed:validate": "node seed/validate.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.123.0",
     "next": "16.3.4",
     "postgres": "3.4.7",
     "react": "19.2.8",

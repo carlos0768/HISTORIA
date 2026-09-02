@@ -9,9 +9,11 @@
  * ★ すべての呼び出しは支出遮断器の関門を通る。迂回路を作らない。
  */
 import type { Sql } from 'postgres'
-import type { AnonymizedContext, Claim, GenerateResult, Provider, VerifyResult } from './types'
+import type { Claim, GenerateResult, Provider, RenderedPrompt, VerifyResult } from './types'
 import { createFakeProvider } from './fake'
-import { assertAnonymized } from './redact'
+import { createGeminiProvider } from './gemini'
+import { createAnthropicProvider } from './anthropic'
+import { assertNoIdentifiers } from './redact'
 import { reserve, settle, release, estimateJpy, type Purpose, type Price } from './budget'
 
 export type AiConfig = {
@@ -61,16 +63,25 @@ export const PRICES: Record<string, Price> = {
 const priceOf = (model: string): Price =>
   PRICES[model] ?? { inputPerMTok: 3, outputPerMTok: 15 } // 未知のモデルは高めに見積もる
 
-/** 鍵が無いプロバイダはフェイクにする。閉ループが最後まで通ることを優先する */
+/**
+ * 鍵があれば実物、無ければフェイクにする。
+ * フェイクは実物と同じ型・同じ制約で動くので、鍵が無くても閉ループは最後まで通る。
+ */
 function resolveProvider(name: string, cfg: AiConfig): Provider {
-  if (name === 'gemini' && cfg.geminiApiKey) throw new Error('gemini の実装は未接続です（鍵はあります）')
-  if (name === 'anthropic' && cfg.anthropicApiKey) throw new Error('anthropic の実装は未接続です（鍵はあります）')
+  if (name === 'gemini' && cfg.geminiApiKey) {
+    return createGeminiProvider({
+      apiKey: cfg.geminiApiKey, model: cfg.genModel, embedModel: cfg.embedModel,
+    })
+  }
+  if (name === 'anthropic' && cfg.anthropicApiKey) {
+    return createAnthropicProvider({ apiKey: cfg.anthropicApiKey, model: cfg.verifyModel })
+  }
   return createFakeProvider(name)
 }
 
 export type GenerateCall = {
-  db: Sql; context: AnonymizedContext; schema: object; maxOutputTokens: number
-  promptVersion: string; purpose?: Purpose; jobId?: string | null; now: Date
+  db: Sql; prompt: RenderedPrompt; schema: object; maxOutputTokens: number
+  purpose?: Purpose; jobId?: string | null; now: Date
 }
 export type VerifyCall = {
   db: Sql; claims: Claim[]; maxOutputTokens: number; jobId?: string | null; now: Date
@@ -119,17 +130,16 @@ export function createClient(cfg: AiConfig = readConfig()): Client {
     usingFake,
 
     async generate<T>(a: GenerateCall) {
-      // 型だけでなく実行時にも個人識別情報の混入を止める（§4.2）
-      assertAnonymized(a.context)
-      // 入力の上限は文脈の実測値から。教材生成は出力が支配的
-      const maxIn = Math.ceil(JSON.stringify(a.context).length / 1.5) + 2000
+      // 型だけでなく実行時にも個人識別情報の混入を止める（§4.2）。
+      // renderMaterialPrompt でも検査しているが、経路を1つに絞れない以上ここでも見る
+      assertNoIdentifiers(a.prompt.system)
+      assertNoIdentifiers(a.prompt.user)
+      // 入力の上限はプロンプトの実測値から。教材生成は出力が支配的
+      const maxIn = Math.ceil((a.prompt.system.length + a.prompt.user.length) / 1.5) + 1000
       return guarded(
         a.db, a.now, cfg.genModel, cfg.genProvider, a.purpose ?? 'generate',
         maxIn, a.maxOutputTokens, a.jobId,
-        () => gen.generate<T>({
-          context: a.context, schema: a.schema,
-          maxOutputTokens: a.maxOutputTokens, promptVersion: a.promptVersion,
-        }),
+        () => gen.generate<T>({ prompt: a.prompt, schema: a.schema, maxOutputTokens: a.maxOutputTokens }),
       )
     },
 
