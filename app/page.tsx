@@ -10,6 +10,7 @@ import { NotReady } from '@/components/not-ready'
 import { FakeNotice } from '@/components/fake-warning'
 import { readConfig } from '@/lib/ai/client'
 import { DEFAULT_MAX_DAILY } from '@/lib/domain/scheduler'
+import { hasDiagnostic } from '@/lib/loop/diagnostic'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,6 +27,38 @@ export default async function Home() {
   }
 
   const now = new Date()
+
+  /**
+   * ★ 診断が未了なら、ホームは診断の導線だけを出す（docs/11-ux.md:80）。
+   *   弱点は確認テストから生まれ、確認テストは特訓の中にあり、特訓の教材は
+   *   弱点から作られる。新規ユーザーはこの環のどこからも起動できないので、
+   *   「今日やること 0問」と「特訓がありません」だけの画面になってしまう
+   *   （docs/04 §5.1 の循環依存）。診断がその環を断ち切る唯一の入口である。
+   *
+   * ★ ただし**素通りできる**ようにする。共有プールが未承認だと診断は始められず、
+   *   そこで足止めすると特訓も教材も使えなくなる。
+   */
+  if (!await hasDiagnostic(db, userId)) {
+    return (
+      <Screen title="HISTORIA" tab="home">
+        <Card>
+          <span className="lv-label">はじめに</span>
+          <p className="lv-body">
+            まず10分ほどの診断テストで、どこから確かめていくかの見当を付けます。
+            点数は付きません。
+          </p>
+          <Link className="lv-btn lv-btn--primary lv-btn--block" href="/diagnostic">
+            診断テストを受ける
+          </Link>
+          <p className="lv-caption">
+            あとで受けても構いません。その場合は範囲と締切を先に決めてください。
+          </p>
+          <Link className="lv-btn lv-btn--block" href="/drills/new">範囲と締切を決める</Link>
+        </Card>
+      </Screen>
+    )
+  }
+
   const [plan, drills, days] = await Promise.all([
     todaysPlan(db, userId, now, DEFAULT_MAX_DAILY),
     drillProgressList(db, userId, now),
