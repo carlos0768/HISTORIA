@@ -23,7 +23,14 @@ export const TABS = [
   { key: 'records', href: '/records', label: '記録', icon: '▤' },
 ] as const
 
-export type TabKey = typeof TABS[number]['key']
+/**
+ * 画面がシェルのどこに属するか。
+ *
+ * ★ 'settings' はタブではない（docs/11 §9 は3タブと定めている）。
+ *   デスクトップのサイドバーで別の見出しに置くための印である。
+ *   TABS に足すと、モバイルのフッタが4つになって仕様から外れる。
+ */
+export type TabKey = typeof TABS[number]['key'] | 'settings'
 
 /**
  * 1画面。
@@ -61,6 +68,15 @@ export function Screen({
             {t.label}
           </Link>
         ))}
+        {/* ★ 設定はタブに入れない。docs/11 §9 が3タブと定めている。
+             デスクトップは横に余裕があるので、別の見出しで下に置く。
+             モバイルからは記録タブの末尾から入る。 */}
+        <span className="hs-side__label">アカウント</span>
+        <Link href="/settings"
+              className={`hs-side__item${tab === 'settings' ? ' hs-side__item--active' : ''}`}
+              aria-current={tab === 'settings' ? 'page' : undefined}>
+          設定
+        </Link>
       </nav>
 
       <div className="hs-shell__main">

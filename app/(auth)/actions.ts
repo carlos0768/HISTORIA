@@ -12,7 +12,7 @@
 import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { sql } from '@/lib/db/client'
-import { authEnv, createAuthClient } from '@/lib/auth/supabase'
+import { clientWithCookies } from '@/lib/auth/server'
 import { checkInvite, inviteError } from '@/lib/auth/invite'
 import { checkBirthDate, ageError } from '@/lib/auth/age'
 import { signup } from '@/lib/auth/signup'
@@ -48,17 +48,6 @@ async function origin(): Promise<string> {
  * cookie を読み書きできる Supabase クライアント。
  * Server Action からは cookie を書けるので setAll を通す。
  */
-async function clientWithCookies() {
-  const env = authEnv()
-  if (!env) return null
-  const jar = await cookies()
-  return createAuthClient(env, {
-    getAll: () => jar.getAll().map(c => ({ name: c.name, value: c.value })),
-    setAll: (list) => {
-      for (const c of list) jar.set(c.name, c.value, c.options)
-    },
-  })
-}
 
 /**
  * Google の同意画面へ送る。
