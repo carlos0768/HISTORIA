@@ -444,7 +444,7 @@ INSERT INTO syllabus_unit (id, subject, parent_id, level, label, ord) VALUES ('g
   ON CONFLICT (id) DO UPDATE SET subject = EXCLUDED.subject, parent_id = EXCLUDED.parent_id,
     level = EXCLUDED.level, label = EXCLUDED.label, ord = EXCLUDED.ord;
 
--- KC 60 件（承認済みのみ。未承認 197 件は含めない）
+-- KC 60 件（承認済みのみ。未承認 348 件は含めない）
 -- 作者承認制については docs/02 §5 を参照
 INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
   ('kc.orient.mesopotamia_dynasty_order', 'メソポタミアの支配者交替の順序', 'chronology', 1, -3000,

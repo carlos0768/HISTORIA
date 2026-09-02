@@ -107,8 +107,14 @@ dbSuite('教材の閲覧と読了（実DB）', () => {
 
     it('geo の KC が付いたセクションだけ地図の地域を返す', async () => {
       const id = await genReady()
+      // ★ 「この節には geo の KC が無い」という前提に寄りかからない。
+      //   seed に geo の KC が増えると前提が黙って崩れる（60→408件のときに実際に崩れた）。
+      //   geo の紐づけを明示的に外してから測る。
+      await db`DELETE FROM material_section_kc msk
+                USING kc k, material_section s
+                WHERE msk.kc_id = k.id AND k.kind = 'geo'
+                  AND msk.section_id = s.id AND s.material_id = ${id}`
       const v = (await materialView(db, userId, id))!
-      // wh.2.1.1 には geo の KC が無いので、どのセクションにも地図は出ない
       expect(v.sections.every(s => s.geoRegionIds.length === 0)).toBe(true)
 
       // このセクションに geo の KC を足すと、その KC の地域が返る
