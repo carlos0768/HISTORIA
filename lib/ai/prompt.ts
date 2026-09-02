@@ -17,7 +17,7 @@ import { assertAnonymized, assertNoIdentifiers } from './redact'
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 export const PROMPTS_DIR = join(ROOT, 'prompts')
 
-export const MATERIAL_PROMPT_VERSION = 'material_v1'
+export const MATERIAL_PROMPT_VERSION = 'material_v2'
 
 export type PromptTemplate = { system: string; user: string }
 

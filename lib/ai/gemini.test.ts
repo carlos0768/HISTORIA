@@ -18,7 +18,13 @@ function validMaterial() {
       choices: (['a', 'b', 'c', 'd'] as const).map(k => ({ key: k, text: k, why_wrong: k === 'a' ? '' : '誤り' })),
       answer_key: 'a' as const, explanation: '解説', kc_ids: ['kc.a.b'],
     })),
-    claims: [{ kind: 'year' as const, text: 'ハンムラビ法典は前18世紀', section_ord: 1 }],
+    // claims はスキーマ下限（6件）を満たす必要がある。
+    // 空や少数を許すと層2・層3 が素通りするため、契約として下限を持たせてある
+    claims: Array.from({ length: 12 }, (_, i) => ({
+      kind: (['year', 'person', 'event', 'causal', 'place'] as const)[i % 5]!,
+      text: `検証できる主張${i + 1}`,
+      section_ord: (i % 7) + 1,
+    })),
   }
 }
 

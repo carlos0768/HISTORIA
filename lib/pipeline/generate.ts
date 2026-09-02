@@ -167,6 +167,13 @@ export async function generateMaterial(
     sectionOrd: c.section_ord,
   }))
 
+  // ★ 検証されなかった教材を配信しない。
+  //   claims が空だと層2は0件を返し、層3は呼ばれず、wrong が空のまま ready になる。
+  //   スキーマ側にも下限を入れてあるが、経路を1つに絞れない以上ここでも見る。
+  if (claims.length === 0) {
+    return fail('検証用の主張が1件も出力されませんでした。未検証の教材は配信しません')
+  }
+
   const check = await machineCheck(db, claims)
   const machineWrong = check.verdicts.filter(v => v.status === 'wrong')
 
