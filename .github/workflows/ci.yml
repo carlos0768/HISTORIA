@@ -42,6 +42,11 @@ jobs:
       - name: 型検査
         run: npx tsc --noEmit
 
+      # tsc が見ない層を拾う（<a> ではなく <Link>、effect 内の setState 等）。
+      # 設定ファイルが無くて長らく動いていなかったので、CI に入れて空回りを防ぐ。
+      - name: 静的検査
+        run: npx eslint .
+
       - name: テスト
         run: npx vitest run
 
