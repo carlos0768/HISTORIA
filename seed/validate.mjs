@@ -281,6 +281,24 @@ for (const t of item) {
     }
   }
 
+  // ★ 日本語の文章に別の言語の文字が紛れ込むのを落とす。
+  //   起草中に "única"（スペイン語）と "교회"（ハングル）を実際に混入させた。
+  //   人が読めば一目で分かるが、400件を目視で洗うのは現実的でない。
+  //   許すのは日本語・英数字・記号・ギリシア文字（史料名などに出る）まで。
+  for (const [field, text] of Object.entries({ 問題文: t.stem, 解説: t.explanation, a: t.a, b: t.b, c: t.c, d: t.d })) {
+    const stray = [...(text ?? '')].filter(ch => {
+      const cp = ch.codePointAt(0);
+      if (cp < 0x0250) return false;                       // ASCII とラテン拡張
+      if (cp >= 0x0370 && cp <= 0x03ff) return false;      // ギリシア文字
+      if (cp >= 0x2000 && cp <= 0x303f) return false;      // 記号・約物
+      if (cp >= 0x3040 && cp <= 0x30ff) return false;      // かな
+      if (cp >= 0x4e00 && cp <= 0x9fff) return false;      // 漢字
+      if (cp >= 0xff00 && cp <= 0xffef) return false;      // 全角の英数と記号
+      return true;
+    });
+    if (stray.length) fail(`10: ${t.id} の${field}に日本語以外の文字が混ざっている: ${[...new Set(stray)].join('')}`);
+  }
+
   // 同じ問題文が2つあると、同じ設問を2回出すことになる
   const seen = stems.get(t.stem);
   if (seen) fail(`10: item の問題文が重複: ${t.id} と ${seen}`);
