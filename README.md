@@ -91,18 +91,40 @@ Google を主にするには次を行う（[`03`](./docs/03-data-model.md) §7.1
 
 ### `DATABASE_URL` は Transaction pooler にする
 
-**直結（`db.<project>.supabase.co:5432`）を入れてはいけない。**
-Vercel の関数は要求ごとに立ち上がるので、直結だと接続を食い潰して
-`too many connections` で落ちる（[`12`](./docs/12-nonfunctional.md) §4）。
+**直結（`db.<project>.supabase.co:5432`）は Vercel からは使えない。** 理由は2つある。
 
-Supabase の Connect → **Transaction pooler** に出る文字列を使う。ポートは **6543**。
+1. **無料枠の直結は IPv6 のみ**である（IPv4 は有料アドオン）。Vercel の関数は IPv4 なので、
+   そもそも名前が引けない
+2. 仮に繋がっても、関数は要求ごとに立ち上がるので接続を食い潰して
+   `too many connections` で落ちる（[`12`](./docs/12-nonfunctional.md) §4）
+
+**取り方。** ダッシュボード上部の **Connect** ボタンを押す（Settings → Database ではない）。
+直接開くなら `https://supabase.com/dashboard/project/<project>?showConnect=true&method=transaction`。
+そこに出る **Transaction pooler**（公式文書では「Shared Pooler (Supavisor) - transaction mode」）
+の文字列をそのまま貼る。ポートは **6543**。
 
 ```
-postgresql://postgres.<project>:<パスワード>@aws-0-<region>.pooler.supabase.com:6543/postgres
+postgres://postgres.<project>:<パスワード>@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres
 ```
+
+★ **手で組み立てない。** 2箇所が直結と違う。
+
+- ユーザ名が `postgres` ではなく **`postgres.<project>`**
+- ホスト名に案件ごとの番号（`aws-0-` / `aws-1-`）が入る。
+  DNS で確かめたところ、番号を落とした `aws-ap-northeast-1.pooler.supabase.com` は**存在しない**
+  （公式文書の `aws-[REGION]` は表記の省略である）
 
 `lib/db/client.ts` は既に `prepare: false` を設定してある。
-transaction モードのプーラーは prepared statement を持てないので、これが要る。
+transaction モードは prepared statement を持てないので、これが要る
+（公式文書も「To avoid errors, turn off prepared statements」と明記している）。
+
+| | ホスト | ポート | 用途 |
+|---|---|---|---|
+| 直結 | `db.<project>.supabase.co` | 5432 | 移行・`pg_dump`・常駐サーバ（IPv6） |
+| Session pooler | `aws-N-<region>.pooler.supabase.com` | 5432 | IPv4 の常駐サーバ |
+| **Transaction pooler** | `aws-N-<region>.pooler.supabase.com` | **6543** | **サーバーレス（Vercel）** |
+
+ポートだけが違うので、**5432 のまま貼ると Session pooler になる**。ここが一番間違えやすい。
 
 ### 招待コードを1枚も発行していないと、誰もログインできない
 
