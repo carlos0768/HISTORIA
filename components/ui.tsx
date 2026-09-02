@@ -42,12 +42,14 @@ export type TabKey = typeof TABS[number]['key'] | 'settings'
  *   モバイルでは**そもそも並べない**ので、中身の描画費用もかからない。
  */
 export function Screen({
-  title, children, tab, aside,
+  title, children, tab, aside, trailing,
 }: {
   title: string
   children: ReactNode
   tab?: TabKey
   aside?: ReactNode
+  /** 見出しの右端に置くもの（連続日数など）。docs/11-ux.md §7 */
+  trailing?: ReactNode
 }) {
   if (!tab) {
     return (
@@ -80,7 +82,10 @@ export function Screen({
       </nav>
 
       <div className="hs-shell__main">
-        <header className="lv-navbar"><span className="lv-navbar__title">{title}</span></header>
+        <header className="lv-navbar">
+          <span className="lv-navbar__title">{title}</span>
+          {trailing && <span className="hs-navbar__trailing">{trailing}</span>}
+        </header>
         <div className="hs-pad">{children}</div>
         <nav className="lv-tabbar" aria-label="メニュー">
           {TABS.map(t => (

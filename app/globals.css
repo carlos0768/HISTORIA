@@ -121,6 +121,15 @@ body { margin: 0; background: var(--lv-canvas); }
 /* 数字とラベルを横に並べる小さな見出し */
 .hs-count { display: flex; align-items: baseline; gap: var(--lv-space-2); }
 
+/* 見出しの右端（連続日数）。docs/11-ux.md §7「ホーム右上に 12日連続」
+   ★ .lv-navbar__title が flex:1 なので、これを足すと題名の中心が少し左へ寄る。
+     設計系の .lv-navbar__btn--right も同じ振る舞いなので、そこに合わせる。 */
+.hs-navbar__trailing {
+  flex: none; padding: 0 16px; white-space: nowrap;
+  font: 600 11px/1 var(--lv-font-ja); color: var(--lv-sub);
+}
+.hs-navbar__trailing b { font-family: var(--lv-font-en); font-size: 13px; color: var(--lv-ink); }
+
 /* 題名（可変・縮む）と添え字（固定）を1行に並べる。
    ★ 縮む側に min-width:0 が要る。flex の既定は min-width:auto で、
      日本語の長い題名がそのまま押し広げて画面から溢れる。 */

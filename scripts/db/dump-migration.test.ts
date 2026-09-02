@@ -89,6 +89,43 @@ dbSuite('後から足した表と列の差分 SQL（実DB）', () => {
   }, 120_000)
 
   /**
+   * ★ 表を足しただけでは中身が空である。既にある解答から user_activity を
+   *   作り直せないと、これまで毎日やってきた人の連続日数が 0 に見える。
+   *   日付が Asia/Tokyo であることも同時に見る（UTC だと1日ずれる）。
+   */
+  it('user_activity を既存の解答から作り直せる（Asia/Tokyo で・何度流しても同じ）', async () => {
+    const [u] = await db<{ id: string }[]>`
+      INSERT INTO app_user (id, birth_date, guardian_consent_required, consent_version, consent_at)
+      VALUES (gen_random_uuid(), '2008-01-01', false, 'v1', now()) RETURNING id`
+    const userId = u!.id
+    const [it] = await db<{ id: string }[]>`
+      INSERT INTO item (id, user_id, format, stem, answer_key, guess_rate,
+                        approved, approved_by, approved_at)
+      VALUES (gen_random_uuid(), NULL, 'mcq4', '設問', '"a"'::jsonb, 0.25,
+              true, 'author', now())
+      RETURNING id`
+    // JST 2026-09-15 00:30（UTC では 09-14 15:30）と、同じ日の昼
+    for (const t of ['2026-09-14T15:30:00Z', '2026-09-15T04:00:00Z']) {
+      await db`
+        INSERT INTO response (user_id, item_id, session_kind, chosen, correct, answered_at)
+        VALUES (${userId}, ${it!.id}, 'quiz', '"a"'::jsonb, true, ${t})`
+    }
+    await db`DELETE FROM user_activity WHERE user_id = ${userId}`   // 空から作り直す
+
+    const sql = buildMigrationSql().replace(/^BEGIN;$/m, '').replace(/^COMMIT;$/m, '')
+    const read = async () => db<{ d: string; responses: number }[]>`
+      SELECT to_char(activity_date, 'YYYY-MM-DD') AS d, responses
+        FROM user_activity WHERE user_id = ${userId} ORDER BY activity_date`
+
+    await db.begin(tx => tx.unsafe(sql))
+    // 2件とも JST では 9/15。UTC で数えると 9/14 と 9/15 の2行に割れる
+    expect(await read()).toEqual([{ d: '2026-09-15', responses: 2 }])
+
+    await db.begin(tx => tx.unsafe(sql))
+    expect(await read()).toEqual([{ d: '2026-09-15', responses: 2 }])   // 増えない
+  }, 120_000)
+
+  /**
    * ★ 表を落としてから流し、本当に作れることを見る。
    *   「既にあるので何も起きなかった」だけを見ていると、
    *   CREATE TABLE の中身が壊れていても気づけない。

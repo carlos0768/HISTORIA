@@ -35,6 +35,14 @@ export default async function Records() {
       <div className="lv-meta__row"><span className="lv-meta__key">連続</span><span>{s.current} 日</span></div>
       <div className="lv-meta__row"><span className="lv-meta__key">最長</span><span>{s.longest} 日</span></div>
       <div className="lv-meta__row"><span className="lv-meta__key">学習した日</span><span>{s.days} 日</span></div>
+      {/* ★ 保護の残りを出す。黙って使われると「休んだのに続いている」が不可解になる。
+           docs/11-ux.md §7.1 の「ストリーク保護を月2回まで自動適用する」 */}
+      <div className="lv-meta__row">
+        <span className="lv-meta__key">今月の保護</span><span>あと {s.protectionsLeft} 回</span>
+      </div>
+      <p className="lv-caption">
+        1日か2日休んでも、月2回までは連続が切れません。数えるのは解いた日だけです。
+      </p>
       <p className="lv-caption">
         弱点は「まだできていない項目」だけを弱い順に出しています。
         できるようになった項目は消えます。

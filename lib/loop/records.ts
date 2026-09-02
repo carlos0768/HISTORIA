@@ -16,6 +16,7 @@ import type { Sql } from 'postgres'
 import {
   mastery, masteryStatus, type KcState, type MasteryStatus,
 } from '@/lib/domain/weakness'
+import { computeStreak, jstDate, type Streak } from '@/lib/domain/streak'
 
 /** 保持率の推定を出す基準日数。SM-2 の interval に対する経過日数で見る */
 const DAY_MS = 86_400_000
@@ -190,41 +191,28 @@ export async function weakKcs(
   return out.slice(0, limit)
 }
 
-export type Streak = { current: number; longest: number; days: number }
+export type { Streak } from '@/lib/domain/streak'
 
 /**
  * 学習を続けた日数。
  *
- * ★ 「解答した日」を数える。教材を読んだだけの日も学習ではあるが、
- *   docs/11 §7.1 が数えるのは出題への解答なので、それに揃える。
+ * ★ `user_activity` から数える（docs/11-ux.md §7 の明文）。
+ *   以前は `response` を直接数えていたが、それだと
+ *   (a) 教材を読んだだけの日を落とすかどうかを SQL に埋めることになり、
+ *   (b) 日付が UTC のままで、日本時間の深夜0〜9時に解いた分が前日に落ちていた。
+ *   `user_activity` は `submitAnswer` と `recordRead` が Asia/Tokyo の日付で書く。
+ *
+ * ★ 「その日に1問以上解いた」で成立する（docs/11-ux.md §7.1）。
+ *   `sections_read` だけの日は数えない。教材を読むのは学習だが、
+ *   仕様が数えると決めているのは出題への解答である。
+ *
+ * ★ 連続の計算そのものは lib/domain/streak.ts にある（DB を持ちこまない）。
  */
 export async function streak(db: Sql, userId: string, now: Date): Promise<Streak> {
-  const rows = await db<{ d: Date }[]>`
-    SELECT DISTINCT date(answered_at) AS d
-      FROM response WHERE user_id = ${userId} ORDER BY d DESC`
-  if (rows.length === 0) return { current: 0, longest: 0, days: 0 }
-
-  const iso = (d: Date) => d.toISOString().slice(0, 10)
-  const set = new Set(rows.map(r => iso(new Date(r.d))))
-
-  // 今日か昨日から遡る。今日まだ解いていなくても連続は途切れていない
-  let current = 0
-  const cursor = new Date(now)
-  if (!set.has(iso(cursor))) cursor.setUTCDate(cursor.getUTCDate() - 1)
-  while (set.has(iso(cursor))) {
-    current++
-    cursor.setUTCDate(cursor.getUTCDate() - 1)
-  }
-
-  // 最長。日付を昇順にして隣接を数える
-  const asc = [...set].sort()
-  let longest = 0, run = 0
-  let prev: number | null = null
-  for (const s of asc) {
-    const t = Date.parse(`${s}T00:00:00Z`)
-    run = prev !== null && t - prev === DAY_MS ? run + 1 : 1
-    longest = Math.max(longest, run)
-    prev = t
-  }
-  return { current, longest, days: set.size }
+  const rows = await db<{ d: string }[]>`
+    SELECT to_char(activity_date, 'YYYY-MM-DD') AS d
+      FROM user_activity
+     WHERE user_id = ${userId} AND responses > 0
+     ORDER BY activity_date DESC`
+  return computeStreak(rows.map(r => r.d), jstDate(now))
 }

@@ -10,6 +10,7 @@
 import type { Sql } from 'postgres'
 import { countsAsRead, requiredDwellMs, estimatedReadMs, CHARS_PER_MIN, READ_DWELL_RATIO }
   from '@/lib/domain/reading'
+import { jstDate } from '@/lib/domain/streak'
 
 /**
  * 「学習イベントとして数える滞在時間」の SQL 側の式。
@@ -150,9 +151,20 @@ export async function recordRead(
   const dwell = Math.max(0, Math.min(Math.round(a.dwellMs), 24 * 3600 * 1000))
   const scroll = a.scrollPct === null ? null : Math.max(0, Math.min(1, a.scrollPct))
 
-  await db`
-    INSERT INTO material_read (user_id, section_id, dwell_ms, scroll_pct, read_at)
-    VALUES (${a.userId}, ${a.sectionId}, ${dwell}, ${scroll}, ${a.now})`
+  // ★ 読了の記録とその日の活動を1つのトランザクションで書く。
+  //   別々に書くと「読んだのにその日の記録が無い」状態が生まれ、
+  //   連続日数（docs/11-ux.md §7）が理由もなく途切れる。
+  await db.begin(async tx => {
+    await tx`
+      INSERT INTO material_read (user_id, section_id, dwell_ms, scroll_pct, read_at)
+      VALUES (${a.userId}, ${a.sectionId}, ${dwell}, ${scroll}, ${a.now})`
+    // 日付は Asia/Tokyo。UTC で入れると日本時間の深夜0〜9時が前日に落ちる
+    await tx`
+      INSERT INTO user_activity (user_id, activity_date, sections_read)
+      VALUES (${a.userId}, ${jstDate(a.now)}, 1)
+      ON CONFLICT (user_id, activity_date)
+        DO UPDATE SET sections_read = user_activity.sections_read + 1`
+  })
 
   const [n] = await db<{ read: string; total: string }[]>`
     SELECT count(*) FILTER (WHERE EXISTS (

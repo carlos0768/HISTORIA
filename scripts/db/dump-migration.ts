@@ -32,6 +32,40 @@ export const NEW_COLUMNS = [
   { table: 'app_user', column: 'remind_hour', type: 'smallint', check: 'remind_hour BETWEEN 0 AND 23' },
 ] as const
 
+/**
+ * 導出テーブルの作り直し。
+ *
+ * ★ 表を足しただけでは中身が空である。`user_activity` は「連続学習日数」の
+ *   土台で、これから先は submitAnswer と recordRead が書くが、
+ *   **既にある解答の分は誰も書いてくれない**。空のまま出すと、
+ *   これまで毎日やってきた人の連続日数が 0 に見える。
+ *
+ * ★ response が唯一の真実なので、そこから作り直せる（docs/03 §2.2）。
+ *   何度流しても同じ値になる（合計を数え直して上書きする）。
+ */
+export const BACKFILLS = [
+  {
+    title: 'user_activity を response と material_read から作り直す',
+    why: [
+      '★ 日付は Asia/Tokyo。UTC で入れると日本時間の深夜0〜9時が前日に落ちる。',
+      '  アプリ側（lib/domain/streak.ts の jstDate）と同じ基準にそろえる。',
+      '★ 何度流しても同じ。数え直して上書きするので、増え続けることはない。',
+    ],
+    sql: `INSERT INTO user_activity (user_id, activity_date, responses, sections_read)
+SELECT user_id, day, sum(r), sum(s) FROM (
+  SELECT user_id, (answered_at AT TIME ZONE 'Asia/Tokyo')::date AS day,
+         count(*) AS r, 0 AS s
+    FROM response GROUP BY 1, 2
+  UNION ALL
+  SELECT user_id, (read_at AT TIME ZONE 'Asia/Tokyo')::date AS day,
+         0 AS r, count(*) AS s
+    FROM material_read GROUP BY 1, 2
+) t GROUP BY user_id, day
+ON CONFLICT (user_id, activity_date) DO UPDATE
+  SET responses = EXCLUDED.responses, sections_read = EXCLUDED.sections_read;`,
+  },
+] as const
+
 /** CREATE TABLE <name> ( … ); を丸ごと切り出す */
 export function tableBlock(schema: string, name: string): string {
   const head = `CREATE TABLE ${name} (`
@@ -88,6 +122,13 @@ export function buildMigrationSql(schema = readFileSync(SCHEMA_PATH, 'utf8')): s
     say(`-- ---- ${c.table}.${c.column} ----`)
     say(`ALTER TABLE ${c.table} ADD COLUMN IF NOT EXISTS ${c.column} ${c.type}` +
         (c.check ? ` CHECK (${c.check})` : '') + ';')
+    say('')
+  }
+
+  for (const b of BACKFILLS) {
+    say(`-- ---- ${b.title} ----`)
+    for (const line of b.why) say(`-- ${line}`)
+    say(b.sql)
     say('')
   }
 

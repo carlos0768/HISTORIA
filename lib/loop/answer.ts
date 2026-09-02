@@ -13,6 +13,7 @@ import { sm2Update, jitterFromSeed, newKcCard, type KcCard, type Grade } from '@
 import { updateKcState, initialKcState, type KcState } from '@/lib/domain/weakness'
 import { objectiveGrade, flashcardGrade, type FlashcardButton } from '@/lib/domain/grading'
 import { ALGO_VERSION, SCHED_VERSION, GUESS, MISCONCEPTION_HITS, type ItemFormat } from '@/lib/domain/params'
+import { jstDate } from '@/lib/domain/streak'
 
 /** SM-2 を呼ぶ最小の重み。これ未満の KC はその設問が主に問うていない（04b §3.1） */
 export const SM2_MIN_WEIGHT = 0.5
@@ -115,6 +116,16 @@ export async function submitAnswer(db: Sql, input: SubmitInput): Promise<SubmitR
       UPDATE item SET observed_total = observed_total + 1,
                       observed_correct = observed_correct + ${correct ? 1 : 0}
        WHERE id = ${item.id}`
+
+    // --- 3b. その日の活動を数える（ストリークの土台・docs/11-ux.md §7）---
+    // ★ response と同じトランザクションで書く。別にすると「解答は入ったが
+    //   その日の記録が無い」状態が生まれ、連続日数が理由もなく途切れる。
+    // ★ 日付は Asia/Tokyo。UTC で入れると日本時間の深夜0〜9時が前日に落ちる。
+    await tx`
+      INSERT INTO user_activity (user_id, activity_date, responses)
+      VALUES (${input.userId}, ${jstDate(input.now)}, 1)
+      ON CONFLICT (user_id, activity_date)
+        DO UPDATE SET responses = user_activity.responses + 1`
 
     const dk = correct ? null : distractorKey(input.chosen)
     const updatedKcs: SubmitResult['updatedKcs'] = []

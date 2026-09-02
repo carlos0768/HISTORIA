@@ -157,7 +157,59 @@ dbSuite('記録タブ（実DB）', () => {
     }
 
     it('解答が無ければ0', async () => {
-      expect(await streak(db, userId, NOW)).toEqual({ current: 0, longest: 0, days: 0 })
+      expect(await streak(db, userId, NOW))
+        .toEqual({ current: 0, longest: 0, days: 0, protectionsLeft: 2 })
+    })
+
+    /**
+     * ★ ここが「user_activity から数える」に切り替えた効き目である。
+     *   以前は response を UTC の date() で数えていたので、
+     *   日本時間の深夜0〜9時に解いた分が前日に落ちていた。
+     *   「日付が変わる前に1問やった」が連続に効かない、という壊れ方をする。
+     */
+    it('日本時間の深夜に解いた分が、その日に入る（UTC では前日になる時刻）', async () => {
+      const item = await setup()
+      // JST 9/15 00:30 = UTC 9/14 15:30
+      await answer(item, 'a', new Date('2026-09-14T15:30:00Z'))
+      const [row] = await db<{ d: string }[]>`
+        SELECT to_char(activity_date, 'YYYY-MM-DD') AS d
+          FROM user_activity WHERE user_id = ${userId}`
+      expect(row!.d).toBe('2026-09-15')
+      expect((await streak(db, userId, new Date('2026-09-15T03:00:00Z'))).current).toBe(1)
+    })
+
+    it('同じ日に2回解いても user_activity は1行のまま（回数だけ増える）', async () => {
+      const item = await setup()
+      await answer(item, 'a', NOW)
+      await answer(item, 'b', new Date(NOW.getTime() + 60_000))
+      const rows = await db<{ responses: number }[]>`
+        SELECT responses FROM user_activity WHERE user_id = ${userId}`
+      expect(rows).toHaveLength(1)
+      expect(rows[0]!.responses).toBe(2)
+      expect((await streak(db, userId, NOW)).days).toBe(1)
+    })
+
+    /** docs/11-ux.md §7.1「1日空いた場合はストリーク保護を月2回まで自動適用する」 */
+    it('1日空いても連続が切れない（ストリーク保護）', async () => {
+      const item = await setup()
+      for (const d of [0, 1, 3, 4]) {          // 2日前だけ空ける
+        await answer(item, 'a', new Date(NOW.getTime() - d * 86_400_000))
+      }
+      const s = await streak(db, userId, NOW)
+      expect(s.current).toBe(4)                // 休んだ日は数に入れない
+      expect(s.protectionsLeft).toBe(1)
+    })
+
+    it('教材を読んだだけの日は連続に数えない（仕様は「1問以上解いた」）', async () => {
+      const item = await setup()
+      await answer(item, 'a', NOW)
+      // 昨日ぶんの読了だけを入れる（解答は無い）
+      await db`
+        INSERT INTO user_activity (user_id, activity_date, responses, sections_read)
+        VALUES (${userId}, '2026-09-14', 0, 3)`
+      const s = await streak(db, userId, NOW)
+      expect(s.current).toBe(1)
+      expect(s.days).toBe(1)
     })
 
     it('連続した日を数える', async () => {
