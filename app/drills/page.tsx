@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { drillProgressList } from '@/lib/loop/today'
+import { canRetest, RETEST_COOLDOWN_DAYS } from '@/lib/domain/assessment'
 import { Screen, Card, TwoBars, Empty } from '@/components/ui'
 
 export const dynamic = 'force-dynamic'
@@ -30,6 +31,16 @@ export default async function Drills() {
   const now = new Date()
   const drills = await drillProgressList(db, userId, now)
 
+  // ★ 「受けられません」と書いた画面へ送るくらいなら、ここで出さない。
+  //   docs/11 §9 が「行き止まりを作らない」としているのは、タブに限った話ではない。
+  //   直近の確認テストの開始時刻だけ引いて、待ち時間はその場で示す。
+  const lastTests = await db<{ drill_id: string; started_at: Date }[]>`
+    SELECT DISTINCT ON (drill_id) drill_id, started_at
+      FROM check_test
+     WHERE user_id = ${userId} AND finished_at IS NOT NULL
+     ORDER BY drill_id, started_at DESC`
+  const lastTestAt = new Map(lastTests.map(t => [t.drill_id, t.started_at]))
+
   const aside = (
     <>
       <span className="hs-side__label">特訓とは</span>
@@ -51,20 +62,34 @@ export default async function Drills() {
         </Empty>
       ) : (
         <>
-          {drills.map(d => (
-            <Card key={d.drillId}>
-              {/* ★ 題名は長い。lv-meta__row は flex なので、縮む指定が無いと
-                   締切と詰まって画面から溢れる（375px で実測） */}
-              <div className="hs-titlerow">
-                <span className="lv-list__value">{d.title}</span>
-                <span className="lv-caption">{jstDate(d.deadline)} まで</span>
-              </div>
-              <TwoBars
-                masteredCount={d.masteredCount} totalKc={d.totalKc}
-                materialsRead={d.materialsRead} materialsTotal={d.materialsTotal}
-              />
-            </Card>
-          ))}
+          {drills.map(d => {
+            const last = lastTestAt.get(d.drillId) ?? null
+            const ready = canRetest(last, now)
+            return (
+              <Card key={d.drillId}>
+                {/* ★ 題名は長い。lv-meta__row は flex なので、縮む指定が無いと
+                     締切と詰まって画面から溢れる（375px で実測） */}
+                <div className="hs-titlerow">
+                  <span className="lv-list__value">{d.title}</span>
+                  <span className="lv-caption">{jstDate(d.deadline)} まで</span>
+                </div>
+                <TwoBars
+                  masteredCount={d.masteredCount} totalKc={d.totalKc}
+                  materialsRead={d.materialsRead} materialsTotal={d.materialsTotal}
+                />
+                {ready ? (
+                  <Link className="lv-btn lv-btn--block" href={`/checktest/${d.drillId}`}>
+                    確認テストを受ける
+                  </Link>
+                ) : (
+                  <p className="lv-caption">
+                    確認テストは {jstDate(new Date(last!.getTime() + RETEST_COOLDOWN_DAYS * 86_400_000))} から
+                    受けられます（連続で受けると、覚えているのが問題文なのか中身なのか分からなくなるため）。
+                  </p>
+                )}
+              </Card>
+            )
+          })}
           <Link className="lv-btn lv-btn--block" href="/drills/new">新しい特訓をつくる</Link>
         </>
       )}

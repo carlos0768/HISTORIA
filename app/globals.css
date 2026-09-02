@@ -68,8 +68,14 @@ body { margin: 0; background: var(--lv-canvas); }
     --lv-text-body: 400 15px/1.9 var(--lv-font-ja);
     --lv-text-title: 600 26px/1.35 var(--lv-font-ja);
   }
-  /* 本体は広がりすぎると読みにくい。本文の測度を保つ */
-  .hs-shell__main .hs-pad { max-width: 720px; padding: var(--lv-space-8) var(--lv-space-6); }
+  /* 本体は広がりすぎると読みにくい。本文の測度を保つ。
+     ★ margin-inline:auto で本体の帯の中に置く。左寄せのままだと、
+       資料面を持たない画面（確認テスト・その結果）で本体が 1200px になり、
+       右に 480px の空白が残って「描画に失敗した」ように見える（1440 で実測）。 */
+  .hs-shell__main .hs-pad {
+    max-width: 720px; margin-inline: auto;
+    padding: var(--lv-space-8) var(--lv-space-6);
+  }
   /* 三分割のときフッタのタブは要らない。左のサイドバーが同じ役割をする */
   .hs-shell .lv-tabbar { display: none; }
 }
