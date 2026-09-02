@@ -15,7 +15,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { readCsv, orNull, num, list } from './csv'
-import { SEED_DIR } from './seed'
+import { SEED_DIR as DEFAULT_SEED_DIR } from './seed'
 
 /** SQL の文字列リテラル。単引用符を二重にする */
 const q = (v: string): string => `'${v.replaceAll("'", "''")}'`
@@ -26,8 +26,14 @@ const arr = (v: string[]): string => (v.length === 0 ? `'{}'::text[]` : `ARRAY[$
 
 export type SeedSql = { sql: string; counts: Record<string, number> }
 
-/** CSV から SQL を組み立てる。試験から呼べるよう関数にしてある */
-export function buildSeedSql(): SeedSql {
+/**
+ * CSV から SQL を組み立てる。試験から呼べるよう関数にしてある。
+ *
+ * ★ dir を差し替えられるようにしてある（`seedKc(db, dir, opts)` と同じ形）。
+ *   実データが全件承認になると「未承認は含めない」を実データでは示せなくなるため、
+ *   承認を落とした写しを渡して確かめられる必要がある。
+ */
+export function buildSeedSql(SEED_DIR = DEFAULT_SEED_DIR): SeedSql {
 const out: string[] = []
 const say = (s = '') => out.push(s)
 
@@ -143,14 +149,14 @@ return {
 }
 
 /** 書き出し先。リポジトリに入れて、実行しなくても GitHub から取れるようにする */
-export const SEED_SQL_PATH = join(SEED_DIR, 'sql', '02_seed.sql')
+export const SEED_SQL_PATH = join(DEFAULT_SEED_DIR, 'sql', '02_seed.sql')
 
 if (process.argv[1]?.endsWith('dump-sql.ts')) {
   const { sql, counts } = buildSeedSql()
   if (process.argv.includes('--stdout')) {
     process.stdout.write(sql)
   } else {
-    mkdirSync(join(SEED_DIR, 'sql'), { recursive: true })
+    mkdirSync(join(DEFAULT_SEED_DIR, 'sql'), { recursive: true })
     writeFileSync(SEED_SQL_PATH, sql)
     console.log(`seed/sql/02_seed.sql に書き出した（${(sql.length / 1024).toFixed(0)}KB）`)
     console.log(`  時代 ${counts.era} / 地域 ${counts.region} / 章立て ${counts.syllabusUnit} / ` +
