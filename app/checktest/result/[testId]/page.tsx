@@ -4,6 +4,8 @@ import { currentUserId } from '@/lib/auth/dal'
 import { RETEST_COOLDOWN_DAYS, type Verdict } from '@/lib/domain/assessment'
 import { Screen, Card, Empty, MasteryBar } from '@/components/ui'
 import { NotReady } from '@/components/not-ready'
+import { ReportButton } from '@/components/report-button'
+import { reportItem } from '@/app/study/actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -134,6 +136,9 @@ export default async function Result({ params }: { params: Promise<{ testId: str
                   この項目の教材を読み直す
                 </Link>
               )}
+              {/* ★ 誤答の解説はいちばん疑いが向く場所である。ここに導線が無いと
+                   「解説が間違っている」という気づきを受け取れない（docs/08 §5 層4） */}
+              <ReportButton targetKind="item" targetId={w.item_id} action={reportItem} />
             </Card>
           ))}
         </>

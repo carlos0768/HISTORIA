@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { submit } from './actions'
+import { submit, reportItem } from './actions'
+import { ReportButton } from '@/components/report-button'
 
 export type Choice = { key: string; text: string }
 export type QuizItem = { id: string; stem: string; choices: Choice[]; kcLabel: string }
@@ -104,6 +105,9 @@ export function Quiz({ items }: { items: QuizItem[] }) {
             <button type="button" className="lv-btn lv-btn--primary lv-btn--block" onClick={next}>
               {i + 1 < items.length ? '次へ' : '終わる'}
             </button>
+            {/* ★ 解説を読んだ直後にだけ出す。解く前に出すと
+                 「分からないから報告する」を誘ってしまう（docs/08 §5 層4） */}
+            <ReportButton key={item.id} targetKind="item" targetId={item.id} action={reportItem} />
           </div>
         </div>
       )}

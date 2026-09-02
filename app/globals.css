@@ -169,3 +169,28 @@ body { margin: 0; background: var(--lv-canvas); }
 .hs-prose .lv-body { margin: 0; }
 .hs-prose__list { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
 
+
+/* ---- 誤りの報告（docs/08 §5 層4） ---- */
+/* ★ 目立たせない。朱は主要ボタンの色なので使わず、字だけの控えめな導線にする。
+     本文を読む邪魔をしてまで出すものではない。押しやすさだけは確保する。 */
+.hs-report__open {
+  align-self: flex-start;
+  padding: 4px 0; border: 0; background: none; cursor: pointer;
+  font: 400 12px/1.7 var(--lv-font-ja); color: var(--lv-muted);
+  text-decoration: underline; text-underline-offset: 3px;
+  min-height: var(--lv-touch);
+}
+.hs-report__open:hover { color: var(--lv-ink); }
+.hs-report__done { color: var(--lv-sub); }
+.hs-report {
+  display: flex; flex-direction: column; gap: var(--lv-space-2);
+  padding: var(--lv-space-3); border: var(--lv-hairline); border-radius: var(--lv-radius-sm);
+  background: var(--lv-paper);
+}
+.hs-report__text {
+  width: 100%; padding: 8px; border: var(--lv-hairline); border-radius: var(--lv-radius-sm);
+  background: var(--lv-paper); color: var(--lv-ink);
+  font: 400 13px/1.7 var(--lv-font-ja); resize: vertical;
+}
+.hs-report__row { display: flex; gap: var(--lv-space-2); }
+.hs-report__row > * { flex: 1; }

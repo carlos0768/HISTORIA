@@ -8,7 +8,8 @@ import dynamic from 'next/dynamic'
 // 基図は約80KBある。geo の KC があるセクションを開いたときだけ読む。
 // 全教材ページに載せると、地図を一度も見ない読者にも毎回送ることになる
 const WorldMap = dynamic(() => import('@/components/world-map').then(m => m.WorldMap))
-import { markRead } from './actions'
+import { markRead, report } from './actions'
+import { ReportButton } from '@/components/report-button'
 
 export type SectionProps = {
   id: string
@@ -174,6 +175,11 @@ function SectionPane({
           >
             {pending ? '記録しています…' : '読み終えた'}
           </button>
+        )}
+
+        {/* ★ 層4の導線。既に伏せてある節には出さない（報告する対象が無い） */}
+        {!section.hidden && (
+          <ReportButton targetKind="material_section" targetId={section.id} action={report} />
         )}
       </div>
     </>
