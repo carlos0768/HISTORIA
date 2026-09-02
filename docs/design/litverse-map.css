@@ -18,7 +18,8 @@
   --lv-map-route:      #DC5A28;
 
   /* タイル地図の減色フィルタ（OSM を紙色に寄せる） */
-  --lv-map-tile-filter: sepia(0.72) saturate(0.55) hue-rotate(-8deg) brightness(1.06) contrast(0.92);
+  --lv-map-tile-filter: saturate(0.8);
+  --lv-map-tile-tint: #EFE4CC;   /* multiply で重ねる紙色 */
 }
 
 /* ---------- 面 ---------- */
@@ -64,6 +65,11 @@
 /* ---------- Leaflet 上書き ---------- */
 .lv-map .leaflet-container { background: var(--lv-map-sea); font-family: "M PLUS 1 Code", monospace; }
 .lv-map .leaflet-tile-pane { filter: var(--lv-map-tile-filter); }
+/* 紙色は輝度を壊さないよう multiply の層で与える（フィルタだけだと明るい地図が白に潰れる） */
+.lv-map .leaflet-container::before {
+  content: ""; position: absolute; inset: 0; z-index: 250; pointer-events: none;
+  background: var(--lv-map-tile-tint); mix-blend-mode: multiply;
+}
 .lv-map .leaflet-control-attribution {
   background: var(--lv-paper); border-top: var(--lv-hairline); border-left: var(--lv-hairline);
   font: 400 9px/1.4 "Space Mono", monospace; color: var(--lv-muted); border-radius: 0; padding: 3px 6px;

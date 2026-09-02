@@ -19,6 +19,8 @@
 | `design/litverse.css` | デザインシステム本体（CSS変数32個＋`lv-*` コンポーネント） | **原本のまま。編集しない** |
 | `design/litverse-tokens.json` | トークン定義（Figma Variables / Tailwind theme / Style Dictionary に流し込める） | **原本のまま** |
 | `design/litverse-ui-system.dc.html` | デザインキャンバス（カラー・タイポ・コンポーネント・6画面・コード） | 参照用 |
+| `design/litverse-map.css` | **Litverse Map System**（地図の意匠。`lv-map__*`） | **原本のまま** |
+| `design/litverse-desktop-system.dc.html` | **Litverse Desktop System**（2026-09-02 受領）。三分割シェル・資料テーブル・地図ワークスペース・⌘K。**モバイル版からの差分だけ**を定義している | 参照用 |
 | `design/litverse-reference.jpg` | 元となった参照画像 | 参照用 |
 | `design/historia-overrides.css` | **HISTORIA の上書き層**（アクセシビリティ修正＋固有コンポーネント） | 本プロジェクトで作成 |
 | `design/historia-screens.html` | HISTORIA 主要8画面のモック | 本プロジェクトで作成 |
@@ -30,6 +32,27 @@
 <link rel="stylesheet" href="litverse.css">
 <link rel="stylesheet" href="historia-overrides.css">   <!-- 必ず後 -->
 ```
+
+### 1.1 デスクトップ版（2026-09-02 受領）
+
+| | 値 |
+|---|---|
+| 幅 | 1440–1920（基準 1440×900） |
+| シェル | **三分割**。サイドバー 240 ／ 本体可変 ／ 資料 320 |
+| グリッド | 12列・溝 24px |
+| ポインタ前提の調整 | タップ領域 44→32px ／ 本文 14→15px ／ 見出し 22→26px ／ テーブル行 36px |
+| 追加コンポーネント | 資料テーブル、地図ワークスペース、コマンドパレット（⌘K） |
+| 地図のクラス | `lvd-*`（land / border / grat / sphere / pin / route / lbl / marker） |
+
+**採らないもの。** 設計系は地図に Leaflet + OSM タイルと、実行時の d3 / topojson（unpkg）を
+使っている。どちらも `proxy.ts` の CSP が許していない。§4.1 と同じ理由で、地図は
+**ビルド時に投影してパス文字列だけを出す**方針を保つ（`scripts/map/build-basemap.mjs`）。
+`litverse-map.css` に入っている Leaflet 向けの記述は、資産としては原本のまま置くが実装では使わない。
+
+**地形データの解像度。** 設計系は Natural Earth 50m を指定している。
+`countries-50m.json` は 756KB（現行の 110m は 108KB）で、生成される基図も数倍になる。
+モバイル回線が前提（§7.1・`docs/14` M15）なので、**50m はデスクトップの地図ワークスペース専用**とし、
+動的 import で切り離す。モバイルは 110m のままにする。
 
 ## 2. トークン
 

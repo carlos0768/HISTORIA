@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=M+PLUS+1+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" crossorigin="anonymous"></script>
+<style>
+  body { margin: 0; background: #EFE4CC; -webkit-font-smoothing: antialiased; }
+  a { color: #171512; text-decoration: underline; text-underline-offset: 3px; }
+  a:hover { color: #DC5A28; }
+  ::selection { background: #FCE04A; }
+  .lvd-map svg { display: block; width: 100%; height: auto; touch-action: none; cursor: grab; }
+  .lvd-map svg:active { cursor: grabbing; }
+  .lvd-land { fill: #FCF6E8; stroke: #171512; stroke-width: .6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  .lvd-land--alt { fill: #E6D9BC; }
+  .lvd-land--hi { fill: #F4703C; }
+  .lvd-land--sel { fill: #FCE04A; }
+  .lvd-border { fill: none; stroke: #171512; stroke-width: .4; stroke-opacity: .55; vector-effect: non-scaling-stroke; }
+  .lvd-grat { fill: none; stroke: #C9B896; stroke-width: .4; stroke-dasharray: 2 3; vector-effect: non-scaling-stroke; }
+  .lvd-sphere { fill: none; stroke: #171512; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .lvd-pin { fill: #171512; stroke: #FCF6E8; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+  .lvd-pin--hot { fill: #F4703C; }
+  .lvd-pin--micro { fill: #171512; stroke-width: .8; }
+  .lvd-route { fill: none; stroke: #DC5A28; stroke-width: 1.4; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+  .lvd-lbl { font: 500 10px/1 'M PLUS 1 Code', monospace; fill: #171512; paint-order: stroke; stroke: #FCF6E8; stroke-width: 3px; stroke-linejoin: round; }
+  .lvd-lbl--en { font: 400 9px/1 'Space Mono', monospace; letter-spacing: .1em; fill: #8A7F6C; }
+  .leaflet-container { background: #EFE4CC; font-family: 'M PLUS 1 Code', monospace; }
+  .leaflet-tile-pane { filter: saturate(.8); }
+  .leaflet-container::before { content: ""; position: absolute; inset: 0; z-index: 250; pointer-events: none; background: #EFE4CC; mix-blend-mode: multiply; }
+  .leaflet-control-attribution { background: #FCF6E8; border-top: 1px solid #171512; border-left: 1px solid #171512; font: 400 9px/1.4 'Space Mono', monospace; color: #8A7F6C; border-radius: 0; padding: 3px 6px; }
+  .leaflet-attribution-flag { display: none !important; }
+  .leaflet-bar, .leaflet-bar a { border: 1px solid #171512; border-radius: 0; background: #FCF6E8; color: #171512; box-shadow: none; font-family: 'Space Mono', monospace; }
+  .leaflet-bar a:hover { background: #EFE4CC; }
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #FCF6E8; border: 1.5px solid #171512; border-radius: 6px; box-shadow: none; }
+  .leaflet-popup-content { margin: 12px 14px; font: 400 12px/1.7 'M PLUS 1 Code', monospace; color: #171512; }
+  .lvd-marker { width: 24px; height: 24px; border: 1.5px solid #171512; border-radius: 999px; background: #F4703C; color: #FCF6E8; display: flex; align-items: center; justify-content: center; font: 700 10px/1 'Space Mono', monospace; }
+</style>
+</helmet>
+
+<div style="background:#EFE4CC;padding:56px 48px 96px;font-family:'M PLUS 1 Code','Space Mono',ui-monospace,monospace;color:#171512">
+<div style="max-width:1560px;margin:0 auto;display:flex;flex-direction:column;gap:76px">
+
+  <header style="border:1.5px solid #171512;background:#FCF6E8;padding:40px;display:flex;flex-direction:column;gap:30px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:40px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:16px;max-width:700px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.34em;text-transform:uppercase;color:#8A7F6C">Desktop / 1440–1920 · History learning</span>
+        <h1 style="margin:0;font:700 56px/0.98 'Space Mono',monospace;letter-spacing:-0.02em">LITVERSE<br><span style="font-family:'M PLUS 1 Code',monospace;font-size:32px;letter-spacing:.04em">デスクトップ版デザインシステム</span></h1>
+        <p style="margin:0;font:400 13px/2 'M PLUS 1 Code',monospace;color:#5F584C;text-wrap:pretty">モバイル版の紙・墨・朱・蛍光をそのまま持ち上げ、横幅のある画面向けに三分割シェル、常設サイドバー、資料テーブル、地図ワークスペースを足したものです。地形は実測データのみを使用します。</p>
+      </div>
+      <div style="display:flex;flex-direction:column;border:1.5px solid #171512;min-width:320px">
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 14px;border-bottom:1px solid #171512;font-size:12px"><span style="color:#8A7F6C">基準幅</span><span style="font-weight:600">1440 / 最大 1920</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 14px;border-bottom:1px solid #171512;font-size:12px"><span style="color:#8A7F6C">グリッド</span><span style="font-weight:600">12 列・溝 24px</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 14px;border-bottom:1px solid #171512;font-size:12px"><span style="color:#8A7F6C">シェル</span><span style="font-weight:600">240 / 可変 / 320</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 14px;font-size:12px"><span style="color:#8A7F6C">行高</span><span style="font-weight:600">36px（テーブル）</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span style="border:1px solid #171512;background:#F4703C;color:#FCF6E8;padding:8px 15px;font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.12em;border-radius:4px">01 デスクトップ基準</span>
+      <span style="border:1px solid #171512;padding:8px 15px;font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.12em;border-radius:4px">02 シェル</span>
+      <span style="border:1px solid #171512;padding:8px 15px;font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.12em;border-radius:4px">03 コンポーネント</span>
+      <span style="border:1px solid #171512;background:#FCE04A;padding:8px 15px;font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.12em;border-radius:4px">04 地図ワークスペース</span>
+      <span style="border:1px solid #171512;padding:8px 15px;font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.12em;border-radius:4px">05 画面</span>
+    </div>
+  </header>
+
+  <section style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:18px;border-bottom:1.5px solid #171512;padding-bottom:10px">
+      <span style="font:700 13px/1 'Space Mono',monospace;letter-spacing:.2em">01</span>
+      <h2 style="margin:0;font:700 22px/1 'M PLUS 1 Code',monospace;letter-spacing:.04em">デスクトップ基準</h2>
+      <span style="margin-left:auto;font:400 12px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">モバイル版からの差分だけを定義</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:16px;align-items:start">
+      <div style="border:1.5px solid #171512;background:#FCF6E8;padding:22px;display:flex;flex-direction:column;gap:14px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">SCALE／差分</span>
+        <div style="display:flex;flex-direction:column;border-top:1px solid #171512">
+          <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace"><span>本文</span><span style="color:#8A7F6C">14 → 15px</span></div>
+          <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace"><span>見出し</span><span style="color:#8A7F6C">22 → 26px</span></div>
+          <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace"><span>タップ領域</span><span style="color:#8A7F6C">44 → 32px（ポインタ）</span></div>
+          <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace"><span>本文段幅</span><span style="color:#8A7F6C">最大 68 字</span></div>
+          <div style="display:flex;justify-content:space-between;padding:11px 0;font:400 12px/1.5 'M PLUS 1 Code',monospace"><span>hover 状態</span><span style="color:#8A7F6C">台紙色に沈める</span></div>
+        </div>
+      </div>
+      <div style="border:1.5px solid #171512;background:#FCF6E8;padding:22px;display:flex;flex-direction:column;gap:14px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">GRID／12 列</span>
+        <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:6px;height:96px">
+          <div style="background:#EFE4CC;border:1px solid #171512"></div><div style="background:#EFE4CC;border:1px solid #171512"></div><div style="background:#EFE4CC;border:1px solid #171512"></div><div style="background:#EFE4CC;border:1px solid #171512"></div><div style="background:#EFE4CC;border:1px solid #171512"></div><div style="background:#EFE4CC;border:1px solid #171512"></div><div style="background:#EFE4CC;border:1px solid #171512"></div><div style="background:#EFE4CC;border:1px solid #171512"></div><div style="background:#EFE4CC;border:1px solid #171512"></div><div style="background:#EFE4CC;border:1px solid #171512"></div><div style="background:#EFE4CC;border:1px solid #171512"></div><div style="background:#EFE4CC;border:1px solid #171512"></div>
+        </div>
+        <p style="margin:0;font:400 11px/1.8 'M PLUS 1 Code',monospace;color:#5F584C">溝 24px・外余白 48px。本文は 7 列、資料パネルは 3 列、地図は 8 列を基本とします。</p>
+      </div>
+      <div style="border:1.5px solid #171512;background:#FCF6E8;padding:22px;display:flex;flex-direction:column;gap:14px">
+        <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">COLOR／継承</span>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
+          <div style="height:56px;background:#FCF6E8;border:1px solid #171512"></div>
+          <div style="height:56px;background:#EFE4CC;border:1px solid #171512"></div>
+          <div style="height:56px;background:#171512;border:1px solid #171512"></div>
+          <div style="height:56px;background:#F4703C;border:1px solid #171512"></div>
+          <div style="height:56px;background:#FCE04A;border:1px solid #171512"></div>
+          <div style="height:56px;background:#8A7F6C;border:1px solid #171512"></div>
+        </div>
+        <p style="margin:0;font:400 11px/1.8 'M PLUS 1 Code',monospace;color:#5F584C">色は追加しません。面積が増えるぶん朱の使用比率を 7% → 5% に下げ、蛍光は選択・強調のみに限定します。</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:18px;border-bottom:1.5px solid #171512;padding-bottom:10px">
+      <span style="font:700 13px/1 'Space Mono',monospace;letter-spacing:.2em">02</span>
+      <h2 style="margin:0;font:700 22px/1 'M PLUS 1 Code',monospace;letter-spacing:.04em">アプリシェル</h2>
+      <span style="margin-left:auto;font:400 12px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">サイドバー 240 ／ 本体可変 ／ 資料 320</span>
+    </div>
+    <div style="overflow-x:auto;border:1.5px solid #171512">
+    <div style="width:1440px;background:#FCF6E8;display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;border-bottom:1px solid #171512">
+        <div style="display:flex;gap:7px;padding:0 16px;border-right:1px solid #171512;height:44px;align-items:center">
+          <span style="width:11px;height:11px;border:1px solid #171512;border-radius:999px;background:#F4703C"></span>
+          <span style="width:11px;height:11px;border:1px solid #171512;border-radius:999px;background:#FCE04A"></span>
+          <span style="width:11px;height:11px;border:1px solid #171512;border-radius:999px;background:#EFE4CC"></span>
+        </div>
+        <div style="padding:0 18px;height:44px;display:flex;align-items:center;border-right:1px solid #171512;font:700 14px/1 'Space Mono',monospace;letter-spacing:.16em">LITVERSE</div>
+        <div style="flex:1;display:flex;align-items:center;gap:18px;padding:0 18px;font:400 12px/1 'M PLUS 1 Code',monospace">
+          <span>ファイル</span><span>教材</span><span>地図</span><span>表示</span><span>ヘルプ</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:0 16px;height:44px;border-left:1px solid #171512">
+          <span style="border:1px solid #171512;border-radius:5px;padding:6px 12px;font:400 11px/1 'M PLUS 1 Code',monospace">⌘K　さがす</span>
+          <span style="width:26px;height:26px;border:1px solid #171512;border-radius:999px;background:#EFE4CC;display:flex;align-items:center;justify-content:center;font:600 10px/1 'Space Mono',monospace">S</span>
+        </div>
+      </div>
+      <div style="display:flex;min-height:520px">
+        <div style="width:240px;border-right:1px solid #171512;display:flex;flex-direction:column">
+          <div style="padding:16px 18px 10px;font:700 10px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">LEARNING</div>
+          <div style="padding:10px 18px;font:500 13px/1 'M PLUS 1 Code',monospace;background:#F4703C;color:#FCF6E8;border-top:1px solid #171512;border-bottom:1px solid #171512">きょうの単元</div>
+          <div style="padding:10px 18px;font:400 13px/1 'M PLUS 1 Code',monospace">教科書</div>
+          <div style="padding:10px 18px;font:400 13px/1 'M PLUS 1 Code',monospace">年表</div>
+          <div style="padding:10px 18px;font:400 13px/1 'M PLUS 1 Code',monospace">地図帳</div>
+          <div style="padding:10px 18px;font:400 13px/1 'M PLUS 1 Code',monospace">史料庫</div>
+          <div style="padding:20px 18px 10px;font:700 10px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">MY DESK</div>
+          <div style="padding:10px 18px;font:400 13px/1 'M PLUS 1 Code',monospace">しおり</div>
+          <div style="padding:10px 18px;font:400 13px/1 'M PLUS 1 Code',monospace">ノート</div>
+          <div style="padding:10px 18px;font:400 13px/1 'M PLUS 1 Code',monospace">提出物　<span style="border:1px solid #171512;background:#FCE04A;border-radius:4px;padding:2px 6px;font-size:10px">3</span></div>
+          <div style="margin-top:auto;border-top:1px solid #171512;padding:14px 18px;display:flex;flex-direction:column;gap:8px">
+            <span style="font:400 11px/1.6 'M PLUS 1 Code',monospace;color:#5F584C">日本史 B ／ 第 4 章</span>
+            <div style="height:4px;background:#EFE4CC;border:1px solid #171512"><div style="width:62%;height:100%;background:#F4703C"></div></div>
+            <span style="font:400 10px/1 'Space Mono',monospace;color:#8A7F6C">62% COMPLETE</span>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid #171512">
+            <span style="border:1px solid #171512;background:#171512;color:#FCF6E8;padding:6px 12px;border-radius:5px;font:500 11px/1 'M PLUS 1 Code',monospace">本文</span>
+            <span style="border:1px solid #171512;padding:6px 12px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace">地図</span>
+            <span style="border:1px solid #171512;padding:6px 12px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace">年表</span>
+            <span style="border:1px solid #171512;padding:6px 12px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace">史料</span>
+            <span style="margin-left:auto;font:400 11px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">Aa　行間　⇱</span>
+          </div>
+          <div style="padding:28px 32px;display:flex;flex-direction:column;gap:14px;max-width:720px">
+            <span style="font:400 11px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">第 4 章 — 開国と幕末</span>
+            <h3 style="margin:0;font:700 26px/1.45 'M PLUS 1 Code',monospace">安政の五か国条約</h3>
+            <p style="margin:0;font:400 15px/2 'M PLUS 1 Code',monospace;color:#241F19;text-wrap:pretty">1858 年、幕府は<span style="background:#FCE04A;padding:0 3px">アメリカ・オランダ・ロシア・イギリス・フランス</span>の五か国と修好通商条約を結んだ。関税自主権を欠き、領事裁判権を認めるという不平等な内容であり、以後の外交交渉はこの二点の改正を軸に進むことになる。</p>
+            <p style="margin:0;font:400 15px/2 'M PLUS 1 Code',monospace;color:#241F19;text-wrap:pretty">条約に基づき翌 1859 年から横浜・長崎・箱館が開かれ、生糸と茶が主要な輸出品となった。国内では物価が急騰し、攘夷運動が各地に広がっていく。</p>
+            <div style="border:1px solid #171512;background:#EFE4CC;padding:16px 18px;display:flex;flex-direction:column;gap:8px;margin-top:6px">
+              <span style="font:700 10px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">CHECK／確認</span>
+              <span style="font:400 13px/1.9 'M PLUS 1 Code',monospace">開港地のうち、条約で定められた期日より遅れて開かれたのはどこか。</span>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+                <span style="border:1px solid #171512;background:#FCF6E8;border-radius:5px;padding:7px 13px;font:400 12px/1 'M PLUS 1 Code',monospace">横浜</span>
+                <span style="border:1px solid #171512;background:#FCF6E8;border-radius:5px;padding:7px 13px;font:400 12px/1 'M PLUS 1 Code',monospace">兵庫</span>
+                <span style="border:1px solid #171512;background:#FCF6E8;border-radius:5px;padding:7px 13px;font:400 12px/1 'M PLUS 1 Code',monospace">長崎</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="width:320px;border-left:1px solid #171512;display:flex;flex-direction:column">
+          <div style="padding:14px 18px;border-bottom:1px solid #171512;display:flex;justify-content:space-between;align-items:center">
+            <span style="font:700 10px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">INSPECTOR／資料</span>
+            <span style="font:400 12px/1 'Space Mono',monospace;color:#8A7F6C">×</span>
+          </div>
+          <div style="border-bottom:1px solid #171512">
+            <div id="lvd-inspector" style="height:190px"></div>
+          </div>
+          <div style="padding:14px 18px;border-bottom:1px solid #171512;display:flex;flex-direction:column;gap:6px">
+            <span style="font:600 12px/1.5 'M PLUS 1 Code',monospace">開港地の位置</span>
+            <span style="font:400 11px/1.7 'M PLUS 1 Code',monospace;color:#5F584C">本文で選択した語に連動して地図が動きます。</span>
+          </div>
+          <div style="display:flex;flex-direction:column">
+            <div style="padding:12px 18px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>関税自主権</span><span style="color:#8A7F6C">用語</span></div>
+            <div style="padding:12px 18px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>領事裁判権</span><span style="color:#8A7F6C">用語</span></div>
+            <div style="padding:12px 18px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>日米修好通商条約</span><span style="color:#8A7F6C">史料</span></div>
+            <div style="padding:12px 18px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>生糸の輸出量</span><span style="color:#8A7F6C">図表</span></div>
+          </div>
+          <div style="margin-top:auto;padding:16px 18px;border-top:1px solid #171512;display:flex;flex-direction:column;gap:10px">
+            <div style="border:1px solid #171512;background:#F4703C;color:#FCF6E8;border-radius:6px;padding:11px;text-align:center;font:600 12px/1 'M PLUS 1 Code',monospace">ノートに書き写す</div>
+            <div style="border:1px solid #171512;border-radius:6px;padding:11px;text-align:center;font:400 12px/1 'M PLUS 1 Code',monospace">出典を見る</div>
+          </div>
+        </div>
+      </div>
+      <div style="border-top:1px solid #171512;display:flex;align-items:center;gap:20px;padding:9px 18px;font:400 11px/1 'Space Mono',monospace;color:#8A7F6C">
+        <span>UNIT 4 / 12</span><span>SAVED 09:41</span><span>OFFLINE READY</span>
+        <span style="margin-left:auto">1440 × 900</span>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:18px;border-bottom:1.5px solid #171512;padding-bottom:10px">
+      <span style="font:700 13px/1 'Space Mono',monospace;letter-spacing:.2em">03</span>
+      <h2 style="margin:0;font:700 22px/1 'M PLUS 1 Code',monospace;letter-spacing:.04em">デスクトップ固有のコンポーネント</h2>
+      <span style="margin-left:auto;font:400 12px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">ポインタ前提・キーボード操作あり</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:start">
+      <div style="border:1.5px solid #171512;background:#FCF6E8;display:flex;flex-direction:column">
+        <div style="padding:16px 20px;border-bottom:1px solid #171512;display:flex;justify-content:space-between;align-items:center">
+          <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">TABLE／資料テーブル</span>
+          <span style="font:400 11px/1 'M PLUS 1 Code',monospace;color:#5F584C">行高 36px・ヘッダー固定</span>
+        </div>
+        <div style="display:grid;grid-template-columns:90px 1fr 130px 110px;font:600 11px/1 'M PLUS 1 Code',monospace;background:#EFE4CC;border-bottom:1px solid #171512">
+          <span style="padding:11px 16px;border-right:1px solid #171512">年</span>
+          <span style="padding:11px 16px;border-right:1px solid #171512">出来事</span>
+          <span style="padding:11px 16px;border-right:1px solid #171512">地域</span>
+          <span style="padding:11px 16px">種別</span>
+        </div>
+        <div style="display:grid;grid-template-columns:90px 1fr 130px 110px;font:400 12px/1 'M PLUS 1 Code',monospace;border-bottom:1px solid #171512">
+          <span style="padding:12px 16px;border-right:1px solid #171512;font-family:'Space Mono',monospace">1853</span>
+          <span style="padding:12px 16px;border-right:1px solid #171512">ペリー浦賀に来航</span>
+          <span style="padding:12px 16px;border-right:1px solid #171512">浦賀</span>
+          <span style="padding:12px 16px;color:#8A7F6C">外交</span>
+        </div>
+        <div style="display:grid;grid-template-columns:90px 1fr 130px 110px;font:400 12px/1 'M PLUS 1 Code',monospace;border-bottom:1px solid #171512;background:#FCE04A">
+          <span style="padding:12px 16px;border-right:1px solid #171512;font-family:'Space Mono',monospace">1858</span>
+          <span style="padding:12px 16px;border-right:1px solid #171512">安政の五か国条約</span>
+          <span style="padding:12px 16px;border-right:1px solid #171512">江戸</span>
+          <span style="padding:12px 16px">条約</span>
+        </div>
+        <div style="display:grid;grid-template-columns:90px 1fr 130px 110px;font:400 12px/1 'M PLUS 1 Code',monospace;border-bottom:1px solid #171512">
+          <span style="padding:12px 16px;border-right:1px solid #171512;font-family:'Space Mono',monospace">1859</span>
+          <span style="padding:12px 16px;border-right:1px solid #171512">横浜・長崎・箱館を開港</span>
+          <span style="padding:12px 16px;border-right:1px solid #171512">三港</span>
+          <span style="padding:12px 16px;color:#8A7F6C">経済</span>
+        </div>
+        <div style="display:grid;grid-template-columns:90px 1fr 130px 110px;font:400 12px/1 'M PLUS 1 Code',monospace;border-bottom:1px solid #171512;background:#EFE4CC">
+          <span style="padding:12px 16px;border-right:1px solid #171512;font-family:'Space Mono',monospace">1860</span>
+          <span style="padding:12px 16px;border-right:1px solid #171512">桜田門外の変（hover 行）</span>
+          <span style="padding:12px 16px;border-right:1px solid #171512">江戸</span>
+          <span style="padding:12px 16px;color:#8A7F6C">政変</span>
+        </div>
+        <div style="display:grid;grid-template-columns:90px 1fr 130px 110px;font:400 12px/1 'M PLUS 1 Code',monospace">
+          <span style="padding:12px 16px;border-right:1px solid #171512;font-family:'Space Mono',monospace">1867</span>
+          <span style="padding:12px 16px;border-right:1px solid #171512">大政奉還</span>
+          <span style="padding:12px 16px;border-right:1px solid #171512">京都</span>
+          <span style="padding:12px 16px;color:#8A7F6C">政変</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="border:1.5px solid #171512;background:#FCF6E8;padding:22px;display:flex;flex-direction:column;gap:14px">
+          <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">COMMAND／⌘K</span>
+          <div style="border:1px solid #171512;border-radius:6px;overflow:hidden">
+            <div style="padding:13px 16px;border-bottom:1px solid #171512;font:400 13px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">開港　を検索</div>
+            <div style="padding:11px 16px;border-bottom:1px solid #171512;font:400 12px/1 'M PLUS 1 Code',monospace;background:#F4703C;color:#FCF6E8;display:flex;justify-content:space-between"><span>開港地を地図で開く</span><span style="font-family:'Space Mono',monospace">↵</span></div>
+            <div style="padding:11px 16px;border-bottom:1px solid #171512;font:400 12px/1 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>用語「開港場」</span><span style="color:#8A7F6C">用語</span></div>
+            <div style="padding:11px 16px;font:400 12px/1 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>第 4 章 3 節へ移動</span><span style="color:#8A7F6C">本文</span></div>
+          </div>
+        </div>
+        <div style="border:1.5px solid #171512;background:#FCF6E8;padding:22px;display:flex;flex-direction:column;gap:14px">
+          <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">SHORTCUT／キー割当</span>
+          <div style="display:flex;flex-direction:column;gap:9px;font:400 12px/1 'M PLUS 1 Code',monospace;color:#5F584C">
+            <div style="display:flex;justify-content:space-between"><span>さがす</span><kbd style="border:1px solid #171512;border-radius:4px;padding:4px 8px;font:400 11px/1 'Space Mono',monospace;background:#EFE4CC">⌘ K</kbd></div>
+            <div style="display:flex;justify-content:space-between"><span>地図を開く</span><kbd style="border:1px solid #171512;border-radius:4px;padding:4px 8px;font:400 11px/1 'Space Mono',monospace;background:#EFE4CC">⌘ M</kbd></div>
+            <div style="display:flex;justify-content:space-between"><span>資料パネル切替</span><kbd style="border:1px solid #171512;border-radius:4px;padding:4px 8px;font:400 11px/1 'Space Mono',monospace;background:#EFE4CC">⌘ ⌥ I</kbd></div>
+            <div style="display:flex;justify-content:space-between"><span>蛍光ペン</span><kbd style="border:1px solid #171512;border-radius:4px;padding:4px 8px;font:400 11px/1 'Space Mono',monospace;background:#EFE4CC">⌘ ⇧ H</kbd></div>
+          </div>
+        </div>
+        <div style="border:1.5px solid #171512;background:#FCF6E8;padding:22px;display:flex;flex-direction:column;gap:12px">
+          <span style="font:700 11px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">STATE／ポインタ状態</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span style="border:1px solid #171512;border-radius:6px;padding:9px 14px;font:400 12px/1 'M PLUS 1 Code',monospace">既定</span>
+            <span style="border:1px solid #171512;border-radius:6px;padding:9px 14px;font:400 12px/1 'M PLUS 1 Code',monospace;background:#EFE4CC">hover</span>
+            <span style="border:1.5px solid #F4703C;border-radius:6px;padding:8.5px 13.5px;font:400 12px/1 'M PLUS 1 Code',monospace">focus</span>
+            <span style="border:1px solid #171512;border-radius:6px;padding:9px 14px;font:400 12px/1 'M PLUS 1 Code',monospace;background:#171512;color:#FCF6E8">active</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:18px;border-bottom:1.5px solid #171512;padding-bottom:10px">
+      <span style="font:700 13px/1 'Space Mono',monospace;letter-spacing:.2em">04</span>
+      <h2 style="margin:0;font:700 22px/1 'M PLUS 1 Code',monospace;letter-spacing:.04em">地図ワークスペース</h2>
+      <span style="margin-left:auto;font:400 12px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">Natural Earth 50m + 10m ／ OpenStreetMap</span>
+    </div>
+    <div style="overflow-x:auto;border:1.5px solid #171512">
+    <div style="width:1440px;background:#FCF6E8;display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid #171512">
+        <span style="font:600 13px/1 'M PLUS 1 Code',monospace">地図帳</span>
+        <span style="border:1px solid #171512;background:#171512;color:#FCF6E8;padding:6px 12px;border-radius:5px;font:500 11px/1 'M PLUS 1 Code',monospace">世界</span>
+        <span style="border:1px solid #171512;padding:6px 12px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace">日本</span>
+        <span style="border:1px solid #171512;padding:6px 12px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace">街区</span>
+        <span style="margin-left:auto;font:400 11px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">ホイールで拡大・ドラッグで移動</span>
+      </div>
+      <div style="display:flex;min-height:560px">
+        <div style="width:236px;border-right:1px solid #171512;display:flex;flex-direction:column">
+          <div style="padding:14px 16px 8px;font:700 10px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">LAYERS／重ね</div>
+          <div style="padding:10px 16px;border-top:1px solid #171512;font:400 12px/1 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>海岸線</span><span style="color:#F4703C">●</span></div>
+          <div style="padding:10px 16px;border-top:1px solid #171512;font:400 12px/1 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>現代の国境</span><span style="color:#F4703C">●</span></div>
+          <div style="padding:10px 16px;border-top:1px solid #171512;font:400 12px/1 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>経緯線</span><span style="color:#F4703C">●</span></div>
+          <div style="padding:10px 16px;border-top:1px solid #171512;font:400 12px/1 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>交易路</span><span style="color:#F4703C">●</span></div>
+          <div style="padding:10px 16px;border-top:1px solid #171512;border-bottom:1px solid #171512;font:400 12px/1 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between;color:#8A7F6C"><span>極小国の点</span><span>●</span></div>
+          <div style="padding:16px 16px 8px;font:700 10px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">PERIOD／時代</div>
+          <div style="padding:10px 16px;border-top:1px solid #171512;font:400 12px/1 'M PLUS 1 Code',monospace;background:#FCE04A">前 3000 — 文明の発生</div>
+          <div style="padding:10px 16px;border-top:1px solid #171512;font:400 12px/1 'M PLUS 1 Code',monospace">前 500 — 古代帝国</div>
+          <div style="padding:10px 16px;border-top:1px solid #171512;font:400 12px/1 'M PLUS 1 Code',monospace">1500 — 大航海</div>
+          <div style="padding:10px 16px;border-top:1px solid #171512;border-bottom:1px solid #171512;font:400 12px/1 'M PLUS 1 Code',monospace">1850 — 開国</div>
+          <div style="margin-top:auto;padding:16px;display:flex;flex-direction:column;gap:8px;border-top:1px solid #171512">
+            <span style="font:400 10px/1.6 'M PLUS 1 Code',monospace;color:#8A7F6C">地形データ<br>Natural Earth (public domain)<br>© OpenStreetMap contributors</span>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0;border-right:1px solid #171512">
+          <div class="lvd-map" style="position:relative;background:#EFE4CC;border-bottom:1px solid #171512">
+            <div id="lvd-world" style="min-height:360px"></div>
+          </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;padding:11px 18px;border-bottom:1px solid #171512;font:400 11px/1 'M PLUS 1 Code',monospace;color:#5F584C">
+            <span style="display:inline-flex;align-items:center;gap:7px"><span style="width:13px;height:13px;background:#F4703C;border:1px solid #171512"></span>四大文明の発祥域</span>
+            <span style="display:inline-flex;align-items:center;gap:7px"><span style="width:13px;height:13px;background:#FCE04A;border:1px solid #171512"></span>選択中</span>
+            <span style="display:inline-flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:#171512;border:1px solid #171512"></span>極小国</span>
+            <span style="display:inline-flex;align-items:center;gap:7px"><span style="width:22px;border-top:1.4px dashed #DC5A28"></span>交易路</span>
+            <span style="margin-left:auto;font-family:'Space Mono',monospace;color:#8A7F6C">NATURAL EARTH 50m</span>
+          </div>
+          <div style="display:flex;flex:1;min-height:200px">
+            <div class="lvd-map" style="flex:1;position:relative;background:#EFE4CC;border-right:1px solid #171512">
+              <div id="lvd-japan" style="min-height:300px"></div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column">
+              <div id="lvd-street" style="flex:1;min-height:300px"></div>
+            </div>
+          </div>
+        </div>
+        <div style="width:300px;display:flex;flex-direction:column">
+          <div style="padding:14px 18px;border-bottom:1px solid #171512;font:700 10px/1 'Space Mono',monospace;letter-spacing:.24em;color:#8A7F6C">PLACES／地点</div>
+          <div style="padding:12px 18px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between;background:#EFE4CC"><span>横浜</span><span style="color:#8A7F6C;font-family:'Space Mono',monospace">1859</span></div>
+          <div style="padding:12px 18px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>長崎</span><span style="color:#8A7F6C;font-family:'Space Mono',monospace">1859</span></div>
+          <div style="padding:12px 18px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>箱館</span><span style="color:#8A7F6C;font-family:'Space Mono',monospace">1859</span></div>
+          <div style="padding:12px 18px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>神戸</span><span style="color:#8A7F6C;font-family:'Space Mono',monospace">1867</span></div>
+          <div style="padding:12px 18px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;justify-content:space-between"><span>新潟</span><span style="color:#8A7F6C;font-family:'Space Mono',monospace">1868</span></div>
+          <div style="padding:18px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid #171512">
+            <span style="font:600 12px/1.6 'M PLUS 1 Code',monospace">横浜</span>
+            <span style="font:400 11px/1.8 'M PLUS 1 Code',monospace;color:#5F584C">寒村だった横浜村に運上所と外国人居留地が置かれ、生糸輸出の拠点として急速に市街化した。</span>
+            <div style="display:flex;gap:8px">
+              <span style="flex:1;border:1px solid #171512;border-radius:6px;padding:9px;text-align:center;font:400 11px/1 'M PLUS 1 Code',monospace">本文へ</span>
+              <span style="flex:1;border:1px solid #171512;border-radius:6px;padding:9px;text-align:center;font:400 11px/1 'M PLUS 1 Code',monospace">街区図</span>
+            </div>
+          </div>
+          <div style="margin-top:auto;padding:16px 18px;border-top:1px solid #171512;display:flex;flex-direction:column;gap:10px">
+            <div style="border:1px solid #171512;background:#F4703C;color:#FCF6E8;border-radius:6px;padding:11px;text-align:center;font:600 12px/1 'M PLUS 1 Code',monospace">この地図をノートに貼る</div>
+            <div style="border:1px solid #171512;border-radius:6px;padding:11px;text-align:center;font:400 12px/1 'M PLUS 1 Code',monospace">PNG で書き出す</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:18px;border-bottom:1.5px solid #171512;padding-bottom:10px">
+      <span style="font:700 13px/1 'Space Mono',monospace;letter-spacing:.2em">05</span>
+      <h2 style="margin:0;font:700 22px/1 'M PLUS 1 Code',monospace;letter-spacing:.04em">画面</h2>
+      <span style="margin-left:auto;font:400 12px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">いずれも 1440 幅・横スクロールで全幅</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.1em;color:#8A7F6C">A — 教材ライブラリ</span>
+        <div style="overflow-x:auto;border:1.5px solid #171512">
+        <div style="width:1440px;background:#FCF6E8;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid #171512">
+            <span style="font:700 13px/1 'Space Mono',monospace;letter-spacing:.16em">LITVERSE</span>
+            <span style="flex:1;border:1px solid #171512;border-radius:5px;padding:7px 12px;font:400 11px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">単元・史料・地図をさがす</span>
+            <span style="border:1px solid #171512;background:#FCE04A;border-radius:5px;padding:7px 12px;font:500 11px/1 'M PLUS 1 Code',monospace">新学期の配本</span>
+          </div>
+          <div style="display:flex;gap:7px;padding:12px 18px;border-bottom:1px solid #171512">
+            <span style="border:1px solid #171512;background:#F4703C;color:#FCF6E8;padding:6px 11px;border-radius:5px;font:500 11px/1 'M PLUS 1 Code',monospace">すべて</span>
+            <span style="border:1px solid #171512;padding:6px 11px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace">日本史</span>
+            <span style="border:1px solid #171512;padding:6px 11px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace">世界史</span>
+            <span style="border:1px solid #171512;padding:6px 11px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace">地理</span>
+            <span style="border:1px solid #171512;padding:6px 11px;border-radius:5px;font:400 11px/1 'M PLUS 1 Code',monospace">史料集</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;padding:18px">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="aspect-ratio:2/3;border:1px solid #171512;background:#1F3A5F;color:#F3D8A8;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font:700 10px/1.4 'M PLUS 1 Code',monospace">日本史 B</div>
+              <span style="font:500 11px/1.4 'M PLUS 1 Code',monospace">日本史 B</span>
+              <span style="font:400 10px/1.4 'M PLUS 1 Code',monospace;color:#8A7F6C">第 4 章 · 62%</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="aspect-ratio:2/3;border:1px solid #171512;background:#7C1F1F;color:#F3D8A8;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font:700 10px/1.4 'M PLUS 1 Code',monospace">世界史 探究</div>
+              <span style="font:500 11px/1.4 'M PLUS 1 Code',monospace">世界史 探究</span>
+              <span style="font:400 10px/1.4 'M PLUS 1 Code',monospace;color:#8A7F6C">第 1 章 · 8%</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="aspect-ratio:2/3;border:1px solid #171512;background:#2E4A34;color:#F3D8A8;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font:700 10px/1.4 'M PLUS 1 Code',monospace">地図帳</div>
+              <span style="font:500 11px/1.4 'M PLUS 1 Code',monospace">歴史地図帳</span>
+              <span style="font:400 10px/1.4 'M PLUS 1 Code',monospace;color:#8A7F6C">参照用</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="aspect-ratio:2/3;border:1px solid #171512;background:#4A3A6B;color:#F3D8A8;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font:700 10px/1.4 'M PLUS 1 Code',monospace">史料で読む幕末</div>
+              <span style="font:500 11px/1.4 'M PLUS 1 Code',monospace">史料で読む幕末</span>
+              <span style="font:400 10px/1.4 'M PLUS 1 Code',monospace;color:#8A7F6C">副読本</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="aspect-ratio:2/3;border:1px dashed #8A7F6C;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font:400 10px/1.5 'M PLUS 1 Code',monospace;color:#8A7F6C">＋<br>教材を追加</div>
+              <span style="font:400 11px/1.4 'M PLUS 1 Code',monospace;color:#8A7F6C">コードで登録</span>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font:600 11px/1 'M PLUS 1 Code',monospace;letter-spacing:.1em;color:#8A7F6C">B — 年表と地図の対照</span>
+        <div style="overflow-x:auto;border:1.5px solid #171512">
+        <div style="width:1440px;background:#FCF6E8;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid #171512">
+            <span style="font:600 13px/1 'M PLUS 1 Code',monospace">幕末の年表</span>
+            <span style="margin-left:auto;font:400 11px/1 'M PLUS 1 Code',monospace;color:#8A7F6C">1853 — 1868</span>
+          </div>
+          <div style="display:flex;min-height:300px">
+            <div style="width:760px;border-right:1px solid #171512;display:flex;flex-direction:column">
+              <div style="padding:11px 16px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;gap:12px"><span style="font-family:'Space Mono',monospace;color:#8A7F6C">1853</span>ペリー来航</div>
+              <div style="padding:11px 16px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;gap:12px"><span style="font-family:'Space Mono',monospace;color:#8A7F6C">1854</span>日米和親条約</div>
+              <div style="padding:11px 16px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;gap:12px;background:#FCE04A"><span style="font-family:'Space Mono',monospace">1858</span>安政の五か国条約</div>
+              <div style="padding:11px 16px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;gap:12px"><span style="font-family:'Space Mono',monospace;color:#8A7F6C">1860</span>桜田門外の変</div>
+              <div style="padding:11px 16px;border-bottom:1px solid #171512;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;gap:12px"><span style="font-family:'Space Mono',monospace;color:#8A7F6C">1866</span>薩長同盟</div>
+              <div style="padding:11px 16px;font:400 12px/1.5 'M PLUS 1 Code',monospace;display:flex;gap:12px"><span style="font-family:'Space Mono',monospace;color:#8A7F6C">1867</span>大政奉還</div>
+            </div>
+            <div class="lvd-map" style="flex:1;background:#EFE4CC;position:relative">
+              <div id="lvd-japan2" style="min-height:300px"></div>
+            </div>
+          </div>
+          <div style="border-top:1px solid #171512;padding:11px 18px;font:400 11px/1 'M PLUS 1 Code',monospace;color:#5F584C">年表の行を選ぶと、対応する地点が地図上で蛍光色になります。</div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="border-top:1.5px solid #171512;padding-top:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;font:400 11px/1.7 'M PLUS 1 Code',monospace;color:#8A7F6C">
+    <span>LITVERSE デスクトップ版デザインシステム — 地形データ: Natural Earth (public domain), © OpenStreetMap contributors</span>
+    <span style="font-family:'Space Mono',monospace">v1.0 / 2026</span>
+  </footer>
+
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1560},&quot;showMicrostates&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;地図&quot;},&quot;denseTables&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;表示&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() {
+    this.pins = [
+      { name: "箱館", en: "HAKODATE", lng: 140.73, lat: 41.77, hot: true },
+      { name: "新潟", en: "NIIGATA", lng: 139.04, lat: 37.92, hot: true },
+      { name: "横浜", en: "YOKOHAMA", lng: 139.64, lat: 35.44, hot: true },
+      { name: "神戸", en: "KOBE", lng: 135.19, lat: 34.69, hot: true, dx: -8, dy: 14, anchor: "end" },
+      { name: "長崎", en: "NAGASAKI", lng: 129.87, lat: 32.74, hot: true, dx: -8, dy: 1, anchor: "end" },
+      { name: "下田", en: "SHIMODA", lng: 138.94, lat: 34.68, hot: false, dx: 8, dy: 14 }
+    ];
+    this.sites = [
+      { name: "横浜開港資料館", year: "1854", lat: 35.4460, lng: 139.6440, n: "1" },
+      { name: "象の鼻パーク（開港波止場跡）", year: "1859", lat: 35.4517, lng: 139.6432, n: "2" },
+      { name: "山手居留地跡", year: "1867", lat: 35.4385, lng: 139.6510, n: "3" },
+      { name: "横浜船渠ドック", year: "1896", lat: 35.4547, lng: 139.6317, n: "4" }
+    ];
+    this.waitFor(() => window.d3 && window.topojson, () => this.drawSvgMaps());
+    this.waitFor(() => window.L, () => this.drawLeaflet());
+  }
+
+  waitFor(cond, run, tries = 0) {
+    if (cond()) return run();
+    if (tries > 100) return;
+    setTimeout(() => this.waitFor(cond, run, tries + 1), 100);
+  }
+
+  attachZoom(host, svg, g, W, H) {
+    const zoom = d3.zoom().scaleExtent([1, 14])
+      .translateExtent([[0, 0], [W, H]]).extent([[0, 0], [W, H]])
+      .on("zoom", e => {
+        const k = e.transform.k;
+        g.attr("transform", e.transform);
+        g.selectAll("text").style("font-size", (10 / Math.sqrt(k)) + "px");
+        g.selectAll("circle.pin").attr("r", 4.2 / Math.sqrt(k));
+        g.selectAll("circle.micro").attr("r", 1.9 / Math.sqrt(k));
+        g.select(".microlayer").style("opacity", k > 3 ? 0 : 1);
+      });
+    svg.call(zoom).on("dblclick.zoom", null);
+
+    const box = document.createElement("div");
+    Object.assign(box.style, {
+      position: "absolute", right: "10px", top: "10px", display: "flex",
+      flexDirection: "column", border: "1px solid #171512", background: "#FCF6E8", zIndex: 500
+    });
+    ["＋", "−", "⟲"].forEach((t, i) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.textContent = t;
+      Object.assign(b.style, {
+        width: "30px", height: "30px", border: "none", background: "transparent",
+        borderTop: i ? "1px solid #171512" : "none", font: "400 14px/1 'Space Mono', monospace",
+        color: "#171512", cursor: "pointer"
+      });
+      b.onmouseenter = () => b.style.background = "#EFE4CC";
+      b.onmouseleave = () => b.style.background = "transparent";
+      b.onclick = () => i === 0 ? zoom.scaleBy(svg, 1.6) : i === 1 ? zoom.scaleBy(svg, 1 / 1.6) : zoom.transform(svg, d3.zoomIdentity);
+      box.appendChild(b);
+    });
+    host.appendChild(box);
+  }
+
+  drawJapan(id, W, H, withLabels) {
+    const el = document.getElementById(id);
+    if (!el || !this.hi) return;
+    const frame = { type: "MultiPoint", coordinates: [[128.0, 30.2], [146.2, 45.8]] };
+    const proj = d3.geoMercator().fitExtent([[16, 14], [W - 16, H - 14]], frame);
+    const path = d3.geoPath(proj);
+    const NEAR = new Set([392, 156, 410, 408, 643]);
+    const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`);
+    svg.append("clipPath").attr("id", "clip-" + id).append("rect").attr("width", W).attr("height", H);
+    const g = svg.append("g").attr("clip-path", `url(#clip-${id})`).append("g");
+
+    g.append("path").attr("class", "lvd-grat").attr("d", path(d3.geoGraticule().step([5, 5])()));
+    g.selectAll("path.c").data(this.hi.features.filter(f => NEAR.has(+f.id))).join("path")
+      .attr("class", d => +d.id === 392 ? "lvd-land" : "lvd-land lvd-land--alt")
+      .attr("d", path);
+
+    const pins = g.append("g");
+    this.pins.forEach(p => {
+      const [x, y] = proj([p.lng, p.lat]);
+      pins.append("circle").attr("class", "pin lvd-pin" + (p.hot ? " lvd-pin--hot" : ""))
+        .attr("cx", x).attr("cy", y).attr("r", 4.2).append("title").text(p.name);
+      if (withLabels) {
+        const dx = p.dx ?? 8, dy = p.dy ?? 1, anchor = p.anchor || "start";
+        pins.append("text").attr("class", "lvd-lbl").attr("text-anchor", anchor)
+          .attr("x", x + dx).attr("y", y + dy).text(p.name);
+        pins.append("text").attr("class", "lvd-lbl--en").attr("text-anchor", anchor)
+          .attr("x", x + dx).attr("y", y + dy + 11).text(p.en);
+      }
+    });
+    this.attachZoom(el.parentNode, svg, g, W, H);
+  }
+
+  drawSvgMaps() {
+    const CIV = new Set([818, 368, 356, 156]);
+    const SEL = new Set([392]);
+    const SILK = { type: "LineString", coordinates: [[116.4, 39.9], [103.8, 36.1], [94.7, 40.1], [87.6, 43.8], [69.3, 41.3], [58.4, 37.9], [51.4, 35.7], [44.4, 33.3], [36.3, 33.5], [35.2, 31.8]] };
+    Promise.all([
+      d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json"),
+      d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-10m.json")
+    ]).then(([topo, topoHi]) => {
+      const countries = topojson.feature(topo, topo.objects.countries);
+      const borders = topojson.mesh(topo, topo.objects.countries, (a, b) => a !== b);
+      this.hi = topojson.feature(topoHi, topoHi.objects.countries);
+
+      const el = document.getElementById("lvd-world");
+      if (el) {
+        const W = 900, H = 400;
+        const proj = d3.geoNaturalEarth1().fitExtent([[12, 14], [W - 12, H - 14]], { type: "Sphere" });
+        const path = d3.geoPath(proj);
+        const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`);
+        svg.append("clipPath").attr("id", "clip-world").append("rect").attr("width", W).attr("height", H);
+        const g = svg.append("g").attr("clip-path", "url(#clip-world)").append("g");
+
+        g.append("path").attr("class", "lvd-sphere").attr("d", path({ type: "Sphere" }));
+        g.append("path").attr("class", "lvd-grat").attr("d", path(d3.geoGraticule().step([20, 20])()));
+        g.append("g").selectAll("path").data(countries.features).join("path")
+          .attr("class", d => "lvd-land" + (CIV.has(+d.id) ? " lvd-land--hi" : SEL.has(+d.id) ? " lvd-land--sel" : ""))
+          .attr("d", path).append("title").text(d => d.properties.name);
+        g.append("path").attr("class", "lvd-border").attr("d", path(borders));
+        g.append("path").attr("class", "lvd-route").attr("d", path(SILK));
+
+        const micro = this.hi.features.filter(f => d3.geoArea(f) < 4e-5);
+        g.append("g").selectAll("path").data(micro).join("path")
+          .attr("class", "lvd-land").attr("d", path).append("title").text(d => d.properties.name);
+        const mg = g.append("g").attr("class", "microlayer");
+        micro.forEach(f => {
+          const c = d3.geoCentroid(f);
+          if (!c || isNaN(c[0])) return;
+          const p = proj(c);
+          if (!p) return;
+          mg.append("circle").attr("class", "micro lvd-pin lvd-pin--micro")
+            .attr("cx", p[0]).attr("cy", p[1]).attr("r", 1.9).append("title").text(f.properties.name);
+        });
+
+        [["エジプト", 30, 26], ["メソポタミア", 44, 33], ["インダス", 71, 27], ["黄河", 112, 35]].forEach(([t, lng, lat]) => {
+          const [x, y] = proj([lng, lat]);
+          g.append("text").attr("class", "lvd-lbl").attr("x", x).attr("y", y - 9).attr("text-anchor", "middle").text(t);
+        });
+        this.attachZoom(el.parentNode, svg, g, W, H);
+      }
+
+      this.drawJapan("lvd-japan", 460, 340, true);
+      this.drawJapan("lvd-japan2", 680, 290, false);
+    }).catch(e => console.error("地形データの読み込みに失敗しました", e));
+  }
+
+  drawLeaflet() {
+    const build = (id, zoom, controls) => {
+      const el = document.getElementById(id);
+      if (!el) return null;
+      const map = L.map(el, {
+        zoomControl: controls, attributionControl: true, scrollWheelZoom: controls,
+        fadeAnimation: false, zoomAnimation: false
+      }).setView([35.4450, 139.6440], zoom);
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+        subdomains: "abcd", attribution: "© OpenStreetMap contributors © CARTO", maxZoom: 20, opacity: 1
+      }).addTo(map);
+      this.sites.forEach(s => {
+        L.marker([s.lat, s.lng], {
+          icon: L.divIcon({ className: "", html: `<div class="lvd-marker">${s.n}</div>`, iconSize: [24, 24], iconAnchor: [12, 12] })
+        }).addTo(map).bindPopup(`<strong>${s.name}</strong><br>${s.year} 年`);
+      });
+      if (window.ResizeObserver) new ResizeObserver(() => map.invalidateSize()).observe(el);
+      return map;
+    };
+    const maps = [build("lvd-street", 15, true), build("lvd-inspector", 13, false)].filter(Boolean);
+    const bounds = L.latLngBounds(this.sites.map(s => [s.lat, s.lng])).pad(0.6);
+    const t0 = Date.now();
+    const poll = setInterval(() => {
+      maps.forEach(m => { m.invalidateSize(); if (m.getSize().x > 0) m.fitBounds(bounds); });
+      if (maps.every(m => m.getSize().x > 0) || Date.now() - t0 > 10000) clearInterval(poll);
+    }, 300);
+  }
+}
+</script>
+</body>
+</html>
