@@ -6,6 +6,8 @@ import { Screen, Card, Empty, MasteryBar } from '@/components/ui'
 import { NotReady } from '@/components/not-ready'
 import { ReportButton } from '@/components/report-button'
 import { reportItem } from '@/app/study/actions'
+import { videosForKcs, MAX_PER_RESULT } from '@/lib/loop/video'
+import { VideoEmbed } from '@/components/video-embed'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,6 +26,7 @@ type Wrong = {
   explanation: string | null
   chosen: unknown
   kc_label: string
+  kc_id: string
   material_id: string | null
 }
 
@@ -76,7 +79,7 @@ export default async function Result({ params }: { params: Promise<{ testId: str
 
   const wrong = await db<Wrong[]>`
     SELECT r.item_id, i.stem, i.choices, i.answer_key, i.explanation, r.chosen,
-           kc.label AS kc_label,
+           kc.label AS kc_label, kc.id AS kc_id,
            (SELECT m.id FROM material m
               JOIN kc_syllabus_unit ksu ON ksu.unit_id = m.unit_id AND ksu.kc_id = kc.id
              WHERE (m.user_id = ${userId} OR m.user_id IS NULL) AND m.status = 'ready'
@@ -91,6 +94,18 @@ export default async function Result({ params }: { params: Promise<{ testId: str
        --   前回の確認テストで間違えたものが今回の一覧に紛れ込む
        AND r.answered_at >= ${t.started_at} AND r.answered_at <= ${t.finished_at}
      ORDER BY kc.label`
+
+  // ★ 落とした KC のうち mastery が最も低い3件の動画を出す（docs/09b §7）。
+  //   全部の誤答に付けると動画が主役になる。弱いところだけに絞る。
+  //   ★ 全問正解なら問い合わせ自体をしない。空配列を IN に渡せないからといって
+  //     `['']` のような番兵を入れない（読んだ人が意味を取り違える）。
+  const missedKcs = [...new Set(wrong.map(w => w.kc_id))]
+  const weakestKcs = missedKcs.length === 0 ? [] : (await db<{ kc_id: string }[]>`
+    SELECT s.kc_id FROM user_kc_state s
+     WHERE s.user_id = ${userId} AND s.kc_id IN ${db(missedKcs)}
+     ORDER BY s.p_know ASC
+     LIMIT 3`).map(r => r.kc_id)
+  const resultVideos = await videosForKcs(db, weakestKcs, MAX_PER_RESULT)
 
   const retestAt = new Date(t.finished_at.getTime() + RETEST_COOLDOWN_DAYS * 86_400_000)
   const score = t.raw_score ?? 0
@@ -140,6 +155,24 @@ export default async function Result({ params }: { params: Promise<{ testId: str
                    「解説が間違っている」という気づきを受け取れない（docs/08 §5 層4） */}
               <ReportButton targetKind="item" targetId={w.item_id} action={reportItem} />
             </Card>
+          ))}
+        </>
+      )}
+
+      {/* ★ 動画は「間違えたところを解説している動画」として出す（docs/09b §7）。
+           0件なら見出しごと出さない */}
+      {resultVideos.length > 0 && (
+        <>
+          <span className="lv-label">間違えたところの解説動画</span>
+          {resultVideos.map(v => (
+            <VideoEmbed
+              key={v.id}
+              videoId={v.id}
+              title={v.title}
+              channelTitle={v.channelTitle}
+              startSec={v.startSec}
+              label={`「${v.forKcLabel}」を解説している動画`}
+            />
           ))}
         </>
       )}

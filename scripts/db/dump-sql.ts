@@ -193,6 +193,56 @@ for (const t of items) {
 }
 say('')
 
+// ---- 動画（docs/09b-video.md）----
+// ★ 承認済みのチャンネルと動画だけ。埋め込み禁止・年齢制限は入れない（V5）。
+//   DB 側の CHECK にも同じ条件があるが、当てて落とすのではなくここで落とす。
+const chRows = readCsv(join(SEED_DIR, 'channel_allowlist.csv'))
+const channels = chRows.filter(r => r.approve === '○')
+say(`-- 動画のチャンネル ${channels.length} 件（承認されず除外 ${chRows.length - channels.length}）`)
+for (const c of channels) {
+  say(`INSERT INTO channel_allowlist (channel_id, channel_title, subject_scope, note) VALUES ` +
+    `(${lit(c.id!)}, ${lit(c.channel_title!)}, ${lit(c.subject_scope!)}, ${lit(orNull(c.note))})`)
+  say(`  ON CONFLICT (channel_id) DO UPDATE SET channel_title = EXCLUDED.channel_title,`)
+  say(`    subject_scope = EXCLUDED.subject_scope, note = EXCLUDED.note;`)
+}
+say('')
+
+const vRows = readCsv(join(SEED_DIR, 'video.csv'))
+const videos = vRows.filter(r => r.approve === '○'
+  && r.embeddable === 'true' && r.yt_rating !== 'ytAgeRestricted')
+const chSet = new Set(channels.map(c => c.id))
+say(`-- 動画 ${videos.length} 件（承認・埋め込み可のみ。除外 ${vRows.length - videos.length}）`)
+for (const v of videos) {
+  if (!chSet.has(v.channel_id)) {
+    throw new Error(`video.csv: channel_id "${v.channel_id}" が承認済みの channel_allowlist にありません（${v.id}）`)
+  }
+  say(`INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,`)
+  say(`                   embeddable, yt_rating, status, approved_at) VALUES`)
+  say(`  (${lit(v.id!)}, ${lit(v.title!)}, ${lit(orNull(v.description))}, ${lit(v.channel_id!)},`)
+  say(`   ${lit(num(v.duration_sec))}, ${v.published_at ? lit(v.published_at) : 'NULL'},`)
+  // ★ true と決め打ちにしない（scripts/db/seed.ts と同じ理由）。
+  //   上の filter を通った行しか来ないので値は同じだが、決め打ちにすると
+  //   docs/schema.sql:484 の CHECK が一度も発火しない死んだ制約になる
+  say(`   ${v.embeddable === 'true'}, ${lit(orNull(v.yt_rating))}, 'approved', now())`)
+  say(`  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,`)
+  say(`    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,`)
+  say(`    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,`)
+  say(`    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;`)
+}
+say('')
+
+const vSet = new Set(videos.map(v => v.id))
+const links = readCsv(join(SEED_DIR, 'video_kc.csv')).filter(r => vSet.has(r.video_id))
+say(`-- 動画と KC の対応 ${links.length} 件`)
+for (const l of links) {
+  say(`INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ` +
+    `(${lit(l.video_id!)}, ${lit(l.kc_id!)}, ${num(l.start_sec) ?? 0}, ` +
+    `${lit(num(l.end_sec))}, ${num(l.relevance) ?? 1.0}, 'manual')`)
+  say(`  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET`)
+  say(`    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;`)
+}
+say('')
+
 say('COMMIT;')
 say('')
 say('-- 確認用')
@@ -210,6 +260,7 @@ return {
     era: eras.length, region: regions.length, syllabusUnit: units.length,
     kc: approved.length, kcRegion: kcRegionCount, skipped,
     canonEvent: canon.length, person: persons.length, item: seenItemId.size,
+    channel: channels.length, video: videos.length, videoKc: links.length,
   },
 }
 }
@@ -229,6 +280,7 @@ if (process.argv[1]?.endsWith('dump-sql.ts')) {
       `KC ${counts.kc}（除外 ${counts.skipped}）/ kc_region ${counts.kcRegion}`)
     console.log(`  正典: canon_event ${counts.canonEvent} / person ${counts.person}`)
     console.log(`  共有設問: item ${counts.item}`)
+    console.log(`  動画: チャンネル ${counts.channel} / 動画 ${counts.video} / 対応 ${counts.videoKc}`)
     if (counts.item === 0) {
       console.log('  ※ item が0件。承認欄が空のままだと1問も出題されない。')
       console.log('    npx tsx scripts/db/approve-kc.ts --file item --all')

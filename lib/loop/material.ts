@@ -31,6 +31,8 @@ export type SectionView = {
   hidden: boolean
   hiddenReason: string | null
   kcLabels: string[]
+  /** そのセクションが扱う KC。動画の推薦に使う（docs/09b §7） */
+  kcIds: string[]
   /** geo の KC が付いているセクションだけ、地図に出す地域の id を持つ */
   geoRegionIds: number[]
   /** 学習イベントとして数えられた読了があるか */
@@ -85,7 +87,8 @@ export async function materialView(db: Sql, userId: string, materialId: string):
 
   const rows = await db<{
     id: string; ord: number; heading: string; body_md: string; char_count: number
-    hidden: boolean; hidden_reason: string | null; kc_labels: string[]
+    hidden: boolean; hidden_reason: string | null
+    kc_labels: string[]; kc_ids: string[]
     geo_region_ids: number[]; read: boolean
   }[]>`
     SELECT s.id, s.ord, s.heading, s.body_md, s.char_count, s.hidden, s.hidden_reason,
@@ -94,6 +97,10 @@ export async function materialView(db: Sql, userId: string, materialId: string):
                 FROM material_section_kc sk JOIN kc k ON k.id = sk.kc_id
                WHERE sk.section_id = s.id),
              ARRAY[]::text[]) AS kc_labels,
+           COALESCE(
+             (SELECT array_agg(sk.kc_id ORDER BY sk.kc_id)
+                FROM material_section_kc sk WHERE sk.section_id = s.id),
+             ARRAY[]::text[]) AS kc_ids,
            -- 位置・版図の KC が付いているときだけ地図を出す。
            -- 全セクションに出すと地図が意味を失い、ただの飾りになる
            COALESCE(
@@ -115,7 +122,8 @@ export async function materialView(db: Sql, userId: string, materialId: string):
     // hidden なセクションは本文を渡さない（誤り報告・ファクトチェックで伏せたもの）
     bodyMd: r.hidden ? '' : r.body_md,
     charCount: r.char_count, hidden: r.hidden, hiddenReason: r.hidden_reason,
-    kcLabels: r.kc_labels, geoRegionIds: r.geo_region_ids, read: r.read,
+    kcLabels: r.kc_labels, kcIds: r.kc_ids,
+    geoRegionIds: r.geo_region_ids, read: r.read,
     requiredMs: requiredDwellMs(r.char_count), estimatedMs: estimatedReadMs(r.char_count),
   }))
 

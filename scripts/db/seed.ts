@@ -78,12 +78,16 @@ export type SeedCounts = {
   kc: number; kcRegion: number; kcSyllabusUnit: number
   canonEvent: number; person: number
   item: number; itemKc: number
+  channel: number; video: number; videoKc: number
   /** ★ KC の未承認件数。canon_event / person とは分けて数える。
    *   1つにまとめると「どの CSV の承認が遅れているか」が分からなくなる */
   skippedUnapproved: number
   skippedCanonEvent: number
   skippedPerson: number
   skippedItem: number
+  skippedVideo: number
+  /** 埋め込み禁止・年齢制限で落とした数（docs/09b V5）。承認漏れとは別に数える */
+  unsafeVideo: number
 }
 
 export async function seedMasters(db: Sql, dir = SEED_DIR): Promise<Pick<SeedCounts, 'era' | 'region' | 'syllabusUnit'>> {
@@ -316,6 +320,99 @@ export async function seedItem(
   return { item: items.length, itemKc: links.length, skipped: rows.length - approved.length }
 }
 
+/**
+ * 動画（channel_allowlist / video / video_kc）を入れる。
+ *
+ * 仕様: docs/09b-video.md
+ *
+ * ★ **配信に YouTube の鍵は要らない。** V1 が「実行時に API を呼ばない」と定めており、
+ *   ユーザーへは video テーブルから返すだけである。鍵が要るのは取り込み
+ *   （scripts/db/ingest-video.ts）と週次の生存確認だけ。
+ *
+ * ★ 承認は作者が手で行う（V4）。channel_allowlist と video の approve を見る。
+ *   video_kc には approve を置かない。**承認された動画に紐づくものだけを入れる**ので、
+ *   対応付けを別に承認する意味が無い（承認の対象が2つあると片方だけ通る事故が起きる）。
+ *
+ * ★ embeddable = false と ytAgeRestricted は入れない（V5）。
+ *   DB 側にも CHECK があるが、そこに当てて落とすのではなく、ここで落として
+ *   「何件落としたか」を数える。落ちた理由が分からないまま止まるより良い。
+ */
+export async function seedVideo(
+  db: Sql,
+  dir = SEED_DIR,
+  opts: { requireApproval?: boolean; now?: Date } = {},
+): Promise<{ channel: number; video: number; videoKc: number; skipped: number; unsafe: number }> {
+  const requireApproval = opts.requireApproval ?? true
+  const now = opts.now ?? new Date()
+  const ok = (r: Record<string, string>) => !requireApproval || r.approve === '○'
+
+  const chRows = readCsv(join(dir, 'channel_allowlist.csv'))
+  const channels = chRows.filter(ok)
+  await insertMany(db, 'channel_allowlist',
+    dedupe(channels.map(c => ({
+      channel_id: c.id!, channel_title: c.channel_title!, subject_scope: c.subject_scope!,
+      note: orNull(c.note),
+    })), r => r.channel_id),
+    ['channel_id', 'channel_title', 'subject_scope', 'note'],
+    d => d`ON CONFLICT (channel_id) DO UPDATE SET channel_title = EXCLUDED.channel_title,
+             subject_scope = EXCLUDED.subject_scope, note = EXCLUDED.note`)
+
+  const chIds = new Set(channels.map(c => c.id!))
+  const vRows = readCsv(join(dir, 'video.csv'))
+  const approvedV = vRows.filter(ok)
+  // ★ 許可リストに無いチャンネルの動画は入れない（V2）。CSV に直接書かれても通さない
+  const known = approvedV.filter(v => {
+    if (!chIds.has(v.channel_id!)) {
+      throw new Error(`video.csv: channel_id "${v.channel_id}" が承認済みの channel_allowlist にありません（${v.id}）`)
+    }
+    return true
+  })
+  // 埋め込めない動画・年齢制限つきの動画は入れない（docs/09b V5）
+  const embeddable = known.filter(v => v.embeddable === 'true' && v.yt_rating !== 'ytAgeRestricted')
+
+  await insertMany(db, 'video',
+    dedupe(embeddable.map(v => ({
+      id: v.id!, title: v.title!, description: orNull(v.description),
+      channel_id: v.channel_id!, duration_sec: num(v.duration_sec),
+      // ★ true と決め打ちにしない。上の filter を通った行しかここへ来ないので
+      //   値としては同じだが、決め打ちにすると **DB の CHECK が死ぬ**。
+      //   `CHECK (status <> 'approved' OR (embeddable AND …))`（docs/schema.sql:484）は
+      //   「承認済みなのに埋め込めない」を拒む最後の砦なのに、常に true を書いていては
+      //   一度も発火しない。filter を誰かが外したり壊したりしたとき、
+      //   嘘（embeddable=false の動画を true として）を静かに保存してしまう。
+      //   CSV の値をそのまま渡せば、そのとき DB が大声で止める。
+      published_at: orNull(v.published_at), embeddable: v.embeddable === 'true',
+      yt_rating: orNull(v.yt_rating),
+      status: 'approved', approved_at: now,
+    })), r => r.id),
+    ['id', 'title', 'description', 'channel_id', 'duration_sec', 'published_at',
+     'embeddable', 'yt_rating', 'status', 'approved_at'],
+    d => d`ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+             description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+             embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+             status = EXCLUDED.status, approved_at = EXCLUDED.approved_at`)
+
+  const vIds = new Set(embeddable.map(v => v.id!))
+  const kcRows = readCsv(join(dir, 'video_kc.csv')).filter(r => vIds.has(r.video_id!))
+  await insertMany(db, 'video_kc',
+    dedupe(kcRows.map(r => ({
+      video_id: r.video_id!, kc_id: r.kc_id!, start_sec: num(r.start_sec) ?? 0,
+      end_sec: num(r.end_sec), relevance: num(r.relevance) ?? 1.0,
+      source: 'manual',
+    })), r => `${r.video_id}|${r.kc_id}|${r.start_sec}`),
+    ['video_id', 'kc_id', 'start_sec', 'end_sec', 'relevance', 'source'],
+    d => d`ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+             end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source`)
+
+  return {
+    channel: channels.length,
+    video: embeddable.length,
+    videoKc: kcRows.length,
+    skipped: (chRows.length - channels.length) + (vRows.length - approvedV.length),
+    unsafe: known.length - embeddable.length,
+  }
+}
+
 export async function seedAll(db: Sql, dir = SEED_DIR, opts: { requireApproval?: boolean } = {}): Promise<SeedCounts> {
   const m = await seedMasters(db, dir)
   const k = await seedKc(db, dir, opts)
@@ -324,14 +421,21 @@ export async function seedAll(db: Sql, dir = SEED_DIR, opts: { requireApproval?:
   const p = await seedPerson(db, dir, opts)
   // 設問は KC を参照するので KC の後に入れる
   const i = await seedItem(db, dir, opts)
+  // 動画は KC を参照するので KC の後に入れる
+  const v = await seedVideo(db, dir, opts)
   return {
     ...m, ...k,
     canonEvent: c.canonEvent,
     person: p.person,
     item: i.item,
     itemKc: i.itemKc,
+    channel: v.channel,
+    video: v.video,
+    videoKc: v.videoKc,
     skippedCanonEvent: c.skipped,
     skippedPerson: p.skipped,
     skippedItem: i.skipped,
+    skippedVideo: v.skipped,
+    unsafeVideo: v.unsafe,
   }
 }

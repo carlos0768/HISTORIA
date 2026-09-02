@@ -8,8 +8,10 @@ import dynamic from 'next/dynamic'
 // 基図は約80KBある。geo の KC があるセクションを開いたときだけ読む。
 // 全教材ページに載せると、地図を一度も見ない読者にも毎回送ることになる
 const WorldMap = dynamic(() => import('@/components/world-map').then(m => m.WorldMap))
-import { markRead, report } from './actions'
+import { markRead, report, watchVideo } from './actions'
 import { ReportButton } from '@/components/report-button'
+import { VideoEmbed } from '@/components/video-embed'
+import type { VideoCard } from '@/lib/loop/video'
 
 export type SectionProps = {
   id: string
@@ -24,6 +26,8 @@ export type SectionProps = {
   read: boolean
   requiredMs: number
   estimatedMs: number
+  /** このセクションの理解を助ける動画。最大2件（docs/09b §7） */
+  videos: VideoCard[]
 }
 
 const mmss = (ms: number) => {
@@ -181,6 +185,20 @@ function SectionPane({
         {!section.hidden && (
           <ReportButton targetKind="material_section" targetId={section.id} action={report} />
         )}
+
+        {/* ★ 動画は節の末尾（docs/09b §7）。0件なら見出しごと出さない（§8）。
+             「動画がありません」も出さない — 無いことを知らせる価値が無い */}
+        {section.videos.map(v => (
+          <VideoEmbed
+            key={v.id}
+            videoId={v.id}
+            title={v.title}
+            channelTitle={v.channelTitle}
+            startSec={v.startSec}
+            label={`「${v.forKcLabel}」の理解を助ける動画`}
+            onPlay={() => { void watchVideo({ videoId: v.id, watchedSec: 0 }) }}
+          />
+        ))}
       </div>
     </>
   )

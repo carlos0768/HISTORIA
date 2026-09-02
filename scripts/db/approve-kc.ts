@@ -1,5 +1,5 @@
 /**
- * 承認欄を埋める（kc.csv / canon_event.csv / person.csv / item.csv）
+ * 承認欄を埋める（kc / canon_event / person / item / channel_allowlist / video の各 csv）
  *
  *   npx tsx scripts/db/approve-kc.ts --all                    … kc.csv の未記入を全て ○ に
  *   npx tsx scripts/db/approve-kc.ts --all --except a.b,c.d   … 挙げた id だけ空欄のまま残す
@@ -24,7 +24,7 @@ import { join } from 'node:path'
 import { SEED_DIR } from './seed'
 
 /** 承認欄を持つ CSV。先頭2列が approve,id であること */
-export const APPROVABLE = ['kc', 'canon_event', 'person', 'item'] as const
+export const APPROVABLE = ['kc', 'canon_event', 'person', 'item', 'channel_allowlist', 'video'] as const
 export type Approvable = typeof APPROVABLE[number]
 export const csvPath = (name: Approvable): string => join(SEED_DIR, `${name}.csv`)
 
