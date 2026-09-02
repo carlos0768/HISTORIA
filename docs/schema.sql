@@ -667,7 +667,16 @@ CREATE INDEX ON content_report (status) WHERE status = 'open';
 -- =====================================================================
 
 -- 弱点の根拠を引く（説明可能性）  docs/04-weakness-engine.md §4.3
-CREATE VIEW v_weakness_evidence AS
+--
+-- ★ security_invoker を明示する。既定に頼ってはいけない。
+--   PostgreSQL 15 以降もビューの既定は「定義者（所有者）の権限で実行」である。
+--   このビューは response を読むが、既定のままだと所有者 postgres の権限で
+--   評価されるため response の RLS が素通りする。つまり anon キーで
+--   /rest/v1/v_weakness_evidence を1回叩くだけで、
+--   全利用者の解答履歴（誰が・どの KC を・何と答えて・正誤）が読めてしまう。
+--   Supabase のリンタが ERROR で挙げる security_definer_view はこれである。
+--   security_invoker = true にすると、問い合わせた本人の権限と RLS で評価される。
+CREATE VIEW v_weakness_evidence WITH (security_invoker = true) AS
 SELECT r.user_id, ik.kc_id, r.answered_at, r.correct, r.chosen,
        i.stem, i.format, r.session_kind, r.latency_ms
 FROM response r
@@ -677,7 +686,25 @@ JOIN item_kc ik ON ik.item_id = i.id;
 -- =====================================================================
 -- 13. RLS（Supabase）
 --     所有者のみが自分の行を読み書きできる。
---     マスタ系（era/region/kc/material/item/video）は全認証ユーザーが読み取り可・書き込み不可。
+--     マスタ系（era/region/kc/video など）は全認証ユーザーが読み取り可・書き込み不可。
+--
+-- ★★ Supabase では素の PostgreSQL と既定が逆である。ここを間違えると穴が開く。
+--
+--   素の PostgreSQL … 権限は「GRANT した分だけ」。何もしなければ誰も読めない。
+--   Supabase        … public スキーマに作った表は、ALTER DEFAULT PRIVILEGES に
+--                     よって anon / authenticated へ自動的に ALL が付く。
+--                     つまり **RLS を有効にしていない表は、公開されている anon
+--                     キーだけで誰でも SELECT / INSERT / UPDATE / DELETE できる。**
+--
+--   2026-09-02 に本番（Supabase）で実測した結果:
+--       has_table_privilege('anon', 'public.kc', 'DELETE') → true
+--   RLS を有効にしていなければ、anon キー1本で kc を全消しできる状態だった。
+--
+--   したがって本スキーマの原則は次の2つになる。
+--     (a) public の**全ての表**で RLS を有効にする。例外を作らない。
+--     (b) 読ませたい表にだけ SELECT ポリシーを書いて開ける。
+--   RLS を有効にしただけでポリシーを書かなければ「全行拒否」になる。
+--   これは事故ではなく、既定として正しい側である。
 -- =====================================================================
 
 ALTER TABLE app_user                 ENABLE ROW LEVEL SECURITY;
@@ -714,6 +741,37 @@ ALTER TABLE app_setting              ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_budget                ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_spend                 ENABLE ROW LEVEL SECURITY;
 
+-- ---- マスタ系（全認証ユーザーが読み取り可・書き込み不可）----
+-- ★ 以前はこの9表で RLS を有効にしていなかった。「RLS を掛けなければ読める」
+--   という素の PostgreSQL の感覚で書いたためだが、上に書いたとおり Supabase では
+--   それは「誰でも書き換えられる」を意味する。読み取りは下の SELECT ポリシーで開ける。
+ALTER TABLE era                      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE region                   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE person                   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE syllabus_unit            ENABLE ROW LEVEL SECURITY;
+ALTER TABLE kc                       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE kc_region                ENABLE ROW LEVEL SECURITY;
+ALTER TABLE kc_syllabus_unit         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE canon_event              ENABLE ROW LEVEL SECURITY;
+ALTER TABLE video                    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE video_kc                 ENABLE ROW LEVEL SECURITY;
+
+-- ---- 残りも全て「全行拒否」にする（ポリシーを書かない）----
+-- ★ ここも以前は RLS 無効だった。invite_code と past_exam は特に危ない。
+--   invite_code … 未使用の招待コードが読めると、招待制（上限10名）が意味を失う。
+--   past_exam   … 過去問の本文を格納している（docs/10 §2・作者がリスクを承知の上で採用）。
+--                 「非公開・招待制」が前提の判断なので、anon から読めてはならない。
+--   item_kc     … item に SELECT を許さない方針（下記）と揃える。
+ALTER TABLE invite_code              ENABLE ROW LEVEL SECURITY;
+ALTER TABLE kc_proposal              ENABLE ROW LEVEL SECURITY;
+ALTER TABLE kc_merge                 ENABLE ROW LEVEL SECURITY;
+ALTER TABLE item_kc                  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE channel_allowlist        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE past_exam                ENABLE ROW LEVEL SECURITY;
+ALTER TABLE past_exam_element        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE past_exam_kc             ENABLE ROW LEVEL SECURITY;
+ALTER TABLE evidence_claim           ENABLE ROW LEVEL SECURITY;
+
 -- ★ RLS を有効にしたテーブルには必ずポリシーを書く（直上の運用3テーブルを除く）。
 --   ポリシーが1つも無いテーブルは「全行アクセス拒否」になり、アプリが一切動かない。
 --
@@ -726,15 +784,22 @@ ALTER TABLE ai_spend                 ENABLE ROW LEVEL SECURITY;
 --   （service_role）が行う。これが「response が唯一の真実」（03-data-model.md §2.2）
 --   をDB層で強制する。
 
+-- ★ 全てのポリシーに TO authenticated を付ける。既定の PUBLIC にしない。
+--   PUBLIC のままだと anon（未ログイン）にもポリシーが適用され、
+--   条件に当てはまる行は読めてしまう。実際 material_select の
+--   「OR user_id IS NULL」（共有教材）は anon にも当たるため、
+--   公開されている anon キー1本で共有教材の本文が全部読めていた。
+--   HISTORIA は招待制（上限10名・docs/10）である。未ログインには何も見せない。
+
 -- ---- 自分のアカウント（SELECT のみ。設定変更は Server Action 経由） ----
 -- 列単位の制限は RLS では書けないため、max_daily_items の変更などは
 -- service_role で動く Server Action に閉じる（guardian_consent_at 等を書き換えさせない）
 CREATE POLICY app_user_select ON app_user
-  FOR SELECT USING (id = (SELECT auth.uid()));
+  FOR SELECT TO authenticated USING (id = (SELECT auth.uid()));
 
 -- ---- 追記専用ログ（UPDATE / DELETE のポリシーを作らない） ----
 CREATE POLICY response_select ON response
-  FOR SELECT USING (user_id = (SELECT auth.uid()));
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 -- ★ INSERT のポリシーを作らない（12-nonfunctional.md §6.1）。
 --   correct はサーバーが答え合わせをして決める値であり、利用者が申告する値ではない。
 --   クライアントに INSERT を許すと DevTools から correct=true を直接書けてしまい、
@@ -743,60 +808,60 @@ CREATE POLICY response_select ON response
 
 -- ---- ユーザーが作って編集できるもの ----
 CREATE POLICY drill_all ON drill
-  FOR ALL USING (user_id = (SELECT auth.uid()))
+  FOR ALL TO authenticated USING (user_id = (SELECT auth.uid()))
   WITH CHECK (user_id = (SELECT auth.uid()));
 
 -- drill_kc / drill_unit は user_id を持たないので drill 経由で判定する
 CREATE POLICY drill_kc_all ON drill_kc
-  FOR ALL USING (EXISTS (SELECT 1 FROM drill d
+  FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM drill d
                          WHERE d.id = drill_kc.drill_id AND d.user_id = (SELECT auth.uid())))
   WITH CHECK (EXISTS (SELECT 1 FROM drill d
                       WHERE d.id = drill_kc.drill_id AND d.user_id = (SELECT auth.uid())));
 CREATE POLICY drill_unit_all ON drill_unit
-  FOR ALL USING (EXISTS (SELECT 1 FROM drill d
+  FOR ALL TO authenticated USING (EXISTS (SELECT 1 FROM drill d
                          WHERE d.id = drill_unit.drill_id AND d.user_id = (SELECT auth.uid())))
   WITH CHECK (EXISTS (SELECT 1 FROM drill d
                       WHERE d.id = drill_unit.drill_id AND d.user_id = (SELECT auth.uid())));
 
 -- ---- ユーザーが追加できる記録（更新・削除はしない） ----
 CREATE POLICY material_read_select ON material_read
-  FOR SELECT USING (user_id = (SELECT auth.uid()));
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY material_read_insert ON material_read
-  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+  FOR INSERT TO authenticated WITH CHECK (user_id = (SELECT auth.uid()));
 
 CREATE POLICY video_view_select ON video_view
-  FOR SELECT USING (user_id = (SELECT auth.uid()));
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY video_view_insert ON video_view
-  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+  FOR INSERT TO authenticated WITH CHECK (user_id = (SELECT auth.uid()));
 
 CREATE POLICY content_report_select ON content_report
-  FOR SELECT USING (user_id = (SELECT auth.uid()));
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY content_report_insert ON content_report
-  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+  FOR INSERT TO authenticated WITH CHECK (user_id = (SELECT auth.uid()));
 
 CREATE POLICY evidence_import_select ON evidence_import
-  FOR SELECT USING (user_id = (SELECT auth.uid()));
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY evidence_import_insert ON evidence_import
-  FOR INSERT WITH CHECK (user_id = (SELECT auth.uid()));
+  FOR INSERT TO authenticated WITH CHECK (user_id = (SELECT auth.uid()));
 
 -- ---- 導出テーブル（SELECT のみ。書き込みは service_role） ----
 CREATE POLICY user_kc_state_select ON user_kc_state
-  FOR SELECT USING (user_id = (SELECT auth.uid()));
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY kc_card_select ON kc_card
-  FOR SELECT USING (user_id = (SELECT auth.uid()));
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY misconception_select ON misconception
-  FOR SELECT USING (user_id = (SELECT auth.uid()));
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY user_activity_select ON user_activity
-  FOR SELECT USING (user_id = (SELECT auth.uid()));
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY user_daily_plan_select ON user_daily_plan
-  FOR SELECT USING (user_id = (SELECT auth.uid()));
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY check_test_select ON check_test
-  FOR SELECT USING (user_id = (SELECT auth.uid()));
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 
 -- ---- 生成物（読むだけ。作るのはサーバー側） ----
 -- material と item は「自分のもの」＋「診断用の共有プール（item.user_id IS NULL）」を読める
 CREATE POLICY material_select ON material
-  FOR SELECT USING (user_id = (SELECT auth.uid()) OR user_id IS NULL);
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()) OR user_id IS NULL);
 -- ★ item に SELECT ポリシーを作らない（12-nonfunctional.md §6.1）。
 --   RLS は列単位の制限ができないため、SELECT を許すと answer_key・explanation・
 --   choices[].why_wrong まで解答前に読めてしまう。出題は Server Action が
@@ -804,17 +869,43 @@ CREATE POLICY material_select ON material
 -- 本文は「読める教材の、配信できる版」に限る。
 -- blocked / failed の本文は誰にも見せない（作者判断 Q4・docs/08 §5 層5）。
 CREATE POLICY material_section_select ON material_section
-  FOR SELECT USING (EXISTS (
+  FOR SELECT TO authenticated USING (EXISTS (
     SELECT 1 FROM material m
      WHERE m.id = material_section.material_id
        AND m.status = 'ready'
        AND (m.user_id = (SELECT auth.uid()) OR m.user_id IS NULL)));
 CREATE POLICY material_section_kc_select ON material_section_kc
-  FOR SELECT USING (EXISTS (
+  FOR SELECT TO authenticated USING (EXISTS (
     SELECT 1 FROM material_section s JOIN material m ON m.id = s.material_id
      WHERE s.id = material_section_kc.section_id
        AND m.status = 'ready'
        AND (m.user_id = (SELECT auth.uid()) OR m.user_id IS NULL)));
 
 CREATE POLICY generation_job_select ON generation_job
-  FOR SELECT USING (user_id = (SELECT auth.uid()));
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
+
+-- ---- マスタ系を読み取りだけ開ける ----
+-- ★ USING (true) は「RLS を無効にする」と同じではない。
+--   ポリシーは SELECT にしか付けないので、INSERT / UPDATE / DELETE は
+--   ポリシーが無い＝拒否のままである。これで §13 冒頭に書いた
+--   「全認証ユーザーが読み取り可・書き込み不可」が初めて本当になる。
+--   なお anon（未ログイン）にも開くかは to authenticated で分けている。
+--   招待制（上限10名・docs/10）なので、未ログインには何も見せない。
+CREATE POLICY era_select               ON era               FOR SELECT TO authenticated USING (true);
+CREATE POLICY region_select            ON region            FOR SELECT TO authenticated USING (true);
+CREATE POLICY person_select            ON person            FOR SELECT TO authenticated USING (true);
+CREATE POLICY syllabus_unit_select     ON syllabus_unit     FOR SELECT TO authenticated USING (true);
+CREATE POLICY kc_select                ON kc                FOR SELECT TO authenticated USING (true);
+CREATE POLICY kc_region_select         ON kc_region         FOR SELECT TO authenticated USING (true);
+CREATE POLICY kc_syllabus_unit_select  ON kc_syllabus_unit  FOR SELECT TO authenticated USING (true);
+CREATE POLICY canon_event_select       ON canon_event       FOR SELECT TO authenticated USING (true);
+CREATE POLICY video_select             ON video             FOR SELECT TO authenticated USING (true);
+CREATE POLICY video_kc_select          ON video_kc          FOR SELECT TO authenticated USING (true);
+
+-- ---- 取り込んだ根拠（親の evidence_import が自分のものなら読める）----
+-- evidence_claim は user_id を持たないので親を辿る。evidence_import の
+-- SELECT ポリシーと同じ範囲になり、他人の模試の読み取りは拒まれる。
+CREATE POLICY evidence_claim_select ON evidence_claim
+  FOR SELECT TO authenticated USING (EXISTS (
+    SELECT 1 FROM evidence_import i
+     WHERE i.id = evidence_claim.import_id AND i.user_id = (SELECT auth.uid())));
