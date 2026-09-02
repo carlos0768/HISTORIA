@@ -60,7 +60,8 @@ export default async function MaterialPage({ params }: { params: Promise<{ id: s
         sections={m.sections.map(s => ({
           id: s.id, ord: s.ord, heading: s.heading, bodyMd: s.bodyMd,
           charCount: s.charCount, hidden: s.hidden, hiddenReason: s.hiddenReason,
-          kcLabels: s.kcLabels, read: s.read, requiredMs: s.requiredMs, estimatedMs: s.estimatedMs,
+          kcLabels: s.kcLabels, geoRegionIds: s.geoRegionIds,
+          read: s.read, requiredMs: s.requiredMs, estimatedMs: s.estimatedMs,
         }))}
       />
     </Screen>

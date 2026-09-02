@@ -83,6 +83,29 @@ dbSuite('教材の閲覧と読了（実DB）', () => {
       expect(v.sections.every(s => !s.read)).toBe(true)
     })
 
+    it('geo の KC が付いたセクションだけ地図の地域を返す', async () => {
+      const id = await genReady()
+      const v = (await materialView(db, userId, id))!
+      // wh.2.1.1 には geo の KC が無いので、どのセクションにも地図は出ない
+      expect(v.sections.every(s => s.geoRegionIds.length === 0)).toBe(true)
+
+      // このセクションに geo の KC を足すと、その KC の地域が返る
+      const [geo] = await db<{ id: string }[]>`
+        SELECT k.id FROM kc k WHERE k.kind = 'geo' ORDER BY k.id LIMIT 1`
+      await db`INSERT INTO material_section_kc (section_id, kc_id)
+               VALUES (${v.sections[0]!.id}, ${geo!.id}) ON CONFLICT DO NOTHING`
+
+      const after = (await materialView(db, userId, id))!
+      expect(after.sections[0]!.geoRegionIds.length).toBeGreaterThan(0)
+      expect(after.sections[1]!.geoRegionIds).toEqual([])
+
+      // 返る id が地図の地域表に実在すること
+      const { regionShape } = await import('@/lib/map/regions')
+      for (const rid of after.sections[0]!.geoRegionIds) {
+        expect(regionShape(rid), `region ${rid} の枠がありません`).toBeDefined()
+      }
+    })
+
     it('他人の教材は見えない', async () => {
       const id = await genReady()
       const other = await createUser(db, NOW)
