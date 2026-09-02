@@ -10,7 +10,7 @@
  */
 import type { Sql } from 'postgres'
 import type { Claim, GenerateResult, Provider, RenderedPrompt, VerifyResult } from './types'
-import { createFakeProvider } from './fake'
+import { createFakeProvider, type FakeOptions } from './fake'
 import { createGeminiProvider } from './gemini'
 import { createAnthropicProvider } from './anthropic'
 import { assertNoIdentifiers } from './redact'
@@ -67,7 +67,7 @@ const priceOf = (model: string): Price =>
  * 鍵があれば実物、無ければフェイクにする。
  * フェイクは実物と同じ型・同じ制約で動くので、鍵が無くても閉ループは最後まで通る。
  */
-function resolveProvider(name: string, cfg: AiConfig): Provider {
+function resolveProvider(name: string, cfg: AiConfig, fake: FakeOptions = {}): Provider {
   if (name === 'gemini' && cfg.geminiApiKey) {
     return createGeminiProvider({
       apiKey: cfg.geminiApiKey, model: cfg.genModel, embedModel: cfg.embedModel,
@@ -76,7 +76,7 @@ function resolveProvider(name: string, cfg: AiConfig): Provider {
   if (name === 'anthropic' && cfg.anthropicApiKey) {
     return createAnthropicProvider({ apiKey: cfg.anthropicApiKey, model: cfg.verifyModel })
   }
-  return createFakeProvider(name)
+  return createFakeProvider(name, fake)
 }
 
 export type GenerateCall = {
@@ -96,10 +96,10 @@ export type Client = {
   embed(a: EmbedCall): Promise<{ vectors: number[][]; model: string }>
 }
 
-export function createClient(cfg: AiConfig = readConfig()): Client {
+export function createClient(cfg: AiConfig = readConfig(), fake: FakeOptions = {}): Client {
   assertConfig(cfg)
-  const gen = resolveProvider(cfg.genProvider, cfg)
-  const ver = resolveProvider(cfg.verifyProvider, cfg)
+  const gen = resolveProvider(cfg.genProvider, cfg, fake)
+  const ver = resolveProvider(cfg.verifyProvider, cfg, fake)
   const usingFake = !cfg.geminiApiKey || !cfg.anthropicApiKey
 
   /** 予約 → 呼び出し → 確定。失敗したら解放する */

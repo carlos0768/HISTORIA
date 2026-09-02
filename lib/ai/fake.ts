@@ -5,12 +5,16 @@
  * これがあることで、GEMINI_API_KEY / ANTHROPIC_API_KEY が無くても
  * 「生成 → 検証 → 出題 → 採点 → 弱点更新」の通しを実行して確認できる。
  */
-import type { Provider, GenerateArgs, GenerateResult, VerifyResult, Claim } from './types'
+import type { Provider, GenerateArgs, GenerateResult, VerifyResult, Claim, Usage } from './types'
+import { MaterialOutput, TARGET_CHARS } from './schema'
 
 /** 決定的な擬似乱数。Math.random を使わない（同じ入力で同じ出力にする） */
 function hash(s: string): number {
   let h = 2166136261
-  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) }
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
   return h >>> 0
 }
 
@@ -19,6 +23,19 @@ export type FakeOptions = {
   wrongRate?: number
   /** 生成を失敗させる（層5 の配信停止の経路を試す） */
   failGeneration?: boolean
+  /** 本文の合計文字数。範囲外を意図的に作って再生成の経路を試す */
+  charCount?: number
+  /** 生成物に混ぜる誤った主張。層2・層3 の検出を試す */
+  wrongClaims?: string[]
+}
+
+/** プロンプト本文に並んでいる候補KCの行を読み取る */
+function kcsFromPrompt(user: string): Array<{ id: string; kind: string; label: string }> {
+  return [...user.matchAll(/^- (kc\.[a-z0-9_.]+) \| ([a-z]+) \| ([^|]+) \|/gm)].map(m => ({
+    id: m[1]!,
+    kind: m[2]!,
+    label: m[3]!.trim(),
+  }))
 }
 
 export function createFakeProvider(name: string, opts: FakeOptions = {}): Provider {
@@ -29,35 +46,62 @@ export function createFakeProvider(name: string, opts: FakeOptions = {}): Provid
 
     async generate<T>(args: GenerateArgs<T>): Promise<GenerateResult<T>> {
       if (opts.failGeneration) throw new Error('fake: 生成に失敗しました')
-      // 実物と同じ引数で動く。中身の作り方だけが違う
-      const kcIds = [...args.prompt.user.matchAll(/^- (kc\.[a-z0-9_.]+) \| ([a-z]+) \| ([^|]+) \|/gm)]
-        .map(m => ({ kcId: m[1]!, kind: m[2]!, label: m[3]!.trim() }))
-      const ctx = { weakKcs: kcIds, unitLabel: '（フェイク）', targetCharCount: 3500 }
-      const sections = ctx.weakKcs.slice(0, 5).map((kc, i) => ({
-        ord: i + 1,
-        heading: `${kc.label}`,
-        body_md: `${kc.label}についての解説。`.repeat(
-          Math.max(1, Math.floor(ctx.targetCharCount / 5 / 12)),
-        ),
-        kc_ids: [kc.kcId],
-      }))
-      const value = {
-        title: `${ctx.unitLabel}`,
+
+      const kcs = kcsFromPrompt(args.prompt.user)
+      const kcIds = kcs.length > 0 ? kcs.map(k => k.id) : ['kc.fake.placeholder']
+      const label = (i: number) => kcs[i % Math.max(1, kcs.length)]?.label ?? '項目'
+
+      const total = opts.charCount ?? TARGET_CHARS
+      const per = Math.max(1, Math.floor(total / 7))
+      const sections = Array.from({ length: 7 }, (_, i) => {
+        const want = i === 6 ? total - per * 6 : per
+        return {
+          ord: i + 1,
+          heading: `§${i + 1} ${label(i)}`,
+          body_md: 'あ'.repeat(Math.max(1, want)),
+          kc_ids: [kcIds[i % kcIds.length]!],
+        }
+      })
+
+      const claims = [
+        ...(opts.wrongClaims ?? []).map((text, i) => ({
+          kind: 'year' as const,
+          text,
+          section_ord: (i % 7) + 1,
+        })),
+        {
+          kind: 'causal' as const,
+          text: `${label(0)}に関する因果の主張`,
+          section_ord: 1,
+        },
+      ]
+
+      const value: MaterialOutput = {
+        title: `${label(0)}の単元`,
         sections,
-        claims: ctx.weakKcs.slice(0, 3).map((kc, i) => ({
-          type: (['year', 'person', 'causal'] as const)[i % 3],
-          text: `${kc.label}に関する主張`,
-          sectionOrd: 1,
+        flashcards: Array.from({ length: 10 }, (_, i) => ({
+          front: `${label(i)}とは何か`,
+          back: `${label(i)}の答え`.slice(0, 30),
+          kc_ids: [kcIds[i % kcIds.length]!],
         })),
-        items: ctx.weakKcs.slice(0, 4).map((kc, i) => ({
-          format: 'mcq4' as const,
-          stem: `${kc.label}に関する設問`,
-          choices: ['a', 'b', 'c', 'd'].map(k => ({ key: k, text: `選択肢${k}`, why_wrong: k === 'a' ? null : '誤り' })),
-          answer_key: 'a',
+        mcqs: Array.from({ length: 6 }, (_, i) => ({
+          stem: `${label(i)}に関する設問`,
+          choices: (['a', 'b', 'c', 'd'] as const).map(k => ({
+            key: k,
+            text: `選択肢${k}`,
+            why_wrong: k === 'a' ? '' : '同時代の別の事象と取り違えています',
+          })),
+          answer_key: 'a' as const,
           explanation: '解説',
-          kc_ids: [kc.kcId],
+          kc_ids: [kcIds[i % kcIds.length]!],
         })),
+        claims,
       }
+
+      // フェイクも自分の出力を検証する。実物と同じ契約で動かすため
+      const check = MaterialOutput.safeParse(value)
+      if (!check.success) throw new Error(`fake: 自分の出力がスキーマに反しています: ${check.error.message}`)
+
       const chars = sections.reduce((n, s) => n + s.body_md.length, 0)
       return {
         value: value as unknown as T,
@@ -68,8 +112,9 @@ export function createFakeProvider(name: string, opts: FakeOptions = {}): Provid
 
     async verify(claims: Claim[]): Promise<VerifyResult> {
       const verdicts = claims.map((c, i) => {
-        const isWrong = wrongRate > 0 && (hash(c.text + i) % 1000) / 1000 < wrongRate
-        return isWrong
+        const injected = (opts.wrongClaims ?? []).includes(c.text)
+        const sampled = wrongRate > 0 && (hash(c.text + i) % 1000) / 1000 < wrongRate
+        return injected || sampled
           ? { claim: c, status: 'wrong' as const, reason: 'fake: 年号が正典と一致しません' }
           : { claim: c, status: 'ok' as const }
       })
@@ -89,7 +134,8 @@ export function createFakeProvider(name: string, opts: FakeOptions = {}): Provid
           return (h / 0xffffffff) * 2 - 1
         })
       })
-      return { vectors, usage: { inputTokens: texts.join('').length, outputTokens: 0 }, model: `${name}-fake-embed` }
+      const usage: Usage = { inputTokens: texts.join('').length, outputTokens: 0 }
+      return { vectors, usage, model: `${name}-fake-embed` }
     },
   }
 }
