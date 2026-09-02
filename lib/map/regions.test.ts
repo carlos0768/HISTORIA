@@ -3,8 +3,8 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { REGION_SHAPES, regionShape, unknownCountryCodes } from './regions'
 import {
-  COUNTRY_PATHS, COUNTRY_NAMES, GRATICULE_PATH, EQUATOR_PATH,
-  MAP_LAT, MAP_LON, project, MAP_WIDTH, MAP_HEIGHT,
+  COUNTRY_PATHS, COUNTRY_NAMES, MICRO_PINS,
+  GRATICULE_PATH, SPHERE_PATH, BORDERS_PATH, MAP_WIDTH, MAP_HEIGHT,
 } from './basemap'
 import { SEED_DIR } from '@/scripts/db/seed'
 import { parseCsv } from '@/scripts/db/csv'
@@ -62,15 +62,13 @@ describe('地図の地域表', () => {
 })
 
 describe('基図', () => {
-  it('投影が図の四隅に対応する', () => {
-    expect(project(MAP_LON[0], MAP_LAT[1])).toEqual({ x: 0, y: 0 })
-    expect(project(MAP_LON[1], MAP_LAT[0])).toEqual({ x: MAP_WIDTH, y: MAP_HEIGHT })
-  })
-
-  it('範囲外の緯度は端に丸める（図からはみ出さない）', () => {
-    expect(project(0, 90).y).toBe(0)
-    expect(project(0, -90).y).toBe(MAP_HEIGHT)
-  })
+  const inBounds = (d: string) => {
+    for (const n of d.matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)) {
+      if (Number(n[1]) < -1 || Number(n[1]) > MAP_WIDTH + 1) return false
+      if (Number(n[2]) < -1 || Number(n[2]) > MAP_HEIGHT + 1) return false
+    }
+    return true
+  }
 
   it('国のパスが閉じた輪の連なりで、図の範囲に収まる', () => {
     const codes = Object.keys(COUNTRY_PATHS)
@@ -78,30 +76,35 @@ describe('基図', () => {
     for (const [code, d] of Object.entries(COUNTRY_PATHS)) {
       expect(d.startsWith('M'), code).toBe(true)
       expect(d.split('M').filter(Boolean).every(r => r.endsWith('Z')), code).toBe(true)
-    }
-    for (const n of Object.values(COUNTRY_PATHS).join('').matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)) {
-      expect(Number(n[1])).toBeGreaterThanOrEqual(0)
-      expect(Number(n[1])).toBeLessThanOrEqual(MAP_WIDTH)
-      expect(Number(n[2])).toBeGreaterThanOrEqual(0)
-      expect(Number(n[2])).toBeLessThanOrEqual(MAP_HEIGHT)
+      expect(inBounds(d), `${code} が図からはみ出している`).toBe(true)
     }
   })
 
-  it('日付変更線をまたぐ横断線が残っていない', () => {
-    let crossing = 0
-    for (const d of Object.values(COUNTRY_PATHS)) {
-      for (const ring of d.split('M').filter(Boolean)) {
-        const pts = ring.replace(/Z$/, '').split('L').map(s => s.split(',').map(Number))
-        for (let i = 1; i < pts.length; i++) {
-          if (Math.abs(pts[i]![0]! - pts[i - 1]![0]!) > MAP_WIDTH / 2) crossing++
-        }
-      }
-    }
-    expect(crossing).toBe(0)
-  })
-
-  it('経緯線と赤道が引かれている', () => {
+  it('球の輪郭・経緯線・国境が引かれ、図の範囲に収まる', () => {
+    expect(SPHERE_PATH.length).toBeGreaterThan(100)
     expect(GRATICULE_PATH.split('M').filter(Boolean).length).toBeGreaterThan(10)
-    expect(EQUATOR_PATH).toContain(`L${MAP_WIDTH},`)
+    expect(BORDERS_PATH.length).toBeGreaterThan(1000)
+    for (const [name, d] of [['球', SPHERE_PATH], ['経緯線', GRATICULE_PATH], ['国境', BORDERS_PATH]] as const) {
+      expect(inBounds(d), `${name} が図からはみ出している`).toBe(true)
+    }
+  })
+
+  it('極小国の点が図の中にあり、国土と重複しない', () => {
+    expect(MICRO_PINS.length).toBeGreaterThan(20)
+    for (const p of MICRO_PINS) {
+      expect(p.x).toBeGreaterThanOrEqual(0)
+      expect(p.x).toBeLessThanOrEqual(MAP_WIDTH)
+      expect(p.y).toBeGreaterThanOrEqual(0)
+      expect(p.y).toBeLessThanOrEqual(MAP_HEIGHT)
+      // 国土で描けているものを点にしない（二重に出る）
+      expect(COUNTRY_PATHS[p.id], `${COUNTRY_NAMES[p.id]} が国土と点の両方にある`).toBeUndefined()
+    }
+  })
+
+  it('マルタ・バーレーン・シンガポールが点で出る（110m の国土では消える大きさ）', () => {
+    const pinned = new Set(MICRO_PINS.map(p => p.id))
+    for (const code of ['470', '048', '702']) {
+      expect(pinned.has(code), `${COUNTRY_NAMES[code]} の点がありません`).toBe(true)
+    }
   })
 })

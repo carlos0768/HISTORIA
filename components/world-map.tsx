@@ -1,18 +1,18 @@
 /**
  * 学習用の世界地図
  *
- * 意匠は docs/design/litverse-map.css（作者提供の Litverse Map System）に従う。
+ * 意匠は docs/design/litverse-map.css（作者提供の Litverse Map System v3）に従う。
  * ここで新しい意匠を定義しない。クラス名も同システムのものをそのまま使う。
  *
  * ★ タイル地図（Leaflet + OSM）の側は採っていない。
  *   proxy.ts の CSP が img-src / connect-src を 'self' に絞っているため、
  *   タイルを引くには CSP を広げることになる。SVG 側だけで足りる。
- * ★ 基図は Natural Earth（パブリックドメイン）から自前で作って埋め込む。
- *   実行時に外部へ取りに行かない（docs/10 §2 の第三者著作物のリスクを避ける）。
+ * ★ 投影は d3 でビルド時に済ませてある（scripts/map/build-basemap.mjs）。
+ *   実行時に d3 も地図データも取りに行かない。
  * ★ これは模式図である。現在の国境で歴史上の地域を近似しているにすぎない。
  */
 import {
-  COUNTRY_PATHS, GRATICULE_PATH, EQUATOR_PATH, MAP_VIEWBOX,
+  COUNTRY_PATHS, MICRO_PINS, SPHERE_PATH, GRATICULE_PATH, BORDERS_PATH, MAP_VIEWBOX,
 } from '@/lib/map/basemap'
 import { regionShape } from '@/lib/map/regions'
 
@@ -32,11 +32,17 @@ export function WorldMap({ highlight, title }: WorldMapProps) {
   const hasChild = shapes.some(s => !s.isParent)
   const drawn = shapes.filter(s => !s.isParent || !hasChild)
 
-  // 国 → その国を含む最初の地域。重なったときは先に指定された地域を優先する
-  const owner = new Map<string, number>()
+  // 国 → その国を最初に含む地域の順番。重なったときは先に指定された地域を優先する
+  const rank = new Map<string, number>()
   drawn.forEach((s, i) => {
-    for (const c of s.countries) if (!owner.has(c)) owner.set(c, i)
+    for (const c of s.countries) if (!rank.has(c)) rank.set(c, i)
   })
+  const landClass = (code: string) => {
+    const at = rank.get(code)
+    return at === undefined ? 'lv-map__land'
+      : at === 0 ? 'lv-map__land lv-map__land--highlight'
+      : 'lv-map__land lv-map__land--select'
+  }
 
   return (
     <figure className="lv-map">
@@ -45,24 +51,26 @@ export function WorldMap({ highlight, title }: WorldMapProps) {
         role="img"
         aria-label={`世界地図。${drawn.map(s => s.label).join('、')}を示しています`}
       >
-        <rect className="lv-map__sea" x="0" y="0" width="100%" height="100%" />
+        <path className="lv-map__sphere" d={SPHERE_PATH} />
         <path className="lv-map__graticule" d={GRATICULE_PATH} />
-        <path className="lv-map__graticule" d={EQUATOR_PATH} />
 
-        {Object.entries(COUNTRY_PATHS).map(([code, d]) => {
-          const at = owner.get(code)
-          return (
-            <path
-              key={code}
-              d={d}
-              className={
-                at === undefined ? 'lv-map__land'
-                : at === 0 ? 'lv-map__land lv-map__land--highlight'
-                : 'lv-map__land lv-map__land--select'
-              }
+        {Object.entries(COUNTRY_PATHS).map(([code, d]) => (
+          <path key={code} d={d} className={landClass(code)} />
+        ))}
+
+        {/* 国境は共有辺だけ。海岸線は国土の stroke が描いている */}
+        <path className="lv-map__border" d={BORDERS_PATH} />
+
+        {/* 110m の国土で描けない極小国（マルタ・バーレーン等）は点で示す */}
+        <g className="lv-map__micro">
+          {MICRO_PINS.map(p => (
+            <circle
+              key={p.id}
+              cx={p.x} cy={p.y} r={1.9}
+              className={`lv-map__pin lv-map__pin--micro${rank.has(p.id) ? ' lv-map__pin--hot' : ''}`}
             />
-          )
-        })}
+          ))}
+        </g>
       </svg>
 
       <figcaption className="lv-map__caption">
