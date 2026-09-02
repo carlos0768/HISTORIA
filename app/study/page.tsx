@@ -1,4 +1,5 @@
-import { tryDb, demoUserId } from '@/lib/db/optional'
+import { tryDb } from '@/lib/db/optional'
+import { currentUserId } from '@/lib/auth/dal'
 import { todaysPlan } from '@/lib/loop/today'
 import { Screen, Empty } from '@/components/ui'
 import { Quiz, type QuizItem } from './quiz'
@@ -8,7 +9,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function Study() {
   const db = tryDb()
-  const userId = demoUserId()
+  const userId = await currentUserId()
   if (!db || !userId) {
     return (
       <Screen title="今日やること">

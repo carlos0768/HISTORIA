@@ -15,7 +15,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { readCsv, orNull, num, list } from './csv'
-import { SEED_DIR } from './seed'
+import { SEED_DIR as DEFAULT_SEED_DIR } from './seed'
 
 /** SQL の文字列リテラル。単引用符を二重にする */
 const q = (v: string): string => `'${v.replaceAll("'", "''")}'`
@@ -23,11 +23,20 @@ const lit = (v: string | number | null): string =>
   v === null ? 'NULL' : typeof v === 'number' ? String(v) : q(v)
 /** text[] のリテラル */
 const arr = (v: string[]): string => (v.length === 0 ? `'{}'::text[]` : `ARRAY[${v.map(q).join(',')}]::text[]`)
+/** smallint[] のリテラル。canon_event.region_ids 用（arr は ::text[] 固定なので使えない） */
+const numArr = (v: number[]): string =>
+  v.length === 0 ? `'{}'::smallint[]` : `ARRAY[${v.join(',')}]::smallint[]`
 
 export type SeedSql = { sql: string; counts: Record<string, number> }
 
-/** CSV から SQL を組み立てる。試験から呼べるよう関数にしてある */
-export function buildSeedSql(): SeedSql {
+/**
+ * CSV から SQL を組み立てる。試験から呼べるよう関数にしてある。
+ *
+ * ★ dir を差し替えられるようにしてある（`seedKc(db, dir, opts)` と同じ形）。
+ *   実データが全件承認になると「未承認は含めない」を実データでは示せなくなるため、
+ *   承認を落とした写しを渡して確かめられる必要がある。
+ */
+export function buildSeedSql(SEED_DIR = DEFAULT_SEED_DIR): SeedSql {
 const out: string[] = []
 const say = (s = '') => out.push(s)
 
@@ -125,36 +134,70 @@ for (const k of approved) {
 }
 say('')
 
+// ---- 層2の正典（docs/08 §5 層2）----
+const canonRows = readCsv(join(SEED_DIR, 'canon_event.csv'))
+const canon = canonRows.filter(r => r.approve === '○')
+say(`-- 正典イベント ${canon.length} 件（承認されず除外 ${canonRows.length - canon.length}）`)
+for (const e of canon) {
+  const regions2 = list(e.region_ids).map(label => {
+    const id = regionId.get(label)
+    if (id === undefined) throw new Error(`canon_event.csv: region "${label}" が region.csv にありません（${e.id}）`)
+    return id
+  })
+  say(`INSERT INTO canon_event (id, label, aliases, year_from, year_to, precision, region_ids) VALUES ` +
+    `(${lit(e.id!)}, ${lit(e.label!)}, ${arr(list(e.aliases))}, ${lit(num(e.year_from))}, ` +
+    `${lit(num(e.year_to))}, ${lit(e.precision!)}, ${numArr(regions2)})`)
+  say(`  ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, aliases = EXCLUDED.aliases,`)
+  say(`    year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to,`)
+  say(`    precision = EXCLUDED.precision, region_ids = EXCLUDED.region_ids;`)
+}
+say('')
+
+// ★ person.id は GENERATED ALWAYS AS IDENTITY。label が UNIQUE なので冪等性はそちらで取る
+const personRows = readCsv(join(SEED_DIR, 'person.csv'))
+const persons = personRows.filter(r => r.approve === '○')
+say(`-- 正典人物 ${persons.length} 件（承認されず除外 ${personRows.length - persons.length}）`)
+for (const p of persons) {
+  say(`INSERT INTO person (label, aliases, era_id) VALUES ` +
+    `(${lit(p.label!)}, ${arr(list(p.aliases))}, ${lit(num(p.era_id))})`)
+  say(`  ON CONFLICT (label) DO UPDATE SET aliases = EXCLUDED.aliases, era_id = EXCLUDED.era_id;`)
+}
+say('')
+
 say('COMMIT;')
 say('')
 say('-- 確認用')
 say(`-- SELECT (SELECT count(*) FROM era) AS era, (SELECT count(*) FROM region) AS region,`)
 say(`--        (SELECT count(*) FROM syllabus_unit) AS unit, (SELECT count(*) FROM kc) AS kc,`)
-say(`--        (SELECT count(*) FROM kc_region) AS kc_region;`)
-say(`-- 期待値: era=${eras.length} region=${regions.length} unit=${units.length} kc=${approved.length} kc_region=${kcRegionCount}`)
+say(`--        (SELECT count(*) FROM kc_region) AS kc_region,`)
+say(`--        (SELECT count(*) FROM canon_event) AS canon_event, (SELECT count(*) FROM person) AS person;`)
+say(`-- 期待値: era=${eras.length} region=${regions.length} unit=${units.length} kc=${approved.length} ` +
+  `kc_region=${kcRegionCount} canon_event=${canon.length} person=${persons.length}`)
 
 return {
   sql: out.join('\n') + '\n',
   counts: {
     era: eras.length, region: regions.length, syllabusUnit: units.length,
     kc: approved.length, kcRegion: kcRegionCount, skipped,
+    canonEvent: canon.length, person: persons.length,
   },
 }
 }
 
 /** 書き出し先。リポジトリに入れて、実行しなくても GitHub から取れるようにする */
-export const SEED_SQL_PATH = join(SEED_DIR, 'sql', '02_seed.sql')
+export const SEED_SQL_PATH = join(DEFAULT_SEED_DIR, 'sql', '02_seed.sql')
 
 if (process.argv[1]?.endsWith('dump-sql.ts')) {
   const { sql, counts } = buildSeedSql()
   if (process.argv.includes('--stdout')) {
     process.stdout.write(sql)
   } else {
-    mkdirSync(join(SEED_DIR, 'sql'), { recursive: true })
+    mkdirSync(join(DEFAULT_SEED_DIR, 'sql'), { recursive: true })
     writeFileSync(SEED_SQL_PATH, sql)
     console.log(`seed/sql/02_seed.sql に書き出した（${(sql.length / 1024).toFixed(0)}KB）`)
     console.log(`  時代 ${counts.era} / 地域 ${counts.region} / 章立て ${counts.syllabusUnit} / ` +
       `KC ${counts.kc}（除外 ${counts.skipped}）/ kc_region ${counts.kcRegion}`)
+    console.log(`  正典: canon_event ${counts.canonEvent} / person ${counts.person}`)
     console.log('')
     console.log('Supabase の SQL エディタに、この順で貼る:')
     console.log('  1. docs/schema.sql          （そのまま貼れる）')

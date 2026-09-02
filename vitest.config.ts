@@ -5,7 +5,8 @@ export default defineConfig({
   resolve: { alias: { '@': fileURLToPath(new URL('.', import.meta.url)) } },
   test: {
     environment: 'node',
-    include: ['lib/**/*.test.ts', 'scripts/**/*.test.ts'],
+    // proxy.ts は Next の作法で置き場所が決まっているため、試験も根に置く
+    include: ['lib/**/*.test.ts', 'scripts/**/*.test.ts', 'proxy.test.ts'],
 
     /**
      * 実 DB を使うテストは既定の 5 秒では足りない。

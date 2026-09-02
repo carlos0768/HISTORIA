@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { tryDb, demoUserId } from '@/lib/db/optional'
+import { tryDb } from '@/lib/db/optional'
+import { currentUserId } from '@/lib/auth/dal'
 import { todaysPlan, drillProgressList } from '@/lib/loop/today'
 import { drillMaterials } from '@/lib/loop/material'
 import { UnitMaterials } from './units'
@@ -10,7 +11,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function Home() {
   const db = tryDb()
-  const userId = demoUserId()
+  const userId = await currentUserId()
 
   if (!db || !userId) {
     return (

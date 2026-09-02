@@ -172,7 +172,7 @@ export async function generateMaterial(
   const ctx = await buildGenerationContext(db, args.userId, args.unitId)
   const facts = await unitFacts(db, args.unitId)
   const hash = paramsHash(args.unitId, MATERIAL_PROMPT_VERSION, ctx.weakKcs.map(k => k.kcId))
-  const emptyCheck: MachineCheckResult = { verdicts: [], matched: 0, matchable: 0 }
+  const emptyCheck: MachineCheckResult = { verdicts: [], matched: 0, matchable: 0, unreadable: 0 }
 
   // この利用者の弱点に寄せる必要があるか。無ければ共有教材で足りる
   const shareable = isDefaultContext(ctx)
@@ -259,9 +259,16 @@ export async function generateMaterial(
   const material = out
 
   // ---- 層1で出させた claims を、層2 → 層3 の順で確認する ----
+  // ★ subject と year_from を落とさない。docs/08 §5 層2 は
+  //   「claim.subject を canon_event.label / aliases と照合」と定めており、
+  //   本文全体で部分一致させると関係ない正典に当たる。
+  // ★ event を causal に畳まない。畳むと層3へ渡す種別が事実と食い違う
   const claims: Claim[] = material.claims.map(c => ({
-    type: c.kind === 'event' ? 'causal' : c.kind,
+    type: c.kind,
     text: c.text,
+    ...(c.subject !== undefined ? { subject: c.subject } : {}),
+    ...(c.year_from !== undefined ? { yearFrom: c.year_from } : {}),
+    ...(c.year_to !== undefined ? { yearTo: c.year_to } : {}),
     sectionOrd: c.section_ord,
   }))
 

@@ -51,10 +51,25 @@ export type GenerateArgs = {
   maxOutputTokens: number
 }
 
-/** 教材が主張している検証可能な事実（§5 層1） */
+/**
+ * 教材が主張している検証可能な事実（§5 層1）
+ *
+ * ★ `subject` と `yearFrom` / `yearTo` を落とさずに運ぶ。
+ *   docs/08 §5 層2 は「**claim.subject** を canon_event.label / aliases と照合」と
+ *   定めている。ここを捨てて本文全体で部分一致させると、
+ *   1文に複数の固有名詞があるときに関係ない正典に当たる。
+ *
+ * ★ `event` を `causal` に畳まない。生成側のスキーマ（lib/ai/schema.ts）は
+ *   event を出すので、畳むと層3へ渡す種別が事実と食い違う。
+ */
 export type Claim = {
-  type: 'year' | 'person' | 'place' | 'causal' | 'order'
+  type: 'year' | 'person' | 'place' | 'causal' | 'order' | 'event'
   text: string
+  /** 照合の対象となる固有名詞。無ければ text で代用する */
+  subject?: string
+  /** モデルが構造化して返した年。本文からの抽出より信頼できる */
+  yearFrom?: number
+  yearTo?: number
   /** 本文中の該当箇所 */
   sectionOrd?: number
 }

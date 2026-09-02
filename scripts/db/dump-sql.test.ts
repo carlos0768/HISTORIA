@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { readFileSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdtempSync, cpSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import type { Sql } from 'postgres'
 import { createTestDb, TEST_DB_URL } from '@/lib/db/test-helper'
 import { buildSeedSql, SEED_SQL_PATH } from './dump-sql'
@@ -20,15 +22,42 @@ describe('Supabase 用の SQL', () => {
     expect(readFileSync(SEED_SQL_PATH, 'utf8')).toBe(buildSeedSql().sql)
   })
 
-  it('承認されていない KC を含めない（作者承認制）', () => {
-    const { sql } = buildSeedSql()
+  it('承認済みの KC が全件入る', () => {
+    const { sql, counts } = buildSeedSql()
     const rows = readCsv(`${SEED_DIR}/kc.csv`)
-    for (const k of rows.filter(r => r.approve !== '○')) {
-      expect(sql, `未承認の ${k.id} が含まれている`).not.toContain(k.id!)
-    }
-    for (const k of rows.filter(r => r.approve === '○')) {
+    const approved = rows.filter(r => r.approve === '○')
+    expect(approved.length).toBeGreaterThan(0)
+    expect(counts.kc).toBe(approved.length)
+    for (const k of approved) {
       expect(sql, `承認済みの ${k.id} が含まれていない`).toContain(k.id!)
     }
+  })
+
+  /**
+   * ★ 承認制そのものの検査は、実データではもう示せない。
+   *   2026-09-02 に作者が408件すべてを承認したため、未承認の行が0件になった。
+   *   実データで `filter(r => r.approve !== '○')` を回すと対象が空になり、
+   *   ループの中が一度も走らない——承認制が壊れても気づけない試験になる。
+   *   承認を落とした写しを作って、そちらで「除外されること」を確かめる。
+   */
+  it('承認欄が空の KC は含めない（作者承認制 docs/02 §5）', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'historia-dumpsql-'))
+    cpSync(SEED_DIR, dir, { recursive: true })
+    const lines = readFileSync(join(dir, 'kc.csv'), 'utf8').split('\n')
+    // 先頭2件の承認を外す
+    const dropped = [1, 2].map(i => {
+      lines[i] = lines[i]!.replace(/^○,/, ',')
+      return lines[i]!.split(',')[1]!
+    })
+    writeFileSync(join(dir, 'kc.csv'), lines.join('\n'))
+
+    const { sql, counts } = buildSeedSql(dir)
+    for (const id of dropped) {
+      expect(sql, `未承認の ${id} が含まれている`).not.toContain(id)
+    }
+    expect(counts.skipped).toBe(2)
+    // 残りは入っている（承認を外した2件だけが落ちる）
+    expect(counts.kc).toBe(readCsv(`${SEED_DIR}/kc.csv`).filter(r => r.approve === '○').length - 2)
   })
 
   it('単引用符を含む文字列を壊さない', () => {

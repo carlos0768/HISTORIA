@@ -2,13 +2,13 @@
 
 import { revalidatePath } from 'next/cache'
 import { sql } from '@/lib/db/client'
-import { demoUserId } from '@/lib/db/optional'
+import { currentUserId } from '@/lib/auth/dal'
 import { createClient } from '@/lib/ai/client'
 import { createDrill, checkOverlap, kcsForUnits, type OverlapWarning } from '@/lib/pipeline/drill'
 import { generateMaterial } from '@/lib/pipeline/generate'
 
-function requireUser(): string {
-  const id = demoUserId()
+async function requireUser(): Promise<string> {
+  const id = await currentUserId()
   if (!id) throw new Error('ユーザーが特定できません')
   return id
 }
@@ -30,7 +30,7 @@ export async function createDrillAction(input: {
   deadline: string
   confirm?: boolean
 }): Promise<CreateResult> {
-  const userId = requireUser()
+  const userId = await requireUser()
   const db = sql()
 
   const title = input.title.trim()
@@ -70,7 +70,7 @@ export async function generateMaterialAction(input: {
   unitId: string
   force?: boolean
 }): Promise<GenerateResult> {
-  const userId = requireUser()
+  const userId = await requireUser()
   const db = sql()
   const ai = createClient()
 

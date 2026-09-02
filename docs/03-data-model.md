@@ -222,12 +222,45 @@ Free で始める理由:
 
 ```
 1. 招待コードを入力（invite_code。作者が発行、上限10名）
-2. Google ログイン
+2. Google ログイン ／ メールリンク
 3. 生年月日を入力
-4. 16歳未満なら保護者メールでの同意（10-legal-risk.md §5.3）
+4. 16歳未満は受け付けない（10-legal-risk.md §5.3・作者判断 2026-09-02）
 ```
 
 招待コードは「限られた範囲」の客観的な担保でもある（`10-legal-risk.md` §3.2 G1/G7）。
+
+### 7.1 メールリンクを併設する（作者判断・2026-09-02）
+
+Google ログインは **Google Cloud で OAuth クライアントを作り、Supabase の
+Authentication → Providers に client_id / secret を入れる**という作者の手作業が要る。
+その設定が済むまで実機で認証を確かめられないので、**メールリンク（マジックリンク）を
+併設する**。Supabase の既定で使えるため、追加の設定も鍵も要らない。
+
+**順序は変えない。** 冒頭のとおりメール確認の導線は離脱が大きいので、
+画面でも Google を主、メールリンクを予備として下に置く（`app/(auth)/login/form.tsx`）。
+
+### 7.2 未認証は 404（リダイレクトではない）
+
+`10-legal-risk.md` §3.2 G2 の明文である。ログイン画面へリダイレクトすると
+**`Location` ヘッダで行き先が漏れ、アプリの存在が外から見える**。
+招待された人には作者が `/invite` の URL を直接渡す。
+
+未認証でも開ける経路は `/invite` `/login` `/auth/callback` の3本だけで、
+他は全て 404 になる（`proxy.ts` の `PUBLIC_PATHS`）。
+`proxy.test.ts` が「404 であってリダイレクトでないこと」を試験している。
+
+### 7.3 ブラウザに Supabase を触らせない
+
+OAuth のやり取りは Server Action と Route Handler の中だけで完結させる。
+こうすると `proxy.ts` の CSP（`connect-src 'self'`）を広げずに認証を入れられる。
+`createBrowserClient` はこのプロジェクトで使わない（`lib/auth/supabase.ts`）。
+
+### 7.4 環境変数が無ければ関門ごと素通りさせる
+
+`NEXT_PUBLIC_SUPABASE_URL` と `NEXT_PUBLIC_SUPABASE_ANON_KEY` が揃わないときは
+認証を無効にする。`lib/db/optional.ts` の `tryDb()` と同じ作法である。
+そうしないと **DB も鍵も無い Vercel のプレビューが全ページ 404 になり、
+意匠の確認ができなくなる**（`11b-design-system.md` の検証がプレビュー頼み）。
 
 ## 8. 制約テストの結果
 

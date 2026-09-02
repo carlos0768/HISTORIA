@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { sql } from '@/lib/db/client'
-import { demoUserId } from '@/lib/db/optional'
+import { currentUserId } from '@/lib/auth/dal'
 import { recordRead, type ReadResult } from '@/lib/loop/material'
 
 /**
@@ -17,7 +17,7 @@ export async function markRead(input: {
   dwellMs: number
   scrollPct: number | null
 }): Promise<ReadResult> {
-  const userId = demoUserId()
+  const userId = await currentUserId()
   if (!userId) throw new Error('ユーザーが特定できません')
   const r = await recordRead(sql(), {
     userId,

@@ -10,12 +10,14 @@
 | | 状態 |
 |---|---|
 | 仕様書 | [`docs/`](./docs) 19文書。作者判断の未決は0件 |
-| スキーマ | [`docs/schema.sql`](./docs/schema.sql) 42テーブル・RLS 21本。PostgreSQL 16.13 で投入検証済み |
-| マスタ | [`seed/`](./seed) 章立て117件・KC 60件（**承認待ち**） |
-| 学習ロジック | SM-2 / 弱点推定 / スケジューラ / 確認テスト / 支出遮断器 — テスト200件 |
+| スキーマ | [`docs/schema.sql`](./docs/schema.sql) 42テーブル・RLS 42本＋ポリシー34本。本番 Supabase で 52項目の検査を通過 |
+| マスタ | [`seed/`](./seed) 章立て117件・KC 408件（承認済み・75/75 節を網羅） |
+| 学習ロジック | SM-2 / 弱点推定 / スケジューラ / 確認テスト / 支出遮断器 |
 | 閉ループ | 出題→採点→弱点更新→翌日出し直しが実 DB で動く |
-| 画面 | ホームと出題画面。Litverse デザインシステム |
+| **認証** | 招待コード＋Google／メールリンク。未認証は全経路 404 |
+| 画面 | ホーム・出題・教材・範囲選択・認証4画面。Litverse デザインシステム |
 | AI 生成 | プロバイダ抽象層のみ。**鍵が無い間はフェイクで通る** |
+| テスト | 410件（`npm test`） |
 
 ## 動かす
 
@@ -29,6 +31,51 @@ npm run dev
 ```
 
 `DATABASE_URL` が無くても画面は開く（「未接続」と表示される）。
+`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` を**設定しなければ認証も無効**で、
+`DEMO_USER_ID` の1人として全画面を見られる（意匠の確認用）。
+
+## 認証を有効にする
+
+環境変数を2つ入れると認証が有効になり、**未認証は `/invite` `/login` `/auth/callback`
+以外の全経路が 404 になる**（[`10`](./docs/10-legal-risk.md) §3.2 G2）。
+
+```bash
+export NEXT_PUBLIC_SUPABASE_URL=https://<project>.supabase.co
+export NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key>
+```
+
+### 招待コードを発行する
+
+`invite_code` は 0 件で始まるので、**発行しないと誰もサインアップできない**。
+
+```bash
+DATABASE_URL='postgresql://...' npx tsx scripts/db/issue-invite.ts                  # 一覧だけ
+DATABASE_URL='postgresql://...' npx tsx scripts/db/issue-invite.ts --issue           # 1枚
+DATABASE_URL='postgresql://...' npx tsx scripts/db/issue-invite.ts --issue --count 3 --days 30
+```
+
+上限は**利用者＋未使用のコードで10**（G7）。10枚配ってから作者自身が入れない、が起きない。
+発行したコードと `/invite` の URL は、招待する相手に直接渡す（検索からは辿れない）。
+
+### Google ログインを使えるようにする（作者の手作業）
+
+メールリンクは Supabase の既定で動くので、**この設定を待たずに実機で確かめられる**。
+Google を主にするには次を行う（[`03`](./docs/03-data-model.md) §7.1）。
+
+1. **Supabase の戻り先 URL を控える** — Authentication → Providers → Google を開くと
+   `https://<project>.supabase.co/auth/v1/callback` が表示される
+2. **Google Cloud で OAuth クライアントを作る** — [console.cloud.google.com](https://console.cloud.google.com)
+   → APIs & Services → OAuth consent screen（外部・テストで可、自分と友人をテストユーザーに追加）
+   → Credentials → Create Credentials → OAuth client ID → **Web application**
+   - Authorized redirect URIs に **1 で控えた URL** を入れる（アプリ側の `/auth/callback` ではない）
+3. **Supabase に client ID と secret を入れる** — Providers → Google を有効にして貼る
+4. **Supabase の Redirect URLs にアプリを登録する** — Authentication → URL Configuration →
+   Redirect URLs に `https://<本番ドメイン>/auth/callback` と
+   `http://localhost:3000/auth/callback` を追加する（ここに無い戻り先は拒否される）
+5. **Vercel に環境変数を入れる** — `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` /
+   `DATABASE_URL`
+
+> `anon key` は公開されてよい鍵である（RLS が守る）。**`service_role` key は絶対に入れない。**
 
 ## 検査
 
@@ -45,6 +92,8 @@ npm run build
 - **`response` が唯一の真実**。弱点もスケジュールもここから再計算できる（[`03`](./docs/03-data-model.md) §2.2）
 - **SM-2 は KC 単位**。設問を毎回生成すると item 単位では状態が積み上がらない（[`04b`](./docs/04b-spaced-repetition.md) §1.2）
 - **正答はクライアントに配らない**。採点はサーバー（[`12`](./docs/12-nonfunctional.md) §6.1）
+- **未認証はリダイレクトではなく404**。ログイン画面の存在すら見せない（[`10`](./docs/10-legal-risk.md) §3.2 G2）
+- **ブラウザに Supabase を触らせない**。OAuth をサーバー側に閉じて CSP を広げない（[`03`](./docs/03-data-model.md) §7.3）
 - **月1万円で AI 呼び出しを機械的に停止する**。上限を1円も超えない（[`08`](./docs/08-ai-architecture.md) §7.1）
 - **生成は無料枠、検証は課金**。同一モデルの自己検証に退化させない（[`08`](./docs/08-ai-architecture.md) §2）
 
@@ -52,6 +101,7 @@ npm run build
 
 ## 残っていること
 
-1. **KC 60件の承認** — [`seed/kc.csv`](./seed/kc.csv) の `approve` 列（[手順](./seed/README.md)）
-2. Supabase プロジェクトと API キー
-3. Phase 0（仮説検証）— [`13-roadmap.md`](./docs/13-roadmap.md)
+1. **KC 408件を本番 Supabase に入れる** — `DATABASE_URL=... npx tsx scripts/db/seed-remote.ts --apply`
+2. **Google OAuth の設定**（上記「認証を有効にする」）— メールリンクは設定不要で先に試せる
+3. `canon_event` の起草 — 層2の機械照合が0件で空回りしている（[`14`](./docs/14-open-questions.md) M26）
+4. Phase 0（仮説検証）— [`13-roadmap.md`](./docs/13-roadmap.md)。Gemini の課金開通が前提（M28）

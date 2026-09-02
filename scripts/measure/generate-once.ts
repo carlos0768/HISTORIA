@@ -7,6 +7,7 @@
  *   M5  responseSchema が docs/07 §5.3 のまま通るか
  *   M27 モデルが claims を実際に何件出すか。その主張が本文に実在するか
  *   M2  1ユニットの生成時間が240秒以内か（Vercel の300秒上限）
+ *   M2b **層2の機械照合率が80%以上か**（docs/13 Phase 0 の 0-4b）
  *
  * ★ 検証（層3）は鍵が無ければフェイクになる。ここで測るのは生成側である。
  * ★ 使い捨ての DB を作って消す。既存のデータには触らない。
@@ -17,6 +18,7 @@ import { seedMasters, seedKc, SEED_DIR } from '../db/seed'
 import { createClient, readConfig } from '@/lib/ai/client'
 import { ensureBudgetRow, periodOf, budgetStatus } from '@/lib/ai/budget'
 import { generateMaterial } from '@/lib/pipeline/generate'
+import { matchRate } from '@/lib/pipeline/factcheck'
 import { createUser } from '@/lib/loop/fixture'
 
 const unitId = process.argv[2] ?? 'wh.2.1.1'
@@ -82,7 +84,8 @@ try {
 
     // ---- M27: claims の件数と、それが本文に実在するか ----
     const body = secs.map(s => s.body_md).join('\n')
-    const claims = (r as { check?: { verdicts: { claim: { text: string; type: string } }[] } }).check?.verdicts ?? []
+    const check = 'check' in r ? r.check : undefined
+    const claims = check?.verdicts ?? []
     console.log(`\nclaims ${claims.length} 件（プロンプトの要求 12〜24 / スキーマ下限 6）`)
     const byKind: Record<string, number> = {}
     let grounded = 0
@@ -94,8 +97,46 @@ try {
     }
     console.log(`  種別: ${Object.entries(byKind).map(([k, n]) => `${k} ${n}`).join(' / ') || '-'}`)
     console.log(`  本文に語が見つかったもの: ${grounded} / ${claims.length}`)
+
+    // ★ subject と year_from は照合の鍵になった（層2）。プロンプトは求めているが
+    //   モデルが実際に埋めるかは未測定である。埋まらなければ照合は本文の部分一致に
+    //   落ちて誤当たりが増えるので、ここで率を出しておく
+    const target = claims.filter(v => v.claim.type === 'year' || v.claim.type === 'person')
+    const withSubject = target.filter(v => v.claim.subject).length
+    const withYear = claims.filter(v => v.claim.type === 'year' && v.claim.yearFrom !== undefined).length
+    const years = claims.filter(v => v.claim.type === 'year').length
+    console.log(`  subject が埋まった (year/person): ${withSubject} / ${target.length}`)
+    console.log(`  year_from が埋まった (year): ${withYear} / ${years}`)
     console.log('\n  最初の5件:')
     for (const v of claims.slice(0, 5)) console.log(`   [${v.claim.type}] ${v.claim.text}`)
+
+    // ---- M2b: 層2の機械照合率（docs/13 Phase 0 の 0-4b・目標 80%） ----
+    if (check) {
+      const rate = matchRate(check)
+      const pct = rate === null ? '—' : `${(rate * 100).toFixed(1)}%`
+      const gate = rate === null ? '測定不能' : rate >= 0.8 ? '達成' : '未達'
+      console.log(`\n機械照合率: ${check.matched} / ${check.matchable} = ${pct}（目標80% → ${gate}）`)
+
+      // ★ 分母が痩せていないかを見る。年を読み取れない claim を分母に入れると
+      //   正典を何件足しても届かなくなるので、外した件数を必ず出す
+      const canonEvents = await db<{ n: string }[]>`SELECT count(*) AS n FROM canon_event`
+      const persons = await db<{ n: string }[]>`SELECT count(*) AS n FROM person`
+      console.log(`  分母から外した（年を読み取れない）: ${check.unreadable} 件`)
+      console.log(`  正典: canon_event ${canonEvents[0]!.n} 件 / person ${persons[0]!.n} 件`)
+      if (Number(canonEvents[0]!.n) === 0) {
+        console.log('  ※ canon_event が0件です。照合率は正典を入れるまで意味を持ちません（M26）')
+      }
+
+      const unmatched = claims.filter(v => v.status === 'unmatched' && (v.claim.type === 'year' || v.claim.type === 'person'))
+      if (unmatched.length > 0) {
+        console.log('\n  照合できなかったもの（正典に足す候補）:')
+        for (const v of unmatched.slice(0, 10)) {
+          console.log(`   [${v.claim.type}] ${v.claim.subject ?? v.claim.text} — ${v.reason ?? ''}`)
+        }
+      }
+      const wrong = claims.filter(v => v.status === 'wrong')
+      for (const v of wrong) console.log(`  ✗ ${v.reason}`)
+    }
   }
 
   const spend = await db<{ provider: string; model: string; purpose: string; state: string; est_jpy: string; actual_jpy: string | null }[]>`
