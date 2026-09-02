@@ -114,25 +114,39 @@ dbSuite('seed 投入（実DB）', () => {
     expect(await n('person')).toBe(peOk.length)
   })
 
-  it('承認欄が空の canon_event / person は入らない', async () => {
-    await db`TRUNCATE canon_event, person RESTART IDENTITY CASCADE`
-
-    // 承認を付けた写しを作って「入る」側を示す。実データは起草中で全件空欄なので、
-    // そのままでは「入らない」しか示せず、投入経路が壊れても気づけない
-    const dir = mkdtempSync(join(tmpdir(), 'historia-canon-'))
+  /**
+   * ちょうど n 件だけを承認した写しを作る。
+   *
+   * ★ 「先頭 n 件に ○ を足す」ではなく「**全件の承認を落としてから** n 件に付ける」。
+   *   足すだけだと、実データが全件承認になった瞬間に写しも全件承認になり、
+   *   件数を数える試験が全て壊れる（2026-09-02 に実際に3件壊した）。
+   *   実データの承認状態に依らず成り立つ形にしておく。
+   */
+  const copyWithExactly = (counts: Record<string, number>): string => {
+    const dir = mkdtempSync(join(tmpdir(), 'historia-approve-'))
     cpSync(SEED_DIR, dir, { recursive: true })
-    const approveFirst = (file: string, howMany: number) => {
+    for (const [file, n] of Object.entries(counts)) {
       const lines = readFileSync(join(dir, file), 'utf8').split('\n')
-      for (let i = 1; i <= howMany; i++) lines[i] = '○' + lines[i]!
+      for (let i = 1; i < lines.length; i++) {
+        if (lines[i]!.trim() === '') continue
+        const body = lines[i]!.replace(/^[○×△]?,/, ',')     // 先頭の判断を落とす
+        lines[i] = (i <= n ? '○' : '') + body
+      }
       writeFileSync(join(dir, file), lines.join('\n'))
     }
-    approveFirst('canon_event.csv', 3)
-    approveFirst('person.csv', 2)
+    return dir
+  }
+
+  it('承認されていない canon_event / person は入らない', async () => {
+    await db`TRUNCATE canon_event, person RESTART IDENTITY CASCADE`
+    const dir = copyWithExactly({ 'canon_event.csv': 3, 'person.csv': 2 })
 
     const c = await seedCanonEvent(db, dir)
     const p = await seedPerson(db, dir)
     expect(c.canonEvent).toBe(3)
     expect(p.person).toBe(2)
+    // 除外された数も数える。全件承認の実データでも、写しでは残りが全て除外される
+    expect(c.skipped).toBe(readCsv(`${SEED_DIR}/canon_event.csv`).length - 3)
 
     // 承認していない行は1件も入っていない
     const rest = readCsv(`${SEED_DIR}/canon_event.csv`).slice(3).map(r => r.id!)
@@ -142,11 +156,7 @@ dbSuite('seed 投入（実DB）', () => {
 
   it('canon_event は冪等（2回流しても増えない・aliases も保たれる）', async () => {
     await db`TRUNCATE canon_event, person RESTART IDENTITY CASCADE`
-    const dir = mkdtempSync(join(tmpdir(), 'historia-canon2-'))
-    cpSync(SEED_DIR, dir, { recursive: true })
-    const lines = readFileSync(join(dir, 'canon_event.csv'), 'utf8').split('\n')
-    for (let i = 1; i <= 5; i++) lines[i] = '○' + lines[i]!
-    writeFileSync(join(dir, 'canon_event.csv'), lines.join('\n'))
+    const dir = copyWithExactly({ 'canon_event.csv': 5 })
 
     await seedCanonEvent(db, dir)
     await seedCanonEvent(db, dir)
@@ -163,11 +173,7 @@ dbSuite('seed 投入（実DB）', () => {
 
   it('person は label が同じなら1件にまとまる（id は自動採番）', async () => {
     await db`TRUNCATE person RESTART IDENTITY CASCADE`
-    const dir = mkdtempSync(join(tmpdir(), 'historia-person-'))
-    cpSync(SEED_DIR, dir, { recursive: true })
-    const lines = readFileSync(join(dir, 'person.csv'), 'utf8').split('\n')
-    lines[1] = '○' + lines[1]!
-    writeFileSync(join(dir, 'person.csv'), lines.join('\n'))
+    const dir = copyWithExactly({ 'person.csv': 1 })
 
     await seedPerson(db, dir)
     await seedPerson(db, dir)
