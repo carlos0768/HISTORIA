@@ -53,7 +53,8 @@ export type MaterialView = {
 
 /**
  * 教材1本を読むために必要なものを1回で集める。
- * user_id で絞ることで、他人の教材の id を打ち込んでも 404 になる。
+ * 自分の教材と共有教材（user_id IS NULL）だけを返す。
+ * 他人の個別教材の id を打ち込んでも 404 になる。
  */
 export async function materialView(db: Sql, userId: string, materialId: string): Promise<MaterialView | null> {
   const [m] = await db<{
@@ -63,7 +64,7 @@ export async function materialView(db: Sql, userId: string, materialId: string):
     SELECT m.id, m.unit_id, u.label AS unit_label, m.title,
            m.status, m.blocked_reason, m.generated_at
       FROM material m JOIN syllabus_unit u ON u.id = m.unit_id
-     WHERE m.id = ${materialId} AND m.user_id = ${userId}`
+     WHERE m.id = ${materialId} AND (m.user_id = ${userId} OR m.user_id IS NULL)`
   if (!m) return null
 
   // 配信しない教材の本文は取りに行かない。画面に渡らなければ漏れようがない
@@ -133,7 +134,8 @@ export async function recordRead(
   const [s] = await db<{ char_count: number; material_id: string; hidden: boolean }[]>`
     SELECT s.char_count, s.material_id, s.hidden
       FROM material_section s JOIN material m ON m.id = s.material_id
-     WHERE s.id = ${a.sectionId} AND m.user_id = ${a.userId} AND m.status = 'ready'`
+     WHERE s.id = ${a.sectionId} AND m.status = 'ready'
+       AND (m.user_id = ${a.userId} OR m.user_id IS NULL)`
   if (!s) throw new Error('セクションが見つかりません')
   if (s.hidden) throw new Error('このセクションは表示していません')
 
@@ -195,11 +197,15 @@ export async function drillMaterials(db: Sql, userId: string, drillId: string): 
       JOIN syllabus_unit u ON u.id = du.unit_id
       LEFT JOIN LATERAL (
         SELECT x.* FROM material x
-         WHERE x.user_id = ${userId} AND x.unit_id = du.unit_id AND x.status <> 'superseded'
+         WHERE (x.user_id = ${userId} OR x.user_id IS NULL)
+           AND x.unit_id = du.unit_id AND x.status <> 'superseded'
+         -- 同じ単元に個別版と共有版があれば個別版を優先する。
+         -- 個別版はその人の弱点に寄せて作り直したものだからである
          -- 同じ単元に複数あるときは「今いちばん意味のある1本」を選ぶ。
          -- 配信できるものが最優先、次に生成中、最後に止まっているもの
          ORDER BY CASE x.status WHEN 'ready' THEN 1 WHEN 'generating' THEN 2
                                 WHEN 'blocked' THEN 3 ELSE 4 END,
+                  (x.user_id IS NULL),
                   x.generated_at DESC
          LIMIT 1
       ) m ON true

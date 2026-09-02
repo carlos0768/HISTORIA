@@ -178,7 +178,12 @@ CREATE TABLE user_activity (
 -- ★ v0.3: ユーザーごとに生成する。(user_id, unit_id) で1本（§3.1）
 CREATE TABLE material (
   id             uuid PRIMARY KEY,
-  user_id        uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  -- NULL = 共有教材。誰の弱点にも寄せていない「初回版」であり、全利用者が読む。
+  --   初回生成の時点では p_know も misconception も空なので、
+  --   誰に対しても同じプロンプトから同じ教材が作られる（docs/07 §3.1 の実装上の帰結）。
+  --   人数分作ると生成費だけが人数倍になり、得るものが無い。
+  -- 非NULL = 個別教材。学習が進んで弱点が溜まった利用者に作り直したもの。
+  user_id        uuid REFERENCES app_user(id) ON DELETE CASCADE,
   unit_id        text NOT NULL REFERENCES syllabus_unit(id),
   title          text NOT NULL,
   provider       text NOT NULL,               -- 'gemini' | 'anthropic'
@@ -198,10 +203,16 @@ CREATE TABLE material (
   output_tokens  int,
   generated_at   timestamptz NOT NULL DEFAULT now()
 );
--- 1ユーザー・1単元につき、表示できる教材はちょうど1本
+-- 1ユーザー・1単元につき、表示できる教材はちょうど1本。
+-- ★ 索引を2本に分ける。PostgreSQL の一意索引は NULL を互いに異なる値として扱うため、
+--   (user_id, unit_id) の1本だけでは共有教材（user_id IS NULL）が同じ単元に
+--   何本でも作れてしまう。
 CREATE UNIQUE INDEX material_one_ready_per_user_unit
-  ON material (user_id, unit_id) WHERE status = 'ready';
+  ON material (user_id, unit_id) WHERE status = 'ready' AND user_id IS NOT NULL;
+CREATE UNIQUE INDEX material_one_shared_ready_per_unit
+  ON material (unit_id) WHERE status = 'ready' AND user_id IS NULL;
 CREATE INDEX ON material (user_id, unit_id);
+CREATE INDEX ON material (unit_id) WHERE user_id IS NULL;
 
 CREATE TABLE material_section (
   id          uuid PRIMARY KEY,
@@ -680,6 +691,10 @@ ALTER TABLE misconception            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE check_test               ENABLE ROW LEVEL SECURITY;
 ALTER TABLE material_read            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE material                 ENABLE ROW LEVEL SECURITY;
+-- ★ 本文は material_section にある。ここを保護しないと material のポリシーが素通りする
+--   （他人の教材も、配信を止めた blocked の本文も読めてしまう）。
+ALTER TABLE material_section         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE material_section_kc      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE item                     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE generation_job           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE video_view               ENABLE ROW LEVEL SECURITY;
@@ -781,10 +796,25 @@ CREATE POLICY check_test_select ON check_test
 -- ---- 生成物（読むだけ。作るのはサーバー側） ----
 -- material と item は「自分のもの」＋「診断用の共有プール（item.user_id IS NULL）」を読める
 CREATE POLICY material_select ON material
-  FOR SELECT USING (user_id = (SELECT auth.uid()));
+  FOR SELECT USING (user_id = (SELECT auth.uid()) OR user_id IS NULL);
 -- ★ item に SELECT ポリシーを作らない（12-nonfunctional.md §6.1）。
 --   RLS は列単位の制限ができないため、SELECT を許すと answer_key・explanation・
 --   choices[].why_wrong まで解答前に読めてしまう。出題は Server Action が
 --   stem と choices の key/text だけを返し、正答は採点の応答で初めて返す。
+-- 本文は「読める教材の、配信できる版」に限る。
+-- blocked / failed の本文は誰にも見せない（作者判断 Q4・docs/08 §5 層5）。
+CREATE POLICY material_section_select ON material_section
+  FOR SELECT USING (EXISTS (
+    SELECT 1 FROM material m
+     WHERE m.id = material_section.material_id
+       AND m.status = 'ready'
+       AND (m.user_id = (SELECT auth.uid()) OR m.user_id IS NULL)));
+CREATE POLICY material_section_kc_select ON material_section_kc
+  FOR SELECT USING (EXISTS (
+    SELECT 1 FROM material_section s JOIN material m ON m.id = s.material_id
+     WHERE s.id = material_section_kc.section_id
+       AND m.status = 'ready'
+       AND (m.user_id = (SELECT auth.uid()) OR m.user_id IS NULL)));
+
 CREATE POLICY generation_job_select ON generation_job
   FOR SELECT USING (user_id = (SELECT auth.uid()));

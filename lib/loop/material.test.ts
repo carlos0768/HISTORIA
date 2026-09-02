@@ -60,6 +60,28 @@ dbSuite('教材の閲覧と読了（実DB）', () => {
     userId = await createUser(db, NOW)
   })
 
+  /**
+   * 学習の記録を与えて、この利用者の教材が共有ではなく個別になるようにする。
+   * p_know を既定より上げると band が変わり、isDefaultContext が false になる。
+   */
+  const makePersonalized = async (uid: string) => {
+    const kcs = await db<{ id: string }[]>`
+      SELECT kc_id AS id FROM kc_syllabus_unit WHERE unit_id = ${UNIT} ORDER BY kc_id LIMIT 2`
+    for (const k of kcs) {
+      await db`INSERT INTO user_kc_state (user_id, kc_id, p_know, n_obs, n_eff)
+               VALUES (${uid}, ${k.id}, 0.9, 5, 4)
+               ON CONFLICT (user_id, kc_id) DO UPDATE SET p_know = 0.9`
+    }
+  }
+
+  /** 個別教材（user_id 非NULL）を作る */
+  const genPersonal = async (uid: string) => {
+    await makePersonalized(uid)
+    const r = await generateMaterial(db, createClient(cfg), { userId: uid, unitId: UNIT, now: NOW })
+    if (r.status !== 'ready') throw new Error(`ready ではありません: ${r.status}`)
+    return r.materialId
+  }
+
   const genReady = async () => {
     const r = await generateMaterial(db, createClient(cfg), { userId, unitId: UNIT, now: NOW })
     if (r.status !== 'ready') throw new Error(`ready ではありません: ${r.status}`)
@@ -106,10 +128,22 @@ dbSuite('教材の閲覧と読了（実DB）', () => {
       }
     })
 
-    it('他人の教材は見えない', async () => {
-      const id = await genReady()
+    it('他人の個別教材は見えない', async () => {
+      const mine = await genPersonal(userId)
       const other = await createUser(db, NOW)
-      expect(await materialView(db, other, id)).toBeNull()
+      expect(await materialView(db, other, mine)).toBeNull()
+    })
+
+    it('共有教材は誰でも読める（生成した本人でなくても）', async () => {
+      const id = await genReady()
+      const [m] = await db<{ user_id: string | null }[]>`
+        SELECT user_id FROM material WHERE id = ${id}`
+      expect(m!.user_id).toBeNull()   // 学習履歴が無いので共有として保存される
+
+      const other = await createUser(db, NOW)
+      const v = await materialView(db, other, id)
+      expect(v).not.toBeNull()
+      expect(v!.sections).toHaveLength(7)
     })
 
     it('存在しない id は null', async () => {
@@ -185,13 +219,27 @@ dbSuite('教材の閲覧と読了（実DB）', () => {
       expect((await materialView(db, userId, id))!.readCount).toBe(3)
     })
 
-    it('他人のセクションには記録できない', async () => {
-      const id = await genReady()
-      const v = (await materialView(db, userId, id))!
+    it('他人の個別教材のセクションには記録できない', async () => {
+      const mine = await genPersonal(userId)
+      const v = (await materialView(db, userId, mine))!
       const other = await createUser(db, NOW)
       await expect(recordRead(db, {
         userId: other, sectionId: v.sections[0]!.id, dwellMs: 999_999, scrollPct: null, now: NOW,
       })).rejects.toThrow('見つかりません')
+    })
+
+    it('共有教材の読了は誰でも記録できる', async () => {
+      const id = await genReady()
+      const v = (await materialView(db, userId, id))!
+      const other = await createUser(db, NOW)
+      const r = await recordRead(db, {
+        userId: other, sectionId: v.sections[0]!.id,
+        dwellMs: v.sections[0]!.requiredMs, scrollPct: null, now: NOW,
+      })
+      expect(r.counted).toBe(true)
+      // 読了は利用者ごと。他人が読んでも自分の読了数は増えない
+      expect((await materialView(db, userId, id))!.readCount).toBe(0)
+      expect((await materialView(db, other, id))!.readCount).toBe(1)
     })
 
     it('伏せたセクションには記録できない', async () => {
@@ -274,7 +322,18 @@ dbSuite('教材の閲覧と読了（実DB）', () => {
       expect(row!.materialId).toBe(readyId)
     })
 
-    it('他人の教材は混ざらない', async () => {
+    it('他人の個別教材は混ざらない', async () => {
+      const { drillId } = await createDrill(db, {
+        userId, title: '古代オリエント', unitIds: [UNIT], deadline: DEADLINE,
+      })
+      const other = await createUser(db, NOW)
+      await genPersonal(other)
+
+      const [row] = await drillMaterials(db, userId, drillId)
+      expect(row!.status).toBe('none')
+    })
+
+    it('共有教材は自分が作っていなくても ready で出る', async () => {
       const { drillId } = await createDrill(db, {
         userId, title: '古代オリエント', unitIds: [UNIT], deadline: DEADLINE,
       })
@@ -283,7 +342,8 @@ dbSuite('教材の閲覧と読了（実DB）', () => {
       expect(r.status).toBe('ready')
 
       const [row] = await drillMaterials(db, userId, drillId)
-      expect(row!.status).toBe('none')
+      expect(row!.status).toBe('ready')
+      expect(row!.sectionCount).toBe(7)
     })
   })
 })

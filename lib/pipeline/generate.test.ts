@@ -248,7 +248,8 @@ dbSuite('生成パイプライン（実DB）', () => {
 
     const jobs = await db<{ n: string }[]>`SELECT count(*) AS n FROM generation_job WHERE user_id = ${userId}`
     expect(Number(jobs[0]!.n)).toBe(1)
-    const mats = await db<{ n: string }[]>`SELECT count(*) AS n FROM material WHERE user_id = ${userId}`
+    // 学習履歴が無いので共有教材（user_id IS NULL）として1本だけ保存される
+    const mats = await db<{ n: string }[]>`SELECT count(*) AS n FROM material`
     expect(Number(mats[0]!.n)).toBe(1)
   })
 
@@ -287,8 +288,116 @@ dbSuite('生成パイプライン（実DB）', () => {
 
     // 配信できる教材は単元につき1本のまま
     const ready = await db<{ n: string }[]>`
-      SELECT count(*) AS n FROM material WHERE user_id = ${userId} AND status = 'ready'`
+      SELECT count(*) AS n FROM material WHERE unit_id = ${UNIT} AND status = 'ready'`
     expect(Number(ready[0]!.n)).toBe(1)
+  })
+
+  // ---- 初回教材の共有（生成費の削減） ----
+
+  /**
+   * 初回生成の時点では p_know も misconception も空なので、
+   * 誰に対しても同じプロンプトが組み立つ。人数分作れば生成費だけが人数倍になる。
+   */
+  describe('初回教材の共有', () => {
+    const personalize = async (uid: string) => {
+      const kcs = await db<{ id: string }[]>`
+        SELECT kc_id AS id FROM kc_syllabus_unit WHERE unit_id = ${UNIT} ORDER BY kc_id LIMIT 2`
+      for (const k of kcs) {
+        await db`INSERT INTO user_kc_state (user_id, kc_id, p_know, n_obs, n_eff)
+                 VALUES (${uid}, ${k.id}, 0.9, 5, 4)
+                 ON CONFLICT (user_id, kc_id) DO UPDATE SET p_know = 0.9`
+      }
+    }
+
+    it('学習履歴が無ければ共有教材として保存される', async () => {
+      const r = await generateMaterial(db, createClient(cfg), { userId, unitId: UNIT, now: NOW })
+      expect(r.status).toBe('ready')
+      if (r.status !== 'ready') return
+      const [m] = await db<{ user_id: string | null }[]>`
+        SELECT user_id FROM material WHERE id = ${r.materialId}`
+      expect(m!.user_id).toBeNull()
+    })
+
+    it('2人目は生成せず共有教材を使う（呼び出しが増えない）', async () => {
+      const ai = createClient(cfg)
+      const a = await generateMaterial(db, ai, { userId, unitId: UNIT, now: NOW })
+      const other = await createUser(db, NOW)
+      const b = await generateMaterial(db, ai, { userId: other, unitId: UNIT, now: NOW })
+
+      expect(a.status).toBe('ready')
+      expect(b.status).toBe('ready')
+      if (a.status !== 'ready' || b.status !== 'ready') return
+      expect(b.materialId).toBe(a.materialId)
+
+      // ★ ここが節約の実体。教材は1本、元帳も1回ぶんしか増えない
+      const [mats] = await db<{ n: string }[]>`SELECT count(*) AS n FROM material`
+      expect(Number(mats!.n)).toBe(1)
+      const spend = await db<{ purpose: string }[]>`
+        SELECT purpose FROM ai_spend WHERE period = ${periodOf(NOW)} ORDER BY id`
+      expect(spend.map(x => x.purpose)).toEqual(['generate', 'factcheck'])
+    })
+
+    it('2人目にも設問が複製される（共有教材でも解ける）', async () => {
+      const ai = createClient(cfg)
+      await generateMaterial(db, ai, { userId, unitId: UNIT, now: NOW })
+      const other = await createUser(db, NOW)
+      const b = await generateMaterial(db, ai, { userId: other, unitId: UNIT, now: NOW })
+      expect(b.status).toBe('ready')
+      if (b.status !== 'ready') return
+      expect(b.itemCount).toBe(16)
+
+      const mine = await db<{ format: string; n: string }[]>`
+        SELECT format, count(*) AS n FROM item WHERE user_id = ${userId} GROUP BY format ORDER BY format`
+      const theirs = await db<{ format: string; n: string }[]>`
+        SELECT format, count(*) AS n FROM item WHERE user_id = ${other} GROUP BY format ORDER BY format`
+      expect(theirs).toEqual(mine)
+
+      // 設問は利用者ごと。診断用の共有プール（user_id IS NULL）には入れない
+      const [pool] = await db<{ n: string }[]>`SELECT count(*) AS n FROM item WHERE user_id IS NULL`
+      expect(Number(pool!.n)).toBe(0)
+    })
+
+    it('設問の複製は繰り返しても増えない', async () => {
+      const ai = createClient(cfg)
+      await generateMaterial(db, ai, { userId, unitId: UNIT, now: NOW })
+      const other = await createUser(db, NOW)
+      await generateMaterial(db, ai, { userId: other, unitId: UNIT, now: NOW })
+      await generateMaterial(db, ai, { userId: other, unitId: UNIT, now: NOW })
+      const [n] = await db<{ n: string }[]>`SELECT count(*) AS n FROM item WHERE user_id = ${other}`
+      expect(Number(n!.n)).toBe(16)
+    })
+
+    it('弱点が溜まった利用者には個別に作り直す', async () => {
+      const ai = createClient(cfg)
+      const shared = await generateMaterial(db, ai, { userId, unitId: UNIT, now: NOW })
+      expect(shared.status).toBe('ready')
+
+      const other = await createUser(db, NOW)
+      await personalize(other)
+      const personal = await generateMaterial(db, ai, { userId: other, unitId: UNIT, now: NOW })
+      expect(personal.status).toBe('ready')
+      if (shared.status !== 'ready' || personal.status !== 'ready') return
+
+      expect(personal.materialId).not.toBe(shared.materialId)
+      const [m] = await db<{ user_id: string | null }[]>`
+        SELECT user_id FROM material WHERE id = ${personal.materialId}`
+      expect(m!.user_id).toBe(other)
+
+      // 共有版は残る。他の利用者はそのまま読み続ける
+      const [s] = await db<{ status: string }[]>`
+        SELECT status FROM material WHERE id = ${shared.materialId}`
+      expect(s!.status).toBe('ready')
+    })
+
+    it('同じ単元に配信できる共有教材は1本だけ（一意索引）', async () => {
+      const ai = createClient(cfg)
+      const r = await generateMaterial(db, ai, { userId, unitId: UNIT, now: NOW })
+      if (r.status !== 'ready') throw new Error('ready ではありません')
+      await expect(db`
+        INSERT INTO material (id, user_id, unit_id, title, provider, model, prompt_version, status)
+        VALUES (gen_random_uuid(), NULL, ${UNIT}, '二本目', 'gemini', 'x', 'v1', 'ready')
+      `).rejects.toThrow()
+    })
   })
 
   it('generation_job にトークン数が記録される', async () => {
