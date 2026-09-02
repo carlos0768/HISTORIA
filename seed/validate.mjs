@@ -163,10 +163,10 @@ for (const e of canon) {
     else if (Number(e.year_from) > Number(e.year_to)) fail(`9: year_from > year_to: ${e.id}`);
   }
   // ★ 桁の打ち間違いと符号の落としを拾う。世界史の範囲を外れる年は入力誤りである
-  //   （前4000年より前は文明以前、2100年より後は未来）
+  //   （前1万年より前は農耕以前、2100年より後は未来）
   for (const [col, v] of [['year_from', e.year_from], ['year_to', e.year_to]]) {
     if (v === '' || !/^-?\d+$/.test(v)) continue;
-    if (Number(v) < -4000 || Number(v) > 2100) fail(`9: ${col} が世界史の範囲外（桁か符号の誤りでは）: ${e.id} = ${v}`);
+    if (Number(v) < -10000 || Number(v) > 2100) fail(`9: ${col} が世界史の範囲外（桁か符号の誤りでは）: ${e.id} = ${v}`);
   }
   for (const label of (e.region_ids ? e.region_ids.split(';').map(s => s.trim()).filter(Boolean) : [])) {
     if (!regionLabels.has(label)) fail(`9: canon_event の region "${label}" が region.csv にない（${e.id}）`);
@@ -184,14 +184,48 @@ for (const [name, owners] of canonNames) {
   if (owners.length > 1) fail(`9: 同じ語 "${name}" を複数の canon_event が名乗っている: ${owners.join(', ')}`);
 }
 
-// 他のラベルを完全に含む組を警告する（最長一致で拾えるが、意図した包含かを目で見る）
+// 他のラベルを完全に含む組を調べる。
+//
+// ★ 包含そのものは正常である（「アヘン戦争」⊂「第2次アヘン戦争」）。照合は最長一致なので
+//   長い方が勝ち、正しく解決される。
+//
+// ★ 危ないのは「**短く、かつ他の語に埋もれる**」名前である。たとえば「商」は
+//   「日米修好通商条約」「英仏協商」に含まれるので、それらを主語とする主張が
+//   殷（前1600年）に当たり、**正しい年が誤りと判定されて配信が止まる**。
+//   長い名前なら最長一致で救えるが、短い名前は救えない
+//   （「日米通商条約」のように、こちらの長いラベルの方が主語に含まれないことがあるため）。
+//   したがって **2文字以下で、かつ他の名前に埋もれるもの**だけは落とす。
+const SHORT_NAME = 2;
 const canonWarnings = [];
+const dupWarnings = [];
 const names = [...canonNames.keys()].sort((a, b) => b.length - a.length);
 for (const long of names) {
   for (const short of names) {
     if (short.length >= long.length) continue;
-    if (long.includes(short)) {
-      canonWarnings.push(`"${short}"（${canonNames.get(short)[0]}）が "${long}"（${canonNames.get(long)[0]}）に含まれる`);
+    if (!long.includes(short)) continue;
+    // ★ 同じ行の label と alias どうしの包含は無害。どちらに当たっても同じ行が返る
+    //   （「史記」と「司馬遷の史記」は両方とも ce.cul.sima_qian）
+    if (canonNames.get(short)[0] === canonNames.get(long)[0]) continue;
+    const where = `"${short}"（${canonNames.get(short)[0]}）が "${long}"（${canonNames.get(long)[0]}）に含まれる`;
+    if (short.length <= SHORT_NAME) fail(`9: ${SHORT_NAME}文字以下の名前が他の語に埋もれている（照合が取り違える）: ${where}`);
+    else canonWarnings.push(where);
+  }
+}
+
+// 同じ年で名前が包含関係にある組は、同じ事象を二度書いた疑いがある。
+// ★ 落とさない。同じ年に起きた別の事象（ポツダム会談とポツダム宣言の受諾）は正常である。
+//   ただし二重登録は正典を無駄に増やし、照合の取り違えも招くので目に入れる。
+for (let i = 0; i < canon.length; i++) {
+  const a = canon[i];
+  const an = [a.label, ...(a.aliases ? a.aliases.split(';').map(s => s.trim()).filter(Boolean) : [])];
+  for (let j = i + 1; j < canon.length; j++) {
+    const b = canon[j];
+    if (a.year_from !== b.year_from) continue;
+    const bn = [b.label, ...(b.aliases ? b.aliases.split(';').map(s => s.trim()).filter(Boolean) : [])];
+    if (an.some(x => bn.some(y => x.includes(y) || y.includes(x)))) {
+      // ★ 包含の警告とは別の配列に入れる。同じ配列に混ぜると、包含が数十件あるときに
+      //   表示の上限（20件）に押し出されて**二重登録が画面に出ない**。実際に一度そうなった
+      dupWarnings.push(`同じ ${a.year_from} 年で名前が重なる: ${a.id}「${a.label}」と ${b.id}「${b.label}」（二重登録では）`);
     }
   }
 }
@@ -224,6 +258,11 @@ console.log(`KC を持つ節: ${covered.size} / ${leafUnits.size}（未着手 ${
 
 // ★ 警告は落とさない。包含はしばしば正しい（「ポエニ戦争」と「第1回ポエニ戦争」）。
 //   落とすと正しい正典を消す方向に働くので、目に入れるだけにする。
+if (dupWarnings.length) {
+  // ★ 二重登録は必ず全件出す。件数が少なく、かつ見逃すと正典が無駄に増える
+  console.log(`\n△ 同じ年で名前が重なる組が ${dupWarnings.length} 件`);
+  for (const w of dupWarnings) console.log('  - ' + w);
+}
 if (canonWarnings.length) {
   console.log(`\n△ 正典のラベルに包含関係が ${canonWarnings.length} 件（最長一致で拾うが、意図した包含か確認する）`);
   for (const w of canonWarnings.slice(0, 20)) console.log('  - ' + w);

@@ -4606,9 +4606,9 @@ INSERT INTO kc_region (kc_id, region_id, is_primary) VALUES ('kc.euro.church_pow
   ON CONFLICT (kc_id, region_id) DO UPDATE SET is_primary = true;
 INSERT INTO kc_region (kc_id, region_id, is_primary) VALUES ('kc.euro.church_power', 3, false) ON CONFLICT DO NOTHING;
 
--- 正典イベント 0 件（承認されず除外 152）
+-- 正典イベント 0 件（承認されず除外 1180）
 
--- 正典人物 0 件（承認されず除外 111）
+-- 正典人物 0 件（承認されず除外 446）
 
 COMMIT;
 
