@@ -142,7 +142,7 @@ KC は節に紐づくので、ここがずれると範囲指定がずれる。
 
 ## 5b. Supabase に入れる
 
-**2つの方法がある。どちらでも結果は同じになる。**
+**3つの方法がある。どれでも結果は同じになる。**
 
 ### 方法A: SQL を貼る（Node も接続文字列も要らない）
 
@@ -177,6 +177,39 @@ npx tsx scripts/db/migrate.ts --apply --seed   # 実行
 接続文字列は **Direct connection**（Transaction pooler ではない）を使う。
 繋がらないときは Session pooler。アプリ実行時の `DATABASE_URL` はこれとは別で、
 そちらは Transaction pooler を使う（`docs/12` §4）。
+
+### 方法C: Supabase MCP から流す（2026-09-02 に実際に使った経路）
+
+**Claude Code の遠隔セッションからはこれしか通らない。** ネットワーク方針が
+`*.supabase.co:443` への CONNECT を拒否するため、`DATABASE_URL` を渡されても
+`seed-remote.ts` は繋がらない（`curl: (56) CONNECT tunnel failed, response 403`）。
+MCP は `mcp-proxy.anthropic.com` 経由なので通る。
+
+ただし MCP の `execute_sql` / `apply_migration` は SQL を引数で受けるため、
+`02_seed.sql`（975KB）を渡すと**会話を1MB近い日本語が通過する**。
+打ち直しになるので、誤りが混入しても気づけない。
+
+そこで **DB 側に CSV を取りに行かせる**。
+
+1. 承認済みの CSV を push し、**commit を固定**する
+2. その commit の `raw.githubusercontent.com` を読む Edge Function を
+   `deploy_edge_function` で置く（リポジトリが public なので認証が要らない）
+3. `pg_net` を一時的に入れ、`net.http_post` で DB から関数を呼ぶ
+   （こちらから関数の URL を叩くことはできないため）
+4. `net._http_response` で結果を受け取る
+5. **md5 で中身を照合する。** 件数だけでは打ち間違いを検出できない
+
+```sql
+-- 照合の例。ORDER BY には COLLATE "C" を付ける。
+-- Postgres の既定（en_US）は記号を無視するので、手元のコードポイント順と一致しない
+SELECT md5(string_agg(id || '|' || label || '|' || coalesce(year_from::text,''),
+                      E'\n' ORDER BY id COLLATE "C")) FROM canon_event;
+```
+
+6. **後片付けを必ずする。** Edge Function は service_role でマスタ表に書けるうえ
+   anon 鍵で呼べるので、置きっぱなしにすると攻撃面になる。中身を空にしてから
+   ダッシュボードで削除する。`pg_net` も `DROP EXTENSION` する
+   （DB から外向きに HTTP を出せる状態を残さない）
 
 ## 6. 検査
 
