@@ -15,7 +15,7 @@ export default async function MaterialPage({ params }: { params: Promise<{ id: s
 
   if (!db || !userId) {
     return (
-      <Screen title="教材">
+      <Screen title="教材" tab="drills">
         <Empty><p className="lv-body">データベースに接続していません。</p></Empty>
       </Screen>
     )
@@ -28,7 +28,7 @@ export default async function MaterialPage({ params }: { params: Promise<{ id: s
   // ただし「なぜ出せないのか」は必ず出す。黙って消すと不具合と区別がつかない。
   if (m.status !== 'ready') {
     return (
-      <Screen title={m.unitLabel}>
+      <Screen title={m.unitLabel} tab="drills">
         <Alert title={
           m.status === 'blocked' ? 'この教材は配信していません'
           : m.status === 'generating' ? 'まだ作っています'
@@ -54,7 +54,7 @@ export default async function MaterialPage({ params }: { params: Promise<{ id: s
   }
 
   return (
-    <Screen title={m.unitLabel}>
+    <Screen title={m.unitLabel} tab="drills">
       <Reader
         title={m.title}
         totalChars={m.totalChars}

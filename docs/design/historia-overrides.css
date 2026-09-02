@@ -81,6 +81,14 @@
   }
 }
 
+/* A-9. 全幅ボタンが画面から溢れるのを止める。
+   .lv-btn は padding 14px 20px と 1.5px の枠を持つが box-sizing の指定が無く、
+   .lv-btn--block の width:100% に対して padding と枠が**外側に**足される。
+   375px の画面（.hs-pad の左右余白 20px）で実測 42px はみ出し、横スクロールが出る。
+   .lv-field は line 97 で border-box を指定しており、ボタン側だけ抜けていた。
+   意匠は変わらない（寸法の解釈だけを揃える）。 */
+.lv-btn { box-sizing: border-box; }
+
 /* ---------- 2. HISTORIA 固有のコンポーネント ---------- */
 
 /* H-1. 習得度バー。★（lv-rating）は「評価」に見えるため習得度には使わない。

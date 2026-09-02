@@ -6,7 +6,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     // proxy.ts は Next の作法で置き場所が決まっているため、試験も根に置く
-    include: ['lib/**/*.test.ts', 'scripts/**/*.test.ts', 'proxy.test.ts'],
+    include: ['lib/**/*.test.ts', 'scripts/**/*.test.ts', 'components/**/*.test.ts', 'proxy.test.ts'],
 
     /**
      * 実 DB を使うテストは既定の 5 秒では足りない。

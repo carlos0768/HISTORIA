@@ -26,15 +26,28 @@ export async function createKcs(db: Sql, ids: string[], unitId: string): Promise
 
 export async function createDrill(
   db: Sql, userId: string, kcIds: string[], deadline: Date, unitId?: string,
+  mode: 'ai_material' | 'self_study' = 'ai_material',
 ): Promise<string> {
   const id = randomUUID()
   await db`
     INSERT INTO drill (id, user_id, title, deadline, mode)
-    VALUES (${id}, ${userId}, '集中特訓', ${deadline}, 'ai_material')`
+    VALUES (${id}, ${userId}, '集中特訓', ${deadline}, ${mode})`
   for (const kc of kcIds) {
     await db`INSERT INTO drill_kc (drill_id, kc_id) VALUES (${id}, ${kc})`
   }
   if (unitId) await db`INSERT INTO drill_unit (drill_id, unit_id) VALUES (${id}, ${unitId})`
+  return id
+}
+
+/** 配信済みの教材を1本。本文は要らない試験のために、節は作らない */
+export async function createMaterial(
+  db: Sql, o: { userId: string | null; unitId: string; status?: string },
+): Promise<string> {
+  const id = randomUUID()
+  await db`
+    INSERT INTO material (id, user_id, unit_id, title, provider, model, prompt_version, status)
+    VALUES (${id}, ${o.userId}, ${o.unitId}, '教材', 'fake', 'fake', 'v1',
+            ${o.status ?? 'ready'})`
   return id
 }
 

@@ -15,7 +15,7 @@ export default async function Home() {
 
   if (!db || !userId) {
     return (
-      <Screen title="HISTORIA">
+      <Screen title="HISTORIA" tab="home">
         <Empty>
           <p className="lv-body">データベースに接続していません。</p>
           <p className="lv-caption">
@@ -36,7 +36,7 @@ export default async function Home() {
   const materials = await Promise.all(drills.map(d => drillMaterials(db, userId, d.drillId)))
 
   return (
-    <Screen title="HISTORIA">
+    <Screen title="HISTORIA" tab="home">
       {/* ホームに出す数字は1つだけ。特訓ごとのノルマは出さない（docs/05 §5.1） */}
       <Card>
         <span className="lv-label">今日やること</span>

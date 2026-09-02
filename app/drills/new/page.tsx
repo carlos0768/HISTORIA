@@ -18,7 +18,7 @@ export default async function NewDrill() {
 
   if (!db || !userId) {
     return (
-      <Screen title="範囲を選ぶ">
+      <Screen title="範囲を選ぶ" tab="drills">
         <Empty>
           <p className="lv-body">データベースに接続していません。</p>
           <p className="lv-caption"><code>DATABASE_URL</code> と <code>DEMO_USER_ID</code> が要ります。</p>
@@ -29,7 +29,7 @@ export default async function NewDrill() {
 
   const tree = await unitTree(db)
   return (
-    <Screen title="範囲を選ぶ">
+    <Screen title="範囲を選ぶ" tab="drills">
       <RangePicker tree={tree} defaultDeadline={defaultDeadline()} />
     </Screen>
   )
