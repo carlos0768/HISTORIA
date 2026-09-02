@@ -49,6 +49,34 @@ SELECT has_table_privilege('anon', 'public.kc', 'DELETE');  -- → true
 
 修正前 **45 / 52** → 修正後 **52 / 52**。
 
+#### 本番への適用と、本物の `auth.uid()` での確認（2026-09-02・M22 決着）
+
+`seed/sql/03_rls.sql` を本番（Supabase）に適用した。構造は次のとおりになった。
+
+| 見るもの | 値 |
+|---|---|
+| RLS が無効な表 | **0**（42表すべて有効） |
+| ポリシー | **34 本**（うち `TO authenticated` 限定が 34。PUBLIC 向けは 0） |
+| `v_weakness_evidence` | `{security_invoker=true}` |
+
+そのうえで、**Supabase の本物の `auth.uid()`** を使って挙動を確かめた（全て1トランザクションでロールバック、行は1件も残していない）。
+
+| 立場 | 見えるもの |
+|---|---|
+| 認証済み（利用者A） | `app_user` 1件（自分だけ）／`kc` 60・`syllabus_unit` 117（マスタは読める）／`invite_code`・`past_exam`・`item`・`ai_budget` は **0**／教材3件（自分の ready・共有・自分の blocked）で**他人の教材は0**／本文は **2件だけ**（blocked の本文は見えない）／解答履歴ビュー **0** |
+| 認証済みの書き込み | `kc` 更新 **0行**・`kc_region` 削除 **0行**・`syllabus_unit` 更新 **0行**（読み取り可・書き込み不可が成立） |
+| 未ログイン（anon） | `kc` 0・`syllabus_unit` 0・`app_user` 0・`material` 0・`material_section` 0・解答履歴 0（**何も見えない**） |
+
+Supabase のリンタからも `security_definer_view`（ERROR）が消えた。
+残る `rls_enabled_no_policy`（INFO）12件は、**意図して全行拒否にしている表**である
+（`ai_budget` / `ai_spend` / `app_setting` / `channel_allowlist` / `invite_code` /
+`item` / `item_kc` / `kc_merge` / `kc_proposal` / `past_exam` ×3）。
+**ここにポリシーを足してはいけない。** `schema.sql` §13 に同じ注意が書いてある。
+
+`extension_in_public`（WARN・`vector` が public にある）は直していない。
+移設は既存の型参照を全て書き換える作業になる一方、実害は拡張の関数が見える程度で、
+上の3件とは危険度が2桁違う。意図して後回しにしている。
+
 ### 1.-1 作者が確定させた事項（3回目・Q1/Q2/Q8）
 
 | # | 問い | 決定 | 反映 |
@@ -100,7 +128,7 @@ KC は**追加しても既存データを壊さない**（`kc` への INSERT で
 | M4 | **1ユニットの生成に実際に何秒かかるか** | Vercel の300秒上限に収まるか（`08` §10-6） | 0 |
 | M5 | **Gemini の構造化出力（`responseSchema`）が `07` §5.3 のスキーマで通るか** | 通らなければ階層を浅くする（`08` §10-7） | 0 |
 | M18 | **層3（別系統モデル）が Flash の誤りをどれだけ検出できるか** | **人手レビューの代替が機能するかの判定。目標70%以上** | 0 |
-| M22 | **RLS ポリシーが意図どおり効くこと** | `npx tsx scripts/db/verify-rls.ts` で自動化（**52項目**）。何も残さない（1トランザクションで必ずロールバック）。**2026-09-02、本番の Supabase を読んで3件の穴が出た**（§1.-2 に詳述）。修正前 45/52 → 修正後 52/52。手元での前後比較と、旧スキーマのDBに `seed/sql/03_rls.sql` を当てて新スキーマのDBと `pg_policies` / `relrowsecurity` / ビューの設定が完全一致することまで確認済み。**残るのは Supabase 本体に 03_rls.sql を当てて 52/52 を出すことだけ**である | 1 |
+| M22 | ~~**RLS ポリシーが意図どおり効くこと**~~ **決着（2026-09-02）**。本番の Supabase に修正を適用し、**本物の `auth.uid()` で確認済み**（§1.-2）。`npx tsx scripts/db/verify-rls.ts` で 52 項目を自動化してあり、手元では 52/52 | — |
 | M19 | **judge の distractor 軸と因果軸のスコア** | 機械照合では守れない領域。Flash が落ちるとしたらここ | 0 |
 | M20 | **Supabase Free の一時停止条件**（何日で停止・復帰は手動か） | Free で始める判断の前提（`03` §6.1） | 1 |
 | M21 | **Try IT の再生リストが `playlistItems.list` で取得でき、`embeddable` であること** | 動画連携の前提（`09b` §4.1.1） | 3 |
