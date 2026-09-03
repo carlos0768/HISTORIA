@@ -6158,7 +6158,7 @@ INSERT INTO canon_event (id, label, aliases, year_from, year_to, precision, regi
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, aliases = EXCLUDED.aliases,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to,
     precision = EXCLUDED.precision, region_ids = EXCLUDED.region_ids;
-INSERT INTO canon_event (id, label, aliases, year_from, year_to, precision, region_ids) VALUES ('ce.rev.stephenson_locomotive', 'スティーヴンソンの蒸気機関車', '{}'::text[], 1825, NULL, 'exact', ARRAY[2]::smallint[])
+INSERT INTO canon_event (id, label, aliases, year_from, year_to, precision, region_ids) VALUES ('ce.rev.stephenson_locomotive', 'スティーヴンソンの蒸気機関車', '{}'::text[], 1814, 1825, 'exact', ARRAY[2]::smallint[])
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, aliases = EXCLUDED.aliases,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to,
     precision = EXCLUDED.precision, region_ids = EXCLUDED.region_ids;
@@ -8538,7 +8538,7 @@ INSERT INTO canon_event (id, label, aliases, year_from, year_to, precision, regi
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, aliases = EXCLUDED.aliases,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to,
     precision = EXCLUDED.precision, region_ids = EXCLUDED.region_ids;
-INSERT INTO canon_event (id, label, aliases, year_from, year_to, precision, region_ids) VALUES ('ce.fin.radio_broadcast', 'ラジオ放送の開始', '{}'::text[], 1920, NULL, 'exact', ARRAY[7]::smallint[])
+INSERT INTO canon_event (id, label, aliases, year_from, year_to, precision, region_ids) VALUES ('ce.fin.radio_broadcast', 'ラジオ放送の開始', '{}'::text[], 1920, 1925, 'exact', ARRAY[7]::smallint[])
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, aliases = EXCLUDED.aliases,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to,
     precision = EXCLUDED.precision, region_ids = EXCLUDED.region_ids;
@@ -10229,7 +10229,3679 @@ INSERT INTO person (label, aliases, era_id) VALUES ('サハロフ', '{}'::text[]
 INSERT INTO person (label, aliases, era_id) VALUES ('ソルジェニーツィン', '{}'::text[], 3)
   ON CONFLICT (label) DO UPDATE SET aliases = EXCLUDED.aliases, era_id = EXCLUDED.era_id;
 
--- 共有設問 0 件（承認されず除外 408）
+-- 共有設問 408 件（承認されず除外 0）
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('3195ae42-d017-3806-9cd2-c4211df9c735', NULL, 'mcq4', '古代メソポタミアを支配した勢力を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"アッシリア → アッカド → カッシート → バビロン第1王朝"},{"key":"b","text":"カッシート → アッシリア → バビロン第1王朝 → アッカド"},{"key":"c","text":"アッカド → バビロン第1王朝 → カッシート → アッシリア"},{"key":"d","text":"バビロン第1王朝 → アッカド → アッシリア → カッシート"}]'::jsonb,
+   '"c"'::jsonb, 'アッカド王国（前24世紀）がシュメールの都市国家群を初めて統一し、次にバビロン第1王朝（前19〜前16世紀、ハンムラビ王）が興った。ヒッタイトの侵入で同王朝が滅んだあとカッシートが約400年支配し、最後にアッシリアが前7世紀にオリエントを統一した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('3195ae42-d017-3806-9cd2-c4211df9c735', 'kc.orient.mesopotamia_dynasty_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d177d54d-8fff-34ee-859b-64f5fdfb3753', NULL, 'mcq4', '次のうち、新王国時代の出来事はどれか。', '[{"key":"a","text":"ギザの三大ピラミッドが築かれた"},{"key":"b","text":"アメンホテプ4世がアテン神の一神教への改革を行った"},{"key":"c","text":"メンフィスを都として最初の統一王朝が成立した"},{"key":"d","text":"テーベを都として中王国が成立した"}]'::jsonb,
+   '"b"'::jsonb, 'アマルナ改革（アメンホテプ4世＝イクナートン）は新王国第18王朝の出来事である。ギザのピラミッドは古王国、メンフィス遷都は初期王朝〜古王国、テーベの中王国はその名のとおり中王国。中王国末期にヒクソスが侵入し、これを撃退して成立したのが新王国である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d177d54d-8fff-34ee-859b-64f5fdfb3753', 'kc.orient.egypt_kingdom_periods', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('1438c731-af5c-3903-9594-4b529cc423b0', NULL, 'mcq4', 'アッシリアとアケメネス朝の統治の違いとして正しいものはどれか。', '[{"key":"a","text":"アケメネス朝はアッシリアより短命で、オリエントを統一できなかった"},{"key":"b","text":"アッシリアは服属民を強制移住させる強圧策をとり、アケメネス朝は貢納を課す一方で諸民族の宗教や慣習を認めた"},{"key":"c","text":"アッシリアは各州にサトラップを置いたが、アケメネス朝は属州を置かず直轄支配のみだった"},{"key":"d","text":"両者とも被支配民の宗教を弾圧し、唯一の神の信仰を強制した"}]'::jsonb,
+   '"b"'::jsonb, 'サトラップ（知事）と「王の目・王の耳」、王の道はアケメネス朝の制度である。アッシリアは強制移住と重税で服属民の反発を招き、統一から約60年で崩壊した。これに対しアケメネス朝はダレイオス1世のもとで寛容策をとり、約200年続いた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('1438c731-af5c-3903-9594-4b529cc423b0', 'kc.orient.assyria_vs_achaemenid_rule', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6c8ce9c3-68fc-33dc-836c-3f647c3465a9', NULL, 'mcq4', '東地中海の3民族についての説明として正しいものはどれか。', '[{"key":"a","text":"フェニキア人は唯一神ヤハウェを信仰し、のちのキリスト教の母体となった"},{"key":"b","text":"フェニキア人は地中海の海上交易で活躍し、その表音文字がギリシア文字の起源となった"},{"key":"c","text":"アラム人は地中海の海上交易を独占し、カルタゴを建設した"},{"key":"d","text":"ヘブライ人は内陸の中継交易を担い、その言語が国際商業語となった"}]'::jsonb,
+   '"b"'::jsonb, '海上交易・カルタゴの建設・アルファベットの起源はフェニキア人、ダマスクスを拠点とする内陸の中継交易とアラム語の国際商業語化はアラム人、ヤハウェ信仰の一神教はヘブライ人である。bとcは役割の入れ替え、dは宗教の取り違えにあたる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6c8ce9c3-68fc-33dc-836c-3f647c3465a9', 'kc.orient.east_med_three_peoples', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5fc54e0e-82a0-3a34-866d-79b374e5ff08', NULL, 'mcq4', 'ハンムラビ法典の特徴として正しいものはどれか。', '[{"key":"a","text":"身分に関わらず、すべての人に同じ刑罰を科した"},{"key":"b","text":"復讐を禁じ、賠償金の支払いのみを認めた"},{"key":"c","text":"神官にのみ適用され、一般の市民には適用されなかった"},{"key":"d","text":"同害復讐を原則としたが、刑罰は被害者の身分によって異なった"}]'::jsonb,
+   '"d"'::jsonb, '「目には目を、歯には歯を」の同害復讐で知られるが、貴族・平民・奴隷で刑罰が異なり、身分の低い者が被害者の場合は賠償で済むこともあった。「同害復讐だから平等」ではない点がよく問われる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5fc54e0e-82a0-3a34-866d-79b374e5ff08', 'kc.orient.hammurabi_code_principle', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('90423557-05f8-3020-ae52-0801752b73fa', NULL, 'mcq4', 'キリスト教をめぐる出来事を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"国教化 → ミラノ勅令 → ニケーア公会議 → エフェソス公会議"},{"key":"b","text":"ミラノ勅令 → 国教化 → ニケーア公会議 → エフェソス公会議"},{"key":"c","text":"ミラノ勅令 → ニケーア公会議 → 国教化 → エフェソス公会議"},{"key":"d","text":"ニケーア公会議 → ミラノ勅令 → エフェソス公会議 → 国教化"}]'::jsonb,
+   '"c"'::jsonb, 'ミラノ勅令（313年・公認）→ ニケーア公会議（325年・アリウス派を異端）→ テオドシウス帝による国教化（392年）→ エフェソス公会議（431年・ネストリウス派を異端）→ カルケドン公会議（451年・単性論を異端）。公認と国教化は別の出来事で、その間に約80年ある。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('90423557-05f8-3020-ae52-0801752b73fa', 'kc.rome.christianity_official_steps', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('641b547a-a4bb-3296-b205-b4095a85c75e', NULL, 'mcq4', '古代ギリシアで統一国家が生まれず、ポリスの分立が続いた要因として最も適切なものはどれか。', '[{"key":"a","text":"山がちで平地が分断された地形のため各集落が独立を保ち、増えた人口は植民市の建設で外へ向かったから"},{"key":"b","text":"大河の治水に強力な王権が必要だったから"},{"key":"c","text":"ペルシアの直接支配を受け、統一を禁じられていたから"},{"key":"d","text":"貨幣が普及せず、交易による結びつきが生まれなかったから"}]'::jsonb,
+   '"a"'::jsonb, '地形による分断と、人口圧をマッサリアやネアポリスなどの植民市で解消したことが分立の背景である。bは大河のあるオリエント（エジプト・メソポタミア）で強大な王権が生まれた理由であり、ギリシアには当てはまらない。ペルシア戦争ではポリス側が勝っているためcも誤り。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('641b547a-a4bb-3296-b205-b4095a85c75e', 'kc.greece.polis_formation_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ecca79c2-7bcc-3ad2-912c-e22339234084', NULL, 'mcq4', '陶片追放（オストラキスモス）の制度を定めた人物はだれか。', '[{"key":"a","text":"ソロン"},{"key":"b","text":"ドラコン"},{"key":"c","text":"ペイシストラトス"},{"key":"d","text":"クレイステネス"}]'::jsonb,
+   '"d"'::jsonb, 'ドラコン（慣習法の成文化）→ ソロン（財産政治・債務奴隷の禁止）→ ペイシストラトス（僭主政）→ クレイステネス（デーモスにもとづく10部族制・陶片追放）→ ペリクレス（民会中心の民主政の完成）の順である。陶片追放は僭主の再出現を防ぐための制度だった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ecca79c2-7bcc-3ad2-912c-e22339234084', 'kc.greece.athens_democracy_steps', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('aa103073-5686-3139-a3b7-97ef59a63bc8', NULL, 'mcq4', 'スパルタの社会についての説明として正しいものはどれか。', '[{"key":"a","text":"すべての住民に参政権が与えられ、民会が最高機関だった"},{"key":"b","text":"商工業と海上交易で栄え、多数の在留外国人を受け入れた"},{"key":"c","text":"ペリオイコイは市民権をもつ完全な支配層だった"},{"key":"d","text":"被征服民であるヘイロータイに農耕を担わせ、市民は軍務に専念した"}]'::jsonb,
+   '"d"'::jsonb, 'スパルタはリュクルゴスの制のもと、少数の市民が多数のヘイロータイ（隷属農民）を支配したため、反乱を抑える必要から厳格な軍国主義をとった。ペリオイコイは周辺民で商工業に従事したが参政権はない。cは商工業と在留外国人（メトイコイ）で栄えたアテネの説明である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('aa103073-5686-3139-a3b7-97ef59a63bc8', 'kc.greece.athens_vs_sparta', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('3480ea82-9b4a-3520-92c2-9ac25b403082', NULL, 'mcq4', 'ペルシア戦争の勝利がペロポネソス戦争を招いた過程の説明として正しいものはどれか。', '[{"key":"a","text":"ペルシア戦争に敗れたスパルタが、アテネへの復讐を企てたから"},{"key":"b","text":"ペルシア戦争でアテネが敗北して同盟から脱退し、指導権を失ったから"},{"key":"c","text":"アテネがデロス同盟の資金を自国の再建に流用して同盟を帝国化し、これを警戒したスパルタと衝突したから"},{"key":"d","text":"ペルシアがアテネと結んでスパルタを攻撃したから"}]'::jsonb,
+   '"c"'::jsonb, 'デロス同盟はペルシアの再来に備える軍事同盟だったが、アテネは金庫をデロス島からアテネへ移し、パルテノン神殿の再建などに流用した。この帝国化がペロポネソス同盟（スパルタ）との対立を生んだ。ペルシア戦争はギリシア側の勝利なのでcとdは前提から誤り。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('3480ea82-9b4a-3520-92c2-9ac25b403082', 'kc.greece.persian_war_to_peloponnesian', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('8bf69d98-7d3d-38e8-829b-201f3105a329', NULL, 'mcq4', 'ヘレニズム3王国と、その支配領域の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"セレウコス朝＝シリア、プトレマイオス朝＝エジプト、アンティゴノス朝＝マケドニア"},{"key":"b","text":"セレウコス朝＝エジプト、プトレマイオス朝＝マケドニア、アンティゴノス朝＝シリア"},{"key":"c","text":"セレウコス朝＝マケドニア、プトレマイオス朝＝シリア、アンティゴノス朝＝エジプト"},{"key":"d","text":"セレウコス朝＝エジプト、プトレマイオス朝＝シリア、アンティゴノス朝＝マケドニア"}]'::jsonb,
+   '"a"'::jsonb, 'アレクサンドロス大王の死後、帝国はディアドコイ（後継者）戦争を経て3王国に分かれた。セレウコス朝はシリアを含む西アジア、プトレマイオス朝はエジプト（都アレクサンドリア）、アンティゴノス朝はマケドニア本土を支配した。プトレマイオス朝は前30年にローマに滅ぼされ、ヘレニズム時代が終わる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('8bf69d98-7d3d-38e8-829b-201f3105a329', 'kc.greece.hellenistic_kingdoms_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('58f38327-f895-3784-9f54-734db73db652', NULL, 'mcq4', 'ローマで平民が貴族から政治的譲歩を引き出せた最大の理由はどれか。', '[{"key":"a","text":"ギリシアの民主政を模倣するよう周辺国から求められたから"},{"key":"b","text":"貴族が農業を捨てて商業に移り、政治への関心を失ったから"},{"key":"c","text":"平民が重装歩兵として軍の主力を担うようになり、その協力なしに戦争を遂行できなくなったから"},{"key":"d","text":"平民が貴族より人口で上回り、多数決で決定できたから"}]'::jsonb,
+   '"c"'::jsonb, 'ローマの対外戦争の拡大とともに、武具を自弁できる平民が重装歩兵として軍の中核を占めた。平民会の設置と護民官（前494年の聖山事件）、十二表法（前450年頃）、リキニウス=セクスティウス法（前367年）、ホルテンシウス法（前287年）という譲歩は、この軍事的な必要から引き出されたものである。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('58f38327-f895-3784-9f54-734db73db652', 'kc.rome.plebeian_rights_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d2da23f1-8219-3f8f-9e9a-8e959fe2d1cc', NULL, 'mcq4', '共和政ローマが崩壊し元首政へ移る過程の説明として正しいものはどれか。', '[{"key":"a","text":"元老院が自ら共和政を廃止し、皇帝に全権を委ねる法を制定した"},{"key":"b","text":"ゲルマン人の侵入を防ぐため、軍が非常時の独裁官を常設化した"},{"key":"c","text":"長期の従軍と属州からの安価な穀物で中小農民が没落し、無産市民が私兵化して有力者の抗争が続いた末に、オクタウィアヌスが権力を握った"},{"key":"d","text":"属州の反乱で領土を失い、財政破綻から皇帝を立てざるをえなくなった"}]'::jsonb,
+   '"c"'::jsonb, 'ポエニ戦争後、中小農民の没落（ラティフンディアの拡大）が軍の担い手を失わせた。グラックス兄弟の改革は挫折し、マリウスの兵制改革で無産市民が私兵化する。三頭政治を経てアクティウムの海戦（前31年）に勝ったオクタウィアヌスが、前27年にアウグストゥスの称号を得て元首政を始めた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d2da23f1-8219-3f8f-9e9a-8e959fe2d1cc', 'kc.rome.gracchus_to_principate', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('8dbd0bb1-4aab-36e7-af5b-fb2474fb813b', NULL, 'mcq4', '元首政（プリンキパトゥス）と専制君主政（ドミナトゥス）の違いとして正しいものはどれか。', '[{"key":"a","text":"専制君主政はアウグストゥスが、元首政はディオクレティアヌスが始めた"},{"key":"b","text":"元首政は共和政の制度を残し「市民の第一人者」として統治したが、専制君主政は皇帝崇拝を強制する公然たる専制だった"},{"key":"c","text":"元首政は世襲制で、専制君主政は選挙制だった"},{"key":"d","text":"元首政では元老院が廃止されたが、専制君主政では復活した"}]'::jsonb,
+   '"b"'::jsonb, 'アウグストゥスは共和政の外形を保ち、自らをプリンケプス（第一人者）と称した。3世紀の危機を経てディオクレティアヌスは四帝分治制を敷き、皇帝崇拝を強制して公然と専制君主として振る舞った。dは人物と制度が逆である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('8dbd0bb1-4aab-36e7-af5b-fb2474fb813b', 'kc.rome.principate_vs_dominate', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('1c6b40f8-1f86-3303-8416-47c1448d132b', NULL, 'mcq4', 'インダス文明とアーリヤ人の社会についての説明として正しいものはどれか。', '[{"key":"a","text":"アーリヤ人が先に定住し、のちにインダス文明の都市が建設された"},{"key":"b","text":"両者は同時期に並存し、インダス文字でヴェーダが記された"},{"key":"c","text":"インダス文明は計画的な都市と未解読の文字をもち、その衰退後に中央アジアからアーリヤ人が進入してヴェーダの社会を築いた"},{"key":"d","text":"インダス文明はアーリヤ人が築いたもので、ヴェーダはその都市で編まれた"}]'::jsonb,
+   '"c"'::jsonb, 'モエンジョ=ダーロやハラッパーの計画都市は前2600年頃からで、インダス文字はいまも未解読である。前1500年頃に中央アジアからアーリヤ人がパンジャーブ地方に進入し、『リグ=ヴェーダ』を残した。両者は担い手も時期も異なる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('1c6b40f8-1f86-3303-8416-47c1448d132b', 'kc.india.indus_vs_aryan', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('37ba8619-9965-39b0-b9d9-22957f26cd32', NULL, 'mcq4', 'ヴァルナとジャーティの関係の説明として正しいものはどれか。', '[{"key":"a","text":"ヴァルナとジャーティは同じものを指す別の呼び名である"},{"key":"b","text":"ジャーティが4つの大区分で、ヴァルナはその下位の職業集団である"},{"key":"c","text":"ヴァルナはイギリス統治下で作られた区分で、それ以前には存在しなかった"},{"key":"d","text":"ヴァルナは4つの身分の枠組みで、その内側に職業と結びついた多数のジャーティが存在する"}]'::jsonb,
+   '"d"'::jsonb, 'ヴァルナはバラモン・クシャトリヤ・ヴァイシャ・シュードラの4身分。ジャーティは出生と職業に結びついた集団で、数千に及ぶ。この二重構造をポルトガル語由来の「カースト」が一括して呼んだために混同されやすい。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('37ba8619-9965-39b0-b9d9-22957f26cd32', 'kc.india.varna_jati_structure', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('8fef0cfb-6b13-34b2-96e2-ed3bba0b3771', NULL, 'mcq4', '仏教とジャイナ教に共通する、バラモン教への批判点はどれか。', '[{"key":"a","text":"王権を否定し、政治への関与を拒んだ点"},{"key":"b","text":"ヴァルナによる身分の区別と、いけにえを伴う祭式の権威を認めなかった点"},{"key":"c","text":"唯一神の存在を否定し、無神論を唱えた点"},{"key":"d","text":"文字の使用を禁じ、口伝のみを認めた点"}]'::jsonb,
+   '"b"'::jsonb, '両者ともクシャトリヤやヴァイシャの支持を得て前6世紀頃に成立し、バラモンの祭式至上主義とヴァルナ的身分秩序を批判した。不殺生（アヒンサー）も共通する。相違点は苦行の位置づけで、ジャイナ教は徹底した苦行と不殺生を求めるのに対し、仏教は中道を説いた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('8fef0cfb-6b13-34b2-96e2-ed3bba0b3771', 'kc.india.new_religions_vs_brahmanism', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('909e1470-422b-3754-9041-b1d0d64bfe5b', NULL, 'mcq4', 'インドの王朝と宗教政策の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"マウリヤ朝のアショーカ王は仏教に帰依し、クシャーナ朝のカニシカ王は大乗仏教を保護し、グプタ朝ではヒンドゥー教が定着した"},{"key":"b","text":"マウリヤ朝ではヒンドゥー教が国教とされ、グプタ朝で仏教が保護された"},{"key":"c","text":"カニシカ王は上座部仏教を保護し、アショーカ王は大乗仏教を広めた"},{"key":"d","text":"3王朝ともジャイナ教を国教とした"}]'::jsonb,
+   '"a"'::jsonb, 'アショーカ王はカリンガ征服の惨禍を悔いてダルマ（法）による統治を掲げ、仏典結集を行った。カニシカ王のもとでガンダーラ美術と大乗仏教が栄えた。グプタ朝ではサンスクリット文学とヒンドゥー教が興隆し、『マヌ法典』が整えられた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('909e1470-422b-3754-9041-b1d0d64bfe5b', 'kc.india.maurya_kushana_gupta', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('00e59e9a-7e33-3fd8-bf44-291e97653538', NULL, 'mcq4', '大乗仏教と上座部仏教の伝播経路の説明として正しいものはどれか。', '[{"key":"a","text":"上座部仏教はインドから直接日本へ伝わった"},{"key":"b","text":"大乗仏教は中央アジアを経て中国・朝鮮・日本へ伝わり、上座部仏教はスリランカを経て東南アジアへ伝わった"},{"key":"c","text":"大乗仏教はスリランカ経由で東南アジアへ、上座部仏教は中央アジア経由で東アジアへ伝わった"},{"key":"d","text":"どちらもチベットを経由して東アジアにのみ伝わった"}]'::jsonb,
+   '"b"'::jsonb, '大乗仏教（北伝）は衆生の救済を重んじ、中央アジアのオアシス都市を経て中国・朝鮮・日本へ伝わった。上座部仏教（南伝）は出家者の修行を重んじ、スリランカからビルマ・タイ・カンボジアへ広まった。北伝＝東アジア、南伝＝東南アジアの対応が問われる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('00e59e9a-7e33-3fd8-bf44-291e97653538', 'kc.india.mahayana_vs_theravada', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('00b65e28-3d9b-3bf5-ac29-6e8af6511103', NULL, 'mcq4', '東南アジアの「インド化」が進んだ理由として最も適切なものはどれか。', '[{"key":"a","text":"インドの王朝が軍を派遣して東南アジアを征服したから"},{"key":"b","text":"インドから大規模な移住があり、現地住民が少数派になったから"},{"key":"c","text":"ヨーロッパ人がインド文化を東南アジアへ持ち込んだから"},{"key":"d","text":"季節風を利用した海上交易でインド商人が往来し、現地の首長がインドの王権思想や宗教を統治に取り入れたから"}]'::jsonb,
+   '"d"'::jsonb, 'インド洋の季節風（モンスーン）を利用した交易により、港市の首長がヒンドゥー教・仏教やサンスクリット語、王権思想を受け入れた。軍事征服ではなく交易を通じた自発的な受容であった点が重要である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('00b65e28-3d9b-3bf5-ac29-6e8af6511103', 'kc.sea.indianization_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0732aae6-52cd-3ad0-aa3a-a468ad5a98a9', NULL, 'mcq4', '東南アジアの国家と、その所在地の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"扶南＝スマトラ、チャンパー＝カンボジア、シュリーヴィジャヤ＝メコン川下流"},{"key":"b","text":"扶南＝ベトナム中部、チャンパー＝スマトラ、アンコール朝＝メコン川下流"},{"key":"c","text":"シュリーヴィジャヤ＝ベトナム中部、アンコール朝＝スマトラ、扶南＝カンボジア"},{"key":"d","text":"扶南＝メコン川下流、チャンパー＝ベトナム中部、シュリーヴィジャヤ＝スマトラ、アンコール朝＝カンボジア"}]'::jsonb,
+   '"d"'::jsonb, '扶南は1〜7世紀にメコン川下流に栄え、外港オケオからローマの金貨が出土している。チャンパーはベトナム中部のチャム人の国。シュリーヴィジャヤはスマトラのパレンバンを中心にマラッカ海峡を押さえた。アンコール朝（カンボジア）はアンコール=ワットを残した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0732aae6-52cd-3ad0-aa3a-a468ad5a98a9', 'kc.sea.port_polities_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ff765389-4d75-3fc8-82b3-a9db38a2157c', NULL, 'mcq4', 'アンコール朝とパガン朝の信仰についての説明として正しいものはどれか。', '[{"key":"a","text":"アンコール朝は当初ヒンドゥー教を奉じてアンコール=ワットを建て、のちに上座部仏教が広まった。パガン朝は上座部仏教を保護した"},{"key":"b","text":"アンコール朝は一貫してイスラーム教を、パガン朝はヒンドゥー教を奉じた"},{"key":"c","text":"両朝とも大乗仏教を国教とし、上座部仏教を排斥した"},{"key":"d","text":"パガン朝はヒンドゥー教のみを、アンコール朝はキリスト教を受け入れた"}]'::jsonb,
+   '"a"'::jsonb, 'アンコール=ワットはスールヤヴァルマン2世がヒンドゥー教の寺院として造営し、のちに仏教寺院として用いられた。ビルマのパガン朝はスリランカから上座部仏教を受け入れ、多数の仏塔を残した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ff765389-4d75-3fc8-82b3-a9db38a2157c', 'kc.sea.angkor_and_pagan', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('a05bba6d-23f4-334c-8324-d6573de67b0a', NULL, 'mcq4', '周の封建制と秦の郡県制の違いとして正しいものはどれか。', '[{"key":"a","text":"どちらも土地を国家が所有し、農民に均等に分配する制度だった"},{"key":"b","text":"封建制は血縁を基礎に一族や功臣に領地を与えて世襲させたが、郡県制は中央から任期付きの官僚を派遣して直接統治した"},{"key":"c","text":"封建制は官僚を派遣する制度で、郡県制は諸侯に領地を分け与える制度だった"},{"key":"d","text":"封建制は秦が、郡県制は周が採用した"}]'::jsonb,
+   '"b"'::jsonb, '周の封建制は宗法という血縁の秩序に支えられ、諸侯は世襲した。秦の始皇帝は全国を郡・県に分け、中央から官吏を派遣して統治した。中国の「封建」は血縁を基礎とする点で、主従の契約に基づくヨーロッパの封建制とは異なる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('a05bba6d-23f4-334c-8324-d6573de67b0a', 'kc.china.fengjian_vs_junxian', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('bd7b583f-db46-31b8-a49a-2a727e7085a9', NULL, 'mcq4', '諸子百家の人物と学派・主張の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"荀子＝道家で性善説、老子＝法家、墨子＝儒家"},{"key":"b","text":"孟子＝道家、韓非＝墨家、荘子＝法家"},{"key":"c","text":"荀子＝儒家で性悪説、韓非＝法家、墨子＝墨家で兼愛"},{"key":"d","text":"孟子＝法家で性悪説、韓非＝儒家、荘子＝墨家"}]'::jsonb,
+   '"c"'::jsonb, '儒家は孔子・孟子（性善説）・荀子（性悪説）。荀子の弟子である韓非と李斯が法家を大成した。道家は老子・荘子で無為自然を説く。墨家の墨子は無差別の愛（兼愛）と戦争反対（非攻）を唱えた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('bd7b583f-db46-31b8-a49a-2a727e7085a9', 'kc.china.hundred_schools_positions', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('87fdac06-ca65-3261-ac78-bf8679f8d2c8', NULL, 'mcq4', '秦が戦国の争いを制して中国を統一できた要因として最も適切なものはどれか。', '[{"key":"a","text":"儒家を国家の学とし、道徳による統治で人心を得たから"},{"key":"b","text":"商鞅の変法で法による統治と富国強兵を進め、関中の地を拠点として東方に対して有利な位置を占めたから"},{"key":"c","text":"周王室の血筋を引き、諸侯から正統な支配者と認められていたから"},{"key":"d","text":"早くから鉄製農具を独占し、他国が入手できなかったから"}]'::jsonb,
+   '"b"'::jsonb, '孝公に用いられた商鞅は、什伍の制・信賞必罰・郡県制の先取りなどにより秦を強国にした。渭水流域の関中は東方から攻めにくく、対外進出には有利だった。儒家を国学としたのは前漢の武帝であり、秦はむしろ法家を採り焚書坑儒を行った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('87fdac06-ca65-3261-ac78-bf8679f8d2c8', 'kc.china.qin_unification_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ca08edb5-61a1-379f-b95b-a5b960c4e374', NULL, 'mcq4', '秦が統一から約15年で崩壊した理由として最も適切なものはどれか。', '[{"key":"a","text":"貨幣・度量衡・文字の統一に失敗し、地域ごとに経済が分断されたから"},{"key":"b","text":"峻厳な法と、万里の長城や阿房宮などの大規模な土木工事による負担が民衆の反発を招き、陳勝・呉広の乱をきっかけに崩れたから"},{"key":"c","text":"匈奴との戦いに敗れて長城以南を失い、首都の咸陽が占領されたから"},{"key":"d","text":"始皇帝が反対派に暗殺され、後継者を決められないまま内乱が続いたから"}]'::jsonb,
+   '"b"'::jsonb, '始皇帝は法家による厳格な統治を行い、長城の修築・道路の建設・阿房宮や陵墓の造営に民を徴発した。始皇帝の死後に陳勝・呉広の乱（前209年）が起こり、項羽と劉邦の争いを経て前206年に滅んだ。貨幣・度量衡・文字の統一はむしろ成功した政策である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ca08edb5-61a1-379f-b95b-a5b960c4e374', 'kc.china.qin_fall_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('fdcdf2e0-fa9a-3674-bab4-810ac9259615', NULL, 'mcq4', '前漢の統治体制の変化についての説明として正しいものはどれか。', '[{"key":"a","text":"当初から全土を郡と県に分ける郡県制のみをとり、封建的な要素は一切なかった"},{"key":"b","text":"はじめ郡県制だったが呉楚七国の乱ののち郡国制に移り、諸侯王の権限が拡大した"},{"key":"c","text":"郡国制を廃して周と同じ封建制に戻し、統治を諸侯の自治に委ねた"},{"key":"d","text":"当初は郡県制と封建制を併せた郡国制をとったが、呉楚七国の乱を鎮圧したのち諸侯王の力を削り、実質的な郡県制に移った"}]'::jsonb,
+   '"d"'::jsonb, '高祖は秦の急激な郡県制を改め、直轄地に郡県、功臣や一族に王国・侯国を置く郡国制をとった。景帝のときの呉楚七国の乱（前154年）を鎮圧したのち諸侯王の実権を奪い、武帝の時代には実質的な中央集権が完成した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('fdcdf2e0-fa9a-3674-bab4-810ac9259615', 'kc.china.han_junguo_to_junxian', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e2898726-521d-3eb3-b8b2-dfc6ee6d15fc', NULL, 'mcq4', '前漢の武帝の政策として正しいものはどれか。', '[{"key":"a","text":"仏教を国教とし、均田制によって農民に土地を分配した"},{"key":"b","text":"府兵制を廃して募兵制に改め、節度使を置いた"},{"key":"c","text":"儒学を官学とし、塩・鉄・酒を専売にして財政を支え、匈奴に対抗するため張騫を大月氏に派遣した"},{"key":"d","text":"科挙によって官吏を登用し、両税法で税制を改めた"}]'::jsonb,
+   '"c"'::jsonb, '武帝は董仲舒の献策で儒学を官学とし、郷挙里選で官吏を推薦させた。財源確保のため塩・鉄・酒の専売、均輸法・平準法を行い、匈奴挟撃のため張騫を大月氏へ送った（結果として西域の情報がもたらされた）。科挙は隋、両税法・募兵制・節度使は唐、均田制は北魏に始まる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e2898726-521d-3eb3-b8b2-dfc6ee6d15fc', 'kc.china.wudi_policies', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5195911b-d9b8-3a5f-a141-5babcbca0c52', NULL, 'mcq4', '後漢の滅亡から隋の統一までの出来事を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"黄巾の乱 → 三国時代 → 西晋の統一 → 八王の乱 → 五胡十六国 → 南北朝"},{"key":"b","text":"黄巾の乱 → 西晋の統一 → 三国時代 → 五胡十六国 → 八王の乱 → 南北朝"},{"key":"c","text":"三国時代 → 黄巾の乱 → 八王の乱 → 南北朝 → 五胡十六国 → 西晋の統一"},{"key":"d","text":"黄巾の乱 → 五胡十六国 → 三国時代 → 西晋の統一 → 八王の乱 → 南北朝"}]'::jsonb,
+   '"a"'::jsonb, '黄巾の乱（184年）で後漢が揺らぎ、魏・呉・蜀の三国時代となる。魏を継いだ西晋が280年に統一するが、八王の乱（291年〜）で混乱し、五胡が華北に十六国を建てた。江南の東晋・南朝と、北魏に始まる北朝が並立する南北朝を経て、589年に隋が統一した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5195911b-d9b8-3a5f-a141-5babcbca0c52', 'kc.china.division_period_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('c32f3fd2-1611-3582-94a9-80024f3da676', NULL, 'mcq4', '北魏の孝文帝が行った政策として正しいものはどれか。', '[{"key":"a","text":"仏教を弾圧し、道教を国教として敦煌の石窟を破壊した"},{"key":"b","text":"平城から洛陽へ遷都し、鮮卑の言語や服装を禁じて漢化を進め、均田制を実施した"},{"key":"c","text":"都を洛陽から平城へ移し、漢人の風習を禁じて鮮卑の伝統を復活させた"},{"key":"d","text":"科挙を創始し、官吏を試験で登用する制度を始めた"}]'::jsonb,
+   '"b"'::jsonb, '孝文帝は494年に洛陽へ遷都し、鮮卑語・胡服を禁じ、漢人との通婚を奨励した。485年に始めた均田制は、のちの隋・唐の土地制度の原型となる。科挙は隋の文帝、雲崗・竜門の石窟造営はむしろ北魏の仏教保護を示す。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('c32f3fd2-1611-3582-94a9-80024f3da676', 'kc.china.northern_wei_sinicization', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6bf99f3a-3d5d-372b-b6b9-da6b84955c39', NULL, 'mcq4', '唐の均田制・租調庸・府兵制が崩れた結果として採用された制度の組み合わせはどれか。', '[{"key":"a","text":"一条鞭法と衛所制"},{"key":"b","text":"地丁銀と八旗"},{"key":"c","text":"両税法と募兵制"},{"key":"d","text":"占田法と屯田制"}]'::jsonb,
+   '"c"'::jsonb, '均田制は農民に土地を給付し、その見返りに租調庸を課し、府兵制で兵役を担わせる一体の仕組みだった。土地の兼併と農民の逃亡でこれが崩れ、780年に徳宗が両税法（現有の資産に応じ夏秋2回課税）を採用し、兵は募兵で集めるようになった。安史の乱（755〜763年）がこの転換を決定づけた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6bf99f3a-3d5d-372b-b6b9-da6b84955c39', 'kc.china.tang_system_collapse', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('c44c6320-5d6c-3b2f-b2f2-9b80048c5b9a', NULL, 'mcq4', '隋が始めた事業として正しいものはどれか。', '[{"key":"a","text":"両税法の採用と節度使の設置"},{"key":"b","text":"均田制の創始と洛陽への遷都"},{"key":"c","text":"三省六部の廃止と郡国制の復活"},{"key":"d","text":"科挙（選挙）の開始と大運河の建設"}]'::jsonb,
+   '"d"'::jsonb, '隋の文帝は九品中正を廃して学科試験による選挙（のちの科挙）を始め、煬帝は華北と江南を結ぶ大運河を完成させた。どちらも唐が受け継いだため唐の業績と誤りやすい。両税法・節度使は唐、均田制の創始は北魏である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('c44c6320-5d6c-3b2f-b2f2-9b80048c5b9a', 'kc.china.sui_vs_tang_institutions', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b54003d6-de0a-3980-9251-bc6c0c74aaa9', NULL, 'mcq4', '東アジア文化圏を成り立たせた共通の要素として正しい組み合わせはどれか。', '[{"key":"a","text":"アラビア文字・イスラーム法・スーフィズム・ワクフ"},{"key":"b","text":"ラテン語・カトリック・ローマ法・封建制"},{"key":"c","text":"サンスクリット語・ヒンドゥー教・カースト・ヴェーダ"},{"key":"d","text":"漢字・儒教・仏教・律令"}]'::jsonb,
+   '"d"'::jsonb, '唐を中心に、朝鮮（新羅・高麗）・日本・ベトナムが漢字、儒教、（中国化した）仏教、律令という4要素を共有した。日本の遣唐使や大宝律令、朝鮮の科挙導入がその例である。cはヨーロッパ、dはインド、bはイスラーム世界の要素である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b54003d6-de0a-3980-9251-bc6c0c74aaa9', 'kc.eastasia.tang_cultural_sphere', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5393a851-1fd3-342b-ab33-c767d7031ec1', NULL, 'mcq4', '朝鮮半島の国家を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"三国 → 高麗 → 新羅による統一 → 朝鮮（李朝）"},{"key":"b","text":"新羅による統一 → 三国 → 朝鮮（李朝） → 高麗"},{"key":"c","text":"高句麗・百済・新羅の三国 → 新羅による統一 → 高麗 → 朝鮮（李朝）"},{"key":"d","text":"高麗 → 三国 → 朝鮮（李朝） → 新羅による統一"}]'::jsonb,
+   '"c"'::jsonb, '4世紀以降に高句麗・百済・新羅が並立し、新羅が唐と結んで百済（660年）・高句麗（668年）を滅ぼして統一した。935年に高麗が新羅を併合し、1392年に李成桂が朝鮮を建てた。中国側は唐・五代〜宋・元・明に対応する。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5393a851-1fd3-342b-ab33-c767d7031ec1', 'kc.eastasia.korea_dynasty_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4a245333-3f52-3633-a411-396a80b47b3e', NULL, 'mcq4', '内陸アジアにおける遊牧国家とオアシス都市の関係の説明として正しいものはどれか。', '[{"key":"a","text":"オアシス都市が遊牧民を軍事的に征服し、支配下に置き続けた"},{"key":"b","text":"両者は交流を持たず、それぞれ独立して発展した"},{"key":"c","text":"遊牧国家は軍事力でオアシス都市を保護し、オアシス都市は交易の利益と農産物を提供するという相互依存の関係にあった"},{"key":"d","text":"遊牧民はオアシス都市を破壊するだけで、共存関係は成立しなかった"}]'::jsonb,
+   '"c"'::jsonb, '遊牧国家は騎馬の機動力で交易路の安全を保障し、その見返りに関税や貢納を得た。オアシス都市は灌漑農業と中継交易を担った。この共生関係が「オアシスの道」の繁栄を支えた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4a245333-3f52-3633-a411-396a80b47b3e', 'kc.innerasia.nomad_vs_oasis', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('58eb2444-f0cd-36b1-a845-1bbeb6c2b88d', NULL, 'mcq4', '匈奴と前漢の関係の変化についての説明として正しいものはどれか。', '[{"key":"a","text":"武帝が和親策に転じ、それ以前は攻勢をとっていた"},{"key":"b","text":"高祖が匈奴に敗れて以後は和親策で贈り物と婚姻により関係を保ったが、国力を蓄えた武帝が攻勢に転じた"},{"key":"c","text":"前漢は建国当初から匈奴を圧倒し、一貫して攻勢を続けた"},{"key":"d","text":"匈奴は前漢に服属し、一度も軍事的な脅威にならなかった"}]'::jsonb,
+   '"b"'::jsonb, '冒頓単于のもとで強大化した匈奴に高祖は白登山で敗れ（前200年）、以後は和親策をとった。武帝は衛青・霍去病を派遣して攻勢に出て、河西回廊に敦煌など4郡を置いた。dは順序が逆である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('58eb2444-f0cd-36b1-a845-1bbeb6c2b88d', 'kc.innerasia.xiongnu_and_han', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4304b23a-e6ad-332f-8651-147bb35ece51', NULL, 'mcq4', '突厥とウイグルについての説明として正しいものはどれか。', '[{"key":"a","text":"突厥は安史の乱を起こして唐を滅ぼした"},{"key":"b","text":"ウイグルは唐と敵対し続け、唐を援助したことは一度もない"},{"key":"c","text":"突厥は隋・唐の離間策もあって東西に分裂し、のちにモンゴル高原を支配したウイグルは安史の乱で唐を援助した"},{"key":"d","text":"ウイグルが東西に分裂したのち、突厥がこれを滅ぼして唐に服属した"}]'::jsonb,
+   '"c"'::jsonb, '突厥は6世紀に柔然を破って建国し、独自の突厥文字を残したが、583年頃に東西に分裂した。744年に成立したウイグルは、755年からの安史の乱で唐を援助してその見返りに絹を得た。840年にキルギスに敗れて西へ移った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4304b23a-e6ad-332f-8651-147bb35ece51', 'kc.innerasia.turk_and_uighur', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e308dff5-1a41-3161-bb5e-68a1ac2c7466', NULL, 'mcq4', 'ユーラシアの3つの交易路の説明として正しいものはどれか。', '[{"key":"a","text":"草原の道はタリム盆地のオアシス都市を、オアシスの道は北方の草原地帯を通った"},{"key":"b","text":"海の道は地中海の沿岸のみを結ぶ航路で、インド洋には及ばなかった"},{"key":"c","text":"3つの道はいずれも中国国内を結ぶもので、西方の西アジアには達しなかった"},{"key":"d","text":"草原の道はユーラシア北方の草原地帯、オアシスの道はタリム盆地のオアシス都市を経由し、海の道はインド洋の季節風を利用した"}]'::jsonb,
+   '"d"'::jsonb, '草原の道はスキタイや匈奴などの騎馬遊牧民が担った北方のルート。オアシスの道（いわゆるシルク=ロード）は敦煌からタリム盆地の南北を通り、パミールを越えて西アジアへ至る。海の道は季節風を利用し、中国南部からインド洋を経て西アジア・東アフリカに達した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e308dff5-1a41-3161-bb5e-68a1ac2c7466', 'kc.trade.three_routes_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('7c212530-f693-3588-a39c-5c6a7f395aa6', NULL, 'mcq4', 'ソグド人についての説明として正しいものはどれか。', '[{"key":"a","text":"モンゴル高原を本拠とするトルコ系の遊牧民で、農耕を営まなかった"},{"key":"b","text":"インド出身の商人集団で、海の道の交易を独占した"},{"key":"c","text":"中国の江南出身の商人で、大運河の水運を担った"},{"key":"d","text":"中央アジアのサマルカンドなどを本拠とするイラン系の民族で、オアシスの道の交易と文化の仲介を担った"}]'::jsonb,
+   '"d"'::jsonb, 'ソグド人はサマルカンド・ブハラを拠点とするイラン系の商業民で、唐の長安にも多く住み、ゾロアスター教やマニ教を東方へ伝えた。安史の乱を起こした安禄山もソグド系とされる。ソグド文字はウイグル文字、さらにモンゴル文字の系統につながった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('7c212530-f693-3588-a39c-5c6a7f395aa6', 'kc.trade.sogdian_role', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('dc5d89ce-0758-366d-a034-d7c2164a7d48', NULL, 'mcq4', '仏教が伝わった地域を、伝播の順序が古いものから並べたものはどれか。', '[{"key":"a","text":"中央アジア → インド → 朝鮮 → 中国 → 日本"},{"key":"b","text":"インド → 日本 → 朝鮮 → 中国 → 中央アジア"},{"key":"c","text":"インド → 中央アジア → 中国 → 朝鮮 → 日本"},{"key":"d","text":"インド → 中国 → 中央アジア → 日本 → 朝鮮"}]'::jsonb,
+   '"c"'::jsonb, '前1世紀頃までにインドから中央アジアのオアシス都市へ伝わり、後1世紀頃に中国へ入った。4世紀に朝鮮三国へ、6世紀（538年または552年）に百済から日本へ伝えられた。この経路が「北伝仏教」であり、大乗仏教が主流である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('dc5d89ce-0758-366d-a034-d7c2164a7d48', 'kc.trade.buddhism_transmission_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('1e00e25e-fea5-3d33-ac70-9ced463d088b', NULL, 'mcq4', 'イスラーム暦（ヒジュラ暦）の紀元となった出来事はどれか。', '[{"key":"a","text":"ムハンマドがメッカで生まれたこと"},{"key":"b","text":"ムハンマドが洞窟で最初の啓示を受けたこと"},{"key":"c","text":"ムハンマドがメッカを征服し、カーバ神殿の偶像を除いたこと"},{"key":"d","text":"ムハンマドがメッカからメディナへ移住し、信徒の共同体を築いたこと"}]'::jsonb,
+   '"d"'::jsonb, '622年のメディナ移住（ヒジュラ）を紀元とする。ここで信徒の共同体ウンマが成立し、血縁ではなく信仰による結びつきが生まれた点が重要である。最初の啓示は610年頃、メッカ征服は630年で、いずれも紀元ではない。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('1e00e25e-fea5-3d33-ac70-9ced463d088b', 'kc.islam.hijra_and_umma', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('2ec4c0b7-300d-39f9-a425-8d81da5d0913', NULL, 'mcq4', '正統カリフ時代とウマイヤ朝のカリフ位の継承の違いとして正しいものはどれか。', '[{"key":"a","text":"正統カリフは世襲で、ウマイヤ朝以降は合議による選出に改められた"},{"key":"b","text":"どちらもムハンマドの血縁者だけが継ぐと定められていた"},{"key":"c","text":"どちらもビザンツ皇帝の承認を必要とした"},{"key":"d","text":"正統カリフは信徒の合議で選ばれたが、ウマイヤ朝以降は特定の家系による世襲となった"}]'::jsonb,
+   '"d"'::jsonb, 'アブー=バクルからアリーまでの4代は信徒の合議で選ばれた。661年にムアーウィヤがウマイヤ朝を開いて以後は世襲となり、これに反発してアリーとその子孫のみを指導者と認める人々がシーア派を形成した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('2ec4c0b7-300d-39f9-a425-8d81da5d0913', 'kc.islam.rashidun_vs_umayyad_succession', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('7647b1b3-ea8f-3ef1-a6cb-4c9f9d739b46', NULL, 'mcq4', 'スンナ派とシーア派が分かれた最初のきっかけはどれか。', '[{"key":"a","text":"コーランを翻訳してよいかどうかという言語をめぐる論争"},{"key":"b","text":"メッカへの巡礼を義務とするかどうかの見解の相違"},{"key":"c","text":"ムハンマドを神と認めるかどうかという教義上の対立"},{"key":"d","text":"カリフの位を誰が継ぐかという政治的な対立"}]'::jsonb,
+   '"d"'::jsonb, '第4代カリフのアリーが暗殺され、ウマイヤ朝が世襲を始めたことに対し、アリーとその子孫のみを共同体の指導者（イマーム）と認める人々がシーア派となった。出発点は教義ではなく継承をめぐる政治的対立であり、教義の差はのちに形成された。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('7647b1b3-ea8f-3ef1-a6cb-4c9f9d739b46', 'kc.islam.sunni_vs_shia_origin', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5b7f66e5-c62d-36b3-9f2f-03bded863e74', NULL, 'mcq4', 'アラブの大征服が短期間で成功した要因として最も適切なものはどれか。', '[{"key":"a","text":"アラブ軍が火薬兵器を独占し、圧倒的な火力を持っていたから"},{"key":"b","text":"ビザンツ帝国とササン朝が同盟してアラブ側についたから"},{"key":"c","text":"被征服民に改宗を強制せず、税もいっさい課さなかったから"},{"key":"d","text":"ビザンツ帝国とササン朝が長年の抗争で疲弊しており、被征服民も貢納すれば信仰を保てたため抵抗が小さかったから"}]'::jsonb,
+   '"d"'::jsonb, 'ビザンツとササン朝は6〜7世紀の抗争で消耗していた。征服地の「啓典の民」は人頭税ジズヤと地租ハラージュを納めれば信仰を認められたため（免税ではない）、旧支配者より負担が軽い場合もあり抵抗が小さかった。火薬兵器の使用はずっと後代である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5b7f66e5-c62d-36b3-9f2f-03bded863e74', 'kc.islam.arab_conquest_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('af9b8a22-8519-3e7e-8ecb-90276dc48bbf', NULL, 'mcq4', 'ウマイヤ朝とアッバース朝の違いとして正しいものはどれか。', '[{"key":"a","text":"アッバース朝はアラブ人だけを免税とし、非アラブのムスリムに重税を課した"},{"key":"b","text":"両朝ともシーア派を国教とし、スンナ派を弾圧した"},{"key":"c","text":"ウマイヤ朝はダマスクスを都としアラブ人を優遇したが、アッバース朝はバグダードを都とし民族を問わずムスリムの平等を進めた"},{"key":"d","text":"ウマイヤ朝はバグダードを都とし、アッバース朝はダマスクスを都とした"}]'::jsonb,
+   '"c"'::jsonb, 'ウマイヤ朝ではアラブ人が特権を持ち、非アラブの改宗者（マワーリー）にもジズヤが課される不平等があった。アッバース朝はこの不満を背景に成立し、ムスリムであればハラージュのみでジズヤを免れる原則を確立した。「アラブ帝国」から「イスラーム帝国」への転換と呼ばれる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('af9b8a22-8519-3e7e-8ecb-90276dc48bbf', 'kc.islam.umayyad_vs_abbasid', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cc92d82a-466b-3fed-a699-d0509a3ee010', NULL, 'mcq4', 'アッバース朝カリフの実権喪失に関わる出来事を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"セルジューク朝がバグダードに入りアッバース朝を滅ぼす → ブワイフ朝が代わって立つ"},{"key":"b","text":"ブワイフ朝がバグダードに入り大アミールとなる → セルジューク朝がこれを追いスルタンの称号を得る"},{"key":"c","text":"セルジューク朝がスルタンとなる → ブワイフ朝が大アミールとなる"},{"key":"d","text":"ブワイフ朝がスルタンとなる → セルジューク朝が大アミールとなる"}]'::jsonb,
+   '"b"'::jsonb, '946年にシーア派のブワイフ朝がバグダードに入り、カリフから大アミールの地位を得て実権を握った。1055年にトゥグリル=ベクのセルジューク朝がこれを追い、カリフからスルタン（世俗の支配者）の称号を授かった。カリフは宗教的権威として残り、アッバース朝が滅びるのは1258年のモンゴル侵入による。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cc92d82a-466b-3fed-a699-d0509a3ee010', 'kc.islam.abbasid_decline_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('33325f67-ce8c-3d4b-b12f-43f2d165acda', NULL, 'mcq4', '10世紀にカリフを称した3つの王朝と、その都の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"アッバース朝＝カイロ、ファーティマ朝＝コルドバ、後ウマイヤ朝＝バグダード"},{"key":"b","text":"アッバース朝＝コルドバ、ファーティマ朝＝バグダード、後ウマイヤ朝＝カイロ"},{"key":"c","text":"アッバース朝＝バグダード、ファーティマ朝＝コルドバ、後ウマイヤ朝＝カイロ"},{"key":"d","text":"アッバース朝＝バグダード、ファーティマ朝＝カイロ、後ウマイヤ朝＝コルドバ"}]'::jsonb,
+   '"d"'::jsonb, '909年に北アフリカで興ったファーティマ朝はエジプトを征服してカイロを建設し、カリフを称した。イベリア半島の後ウマイヤ朝もアブド=アッラフマーン3世が929年にカリフを称し、コルドバを都とした。こうして3人のカリフが並立した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('33325f67-ce8c-3d4b-b12f-43f2d165acda', 'kc.islam.three_caliphates_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b6b9bc6b-4174-39e0-b4a0-b8e6f892a2c7', NULL, 'mcq4', 'ファーティマ朝とアイユーブ朝の宗派についての説明として正しいものはどれか。', '[{"key":"a","text":"ファーティマ朝はシーア派、アイユーブ朝はスンナ派で、サラディンによる王朝交替は宗派の転換でもあった"},{"key":"b","text":"ファーティマ朝はスンナ派、アイユーブ朝はシーア派で、サラディンがシーア派を国教とした"},{"key":"c","text":"両朝ともシーア派で、宗派の変化はなかった"},{"key":"d","text":"両朝ともスンナ派で、対立は領土をめぐるものだけだった"}]'::jsonb,
+   '"a"'::jsonb, 'ファーティマ朝はシーア派の一派イスマーイール派の王朝である。サラディン（サラーフ=アッディーン）は1169年にこれを倒してアイユーブ朝を開き、スンナ派に戻した。彼は第3回十字軍と戦い、イェルサレムを奪回した人物でもある。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b6b9bc6b-4174-39e0-b4a0-b8e6f892a2c7', 'kc.islam.fatimid_vs_ayyubid', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0ff38832-5e74-3fb3-b3c5-9755b5da6055', NULL, 'mcq4', 'イクター制についての説明として正しいものはどれか。', '[{"key":"a","text":"軍人に俸給の代わりに一定地域の徴税権を与える制度で、ブワイフ朝で始まりセルジューク朝が広めた"},{"key":"b","text":"農民に土地を均等に分配し、その代わりに税と兵役を課す制度である"},{"key":"c","text":"商人に交易の独占権を与えて関税を免除する制度である"},{"key":"d","text":"カリフが聖職者に土地を寄進し、その収益で学院を運営させる制度である"}]'::jsonb,
+   '"a"'::jsonb, 'それまで軍人には現物や現金で俸給を支払っていたが、財政難からブワイフ朝が徴税権の分与に切り替えた（946年頃）。セルジューク朝が制度として確立し、以後のイスラーム諸王朝に広く受け継がれた。bは均田制、dはワクフに近い。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0ff38832-5e74-3fb3-b3c5-9755b5da6055', 'kc.islam.iqta_system', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6a11f282-985a-3e4f-baed-ed44d9d7a41e', NULL, 'mcq4', 'ギリシアの古典がイスラーム世界を経てヨーロッパへ再流入した経路として正しいものはどれか。', '[{"key":"a","text":"ヨーロッパで独自に再発見され、イスラーム世界とは関わりがなかった"},{"key":"b","text":"アラビア語に訳されて保存された古典が、トレドやシチリア島でラテン語に翻訳されてヨーロッパへ伝わった"},{"key":"c","text":"ビザンツ帝国から直接ギリシア語のまま伝わり、翻訳は行われなかった"},{"key":"d","text":"十字軍がイェルサレムから写本を持ち帰り、そのまま各地の大学で用いられた"}]'::jsonb,
+   '"b"'::jsonb, 'アリストテレスなどの著作はアラビア語に訳され、イブン=ルシュド（アヴェロエス）らの注釈とともに発展した。12世紀にイベリア半島のトレドやシチリア島でラテン語へ大量に翻訳され、スコラ学の展開を促した。これを12世紀ルネサンスと呼ぶ。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6a11f282-985a-3e4f-baed-ed44d9d7a41e', 'kc.islam.transmission_to_europe', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d10592bb-8949-3010-aed6-aaa25b6c6a1b', NULL, 'mcq4', 'ゲルマン人の大移動の直接のきっかけと、その帰結の説明として正しいものはどれか。', '[{"key":"a","text":"イスラーム勢力が北へ進出したことに押されて移動が始まった"},{"key":"b","text":"ゲルマン人がローマに招かれ、平和的に定住したものである"},{"key":"c","text":"フン人の西進に押された西ゴート人が376年にローマ領内へ移動し、混乱のなか476年に西ローマ帝国が滅んだ"},{"key":"d","text":"西ローマ帝国が滅んだ結果、空白地帯にゲルマン人が移動した"}]'::jsonb,
+   '"c"'::jsonb, '中央アジアから西進したフン人が東ゴート人を征服し、圧迫された西ゴート人が376年にドナウ川を越えてローマ領内に入った。これが大移動の起点で、以後約200年続く。西ローマ帝国の滅亡（476年）は移動の結果であって原因ではない。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d10592bb-8949-3010-aed6-aaa25b6c6a1b', 'kc.euro.germanic_migration_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cd40f4aa-f5a4-3144-b709-0e16540aed15', NULL, 'mcq4', 'クローヴィスのアタナシウス派への改宗が持った意味として正しいものはどれか。', '[{"key":"a","text":"ビザンツ皇帝の臣下となり、その保護を受けられるようになった"},{"key":"b","text":"イスラーム勢力との同盟が可能になった"},{"key":"c","text":"他のゲルマン諸国家がアリウス派だったのに対し、ローマ系住民と同じ信仰に立つことで支持を得て融合を進められた"},{"key":"d","text":"ローマ教皇の権威を否定し、独自の教会を立てることができた"}]'::jsonb,
+   '"c"'::jsonb, '東ゴート・西ゴート・ヴァンダルなど多くのゲルマン国家はアリウス派（異端とされた）を奉じ、ローマ系住民と溝があった。496年にクローヴィスがアタナシウス派（正統）に改宗したことで、フランク王国はローマ系住民と教会の支持を得て有利に立った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cd40f4aa-f5a4-3144-b709-0e16540aed15', 'kc.euro.frank_conversion_significance', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('371b2fd3-00e3-3f13-86b7-4bf411c73cba', NULL, 'mcq4', '800年のカールの戴冠が持った政治的な意味として正しいものはどれか。', '[{"key":"a","text":"教皇がカールに臣従を誓い、以後は皇帝が教会を完全に支配した"},{"key":"b","text":"イスラーム勢力を追い出した功績に対する、形式的な称号にすぎなかった"},{"key":"c","text":"西ローマ帝国の復興を宣言する形で、ローマ教皇と西欧の王が互いの権威を支え合う関係が生まれ、ビザンツ皇帝との対立を招いた"},{"key":"d","text":"ビザンツ皇帝がカールを後継者に指名し、東西の帝国が再統一された"}]'::jsonb,
+   '"c"'::jsonb, '教皇レオ3世がカールにローマ皇帝の帝冠を与えたことで、西欧は「ローマ帝国の後継」を名のる根拠を得た。教皇は世俗の保護者を、王は権威の裏づけを得るという相互依存が成立した一方、唯一の皇帝を自任するビザンツとの対立が決定的になった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('371b2fd3-00e3-3f13-86b7-4bf411c73cba', 'kc.euro.carolingian_coronation_meaning', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ad2319dc-6930-3c4c-a5c4-e93177b862bb', NULL, 'mcq4', 'ヴェルダン条約とメルセン条約についての説明として正しいものはどれか。', '[{"key":"a","text":"どちらの条約もフランク王国の再統一を定めたものである"},{"key":"b","text":"843年のヴェルダン条約で王国は3分され、870年のメルセン条約で中部フランクの北部が東西に分けられ、独・仏・伊の原型ができた"},{"key":"c","text":"870年のヴェルダン条約が先で、843年のメルセン条約で3分された"},{"key":"d","text":"ヴェルダン条約で東西2つに分かれ、メルセン条約でさらに4つに分かれた"}]'::jsonb,
+   '"b"'::jsonb, 'ヴェルダン条約（843年）でロタール・ルートヴィヒ・シャルルの3人に分割された。メルセン条約（870年）で中部フランクの北部が東西フランクに分けられ、東フランク＝ドイツ、西フランク＝フランス、イタリアという枠組みの原型ができた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ad2319dc-6930-3c4c-a5c4-e93177b862bb', 'kc.euro.verdun_and_mersen', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6ea80740-b8c2-346f-8415-21a95871fc7c', NULL, 'mcq4', 'ギリシア正教とローマ=カトリックの違いとして正しいものはどれか。', '[{"key":"a","text":"両者の対立は1054年に解消され、以後は一つの教会となった"},{"key":"b","text":"正教では皇帝が教会を統轄する皇帝教皇主義がとられたが、カトリックでは教皇が世俗の権力から自立し対抗した"},{"key":"c","text":"正教は教皇を最高の権威とし、カトリックは皇帝を最高の権威とした"},{"key":"d","text":"正教は聖像を積極的に用い、カトリックは一貫して聖像を禁じた"}]'::jsonb,
+   '"b"'::jsonb, 'ビザンツでは皇帝が総主教を任免するなど教会を統轄した。西欧では東ローマ皇帝の支配が及ばず、教皇がフランク王国と結んで自立し、のちに皇帝と叙任権をめぐって争った。726年の聖像禁止令は対立の一因だが、根底には統治構造の差がある。1054年に東西教会は相互に破門し分裂した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6ea80740-b8c2-346f-8415-21a95871fc7c', 'kc.euro.orthodox_vs_catholic', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('dbd2b1d4-bf9b-3dc2-8b50-39c6f50d1e27', NULL, 'mcq4', 'ビザンツ帝国の軍管区制（テマ制）についての説明として正しいものはどれか。', '[{"key":"a","text":"教会に土地を寄進し、修道院に国境の防衛を任せる制度である"},{"key":"b","text":"帝国を軍管区に分けて司令官に軍事と行政を委ね、農民に土地を与えて兵役を課す屯田兵制と組み合わせた"},{"key":"c","text":"貴族に土地の管理を委ね、その見返りに軍役を課す制度で、7世紀に始まった"},{"key":"d","text":"傭兵のみで軍を編成し、自国民には兵役を課さない制度である"}]'::jsonb,
+   '"b"'::jsonb, '7世紀以降、外敵の圧力に対応して軍管区制が敷かれ、屯田兵となった自由農民が帝国の軍事力と税収を支えた。11世紀以降、この自由農民層が没落すると、貴族に土地の管理を委ねて軍役を課すプロノイア制へ移行し、帝国は衰えた。bはプロノイア制の説明である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('dbd2b1d4-bf9b-3dc2-8b50-39c6f50d1e27', 'kc.euro.byzantine_institutions', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b5d57b93-e0ea-3fa8-9e60-2966a0566d65', NULL, 'mcq4', 'スラヴ人と受け入れた宗派の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"ロシア人・セルビア人はギリシア正教、ポーランド人・チェック人・クロアティア人はローマ=カトリックを受け入れた"},{"key":"b","text":"スラヴ人はすべてギリシア正教を受け入れ、カトリックを受け入れた集団はない"},{"key":"c","text":"ポーランド人はギリシア正教、ロシア人はローマ=カトリックを受け入れた"},{"key":"d","text":"西スラヴのみが正教を受け入れ、東スラヴと南スラヴはカトリックを受け入れた"}]'::jsonb,
+   '"a"'::jsonb, '東スラヴ（ロシア・ウクライナ）と南スラヴの一部（セルビア・ブルガリア）はビザンツの影響で正教とキリル文字を受け入れた。西スラヴ（ポーランド・チェック）と南スラヴのクロアティア・スロヴェニアは西欧の影響でカトリックとラテン文字を受け入れた。南スラヴで境界が分かれる点が問われる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b5d57b93-e0ea-3fa8-9e60-2966a0566d65', 'kc.euro.slav_division_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b09fed0d-bf62-3c26-adf6-ee2a48535fb2', NULL, 'mcq4', '西欧の封建社会の構造の説明として正しいものはどれか。', '[{"key":"a","text":"農奴が土地を所有し、領主に地代を払って軍役を免除される仕組みである"},{"key":"b","text":"主従関係は一方的な服従であり、家臣は主君に義務を負うだけだった"},{"key":"c","text":"主君と家臣が保護と軍役を互いに約束する双務的な主従関係と、領主が農奴を支配する荘園制という2つの層から成る"},{"key":"d","text":"国王が全国の官僚を任命し、農民から直接税を集める中央集権の仕組みである"}]'::jsonb,
+   '"c"'::jsonb, '主従関係は複数の主君に仕えることもできる契約的なもので、主君が義務を果たさなければ家臣は離反できた。この点が中国の封建制（血縁が基礎）と異なる。もう一層の荘園制では、農奴が賦役・貢納・領主裁判権や不輸不入権のもとに置かれた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b09fed0d-bf62-3c26-adf6-ee2a48535fb2', 'kc.euro.feudal_two_layers', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('65f02390-41e3-3277-a573-4246974cd47a', NULL, 'mcq4', '聖職叙任権闘争の経過として正しいものはどれか。', '[{"key":"a","text":"クリュニー修道院に始まる改革を背景に教皇グレゴリウス7世が皇帝ハインリヒ4世を破門し、カノッサの屈辱を経て1122年のヴォルムス協約で決着した"},{"key":"b","text":"皇帝ハインリヒ4世が教皇グレゴリウス7世を破門し、教皇がカノッサで謝罪して、以後は皇帝が聖職者を自由に任命した"},{"key":"c","text":"クリュニー修道院が皇帝の側に立って改革を進め、教皇が孤立して叙任権を放棄することで決着した"},{"key":"d","text":"ヴォルムス協約で皇帝が叙任権を完全に手中にし、教皇は聖職者の任命から締め出された"}]'::jsonb,
+   '"a"'::jsonb, '10世紀のクリュニー修道院の改革運動が、聖職売買と世俗権力による叙任への批判を生んだ。1077年のカノッサの屈辱では皇帝が教皇に謝罪した。1122年のヴォルムス協約で、聖職者の任命は教会が、領地に関わる授与は皇帝が行うと定められ、妥協が成立した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('65f02390-41e3-3277-a573-4246974cd47a', 'kc.euro.investiture_controversy', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d4d3d4a0-b9b0-3ea3-b0a9-d96bed6c0014', NULL, 'mcq4', '中世ヨーロッパで農業生産が伸びた結果として起きたこととして正しいものはどれか。', '[{"key":"a","text":"三圃制と重量有輪犂の普及で収穫が増え、人口が増加して大開墾運動・都市の成長・十字軍などの対外進出につながった"},{"key":"b","text":"収穫が増えた分だけ人口が減り、都市が衰退した"},{"key":"c","text":"農業技術の進歩により農奴が不要となり、11世紀に荘園制が消滅した"},{"key":"d","text":"生産の増加は貴族の消費に吸収され、社会構造には影響しなかった"}]'::jsonb,
+   '"a"'::jsonb, '三圃制（耕地を春耕地・秋耕地・休耕地に分ける）と鉄製の重量有輪犂、水車の普及によって11世紀以降に生産が伸びた。人口増加が大開墾運動（エルベ川以東への東方植民を含む）、都市と商業の復活、十字軍の人的基盤となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d4d3d4a0-b9b0-3ea3-b0a9-d96bed6c0014', 'kc.euro.agricultural_growth_effects', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('29daccda-5e22-3332-9f76-ede588ca7cce', NULL, 'mcq4', '化石人類と段階の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"アウストラロピテクス＝猿人、ジャワ原人＝原人、ネアンデルタール人＝旧人、クロマニョン人＝新人"},{"key":"b","text":"アウストラロピテクス＝原人、ジャワ原人＝猿人、ネアンデルタール人＝新人、クロマニョン人＝旧人"},{"key":"c","text":"アウストラロピテクス＝旧人、ジャワ原人＝新人、ネアンデルタール人＝猿人、クロマニョン人＝原人"},{"key":"d","text":"アウストラロピテクス＝猿人、ジャワ原人＝旧人、ネアンデルタール人＝新人、クロマニョン人＝原人"}]'::jsonb,
+   '"a"'::jsonb, '猿人（アウストラロピテクス、約700万〜200万年前、直立二足歩行）→原人（ジャワ原人・北京原人、火と言語の使用）→旧人（ネアンデルタール人、死者の埋葬）→新人（クロマニョン人、洞穴絵画）の順である。新人は現生人類（ホモ=サピエンス）にあたる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('29daccda-5e22-3332-9f76-ede588ca7cce', 'kc.prehist.hominid_stages', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d51693f2-9019-3499-ba6b-e763155ee6e0', NULL, 'mcq4', '新人がアフリカを出て世界へ広がった経路の説明として正しいものはどれか。', '[{"key":"a","text":"ヨーロッパで誕生し、そこからアフリカとアジアへ同時に広がった"},{"key":"b","text":"オーストラリアで誕生し、島づたいにアジアへ渡って各地へ広がった"},{"key":"c","text":"アフリカから西アジアを経てユーラシア各地へ広がり、最後に陸続きだったベーリング海峡を渡ってアメリカ大陸へ到達した"},{"key":"d","text":"アメリカ大陸で誕生し、ベーリング海峡を渡ってユーラシア・アフリカへ広がった"}]'::jsonb,
+   '"c"'::jsonb, '新人はアフリカで生まれ、約10万〜5万年前に出アフリカを果たした。オーストラリアへは海を渡り、アメリカ大陸へは氷期に陸橋となっていたベーリング海峡を経て約1万5千年前頃に到達した。人類が最後に住みついた大陸がアメリカである。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d51693f2-9019-3499-ba6b-e763155ee6e0', 'kc.prehist.human_dispersal_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('2b9d44ef-40b5-3613-9a00-ee906e8aafd4', NULL, 'mcq4', '直立二足歩行が人類にもたらした変化の説明として正しいものはどれか。', '[{"key":"a","text":"前肢が発達して樹上生活に適応し、地上へ降りる必要がなくなった"},{"key":"b","text":"走る速度が飛躍的に上がり、大型動物を単独で狩れるようになった"},{"key":"c","text":"視野が狭まった代わりに嗅覚が発達し、獲物の追跡が容易になった"},{"key":"d","text":"前肢が移動から解放されて道具の製作と運搬が可能になり、脳容量の増大とともに文化の蓄積が進んだ"}]'::jsonb,
+   '"d"'::jsonb, '直立することで手が自由になり、道具の製作・運搬・投擲が可能になった。手の使用と脳の発達は相互に促進し合い、言語と文化の蓄積につながった。一方で骨盤の形が変わって産道が狭まり、未熟な状態で子を産む（そのぶん長く育てる）ことになった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('2b9d44ef-40b5-3613-9a00-ee906e8aafd4', 'kc.prehist.bipedalism_effects', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('af9ccefc-f8cb-3dae-8469-618c7bc4bf9b', NULL, 'mcq4', '人類の行動とその担い手の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"火の使用＝原人、死者の埋葬＝旧人、洞穴絵画＝新人"},{"key":"b","text":"火の使用＝新人、死者の埋葬＝原人、洞穴絵画＝旧人"},{"key":"c","text":"火の使用＝旧人、死者の埋葬＝新人、洞穴絵画＝原人"},{"key":"d","text":"火の使用＝猿人、死者の埋葬＝原人、洞穴絵画＝旧人"}]'::jsonb,
+   '"a"'::jsonb, '火の使用と言語の使用は原人（北京原人など）の段階に始まる。旧人のネアンデルタール人は死者を埋葬しており、精神文化の芽生えを示す。ラスコー（フランス）やアルタミラ（スペイン）の洞穴絵画は新人（クロマニョン人）の残したものである。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('af9ccefc-f8cb-3dae-8469-618c7bc4bf9b', 'kc.prehist.fire_burial_art', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('9af5eb89-c881-3bba-ba3c-d89c4d1dca5c', NULL, 'mcq4', '旧石器時代・中石器時代・新石器時代を分ける基準として正しいものはどれか。', '[{"key":"a","text":"文字の有無によって分け、文字が現れる前後で区切る"},{"key":"b","text":"石器の製法によって分け、打製石器の時代を旧石器、細石器の時代を中石器、磨製石器の時代を新石器とする"},{"key":"c","text":"使用した金属の種類によって分け、銅・青銅・鉄の順に対応させる"},{"key":"d","text":"農耕の有無によって分け、狩猟採集を旧石器、遊牧を中石器、農耕を新石器とする"}]'::jsonb,
+   '"b"'::jsonb, '区分の基準は石器の製法である。旧石器時代は打製石器、氷期の終わりに小型の細石器を用いる中石器時代を経て、磨製石器と土器を伴う新石器時代となる。農耕の開始は新石器時代とほぼ重なるが、区分の基準そのものは石器の製法である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('9af5eb89-c881-3bba-ba3c-d89c4d1dca5c', 'kc.prehist.stone_age_division', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('107ca3d0-b257-3341-8824-9bde62d698c6', NULL, 'mcq4', '獲得経済から生産経済へ転換した要因として最も適切なものはどれか。', '[{"key":"a","text":"人口が減少して狩猟の獲物が余り、食料の貯蔵が必要になったから"},{"key":"b","text":"国家が成立し、農耕を義務として住民に課したから"},{"key":"c","text":"氷期が終わって温暖化し、西アジアに麦の原生種と羊・山羊が分布していたため、栽培と飼育が可能になったから"},{"key":"d","text":"鉄製の農具が普及し、深く耕せるようになったから"}]'::jsonb,
+   '"c"'::jsonb, '約1万年前の温暖化で植生と動物相が変わり、西アジアの丘陵地帯に自生していた麦類と、羊・山羊・牛・豚の原種が栽培化・家畜化された。生産経済への転換を「新石器革命（農業革命）」と呼ぶ。鉄製農具の普及も国家の成立も、これよりずっと後である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('107ca3d0-b257-3341-8824-9bde62d698c6', 'kc.neolithic.food_production_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('96c7171b-11ed-305c-8d8e-824a6dffc8d6', NULL, 'mcq4', '新石器時代を特徴づける道具の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"磨製石器・土器・織物"},{"key":"b","text":"青銅器・鉄器・戦車"},{"key":"c","text":"打製石器・細石器・骨角器"},{"key":"d","text":"火薬・羅針盤・活版印刷"}]'::jsonb,
+   '"a"'::jsonb, '新石器時代は磨製石器のほか、煮炊きと貯蔵を可能にした土器、麻や毛を用いた織物を伴う。金属器の使用は前3000年頃の青銅器から始まり、新石器時代より後である。cは旧石器〜中石器、dは宋・元代の三大発明である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('96c7171b-11ed-305c-8d8e-824a6dffc8d6', 'kc.neolithic.neolithic_toolkit', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d501209b-8f73-3cda-b0f2-7893aac7f553', NULL, 'mcq4', '「肥沃な三日月地帯」が指す範囲として正しいものはどれか。', '[{"key":"a","text":"ペルシア湾からティグリス・ユーフラテス川流域を経てシリア・パレスチナに至る弧状の地域"},{"key":"b","text":"ナイル川流域からサハラ砂漠を横断して大西洋岸に至る地域"},{"key":"c","text":"インダス川流域からガンジス川流域に至る北インドの平野"},{"key":"d","text":"黄河流域から長江流域に至る中国の平野"}]'::jsonb,
+   '"a"'::jsonb, 'メソポタミアからシリア・パレスチナへ弧を描くこの地域で、麦の栽培と羊・山羊の飼育が始まった。ここからヨーロッパ、エジプト、インドへ農耕が伝わった。エジプトのナイル川流域は農耕の伝播先であって起源地ではない。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d501209b-8f73-3cda-b0f2-7893aac7f553', 'kc.neolithic.fertile_crescent_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d73b4be2-4875-3206-9830-342e79481552', NULL, 'mcq4', '灌漑農業が国家の成立につながった過程として正しいものはどれか。', '[{"key":"a","text":"灌漑によって農民が土地に縛られなくなり、遊牧民が支配者となった"},{"key":"b","text":"灌漑技術を独占した商人が富を蓄え、王を選挙で選ぶ制度が生まれた"},{"key":"c","text":"灌漑が失敗して飢饉が続き、外部からの征服によって国家が押しつけられた"},{"key":"d","text":"治水と灌漑に大規模な共同作業が必要となり、余剰生産が分業と階級を生んで、それを統率する神官や王が現れた"}]'::jsonb,
+   '"d"'::jsonb, '大河の治水・灌漑は個々の村では担えず、広域の共同作業と指揮が要る。灌漑によって生まれた余剰生産が農業以外の職業（神官・職人・戦士）を養い、階級分化が進んで都市国家が成立した。エジプト・メソポタミア・インダス・中国のいずれもこの過程をたどった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d73b4be2-4875-3206-9830-342e79481552', 'kc.neolithic.irrigation_to_state', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('079e8699-5113-35a0-ba1d-b842a55307e2', NULL, 'mcq4', '金属器の使用について、時代の古いものから順に並べたものはどれか。', '[{"key":"a","text":"鉄器のあとに石器が再び用いられ、最後に青銅器が現れた"},{"key":"b","text":"青銅器が先に普及し、ヒッタイトが独占していた製鉄技術が拡散して鉄器が広まった"},{"key":"c","text":"鉄器が先に普及し、のちに青銅器が発明されて取って代わった"},{"key":"d","text":"青銅器と鉄器が同時に現れ、地域によって選択が分かれた"}]'::jsonb,
+   '"b"'::jsonb, '前3000年頃から青銅器（銅と錫の合金）が用いられた。鉄はアナトリアのヒッタイトが前1500年頃に本格的な製鉄を確立して独占したが、前1200年頃にヒッタイトが滅ぶと技術が各地へ広まり、安価で硬い鉄器が農具・武器として普及した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('079e8699-5113-35a0-ba1d-b842a55307e2', 'kc.neolithic.metal_age_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ed7ea868-d605-3326-b6cc-fcd201f2b132', NULL, 'mcq4', '一次史料と二次史料を区別する基準として正しいものはどれか。', '[{"key":"a","text":"現在まで原本が残っているかどうか"},{"key":"b","text":"その出来事と同時代に、当事者や直接の関係者によって作られたかどうか"},{"key":"c","text":"内容が信頼できるかどうか"},{"key":"d","text":"文字で書かれているか、遺物であるか"}]'::jsonb,
+   '"b"'::jsonb, '一次史料は同時代の当事者が残したもの（公文書・日記・書簡・碑文など）、二次史料は後世の人がそれらをもとに書いたものである。基準は「同時代性」であって、信頼性の高さではない。一次史料にも書き手の立場による偏りがあり、批判的に読む必要がある。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ed7ea868-d605-3326-b6cc-fcd201f2b132', 'kc.source.primary_vs_secondary', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d6a7e617-a266-30f1-948c-c0a2d9a72647', NULL, 'mcq4', '文字史料と考古資料の違いについての説明として正しいものはどれか。', '[{"key":"a","text":"文字史料と考古資料は同じことを別の形で記録したもので、内容に違いはない"},{"key":"b","text":"文字史料は書き手の意図や思想を伝えるが、考古資料は遺構や遺物から人々の生活そのものを復元できる"},{"key":"c","text":"文字を持たない社会については、何も知ることができない"},{"key":"d","text":"考古資料は文字史料より常に信頼性が高く、優先して用いるべきである"}]'::jsonb,
+   '"b"'::jsonb, '文字史料は書かれた意図や当時の観念を伝える一方、書き手の立場に偏る。考古資料は住居址・墓・道具・食物の残りかすなどから、書かれなかった日常や交易の範囲を明らかにできる。インダス文明のように文字が未解読でも、都市計画や交易は考古資料から復元されている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d6a7e617-a266-30f1-948c-c0a2d9a72647', 'kc.source.material_vs_written', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('38168498-eaf7-3550-b990-1ebb9f5e13e5', NULL, 'mcq4', '歴史の記録が特定の人々に偏る理由として最も適切なものはどれか。', '[{"key":"a","text":"過去の人々が意図的に嘘を書き残したから"},{"key":"b","text":"古い記録ほど失われやすく、新しい記録だけが残るから"},{"key":"c","text":"歴史家が特定の地域だけを研究対象にしてきたから"},{"key":"d","text":"記録を残せるのは文字を扱える層と権力の側に限られたため、民衆や女性の姿が残りにくいから"}]'::jsonb,
+   '"d"'::jsonb, '文字の使用と記録の保存には費用と教育が要り、それを担えたのは支配層と聖職者・官僚であった。したがって史料は彼らの視点に偏る。この偏りを補うため、考古資料や民衆の口伝、家計簿・裁判記録といった史料が近年重視されている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('38168498-eaf7-3550-b990-1ebb9f5e13e5', 'kc.source.bias_in_records', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('aa850e08-a989-3a0f-afa4-2f017edc2693', NULL, 'mcq4', '時代区分についての説明として正しいものはどれか。', '[{"key":"a","text":"古代・中世・近代という区分はヨーロッパ史をもとに作られたもので、他地域にそのまま当てはめると実態を捉えそこなう"},{"key":"b","text":"時代区分は世界共通で、どの地域でも同じ年代で区切られる"},{"key":"c","text":"中国史では王朝の交替と古代・中世・近代の境目が完全に一致する"},{"key":"d","text":"時代区分は史料の量によって決まり、地域による差はない"}]'::jsonb,
+   '"a"'::jsonb, '三区分法は西欧の経験（ローマ帝国の崩壊、ルネサンス）に由来する。中国史では唐宋の変革を境とする見方、イスラーム史では独自の展開があり、区分の年代も意味も一致しない。区分はあくまで理解のための道具であって、実在する境界ではない。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('aa850e08-a989-3a0f-afa4-2f017edc2693', 'kc.source.periodization_problem', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('828c37c2-05a9-3ea1-8ab6-44f3364edcca', NULL, 'mcq4', 'デリー=スルタン朝の5王朝を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"トゥグルク朝 → サイイド朝 → 奴隷王朝 → ハルジー朝 → ロディー朝"},{"key":"b","text":"ロディー朝 → サイイド朝 → トゥグルク朝 → ハルジー朝 → 奴隷王朝"},{"key":"c","text":"奴隷王朝 → ハルジー朝 → トゥグルク朝 → サイイド朝 → ロディー朝"},{"key":"d","text":"ハルジー朝 → 奴隷王朝 → ロディー朝 → トゥグルク朝 → サイイド朝"}]'::jsonb,
+   '"c"'::jsonb, '1206年にアイバクが開いた奴隷王朝を最初として5王朝が交替した。1526年にバーブルがロディー朝をパーニーパットの戦いで破り、ムガル帝国が成立して以後をムガル時代と呼ぶ。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('828c37c2-05a9-3ea1-8ab6-44f3364edcca', 'kc.islamize.delhi_sultanate_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('260c6930-5c4b-3905-ac19-b62b12cc4789', NULL, 'mcq4', 'インドでイスラームが民衆のあいだに広まった経路として最も適切なものはどれか。', '[{"key":"a","text":"ヒンドゥー教の寺院と聖典がことごとく破壊され、民衆が信仰の対象を失って代わりを求めたから"},{"key":"b","text":"イスラーム教徒になれば土地が無償で与えられる制度が設けられ、経済的な利益が大きかったから"},{"key":"c","text":"神との一体化を求めるスーフィズムと、神への献身を説くヒンドゥー教のバクティ信仰が接近し、身分を問わない信仰として受け入れられたから"},{"key":"d","text":"デリー=スルタン朝の支配者が全住民に改宗を命じ、拒んだ者を国外へ追放する政策を続けたから"}]'::jsonb,
+   '"c"'::jsonb, '支配層の宗教というだけでは民衆に定着しない。神秘主義（スーフィズム）は形式より内面を重んじ、ヴァルナを問わず神への愛を説くバクティ信仰と共鳴した。両者の接近からシク教のような新しい宗教も生まれた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('260c6930-5c4b-3905-ac19-b62b12cc4789', 'kc.islamize.bhakti_and_sufism', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b69970ff-5571-3690-b4e2-4052a4c42e16', NULL, 'mcq4', '東南アジアのイスラーム化についての説明として正しいものはどれか。', '[{"key":"a","text":"ヨーロッパ人がイスラーム教を持ち込み、植民地支配とともに広まった"},{"key":"b","text":"ムスリム商人の交易を通じてスマトラ北端から広まり、マラッカ王国の改宗を経てジャワなど島嶼部に浸透した"},{"key":"c","text":"大陸部のビルマ・タイから広まり、島嶼部には及ばなかった"},{"key":"d","text":"オスマン帝国が軍を送って征服したことで一気に広まった"}]'::jsonb,
+   '"b"'::jsonb, '13世紀末にスマトラ北端のサムドラ=パサイ王国が最初にイスラーム化し、15世紀にマラッカ王国が改宗して交易網とともに広まった。島嶼部（インドネシア・マレーシア）がイスラーム圏、大陸部（ビルマ・タイ・カンボジア・ラオス）が上座部仏教圏という現在の分布はここに由来する。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b69970ff-5571-3690-b4e2-4052a4c42e16', 'kc.islamize.sea_route_islam_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6a7e9f9e-8b35-3b70-8454-b390584efb11', NULL, 'mcq4', '西アフリカの3王国についての説明として正しいものはどれか。', '[{"key":"a","text":"3王国はいずれもインド洋岸に位置し、香辛料交易で栄えた"},{"key":"b","text":"ガーナ・マリ・ソンガイの順に交替し、マリ王国のマンサ=ムーサはメッカ巡礼で大量の金を用いて名を知られた"},{"key":"c","text":"マリ・ガーナ・ソンガイの順に交替し、いずれもキリスト教を国教とした"},{"key":"d","text":"3王国は同時に並立し、たがいに交易を行わなかった"}]'::jsonb,
+   '"b"'::jsonb, 'サハラ縦断交易（金と岩塩の交換）で栄えた王国が、ガーナ→マリ→ソンガイと交替した。マリ王国のマンサ=ムーサは1324年のメッカ巡礼でカイロの金相場を下落させたと伝えられる。トンブクトゥはイスラーム学問の中心となった。位置は西アフリカのニジェール川流域である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6a7e9f9e-8b35-3b70-8454-b390584efb11', 'kc.islamize.west_africa_states', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('2d4357ea-bee7-31bc-821b-ef6696693af3', NULL, 'mcq4', '東アフリカ海岸の海港都市についての説明として正しいものはどれか。', '[{"key":"a","text":"内陸の都市で、サハラ縦断交易の終着点であった"},{"key":"b","text":"いずれもエジプトの支配下にあり、独自の言語は生まれなかった"},{"key":"c","text":"マリンディ・モンバサ・キルワなどがインド洋交易で栄え、現地のバントゥー系言語とアラビア語が混じってスワヒリ語が生まれた"},{"key":"d","text":"これらの都市は大西洋岸にあり、ヨーロッパとの奴隷貿易で栄えた"}]'::jsonb,
+   '"c"'::jsonb, '季節風を利用したインド洋交易で、東アフリカ海岸のマリンディ・モンバサ・ザンジバル・キルワが繁栄した。金・象牙・奴隷を輸出し、陶磁器や織物を輸入した。バントゥー系の言語にアラビア語の語彙が入って成立したのがスワヒリ語である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('2d4357ea-bee7-31bc-821b-ef6696693af3', 'kc.islamize.swahili_coast_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('9e562daa-ee73-34dc-bf33-9856a9ade188', NULL, 'mcq4', 'スーフィーが布教で果たした役割の説明として正しいものはどれか。', '[{"key":"a","text":"軍を率いて征服を行い、改宗を武力で強制した"},{"key":"b","text":"教団を組織して商人とともに辺境へ赴き、現地の慣習を柔軟に取り込みながら民衆に信仰を広めた"},{"key":"c","text":"法学の厳格な適用を求め、現地の慣習を一切認めなかった"},{"key":"d","text":"布教を行わず、修道場にこもって個人の修行にのみ専念した"}]'::jsonb,
+   '"b"'::jsonb, 'スーフィーは神との一体化を求める神秘主義者だが、12世紀以降は教団（タリーカ）を組織し、商人とともにインド・東南アジア・アフリカへ広がった。現地の聖者信仰や慣習を取り込む柔軟さが、民衆への浸透を可能にした。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('9e562daa-ee73-34dc-bf33-9856a9ade188', 'kc.islamize.sufi_role', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('955f2198-ce20-30b1-84fd-e761abdeb9a1', NULL, 'mcq4', '宋の文治主義が軍事的な弱さを招いた過程の説明として正しいものはどれか。', '[{"key":"a","text":"文官を減らして武官を重んじた結果、内乱が続いて対外戦争ができなくなった"},{"key":"b","text":"科挙を廃止して門閥貴族を復活させたため、有能な将軍が育たなかった"},{"key":"c","text":"農民から兵を集める徴兵制をやめ、傭兵を用いなかったため兵が足りなかった"},{"key":"d","text":"唐末の節度使の割拠を防ぐため軍を皇帝の直属とし文官を重んじたが、その結果として軍事力が低下し、遼や西夏に歳幣を贈って和平を保つことになった"}]'::jsonb,
+   '"d"'::jsonb, '趙匡胤は節度使の権限を奪って禁軍を皇帝の直属とし、科挙を整備して文官が軍を統制する体制を敷いた。内政の安定という目的は達したが軍事力は弱く、遼とは澶淵の盟（1004年）、西夏とは慶暦の和約を結び、銀と絹を毎年贈った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('955f2198-ce20-30b1-84fd-e761abdeb9a1', 'kc.song.civil_supremacy_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('093148f2-1315-3699-bf56-14f8c3c1c9ed', NULL, 'mcq4', '北方民族と王朝の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"契丹＝西夏、タングート＝金、女真＝遼"},{"key":"b","text":"契丹＝遼、タングート＝金、女真＝西夏"},{"key":"c","text":"契丹＝遼、タングート＝西夏、女真＝金"},{"key":"d","text":"契丹＝金、タングート＝遼、女真＝西夏"}]'::jsonb,
+   '"c"'::jsonb, '契丹の耶律阿保機が遼（916年）、タングートの李元昊が西夏（1038年）、女真の完顔阿骨打が金（1115年）を建てた。いずれも漢字をもとにしながら独自の文字（契丹文字・西夏文字・女真文字）を作り、民族意識を保とうとした点が共通する。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('093148f2-1315-3699-bf56-14f8c3c1c9ed', 'kc.song.northern_peoples', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('153763bb-7c5a-38a3-b94f-e1afc3e87159', NULL, 'mcq4', '王安石の新法についての説明として正しいものはどれか。', '[{"key":"a","text":"科挙を廃して門閥貴族による政治に戻し、地方の有力者に徴税を委ねる改革であった"},{"key":"b","text":"唐の均田制を復活させて農民に土地を均等に分配し、租調庸を復活させる改革であった"},{"key":"c","text":"仏教を国教として寺院に大量の土地を寄進し、僧に行政を担わせる改革であった"},{"key":"d","text":"財政再建と富国強兵を目的に青苗法・募役法・市易法・保甲法などを実施したが、大地主や大商人を支持基盤とする旧法党の反対で挫折した"}]'::jsonb,
+   '"d"'::jsonb, '青苗法は農民への低利融資、募役法は力役を銭納に改めるもの、市易法は中小商人への融資、保甲法は民兵の組織である。いずれも中小の農民・商人を保護し財政を立て直す狙いだったが、司馬光ら旧法党の反対で神宗の死後に廃止された。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('153763bb-7c5a-38a3-b94f-e1afc3e87159', 'kc.song.wang_anshi_reform', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('8d34af37-3d62-3cdd-a806-8fbc734c65da', NULL, 'mcq4', '北宋と南宋の違いについての説明として正しいものはどれか。', '[{"key":"a","text":"靖康の変で金に華北を奪われ、都を開封から臨安へ移して淮河を境界とする南宋となった"},{"key":"b","text":"北宋が江南、南宋が華北を支配し、長江が境界となった"},{"key":"c","text":"南宋は華北を回復し、開封に都を戻した"},{"key":"d","text":"北宋と南宋の領域は同じで、王朝名だけが変わった"}]'::jsonb,
+   '"a"'::jsonb, '1126〜27年の靖康の変で金が開封を落とし、徽宗・欽宗を連れ去った。逃れた高宗が江南で南宋を再興し、都を臨安（杭州）に置いた。1142年の和議で淮河が国境と定まり、南宋は金に臣礼をとって歳貢を納めた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('8d34af37-3d62-3cdd-a806-8fbc734c65da', 'kc.song.north_to_south_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('596905c6-5315-39f7-940f-2a508399a446', NULL, 'mcq4', '宋代の経済についての説明として正しいものはどれか。', '[{"key":"a","text":"対外貿易が全面的に禁止されて市舶司が廃止され、海上交易は途絶した"},{"key":"b","text":"早稲の占城稲の導入で江南の生産が伸び、交子・会子という紙幣や、行・作という同業組合、鎮という商業都市が現れた"},{"key":"c","text":"貨幣の使用が禁じられて物々交換に戻り、都市の商業は衰えて農村へ人口が流出した"},{"key":"d","text":"経済の重心が江南から華北へ移り、長江流域は戦乱で荒廃して耕地が失われた"}]'::jsonb,
+   '"b"'::jsonb, 'ベトナム原産の占城稲は早稲・干魃に強く、江南の二毛作を可能にした。「蘇湖（江浙）熟すれば天下足る」といわれるほど江南が穀倉となり、経済の重心が南へ移った。交子は世界最初期の紙幣で、海上交易を管理する市舶司も泉州・広州などに置かれた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('596905c6-5315-39f7-940f-2a508399a446', 'kc.song.economic_revolution', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('546de59e-6230-381c-b752-1f9c93706dec', NULL, 'mcq4', '宋代の士大夫と唐までの門閥貴族の違いとして正しいものはどれか。', '[{"key":"a","text":"士大夫は農民から選ばれ、財産を持つことを禁じられていた"},{"key":"b","text":"門閥貴族は家柄によって地位を世襲したが、士大夫は科挙の合格によって地位を得る新しい支配層であった"},{"key":"c","text":"士大夫は家柄で地位を継ぎ、門閥貴族は試験で選ばれた"},{"key":"d","text":"どちらも武力によって地位を得た軍人層であった"}]'::jsonb,
+   '"b"'::jsonb, '唐までは九品中正の下で門閥貴族が高官を独占したが、五代の混乱で没落した。宋は殿試を加えて科挙を完成させ、皇帝が直接合格者を選ぶようにした。合格者は形勢戸・官戸と呼ばれる地主層から出ることが多く、学問と教養を身につけた士大夫が新しい支配層となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('546de59e-6230-381c-b752-1f9c93706dec', 'kc.song.scholar_officials', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('dbd4be87-3759-3c59-9fef-a3d28574b3f5', NULL, 'mcq4', 'モンゴル帝国の拡大に関わる出来事を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"アッバース朝の滅亡 → 南宋の滅亡 → チンギス=ハンの即位 → ワールシュタットの戦い"},{"key":"b","text":"南宋の滅亡 → アッバース朝の滅亡 → ワールシュタットの戦い → チンギス=ハンの即位"},{"key":"c","text":"チンギス=ハンの即位 → ワールシュタットの戦い → アッバース朝の滅亡 → 南宋の滅亡"},{"key":"d","text":"ワールシュタットの戦い → チンギス=ハンの即位 → 南宋の滅亡 → アッバース朝の滅亡"}]'::jsonb,
+   '"c"'::jsonb, '1206年にチンギス=ハンが即位、オゴタイの代の1241年にバトゥがワールシュタット（リーグニッツ）でドイツ・ポーランド連合軍を破った。1258年にフラグがバグダードを占領してアッバース朝を滅ぼし、1279年にフビライが南宋を滅ぼして中国を統一した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('dbd4be87-3759-3c59-9fef-a3d28574b3f5', 'kc.mongol.expansion_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('9a6fa79a-4580-3e79-84e6-eb7dd3887997', NULL, 'mcq4', 'モンゴルのハン国と地域の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"キプチャク=ハン国＝イラン、チャガタイ=ハン国＝中央アジア、イル=ハン国＝南ロシア"},{"key":"b","text":"キプチャク=ハン国＝南ロシア、チャガタイ=ハン国＝中央アジア、イル=ハン国＝イラン"},{"key":"c","text":"キプチャク=ハン国＝イラン、チャガタイ=ハン国＝南ロシア、イル=ハン国＝中央アジア"},{"key":"d","text":"キプチャク=ハン国＝中央アジア、チャガタイ=ハン国＝イラン、イル=ハン国＝南ロシア"}]'::jsonb,
+   '"b"'::jsonb, 'バトゥのキプチャク=ハン国は南ロシアの草原を支配し、ロシア諸公国を服属させた（「タタールのくびき」）。チャガタイ=ハン国は中央アジア、フラグのイル=ハン国はイランを支配した。これに大都を都とする元（大ハン国）を加えた緩やかな連合が帝国を構成した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('9a6fa79a-4580-3e79-84e6-eb7dd3887997', 'kc.mongol.four_khanates_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4848cc7a-793b-3dac-abbd-4cafb6cfb4e2', NULL, 'mcq4', '元の身分序列を、上位から順に並べたものはどれか。', '[{"key":"a","text":"色目人 → モンゴル人 → 南人 → 漢人"},{"key":"b","text":"南人 → 漢人 → 色目人 → モンゴル人"},{"key":"c","text":"モンゴル人 → 色目人 → 漢人 → 南人"},{"key":"d","text":"漢人 → 南人 → モンゴル人 → 色目人"}]'::jsonb,
+   '"c"'::jsonb, 'モンゴル人が支配層、色目人（中央アジア・西アジア出身者）が財務などの実務を担った。漢人は旧金の支配下にあった華北の人々、南人は最後に征服された旧南宋領の人々を指し、最も低く置かれた。科挙は一時停止され、士大夫の登用の道は狭まった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4848cc7a-793b-3dac-abbd-4cafb6cfb4e2', 'kc.mongol.yuan_hierarchy', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('913753e8-60b7-324c-b270-4855f039f92d', NULL, 'mcq4', 'モンゴル帝国のもとで東西交流が活発になった理由として最も適切なものはどれか。', '[{"key":"a","text":"各ハン国が独自の関税を設け、交易を厳しく管理したから"},{"key":"b","text":"陸路が閉ざされ、海路だけが用いられるようになったから"},{"key":"c","text":"モンゴルが交易を禁じ、朝貢のみを認めたから"},{"key":"d","text":"駅伝制（ジャムチ）で道路と宿駅が整備され、広い領域が一つの権力のもとで交易を保護されたから"}]'::jsonb,
+   '"d"'::jsonb, '一定距離ごとに宿駅を置く駅伝制と牌符（通行証）により、使節と商人の往来が安全になった。マルコ=ポーロ、イブン=バットゥータ、プラノ=カルピニやルブルックといった使節が往来し、『世界の記述』『三大陸周遊記』が残された。この時期を「モンゴルの平和」と呼ぶ。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('913753e8-60b7-324c-b270-4855f039f92d', 'kc.mongol.pax_mongolica', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('8ddfed26-0ad9-3fc4-98b7-1542d4b66194', NULL, 'mcq4', '元が中国から退いた要因として最も適切なものはどれか。', '[{"key":"a","text":"対外遠征に成功しすぎて領土が広がり、統治が行き届かなくなったから"},{"key":"b","text":"交鈔（紙幣）の乱発による物価の混乱と、チベット仏教への過度な出費が財政を傾け、紅巾の乱をきっかけに崩れたから"},{"key":"c","text":"モンゴル本土が他の遊牧民に占領され、退却せざるをえなかったから"},{"key":"d","text":"科挙を全面的に実施した結果、漢人官僚が権力を握って追放したから"}]'::jsonb,
+   '"b"'::jsonb, '元は交鈔を乱発して信用を失い、チベット仏教（ラマ教）の寺院造営などの出費も財政を圧迫した。黄河の治水工事の負担も重なり、1351年に白蓮教徒による紅巾の乱が起こる。その中から出た朱元璋が明を建て、元は1368年にモンゴル高原へ退いた（北元）。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('8ddfed26-0ad9-3fc4-98b7-1542d4b66194', 'kc.mongol.yuan_fall_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('63bd35e6-7e8f-3889-9dac-566a89714c43', NULL, 'mcq4', 'イル=ハン国とキプチャク=ハン国の宗教についての説明として正しいものはどれか。', '[{"key":"a","text":"どちらも最後までシャーマニズムを保ち、他の宗教を受け入れなかった"},{"key":"b","text":"どちらもやがてイスラーム教を受け入れたが、キプチャク=ハン国の支配下のロシアはギリシア正教を保った"},{"key":"c","text":"どちらも仏教を国教とし、支配下の住民に改宗を強制した"},{"key":"d","text":"イル=ハン国はキリスト教、キプチャク=ハン国はヒンドゥー教を受け入れた"}]'::jsonb,
+   '"b"'::jsonb, 'イル=ハン国はガザン=ハンの代にイスラーム教を国教とし、キプチャク=ハン国もウズベク=ハンの代にイスラーム化した。一方、間接支配を受けたロシア諸公国は正教とその文化を保ち、モスクワ大公国がやがて自立していく。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('63bd35e6-7e8f-3889-9dac-566a89714c43', 'kc.mongol.khanate_religion', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('40bcee65-3878-34e6-bb65-0b98d96900d3', NULL, 'mcq4', '第1回十字軍が起こされた要因として最も適切なものはどれか。', '[{"key":"a","text":"ビザンツ帝国がセルジューク朝に滅ぼされ、その領土を西欧が回復する義務を負ったから"},{"key":"b","text":"東方貿易が完全に途絶して香辛料が入らなくなり、交易路を武力で開く必要があったから"},{"key":"c","text":"セルジューク朝に圧迫されたビザンツ皇帝が救援を求め、人口増加で土地を求める西欧の諸侯・騎士の事情と、教皇権を高めたい思惑が重なったから"},{"key":"d","text":"イスラーム勢力が西欧の奥深くまで侵入してパリを占領し、これを撃退する必要が生じたから"}]'::jsonb,
+   '"c"'::jsonb, '1071年のマンジケルトの戦いでセルジューク朝に敗れたビザンツ皇帝が救援を要請し、教皇ウルバヌス2世が1095年のクレルモン宗教会議で聖地回復を呼びかけた。西欧側には人口増加による土地不足と、教皇が東西教会の首位に立ちたいという事情もあった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('40bcee65-3878-34e6-bb65-0b98d96900d3', 'kc.crusade.first_crusade_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('f405fcff-3066-3d97-a069-4e00c627a1d6', NULL, 'mcq4', '十字軍についての説明として正しいものはどれか。', '[{"key":"a","text":"第4回でイェルサレムを回復し、以後は十字軍が行われなかった"},{"key":"b","text":"第1回はイェルサレムを奪回して王国を建てたが、第4回はヴェネツィア商人の意向でコンスタンティノープルを占領しラテン帝国を建てた"},{"key":"c","text":"第1回は失敗し、第4回でようやくイェルサレムを回復した"},{"key":"d","text":"すべての遠征がイスラーム勢力のみを相手とし、キリスト教国を攻撃したことはない"}]'::jsonb,
+   '"b"'::jsonb, '第1回（1096〜99年）はイェルサレムを奪回してイェルサレム王国を建てた。第3回はサラディンと戦ったが奪回できず、第4回（1202〜04年）は資金を出したヴェネツィアの思惑で同じキリスト教の都コンスタンティノープルを攻略した。1291年のアッコン陥落で聖地の拠点を失った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('f405fcff-3066-3d97-a069-4e00c627a1d6', 'kc.crusade.expedition_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('7562aa96-86ab-3841-a356-24b8358e63eb', NULL, 'mcq4', '十字軍がもたらした結果の説明として正しいものはどれか。', '[{"key":"a","text":"諸侯と騎士が富を得て力を強め、国王の権力は弱まった"},{"key":"b","text":"西欧とイスラーム世界の接触はなく、文化的な影響は生じなかった"},{"key":"c","text":"聖地回復には失敗したが、教皇の権威が傷つき諸侯・騎士が没落する一方で国王の権力が伸び、東方貿易が拡大した"},{"key":"d","text":"教皇の権威がいっそう高まり、以後の西欧は教皇を頂点とする統一国家となった"}]'::jsonb,
+   '"c"'::jsonb, '度重なる失敗で教皇の権威は失墜し、遠征の費用と戦死で諸侯・騎士は没落した。相対的に国王の権力が伸び、中央集権への道が開けた。またイタリア諸都市が東方貿易（レヴァント貿易）で栄え、イスラーム世界を通じて学問と物産が流入した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('7562aa96-86ab-3841-a356-24b8358e63eb', 'kc.crusade.consequences', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('21c1811a-c382-3cfa-b95c-f850a8186b71', NULL, 'mcq4', '中世ヨーロッパの2つの商業圏についての説明として正しいものはどれか。', '[{"key":"a","text":"地中海商業圏が木材と穀物を、北ヨーロッパ商業圏が香辛料と絹を扱った"},{"key":"b","text":"両商業圏は交流がなく、内陸の交易路で結ばれることはなかった"},{"key":"c","text":"北ヨーロッパ商業圏はイタリア諸都市が、地中海商業圏はハンザ同盟が支配した"},{"key":"d","text":"地中海商業圏ではヴェネツィア・ジェノヴァが東方の香辛料や絹を扱い、北ヨーロッパ商業圏ではハンザ同盟が海産物・木材・穀物を扱った"}]'::jsonb,
+   '"d"'::jsonb, '地中海商業圏はイタリア諸都市がムスリム商人から東方の物産を仕入れた（レヴァント貿易）。北ヨーロッパ商業圏はリューベックを盟主とするハンザ同盟が北海・バルト海で海産物・木材・穀物・毛織物を扱った。両者を結んだのがフランスのシャンパーニュ地方の定期市である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('21c1811a-c382-3cfa-b95c-f850a8186b71', 'kc.crusade.two_trade_zones', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e8a56dfc-cbe9-3cd1-bf2d-7590d38feb51', NULL, 'mcq4', '中世ヨーロッパの都市と役割の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"ヴェネツィア＝東方貿易の拠点、ブリュージュ＝フランドルの毛織物と北海交易の拠点、リューベック＝ハンザ同盟の盟主"},{"key":"b","text":"ヴェネツィア＝ハンザ同盟の盟主、リューベック＝東方貿易の拠点"},{"key":"c","text":"ブリュージュ＝地中海交易の拠点、ジェノヴァ＝バルト海交易の拠点"},{"key":"d","text":"フィレンツェ＝バルト海の港市、リューベック＝毛織物工業の中心"}]'::jsonb,
+   '"a"'::jsonb, 'ヴェネツィア・ジェノヴァ・ピサは東方貿易で栄え、フィレンツェは毛織物と金融で栄えた。フランドル地方（現在のベルギー）のブリュージュ・ガン（ヘント）は毛織物生産と北海交易の中心。リューベックはハンザ同盟の盟主で、バルト海交易を押さえた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e8a56dfc-cbe9-3cd1-bf2d-7590d38feb51', 'kc.crusade.trade_routes_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('40d8669f-0e3d-357a-b705-f3cd4b5eb404', NULL, 'mcq4', '荘園制が崩れていった過程の説明として正しいものはどれか。', '[{"key":"a","text":"貨幣経済の浸透で地代が生産物から貨幣に変わって農民の自立が進み、黒死病による人口減が労働力を貴重にして農民の地位をさらに高めた"},{"key":"b","text":"貨幣経済によって領主が豊かになり、農奴への支配がかえって強まって荘園制が存続した"},{"key":"c","text":"黒死病で農民が激減した結果、領主が農奴を増やして支配を強化した"},{"key":"d","text":"農業技術が衰退して収穫が減り、荘園を維持できなくなった"}]'::jsonb,
+   '"a"'::jsonb, '商業の復活で地代が生産物地代から貨幣地代へ移ると、農民は市場向けに生産して蓄財し、身分的な束縛から自立していった。14世紀半ばの黒死病で人口の3分の1が失われると労働力が不足し、農民の待遇は改善した。領主の再強化（封建反動）に対しては、ジャックリーの乱やワット=タイラーの乱が起きた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('40d8669f-0e3d-357a-b705-f3cd4b5eb404', 'kc.crusade.manor_decline', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5fe183b8-dbab-3345-ad74-164c23b75bdd', NULL, 'mcq4', '教皇権に関わる出来事を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"大シスマ → コンスタンツ公会議 → アナーニ事件 → 教皇のバビロン捕囚"},{"key":"b","text":"インノケンティウス3世の全盛 → アナーニ事件 → 教皇のバビロン捕囚 → 大シスマ → コンスタンツ公会議"},{"key":"c","text":"アナーニ事件 → インノケンティウス3世の全盛 → 大シスマ → 教皇のバビロン捕囚"},{"key":"d","text":"教皇のバビロン捕囚 → 大シスマ → アナーニ事件 → インノケンティウス3世の全盛"}]'::jsonb,
+   '"b"'::jsonb, 'インノケンティウス3世（在位1198〜1216年）が教皇権の絶頂を築いた。1303年のアナーニ事件でフランス王フィリップ4世が教皇ボニファティウス8世を捕らえ、1309年から教皇庁がアヴィニョンへ移った（バビロン捕囚）。帰還後に2人の教皇が並立する大シスマとなり、1414年からのコンスタンツ公会議で収拾された。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5fe183b8-dbab-3345-ad74-164c23b75bdd', 'kc.medstate.papal_decline_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ffe1a152-894f-33dc-a388-0115207fe1b6', NULL, 'mcq4', 'イギリス議会とフランス三部会についての説明として正しいものはどれか。', '[{"key":"a","text":"どちらも国王の権力を強めるために国王自身が自発的に作った"},{"key":"b","text":"イギリスでは大憲章のあと1265年のシモン=ド=モンフォールの議会を経て模範議会が開かれ、フランスでは1302年に国王が教皇と争う際の支持を得るため三部会が招集された"},{"key":"c","text":"イギリスの模範議会は国王が教皇と争うために招集され、フランスの三部会は貴族が国王に認めさせたものである"},{"key":"d","text":"三部会が先に成立し、それを模倣してイギリスが議会を作った"}]'::jsonb,
+   '"b"'::jsonb, 'イギリスでは1215年の大憲章で王権が制限され、1265年のシモン=ド=モンフォールの議会、1295年の模範議会と進んだ。フランスでは1302年にフィリップ4世が教皇ボニファティウス8世との争いで国内の支持を得るため三部会を招集した。成立の事情が逆である点が問われる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ffe1a152-894f-33dc-a388-0115207fe1b6', 'kc.medstate.parliament_vs_etats', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('047fa5b8-8197-36d3-9cf8-509a55e4b58d', NULL, 'mcq4', '百年戦争が英仏の王権を強めた過程の説明として正しいものはどれか。', '[{"key":"a","text":"戦争は数年で終わって死者も少なく、両国の社会構造にはほとんど影響しなかった"},{"key":"b","text":"毛織物産地フランドルとぶどう酒産地ギエンヌをめぐって始まり、長い戦いで諸侯と騎士が没落した結果、常備軍と官僚制をもつ国王の権力が伸びた"},{"key":"c","text":"長い戦争で国王が破産して諸侯に借金を重ね、かえって諸侯の力が強まって分権が進んだ"},{"key":"d","text":"開戦の理由はカトリックとギリシア正教の対立で、その結果として教皇の権威が高まった"}]'::jsonb,
+   '"b"'::jsonb, 'フランス王位の継承問題を名目としつつ、実際にはフランドルとギエンヌの利害が争点だった。火砲と歩兵の台頭で騎士の戦術的価値が下がり、戦費と戦死で諸侯・騎士が没落した。フランスではジャンヌ=ダルクを機に反攻し、イギリスではバラ戦争を経てテューダー朝が中央集権を進めた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('047fa5b8-8197-36d3-9cf8-509a55e4b58d', 'kc.medstate.hundred_years_war', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cd7ca6e0-96ef-33df-95e2-60b13b384b06', NULL, 'mcq4', '同じ時期の神聖ローマ帝国とフランスの違いとして正しいものはどれか。', '[{"key":"a","text":"どちらも選帝侯による選挙で君主を選ぶ制度をとり、王位が世襲されることはなかった"},{"key":"b","text":"ドイツでは金印勅書で七選帝侯による皇帝選挙が定まって分権が固定されたが、フランスでは国王が諸侯を抑えて集権化を進めた"},{"key":"c","text":"ドイツでは金印勅書で皇帝の権力が強化されて集権化が進み、フランスでは諸侯の分立が固定された"},{"key":"d","text":"どちらも百年戦争を通じて常備軍と官僚制を整え、同じ速さで中央集権を達成した"}]'::jsonb,
+   '"b"'::jsonb, '1356年の金印勅書は7人の選帝侯による皇帝選出を定め、諸侯の主権を事実上認めた。イタリア政策で皇帝が本国を留守にしがちだったことも分権を助長した。フランスは百年戦争を経て常備軍と官僚制を整え、逆方向へ進んだ。「同じ中世末期に逆へ動いた」という対比が要点である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cd7ca6e0-96ef-33df-95e2-60b13b384b06', 'kc.medstate.hre_vs_france', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4c26f56b-303f-3900-9cab-aeb1134c6762', NULL, 'mcq4', '15世紀末のヨーロッパの状況として正しいものはどれか。', '[{"key":"a","text":"イベリア半島はまだイスラーム勢力の支配下にあり、スペイン王国は成立していなかった"},{"key":"b","text":"モスクワ大公国はキプチャク=ハン国の支配下にあり続けた"},{"key":"c","text":"神聖ローマ帝国が統一を達成し、ヨーロッパ最大の中央集権国家となっていた"},{"key":"d","text":"イベリア半島ではレコンキスタが完了してスペイン王国が成立し、東方ではモスクワ大公国がモンゴルの支配を脱し、中央部の神聖ローマ帝国は分立したままだった"}]'::jsonb,
+   '"d"'::jsonb, '1492年のグラナダ陥落でレコンキスタが完了した。モスクワ大公国はイヴァン3世の代の1480年にキプチャク=ハン国への貢納をやめて自立した。神聖ローマ帝国は金印勅書以来の分立が続き、統一国家にはならなかった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4c26f56b-303f-3900-9cab-aeb1134c6762', 'kc.medstate.europe_1500_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4b7f67c4-0422-3ec2-a710-ce5191ce920e', NULL, 'mcq4', 'レコンキスタとスペイン王国の成立についての説明として正しいものはどれか。', '[{"key":"a","text":"レコンキスタは失敗に終わり、イベリア半島はイスラーム勢力の支配下に残った"},{"key":"b","text":"レコンキスタの完了はコロンブスの航海より100年後のことである"},{"key":"c","text":"スペイン王国はポルトガルとの合併によって成立した"},{"key":"d","text":"カスティリャとアラゴンの王家の結婚でスペイン王国が生まれ、1492年にグラナダを陥落させて完了し、同じ年にコロンブスを送り出した"}]'::jsonb,
+   '"d"'::jsonb, '1479年にカスティリャのイサベルとアラゴンのフェルナンドの結婚でスペイン王国が成立し、1492年にナスル朝の都グラナダを落として約800年の国土回復運動を終えた。同じ1492年に両王がコロンブスの航海を支援した点が重要で、レコンキスタの延長線上に大航海時代がある。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4b7f67c4-0422-3ec2-a710-ce5191ce920e', 'kc.medstate.reconquista', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d676aec0-97e7-3fa1-a8b9-714468736e67', NULL, 'mcq4', '黒死病が中世社会にもたらした変化の説明として正しいものはどれか。', '[{"key":"a","text":"人口が激減した結果、農民の待遇はさらに悪化し、反乱は一度も起きなかった"},{"key":"b","text":"人口が増加して土地が不足し、農民が都市へ逃げ出した"},{"key":"c","text":"黒死病はイタリアだけに広がり、他の地域には影響しなかった"},{"key":"d","text":"人口の激減で労働力が不足し農民の待遇が改善したが、これに対する領主の再強化の動きがジャックリーの乱やワット=タイラーの乱を招いた"}]'::jsonb,
+   '"d"'::jsonb, '1347年頃から流行したペストで、ヨーロッパの人口の3分の1が失われたとされる。労働力の不足で農民の交渉力が高まり、賦役の軽減や解放が進んだ。これを押し戻そうとする領主の動き（封建反動）に対し、1358年のジャックリーの乱、1381年のワット=タイラーの乱が起きた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d676aec0-97e7-3fa1-a8b9-714468736e67', 'kc.medcult.black_death_effects', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('c99170c8-d22f-3c26-a859-17941636a903', NULL, 'mcq4', 'スコラ学の普遍論争についての説明として正しいものはどれか。', '[{"key":"a","text":"普遍論争は信仰を否定して自然科学を打ち立てる運動であった"},{"key":"b","text":"普遍論争はイスラーム世界で起こったもので、ヨーロッパには伝わらなかった"},{"key":"c","text":"普遍は実在するとしたのが実在論のアンセルムスら、名前にすぎないとしたのが唯名論のアベラールやオッカムである"},{"key":"d","text":"実在論はオッカム、唯名論はアンセルムスの立場である"}]'::jsonb,
+   '"c"'::jsonb, '普遍論争は「人間」や「善」のような普遍的な概念が実在するかを問うもので、信仰と理性の関係という枠組みの中にあった。アンセルムスが実在論、アベラール（概念論に近い）とオッカムが唯名論を代表する。トマス=アクィナスは『神学大全』で両者の調和を図った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('c99170c8-d22f-3c26-a859-17941636a903', 'kc.medcult.realism_vs_nominalism', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('96d93172-c20f-3ec3-9241-983ae46238b1', NULL, 'mcq4', '中世の大学と得意分野の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"ボローニャ大学＝法学、サレルノ大学＝医学、パリ大学＝神学"},{"key":"b","text":"ボローニャ大学＝神学、サレルノ大学＝法学、パリ大学＝医学"},{"key":"c","text":"ボローニャ大学＝医学、サレルノ大学＝神学、パリ大学＝法学"},{"key":"d","text":"3大学とも神学のみを教え、他の学問は扱わなかった"}]'::jsonb,
+   '"a"'::jsonb, '大学は教授と学生の組合（ウニヴェルシタス）として自然に生まれたもので、国王や教皇から特許状を得て自治を認められた。ボローニャは法学、サレルノは医学、パリとオクスフォードは神学で知られた。学芸学部で自由七科を学んだのち専門学部へ進む構成であった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('96d93172-c20f-3ec3-9241-983ae46238b1', 'kc.medcult.medieval_universities', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4e8c5b95-92c6-3d5f-8834-054d3e1a9e90', NULL, 'mcq4', 'ロマネスク様式とゴシック様式の違いとして正しいものはどれか。', '[{"key":"a","text":"ロマネスクは半円アーチと厚い壁・小さい窓を特徴とし、ゴシックは尖頭アーチと飛び梁によって高い天井と大きなステンドグラスを実現した"},{"key":"b","text":"ロマネスクが尖頭アーチとステンドグラス、ゴシックが半円アーチと厚い壁を特徴とする"},{"key":"c","text":"どちらも同じ構造で、装飾の色づかいだけが異なる"},{"key":"d","text":"ゴシックはロマネスクより前の時代の様式である"}]'::jsonb,
+   '"a"'::jsonb, 'ロマネスク（11〜12世紀）は石造りの重い天井を支えるため壁を厚くし、窓が小さい。ピサ大聖堂が代表。ゴシック（12世紀以降）は尖頭アーチと飛び梁（フライング=バットレス）で荷重を外へ逃がし、壁を薄く高くしてステンドグラスを入れた。ノートルダム大聖堂やケルン大聖堂が代表である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4e8c5b95-92c6-3d5f-8834-054d3e1a9e90', 'kc.medcult.romanesque_vs_gothic', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('70e42a40-89cb-3320-b918-d25b31d27022', NULL, 'mcq4', 'ウィクリフとフスについての説明として正しいものはどれか。', '[{"key":"a","text":"2人とも教会の教義に忠実な神学者で、聖職者の腐敗を批判したことは一度もない"},{"key":"b","text":"2人はコンスタンツ公会議で主張が正統と認められ、のちに教会の指導者に迎えられた"},{"key":"c","text":"2人はルターの宗教改革ののちに現れ、その主張を各国語に訳して広めた人物である"},{"key":"d","text":"聖書こそが信仰の拠りどころだと説いて教会を批判し、コンスタンツ公会議で異端とされた。その主張は約100年後のルターに先立つものだった"}]'::jsonb,
+   '"d"'::jsonb, 'イギリスのウィクリフは聖書を英訳し、教会の富と教皇の権威を批判した。ベーメンのフスはその影響を受けて教会を批判し、1415年のコンスタンツ公会議で火刑に処された。これがフス戦争を招いた。両者は宗教改革の先駆と位置づけられる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('70e42a40-89cb-3320-b918-d25b31d27022', 'kc.medcult.wyclif_and_hus', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e0d84c97-a397-3079-b6e2-4d829bb2f987', NULL, 'mcq4', '清の中国支配の方法についての説明として正しいものはどれか。', '[{"key":"a","text":"漢人の風習をすべて認めて辮髪などの強制は一切行わず、思想の取り締まりもしなかった"},{"key":"b","text":"科挙を廃止して満洲語だけを公用語とし、漢文の書物の刊行を禁じた"},{"key":"c","text":"科挙を続け中央官庁の要職を満洲人と漢人に同数配する懐柔策をとる一方、辮髪を強制し文字の獄で思想を取り締まる威圧策も併用した"},{"key":"d","text":"漢人を官職から完全に排除して満洲人だけで統治し、漢語の使用も公の場では禁じた"}]'::jsonb,
+   '"c"'::jsonb, '清は少数の満洲人が多数の漢人を支配する征服王朝であり、懐柔と威圧を組み合わせた。科挙の継続・満漢併用制・『康熙字典』などの大編纂事業が懐柔、辮髪の強制・文字の獄・禁書が威圧にあたる。明は漢民族の王朝である点が対照をなす。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e0d84c97-a397-3079-b6e2-4d829bb2f987', 'kc.mingqing.ming_vs_qing_rule', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('93e69836-c1f8-33b6-9a34-09786ccd979b', NULL, 'mcq4', '明の海禁と朝貢についての説明として正しいものはどれか。', '[{"key":"a","text":"海禁は民間貿易のみを認め、国家間の交易を禁じるものだった"},{"key":"b","text":"鄭和の遠征は海禁に反する私的な航海であった"},{"key":"c","text":"民間の海上貿易を禁じ、対外交易を朝貢の形に一本化する政策で、鄭和の南海遠征も朝貢国を増やすための事業だった"},{"key":"d","text":"民間貿易を奨励し、朝貢を廃止する政策であった"}]'::jsonb,
+   '"c"'::jsonb, '海禁と朝貢貿易は表裏一体の政策である。永楽帝が派遣した鄭和の艦隊は東南アジア・インド洋を経てアフリカ東岸まで達し、各地の使節を伴って帰った。禁令の裏で密貿易（後期倭寇）が絶えず、1567年に海禁は緩められた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('93e69836-c1f8-33b6-9a34-09786ccd979b', 'kc.mingqing.haijin_and_tribute', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5d3c9350-a636-372f-bf4a-e5c75b74f760', NULL, 'mcq4', '一条鞭法と地丁銀が成立した背景として正しいものはどれか。', '[{"key":"a","text":"紙幣の信用が高まり、税を紙幣で納めるようになったから"},{"key":"b","text":"税制を簡素にするため、農民から税を取らないことにしたから"},{"key":"c","text":"日本銀とメキシコ銀が大量に流入して銀が広く流通したため、複雑な税と徭役をまとめて銀で納めさせることが可能になった"},{"key":"d","text":"銀が不足したため、現物での納入に戻す必要があったから"}]'::jsonb,
+   '"c"'::jsonb, '16世紀に日本銀とスペイン領アメリカの銀が中国へ流れ込み、銀が事実上の通貨となった。明末の一条鞭法は各種の税と徭役を一本化して銀納とし、清の地丁銀は人頭税（丁銀）を土地税（地銀）に繰り込んで一本化した。世界的な銀の流通と中国の税制が結びついている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5d3c9350-a636-372f-bf4a-e5c75b74f760', 'kc.mingqing.tax_silver_reform', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0ecb798c-6138-3e77-a06f-ba7f7c20fda7', NULL, 'mcq4', '明の滅亡から清の中国支配の確立までの出来事を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"清軍が入関 → 李自成の乱で明が滅ぶ → 台湾の鄭氏を平定 → 三藩の乱"},{"key":"b","text":"三藩の乱 → 李自成の乱で明が滅ぶ → 清軍が入関 → 台湾の鄭氏を平定"},{"key":"c","text":"台湾の鄭氏を平定 → 三藩の乱 → 清軍が入関 → 李自成の乱で明が滅ぶ"},{"key":"d","text":"李自成の乱で明が滅ぶ → 呉三桂の先導で清軍が入関 → 三藩の乱 → 台湾の鄭氏を平定"}]'::jsonb,
+   '"d"'::jsonb, '1644年に李自成が北京を占領して明が滅び、山海関を守っていた呉三桂が清軍を招き入れた。のち呉三桂ら3人の漢人武将が起こした三藩の乱（1673〜81年）を康熙帝が鎮圧し、1683年に台湾の鄭氏を降して支配を確立した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0ecb798c-6138-3e77-a06f-ba7f7c20fda7', 'kc.mingqing.ming_fall_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('adc72921-ff69-3750-850c-d8e8d59e092c', NULL, 'mcq4', '清の支配の構造についての説明として正しいものはどれか。', '[{"key":"a","text":"チベットは清の支配が及ばず、独立を保っていた"},{"key":"b","text":"中国内地を直轄領とし、モンゴル・青海・チベット・新疆を藩部として理藩院に統括させ、朝鮮・琉球・ベトナムなどを朝貢国とした"},{"key":"c","text":"全領域を直轄領として同じ制度で統治し、藩部という区分はなかった"},{"key":"d","text":"朝鮮とベトナムを直轄領とし、モンゴルを朝貢国とした"}]'::jsonb,
+   '"b"'::jsonb, '清の支配は三層からなる。直轄の中国内地には省・県を置き、藩部（モンゴル・青海・チベット・新疆）には理藩院を通じて間接統治を行い在来の支配層を残した。朝鮮・琉球・ベトナム・タイなどは冊封を受ける朝貢国であった。最大版図は乾隆帝の代に達した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('adc72921-ff69-3750-850c-d8e8d59e092c', 'kc.mingqing.qing_territory_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5c8ff331-a5cd-36a1-9d69-487385966f96', NULL, 'mcq4', '明清期に人口が急増した要因として最も適切なものはどれか。', '[{"key":"a","text":"北方の遊牧地帯から農民が大量に移住し、華北の人口が急激に増えたから"},{"key":"b","text":"新大陸原産のトウモロコシ・サツマイモ・ラッカセイが伝わり、それまで耕作できなかった山地や痩せた土地でも食料が得られるようになったから"},{"key":"c","text":"医学が飛躍的に発達して感染症が根絶され、乳幼児の死亡率が大きく下がったから"},{"key":"d","text":"政府が出産を奨励する政策をとり、子どもの多い家に税を免除したから"}]'::jsonb,
+   '"b"'::jsonb, '新大陸の作物はヨーロッパ経由・海路で伝来し、稲作に向かない土地の開発を可能にした。これが人口の支えとなり、清代には人口が3億を超えた。同時に山地の開発は環境の悪化と社会不安も生み、のちの白蓮教徒の乱の背景にもなった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5c8ff331-a5cd-36a1-9d69-487385966f96', 'kc.mingqing.new_crops_population', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('54b7df44-267a-3b60-9e3e-80d9bdea76f9', NULL, 'mcq4', 'オスマン帝国に関わる出来事を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"第1次ウィーン包囲 → コンスタンティノープル陥落 → 第2次ウィーン包囲 → モハーチの戦い"},{"key":"b","text":"コンスタンティノープル陥落 → モハーチの戦い → 第1次ウィーン包囲 → レパントの海戦 → 第2次ウィーン包囲"},{"key":"c","text":"モハーチの戦い → コンスタンティノープル陥落 → レパントの海戦 → 第1次ウィーン包囲"},{"key":"d","text":"レパントの海戦 → 第2次ウィーン包囲 → コンスタンティノープル陥落 → モハーチの戦い"}]'::jsonb,
+   '"b"'::jsonb, '1453年にメフメト2世がコンスタンティノープルを陥落させてビザンツ帝国を滅ぼした。スレイマン1世が1526年にモハーチでハンガリーを破り、1529年に第1次ウィーン包囲を行った。1571年のレパントの海戦でスペインなどの連合艦隊に敗れ、1683年の第2次ウィーン包囲の失敗から後退が始まる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('54b7df44-267a-3b60-9e3e-80d9bdea76f9', 'kc.ottoman.expansion_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('27203b89-3e0b-352f-9e6d-90e8d470224a', NULL, 'mcq4', 'オスマン帝国の制度についての説明として正しいものはどれか。', '[{"key":"a","text":"バルカンのキリスト教徒の少年を集めて改宗させ訓練するデヴシルメによりイェニチェリを編成し、騎士には軍役の代償として徴税権を与えるティマール制をとった"},{"key":"b","text":"イェニチェリはトルコ人の貴族の子弟から選ばれ、キリスト教徒は軍に入れなかった"},{"key":"c","text":"ティマール制は農民に土地を均等に分配する制度である"},{"key":"d","text":"デヴシルメで集めた少年は農業に従事させ、軍務には就かせなかった"}]'::jsonb,
+   '"a"'::jsonb, 'デヴシルメで集められた少年はスルタンの直属の常備歩兵軍イェニチェリや官僚となり、身分ではなく能力で登用された。ティマール制は騎士（シパーヒー）に一定地域の徴税権を与えて軍役を課すもので、イクター制の系譜に連なる。両者は帝国の軍事力を支える一対の制度である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('27203b89-3e0b-352f-9e6d-90e8d470224a', 'kc.ottoman.devshirme_and_timar', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4e92c768-6eda-3f0d-81e3-069682d17ba4', NULL, 'mcq4', 'ミッレト制についての説明として正しいものはどれか。', '[{"key":"a","text":"異教徒を国外へ追放し、ムスリムのみが住むことを許した"},{"key":"b","text":"すべての住民に改宗を強制し、共同体の自治を認めなかった"},{"key":"c","text":"異教徒からは税を取らず、行政も帝国が直接行った"},{"key":"d","text":"ギリシア正教・アルメニア教会・ユダヤ教などの宗教共同体に自治を認め、その代償として人頭税ジズヤを課した"}]'::jsonb,
+   '"d"'::jsonb, 'ミッレトは宗教ごとの共同体で、宗教指導者を通じて信徒の身分に関わる事柄を自ら裁いた。信仰と自治を保障される代わりに人頭税ジズヤを納めた。「寛容」か「差別」かの一方に片づけず、自治と課税が対になっていることを押さえる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4e92c768-6eda-3f0d-81e3-069682d17ba4', 'kc.ottoman.millet_system', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('f8620c90-bf57-3280-b9be-5bd92f5d8cc0', NULL, 'mcq4', 'オスマン朝とサファヴィー朝の対立の背景として正しいものはどれか。', '[{"key":"a","text":"両朝ともシーア派で、対立は領土をめぐるものだけだった"},{"key":"b","text":"オスマン朝がシーア派、サファヴィー朝がスンナ派を国教とした"},{"key":"c","text":"両朝は同盟してヨーロッパ諸国と戦い、対立したことはない"},{"key":"d","text":"サファヴィー朝がシーア派を国教としたのに対しオスマン朝はスンナ派の盟主を自任し、宗派の違いが両国の対立軸となった"}]'::jsonb,
+   '"d"'::jsonb, '1501年にイスマーイール1世が建てたサファヴィー朝はシーア派の十二イマーム派を国教とし、君主はシャーの称号を用いた。スンナ派のオスマン朝とはイラク・アゼルバイジャンをめぐって長く争った。この宗派の分布が現在のイランと周辺国の関係にもつながっている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('f8620c90-bf57-3280-b9be-5bd92f5d8cc0', 'kc.ottoman.sunni_vs_shia_states', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e0e434db-1b3e-3625-9dab-adf56391653e', NULL, 'mcq4', '3つのイスラーム帝国と、その中心地の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"オスマン帝国＝イスタンブル、サファヴィー朝＝イスファハーン、ムガル帝国＝デリー"},{"key":"b","text":"オスマン帝国＝イスファハーン、サファヴィー朝＝デリー、ムガル帝国＝イスタンブル"},{"key":"c","text":"オスマン帝国＝デリー、サファヴィー朝＝イスタンブル、ムガル帝国＝イスファハーン"},{"key":"d","text":"3帝国とも都をバグダードに置いた"}]'::jsonb,
+   '"a"'::jsonb, 'オスマン帝国はアナトリア・バルカン・アラブ地域を支配しイスタンブル（旧コンスタンティノープル）を都とした。サファヴィー朝はイランを支配し、アッバース1世がイスファハーンを「世界の半分」と称されるまでに整えた。ムガル帝国は北インドを中心にデリー・アグラを都とした。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e0e434db-1b3e-3625-9dab-adf56391653e', 'kc.ottoman.three_empires_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('c57d06bb-fa33-36fc-aeb9-b41761b73ad5', NULL, 'mcq4', '地中海商業圏の地位が16世紀に下がった要因として最も適切なものはどれか。', '[{"key":"a","text":"地中海の水位が下がって大型船の航行が難しくなり、交易路として使えなくなったから"},{"key":"b","text":"イタリア諸都市が交易から手を引いて農業に転じ、商人が内陸へ移っていったから"},{"key":"c","text":"ヨーロッパで香辛料への需要が消滅し、東方貿易そのものが不要になったから"},{"key":"d","text":"東からオスマン帝国が東地中海を掌握し、西からは喜望峰まわりの新航路が開かれて、商業の中心が大西洋岸へ移ったから"}]'::jsonb,
+   '"d"'::jsonb, 'オスマン帝国の進出でレヴァント貿易の条件が悪化する一方、1498年のヴァスコ=ダ=ガマの到達で喜望峰まわりの航路が開けた。アメリカ大陸との交易も加わり、リスボン・アントウェルペン・のちアムステルダムやロンドンが繁栄の中心となった（商業革命）。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('c57d06bb-fa33-36fc-aeb9-b41761b73ad5', 'kc.ottoman.mediterranean_decline', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('95144f34-b9ef-30af-a695-04e1608ce220', NULL, 'mcq4', 'ムガル帝国の皇帝を、在位の古いものから順に並べたものはどれか。', '[{"key":"a","text":"バーブル → アクバル → シャー=ジャハーン → アウラングゼーブ"},{"key":"b","text":"アクバル → バーブル → アウラングゼーブ → シャー=ジャハーン"},{"key":"c","text":"アウラングゼーブ → シャー=ジャハーン → アクバル → バーブル"},{"key":"d","text":"シャー=ジャハーン → アクバル → バーブル → アウラングゼーブ"}]'::jsonb,
+   '"a"'::jsonb, '1526年にバーブルがパーニーパットの戦いでロディー朝を破り建国した。第3代アクバルがジズヤを廃して融和策をとり支配を固め、第5代シャー=ジャハーンがタージ=マハルを造営した。第6代アウラングゼーブは版図を最大にしたが、ジズヤを復活させて反発を招いた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('95144f34-b9ef-30af-a695-04e1608ce220', 'kc.mughal.emperor_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('65cfb43f-b184-3e78-8a78-cbf694a0354b', NULL, 'mcq4', 'アクバルとアウラングゼーブの宗教政策の違いとして正しいものはどれか。', '[{"key":"a","text":"アクバルは非ムスリムへのジズヤを廃して融和を図ったが、アウラングゼーブはこれを復活させ、ヒンドゥー教寺院を破壊して反発を招いた"},{"key":"b","text":"アクバルが非ムスリムへのジズヤを復活させ、アウラングゼーブがこれを廃止して融和を図った"},{"key":"c","text":"2人とも一貫してジズヤを廃止し、諸宗教の融和を図った点で宗教政策に違いはなかった"},{"key":"d","text":"2人ともヒンドゥー教を国教としてイスラーム教を弾圧し、モスクを破壊した"}]'::jsonb,
+   '"a"'::jsonb, 'アクバルはラージプートと姻戚関係を結び、1564年にジズヤを廃して諸宗教の融和を図った。これが帝国の統合を支えた。アウラングゼーブは厳格なスンナ派の立場からジズヤを復活させ（1679年）、マラーター王国やシク教徒の反抗を招いた。統合と解体の分かれ目がここにある。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('65cfb43f-b184-3e78-8a78-cbf694a0354b', 'kc.mughal.akbar_vs_aurangzeb', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('649a0991-b1b6-339e-9d93-44b8f868c851', NULL, 'mcq4', 'マンサブダール制についての説明として正しいものはどれか。', '[{"key":"a","text":"宗教指導者に土地を寄進し、学院の運営を委ねる制度である"},{"key":"b","text":"官僚に位階（マンサブ）を与え、その位階に応じた数の騎兵を維持する義務を課し、代わりに給与地（ジャーギール）を与える制度である"},{"key":"c","text":"農民に土地を分配し、収穫の一部を納めさせる制度である"},{"key":"d","text":"商人に交易の独占権を与え、その代わりに関税を納めさせる制度である"}]'::jsonb,
+   '"b"'::jsonb, 'アクバルが整えた官僚・軍事の制度で、位階によって維持すべき騎兵数が決まり、その費用として給与地の徴税権が与えられた。イクター制やティマール制と同じく「軍役と徴税権の交換」という枠組みだが、位階制と結びついている点が特徴である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('649a0991-b1b6-339e-9d93-44b8f868c851', 'kc.mughal.mansabdar', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('f8cfe00f-a11b-3d71-aed3-70a99cfb7f4f', NULL, 'mcq4', 'ムガル帝国が解体していった要因として最も適切なものはどれか。', '[{"key":"a","text":"外敵の侵入が一度も起きず軍事力が不要になり、軍を解体した結果として統治が緩んだから"},{"key":"b","text":"皇帝がヨーロッパにならった急速な近代化を進め、伝統的な支配層の支持を失ったから"},{"key":"c","text":"イスラーム教徒の人口が激減して支配の基盤が消え、統治する人材を確保できなくなったから"},{"key":"d","text":"アウラングゼーブの強硬な宗教政策がマラーターやシク教徒の離反を招き、その死後は地方の太守が自立して帝国が実質的に分裂したから"}]'::jsonb,
+   '"d"'::jsonb, 'ジズヤの復活と寺院の破壊がヒンドゥー教徒の反発を招き、デカン高原のマラーター王国やパンジャーブのシク教徒が抵抗した。1707年のアウラングゼーブの死後、ベンガル太守などの地方勢力が自立し、その間隙にイギリスとフランスが進出した。1757年のプラッシーの戦いが転機となる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('f8cfe00f-a11b-3d71-aed3-70a99cfb7f4f', 'kc.mughal.decline_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4d0059db-f242-32df-b934-62e71367a181', NULL, 'mcq4', 'インド=イスラーム文化の例として正しいものはどれか。', '[{"key":"a","text":"中国から伝わった水墨画の技法とヒンドゥー教の神像の図像が融合した宗教画の様式"},{"key":"b","text":"ローマの建築技術とヒンドゥー教の信仰が融合して掘られた、アジャンターの石窟寺院"},{"key":"c","text":"ペルシア語の語彙を取り入れインドの言語をアラビア文字で書くウルドゥー語や、ペルシアの細密画とインドの様式が融合したムガル絵画"},{"key":"d","text":"ヘレニズムのギリシア彫刻の技法と仏教の主題が融合したガンダーラ美術と、その仏像"}]'::jsonb,
+   '"c"'::jsonb, 'ウルドゥー語はヒンディー語の文法にペルシア語・アラビア語の語彙を取り入れ、アラビア文字で書かれる。ムガル絵画はペルシアの細密画（ミニアチュール）の技法にインドの主題と写実が加わった。タージ=マハルもペルシア様式のドームとインドの装飾が融合した廟である。ガンダーラ美術は紀元前後の別の融合である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4d0059db-f242-32df-b934-62e71367a181', 'kc.mughal.indo_islamic_culture', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('798d232e-2c22-3f4e-a8cd-20dda3f015e0', NULL, 'mcq4', 'ヨーロッパ人が大洋へ乗り出した動機として最も適切な組み合わせはどれか。', '[{"key":"a","text":"中国の明とインドのムガル帝国から使節が送られ、通商を開くよう積極的な招請があったこと"},{"key":"b","text":"ヨーロッパで穀物の生産が過剰になり、その輸出先を海の向こうに求める必要があったこと"},{"key":"c","text":"香辛料など東方物産への需要、オスマン帝国の進出による陸路の不安定化、レコンキスタで培われた異教徒への対抗意識と布教熱"},{"key":"d","text":"黒死病からの回復で人口が減ったままとなり、国内の労働力が余って移住先を求めたこと"}]'::jsonb,
+   '"c"'::jsonb, '肉の保存や薬用に用いる香辛料は仲介を経るたびに高騰した。オスマン帝国の東地中海進出は既存の経路を不安定にし、レコンキスタを終えたイベリア半島の王権は対外進出の意欲と航海技術（羅針盤・カラベル船）を持っていた。マルコ=ポーロの『世界の記述』も関心を刺激した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('798d232e-2c22-3f4e-a8cd-20dda3f015e0', 'kc.voyage.motives', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('edfde8c2-da99-32b0-9de9-fc313155681d', NULL, 'mcq4', '航海者と航路の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"4人とも西回りの航路をとった"},{"key":"b","text":"バルトロメウ=ディアスとヴァスコ=ダ=ガマがアフリカ南端を回る東回り、コロンブスとマゼランの一行が大西洋を渡る西回りである"},{"key":"c","text":"コロンブスが喜望峰を回ってインドに到達し、ヴァスコ=ダ=ガマが西回りでアメリカに到達した"},{"key":"d","text":"マゼランの一行は東回りで日本に到達した"}]'::jsonb,
+   '"b"'::jsonb, 'ポルトガルは東回りを進め、1488年にバルトロメウ=ディアスが喜望峰に到達、1498年にヴァスコ=ダ=ガマがカリカットに着いた。スペインは西回りを支援し、1492年にコロンブスがサンサルバドル島に到達、1519〜22年にマゼランの一行が世界周航を果たした。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('edfde8c2-da99-32b0-9de9-fc313155681d', 'kc.voyage.two_routes_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('a6c14e10-abba-3960-9cbd-81e20f1d20d5', NULL, 'mcq4', 'トルデシリャス条約についての説明として正しいものはどれか。', '[{"key":"a","text":"教皇の裁定をもとにスペインとポルトガルが世界を東西に分ける境界線を定めたもので、結果としてブラジルがポルトガル領となった"},{"key":"b","text":"スペインとイギリスがアメリカ大陸の権益を南北に分けることを定めた条約である"},{"key":"c","text":"オスマン帝国とスペインが地中海の東西に勢力圏の境界を引くことを定めた条約である"},{"key":"d","text":"ポルトガルとオランダが東南アジアの香辛料交易の権益を島ごとに分けた条約である"}]'::jsonb,
+   '"a"'::jsonb, '1494年の条約で、西アフリカ沖の子午線を境に西をスペイン、東をポルトガルの権益と定めた。この線が南アメリカ大陸の東端をかすめたため、ブラジルだけがポルトガル領となった。1529年のサラゴサ条約でアジア側の境界も定められた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('a6c14e10-abba-3960-9cbd-81e20f1d20d5', 'kc.voyage.tordesillas', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('366c4b68-fdf5-3263-be89-49a358af520a', NULL, 'mcq4', '商業革命と価格革命についての説明として正しいものはどれか。', '[{"key":"a","text":"銀が不足して物価が下落し、商業の中心が大西洋から地中海へ戻った"},{"key":"b","text":"価格革命は穀物の不足による飢饉を指し、銀とは無関係である"},{"key":"c","text":"商業革命はイタリア諸都市の繁栄が頂点に達したことを指す"},{"key":"d","text":"アメリカ大陸の銀が大量に流入して物価が高騰し（価格革命）、商業の中心が地中海から大西洋岸へ移った（商業革命）"}]'::jsonb,
+   '"d"'::jsonb, 'ポトシ銀山などの銀が流入して物価が2〜3倍になり、固定した地代に頼る領主は打撃を受け、商工業者は利益を得た。交易の中心はリスボン・セビリャ・アントウェルペン、のちアムステルダム・ロンドンへ移り、イタリア諸都市とハンザ同盟は衰えた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('366c4b68-fdf5-3263-be89-49a358af520a', 'kc.voyage.commercial_revolution', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e33b9e19-05a1-3240-b646-43ab0126ad27', NULL, 'mcq4', '東インド会社についての説明として正しいものはどれか。', '[{"key":"a","text":"イギリスが1600年、オランダが1602年に設立し、1623年のアンボイナ事件を機に香辛料はオランダ、インドはイギリスという棲み分けが進んだ"},{"key":"b","text":"オランダが最初に設立し、アンボイナ事件でイギリスがモルッカ諸島を確保した"},{"key":"c","text":"フランスが最も早く設立し、インドから他国を追い出した"},{"key":"d","text":"3国の東インド会社は協定を結び、一度も衝突しなかった"}]'::jsonb,
+   '"a"'::jsonb, 'イギリス東インド会社（1600年）、オランダ東インド会社（1602年）、フランス（1604年、コルベールが1664年に再建）の順に設立された。1623年のアンボイナ事件でイギリス商館員が殺害され、イギリスは香辛料の産地モルッカ諸島から手を引いてインド経営へ集中した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e33b9e19-05a1-3240-b646-43ab0126ad27', 'kc.voyage.east_india_companies', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('29ccafcf-28e0-334b-b762-db3b3e391e2b', NULL, 'mcq4', '近世に東欧で農場領主制（グーツヘルシャフト）が強まった理由として正しいものはどれか。', '[{"key":"a","text":"東欧で商業と都市が衰退し、領主も農民も自給自足の生活に戻る必要があったから"},{"key":"b","text":"東欧の農民が貨幣を蓄えて土地を買い取り、領主が没落して直営地を手放したから"},{"key":"c","text":"西欧から農民が大量に移住して労働力が余り、賦役を課す必要がなくなったから"},{"key":"d","text":"西欧の人口増加と都市化で穀物需要が高まり、東欧の領主が輸出向けの穀物生産のため農民の賦役を強化したから"}]'::jsonb,
+   '"d"'::jsonb, '西欧では貨幣経済の浸透で農奴が解放へ向かったが、エルベ川以東では逆に賦役が強化された（再版農奴制）。西欧という市場の存在が、東欧の農民の地位を押し下げたことになる。同じ時期に逆方向へ動いた理由を、両者の結びつきから説明できることが要点である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('29ccafcf-28e0-334b-b762-db3b3e391e2b', 'kc.voyage.gutsherrschaft', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4e0ff810-02f9-3052-b6f7-531f5666c2b9', NULL, 'mcq4', 'アメリカ大陸の文明と場所・特徴の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"アステカ＝メキシコ高原、インカ＝アンデス高地でキープと道路網、マヤ＝ユカタン半島で精密な暦と絵文字"},{"key":"b","text":"アステカ＝アンデス高地、インカ＝ユカタン半島、マヤ＝メキシコ高原"},{"key":"c","text":"インカ＝メキシコ高原で絵文字、マヤ＝アンデス高地でキープ"},{"key":"d","text":"3文明とも同じ地域に同時に存在し、区別はない"}]'::jsonb,
+   '"a"'::jsonb, 'マヤ文明はユカタン半島でニ十進法・精密な暦・マヤ文字を発達させた。アステカ王国はメキシコ高原のテノチティトランを都とした。インカ帝国はアンデスのクスコを都とし、文字を持たない代わりに縄の結び目（キープ）で記録し、広大な道路網を築いた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4e0ff810-02f9-3052-b6f7-531f5666c2b9', 'kc.atlantic.three_civilizations', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('359a91d1-2508-3f25-84fd-41543073b7cb', NULL, 'mcq4', 'アメリカ大陸に関わる出来事を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"ピサロによるインカ征服 → コロンブスの到達 → コルテスによるアステカ征服"},{"key":"b","text":"コルテスによるアステカ征服 → ピサロによるインカ征服 → コロンブスの到達"},{"key":"c","text":"コロンブスの到達 → ピサロによるインカ征服 → コルテスによるアステカ征服"},{"key":"d","text":"コロンブスの到達 → コルテスによるアステカ征服 → ピサロによるインカ征服"}]'::jsonb,
+   '"d"'::jsonb, '1492年にコロンブスがサンサルバドル島に到達した。1521年にコルテスがアステカ王国を、1533年にピサロがインカ帝国を滅ぼした。征服者はコンキスタドールと呼ばれ、いずれもスペインの支援を受けていた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('359a91d1-2508-3f25-84fd-41543073b7cb', 'kc.atlantic.conquest_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('425b26a3-0c72-31c5-ae91-c682d8e44300', NULL, 'mcq4', '少数のスペイン人が大帝国を倒せた要因として最も適切なものはどれか。', '[{"key":"a","text":"スペインが数万の大軍を送り込み、兵力の点で先住民の軍勢を大きく上回っていたから"},{"key":"b","text":"先住民は戦いというものを知らず、武器を持たずに生活していて抵抗できなかったから"},{"key":"c","text":"先住民が自らスペインの支配を望み、使節を送って無抵抗で降伏を申し出たから"},{"key":"d","text":"鉄砲と馬に加え、持ち込まれた天然痘などの疫病で先住民の人口が激減し、支配に不満をもつ周辺部族が征服者に加担したから"}]'::jsonb,
+   '"d"'::jsonb, 'コルテスは数百人規模の兵しか率いていなかったが、アステカの支配に不満をもつ諸部族を味方につけた。免疫のなかった先住民は天然痘・麻疹などで人口が激減し、社会が崩壊した。鉄砲と馬の衝撃も大きかったが、それだけでは説明がつかない。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('425b26a3-0c72-31c5-ae91-c682d8e44300', 'kc.atlantic.conquest_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ddf3b860-db8e-3d32-9064-326656f9aa7d', NULL, 'mcq4', 'エンコミエンダ制とアシエンダ制についての説明として正しいものはどれか。', '[{"key":"a","text":"大農園を経営するアシエンダ制が先にあり、のちに委託方式のエンコミエンダ制へ移った"},{"key":"b","text":"エンコミエンダ制は先住民に土地を与えて自作させ、収穫の一部を納めさせる制度である"},{"key":"c","text":"どちらも先住民を保護するための制度で、宣教師などから批判されたことは一度もない"},{"key":"d","text":"先住民の保護と教化を条件に労働力の使用を委ねるのがエンコミエンダ制で、のちに大農園を黒人奴隷などで経営するアシエンダ制へ移った"}]'::jsonb,
+   '"d"'::jsonb, 'エンコミエンダ制は名目上は保護と布教を条件としたが、実際には過酷な労働を強いて人口減少を招いた。ラス=カサスがこれを告発し、制度は次第に廃れた。代わって私有地での大農園経営（アシエンダ制）が広がり、労働力の不足はアフリカから連れてこられた黒人奴隷で補われた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ddf3b860-db8e-3d32-9064-326656f9aa7d', 'kc.atlantic.encomienda', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('fa920bc4-b37c-3b2a-be36-531b6f2a02bb', NULL, 'mcq4', '大西洋三角貿易で運ばれたものの組み合わせとして正しいものはどれか。', '[{"key":"a","text":"三角貿易では奴隷は運ばれず、商品のみが取引された"},{"key":"b","text":"ヨーロッパからアフリカへ武器や雑貨、アフリカからアメリカへ黒人奴隷、アメリカからヨーロッパへ砂糖・綿花・タバコ"},{"key":"c","text":"ヨーロッパからアフリカへ砂糖、アフリカからアメリカへ綿花、アメリカからヨーロッパへ奴隷"},{"key":"d","text":"ヨーロッパからアメリカへ奴隷、アメリカからアフリカへ武器、アフリカからヨーロッパへ砂糖"}]'::jsonb,
+   '"b"'::jsonb, 'リヴァプールやブリストル、ナントなどの港を拠点に、武器・綿織物・雑貨をアフリカへ運んで奴隷と交換し、その奴隷を西インド諸島やアメリカ大陸のプランテーションへ送り、砂糖・綿花・タバコを持ち帰った。この利益がイギリスの産業革命の資本の一部となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('fa920bc4-b37c-3b2a-be36-531b6f2a02bb', 'kc.atlantic.triangular_trade_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('7ebad32b-fd18-3c13-a613-68b83384eb9a', NULL, 'mcq4', '新旧大陸のあいだで起きた交換の影響として正しいものはどれか。', '[{"key":"a","text":"作物の移動は新大陸から旧大陸への一方向のみで、家畜や病原体は動かなかった"},{"key":"b","text":"旧大陸の作物が新大陸へ渡ったが、その逆は起きなかった"},{"key":"c","text":"交換によって双方の人口が同じように増加した"},{"key":"d","text":"ジャガイモやトウモロコシがヨーロッパと中国の人口増加を支える一方、旧大陸の疫病が新大陸の先住民人口を激減させた"}]'::jsonb,
+   '"d"'::jsonb, '新大陸からはジャガイモ・トウモロコシ・サツマイモ・トマト・カカオ・タバコが、旧大陸からは小麦・サトウキビ・馬・牛・豚が渡った。同時に天然痘・麻疹などの病原体が新大陸へ持ち込まれ、免疫のない先住民の人口を壊滅させた。作物は人口を増やし、病原体は人口を減らすという非対称な結果になった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('7ebad32b-fd18-3c13-a613-68b83384eb9a', 'kc.atlantic.columbian_exchange', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('65dcc561-f590-341d-ac10-cd85002c7b70', NULL, 'mcq4', 'ルネサンスがイタリアで始まった要因として最も適切なものはどれか。', '[{"key":"a","text":"教皇がアヴィニョンへ移ってイタリアを離れ、教会の影響力が完全に消えたから"},{"key":"b","text":"東方貿易で富を蓄えた都市とメディチ家のような有力者が芸術家を保護し、ビザンツ帝国の滅亡で古典の学者と写本が流入したから"},{"key":"c","text":"イタリアが他国に先んじて統一国家となり、強大な国王が芸術家を手厚く保護したから"},{"key":"d","text":"イタリアだけが黒死病の被害を免れて人口が増え続け、豊かな労働力に恵まれたから"}]'::jsonb,
+   '"b"'::jsonb, 'ヴェネツィア・フィレンツェなどはレヴァント貿易と金融で富を蓄え、メディチ家をはじめとする有力者が芸術家の後援者（パトロン）となった。1453年のビザンツ滅亡でギリシア語の学者と写本がイタリアへ移ったことも、古典研究を後押しした。イタリアはむしろ分裂しており、統一国家ではなかった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('65dcc561-f590-341d-ac10-cd85002c7b70', 'kc.renaissance.why_italy', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5d59462f-fc98-30fd-9d5d-1933f5bab6cd', NULL, 'mcq4', '人文主義（ヒューマニズム）とスコラ学の違いとして正しいものはどれか。', '[{"key":"a","text":"スコラ学が信仰の体系化を目的としたのに対し、人文主義は古典古代の原典に立ち返って人間そのものを探究した"},{"key":"b","text":"人文主義はキリスト教を否定する無神論の運動であった"},{"key":"c","text":"スコラ学が古典の原典研究を、人文主義が神学の体系化を担った"},{"key":"d","text":"両者は同じ方法をとり、扱う言語だけが異なっていた"}]'::jsonb,
+   '"a"'::jsonb, 'スコラ学は教会の教義を論理によって基礎づける学問であった。人文主義はギリシア・ローマの原典（と原語）に立ち返り、人間の理性と感情、現世の生を肯定した。ただしエラスムスのように、キリスト教そのものを否定するのではなく、教会の腐敗を批判する立場が多かった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5d59462f-fc98-30fd-9d5d-1933f5bab6cd', 'kc.renaissance.humanism', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('3666685b-33ac-3003-b18d-809c113d1796', NULL, 'mcq4', 'ルネサンス期の三大発明とその影響の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"3つとも軍事にのみ用いられ、社会には影響しなかった"},{"key":"b","text":"火薬＝騎士の没落、羅針盤＝遠洋航海の実現、活版印刷＝思想の急速な普及"},{"key":"c","text":"火薬＝遠洋航海の実現、羅針盤＝思想の普及、活版印刷＝騎士の没落"},{"key":"d","text":"3つともヨーロッパで独自に発明され、中国とは無関係である"}]'::jsonb,
+   '"b"'::jsonb, 'いずれも中国で生まれたものがイスラーム世界を経て伝わり、ヨーロッパで改良された。火砲は城と騎士の戦術的価値を失わせ、羅針盤は大洋の航海を可能にし、グーテンベルクの活版印刷は書物の値段を下げて宗教改革の主張を短期間で広めた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('3666685b-33ac-3003-b18d-809c113d1796', 'kc.renaissance.three_inventions', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5d089ef3-c750-36e2-a790-2be71af711f8', NULL, 'mcq4', 'ルネサンス期の人物と出身・作品の組み合わせとして正しいものはどれか。', '[{"key":"a","text":"エラスムス（ネーデルラント）＝『愚神礼賛』、トマス=モア（イギリス）＝『ユートピア』、セルバンテス（スペイン）＝『ドン=キホーテ』"},{"key":"b","text":"エラスムス（イギリス）＝『ユートピア』、トマス=モア（スペイン）＝『ドン=キホーテ』"},{"key":"c","text":"セルバンテス（フランス）＝『愚神礼賛』、ラブレー（スペイン）＝『ユートピア』"},{"key":"d","text":"4人ともイタリア出身で、同じ工房で学んだ"}]'::jsonb,
+   '"a"'::jsonb, 'エラスムスは『愚神礼賛』で聖職者の腐敗を風刺し、ギリシア語新約聖書の校訂も行った。トマス=モアは『ユートピア』で第1次囲い込みを批判した。フランスのラブレーは『ガルガンチュアとパンタグリュエルの物語』、スペインのセルバンテスは『ドン=キホーテ』を著した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5d089ef3-c750-36e2-a790-2be71af711f8', 'kc.renaissance.northern', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('2ab74c26-5d16-3394-b85c-a09e2cc0f0e8', NULL, 'mcq4', '活版印刷術がもたらした変化として最も適切なものはどれか。', '[{"key":"a","text":"印刷術の普及によってラテン語が唯一の書き言葉となった"},{"key":"b","text":"書物の値段が下がって各国語訳の聖書が広く読まれ、ルターの主張が短期間でドイツ中に広まった"},{"key":"c","text":"書物が高価になり、知識が聖職者に独占されるようになった"},{"key":"d","text":"印刷は聖書にのみ用いられ、他の書物には使われなかった"}]'::jsonb,
+   '"b"'::jsonb, 'グーテンベルクが15世紀半ばに実用化した活版印刷は、写本に比べて格段に安く速い複製を可能にした。ルターの『九十五カ条の論題』とドイツ語訳聖書が急速に広まったのはこの技術による。各国語で書かれた書物の普及は、のちの国民意識の形成にもつながった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('2ab74c26-5d16-3394-b85c-a09e2cc0f0e8', 'kc.renaissance.printing_effects', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('c589c859-b980-3dd5-abe1-b698a7727fc1', NULL, 'mcq4', 'ルターが教会を批判した直接の契機と背景の説明として正しいものはどれか。', '[{"key":"a","text":"教皇がドイツ皇帝を破門したことが契機で、皇帝の要請を受けて教会への批判を始めたものである"},{"key":"b","text":"オスマン帝国の侵入に教会がまったく対処しなかったことが契機で、教皇の無策を批判したものである"},{"key":"c","text":"すでにドイツ語訳の聖書が広く読まれており、その内容と教会の教えの食い違いに気づいたことが契機である"},{"key":"d","text":"サン=ピエトロ大聖堂の改築費を集めるための贖宥状がドイツで大量に売られたことが契機で、分裂して教皇の搾取を受けやすいドイツの事情が背景にあった"}]'::jsonb,
+   '"d"'::jsonb, '1517年、ルターは『九十五カ条の論題』で贖宥状の販売を批判した。ドイツは「ローマの牝牛」と呼ばれるほど教皇への上納が多く、統一国家を欠いていたため対抗しにくかった。ルターによる新約聖書のドイツ語訳は、ヴァルトブルク城に保護されていた1521年以降のことである。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('c589c859-b980-3dd5-abe1-b698a7727fc1', 'kc.reformation.luther_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ecb921c1-4c82-3209-b8dd-f5d28d61cc7b', NULL, 'mcq4', '中央アジアからイランにかけて興った王朝を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"サーマーン朝 → セルジューク朝 → ガズナ朝"},{"key":"b","text":"サーマーン朝 → ガズナ朝 → セルジューク朝"},{"key":"c","text":"ガズナ朝 → サーマーン朝 → セルジューク朝"},{"key":"d","text":"セルジューク朝 → サーマーン朝 → ガズナ朝"}]'::jsonb,
+   '"b"'::jsonb, 'イラン系のサーマーン朝（875〜999、都ブハラ）がまず自立し、その軍のトルコ人奴隷出身者が建てたガズナ朝（962〜1186）が続いた。ついで中央アジアから南下したトルコ系のセルジューク朝（1038〜1157）がガズナ朝を破りイランを支配した。イラン系からトルコ系へ、という流れをおさえる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ecb921c1-4c82-3209-b8dd-f5d28d61cc7b', 'kc.turkiran.samanid_to_ghaznavid', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('7a02ed99-bbb3-3a29-a7eb-77f13741e564', NULL, 'mcq4', '9〜10世紀に中央アジアがトルコ化・イスラーム化した要因として最も適切なものはどれか。', '[{"key":"a","text":"ウイグル崩壊後に西進したトルコ系集団が、交易と傭兵化を通じて改宗した"},{"key":"b","text":"アッバース朝が大軍を送り、現地の住民を武力で強制的に改宗させた"},{"key":"c","text":"唐が西域の統治を強め、仏教にかわってイスラーム教を広めていった"},{"key":"d","text":"モンゴルの西征によってイスラーム教が中央アジアへ持ちこまれた"}]'::jsonb,
+   '"a"'::jsonb, '840年のウイグル崩壊で西へ移ったトルコ系遊牧民が、サーマーン朝との隊商交易に加わり、また軍人奴隷（マムルーク）としてイスラーム政権に仕えるなかで改宗が進んだ。カラハン朝が最初のトルコ系イスラーム王朝である。強制改宗でも、モンゴル（13世紀）でもない点に注意する。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('7a02ed99-bbb3-3a29-a7eb-77f13741e564', 'kc.turkiran.turkification_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('60065039-a839-3bb8-9692-b4262413c93a', NULL, 'mcq4', 'セルジューク朝がスルタンの称号を得た経緯として正しいものはどれか。', '[{"key":"a","text":"アッバース朝を滅ぼし、カリフの位をみずから兼ねてスルタンを名のった"},{"key":"b","text":"ファーティマ朝のカリフから、東方の統治権としてスルタン位を受けた"},{"key":"c","text":"ビザンツ皇帝との講和の条件として、スルタンの称号を承認させた"},{"key":"d","text":"バグダードに入城してブワイフ朝を追い、カリフからスルタンの称号を得た"}]'::jsonb,
+   '"d"'::jsonb, 'トゥグリル=ベクは1055年にバグダードへ入り、シーア派のブワイフ朝を追放した。スンナ派のアッバース朝カリフはこれを歓迎してスルタン（世俗の支配者）の称号を与えた。カリフが宗教的権威、スルタンが政治的権力という分業がここで定着する。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('60065039-a839-3bb8-9692-b4262413c93a', 'kc.turkiran.seljuk_sultanate', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5b21b536-a95c-328f-b3bd-92ebfc57c543', NULL, 'mcq4', 'マムルークとイクター制の結びつきの説明として正しいものはどれか。', '[{"key":"a","text":"イクター制のもとで軍人は土地を私有し、国家への納税の義務を負わなかった"},{"key":"b","text":"現金の俸給が続かず、軍人に徴税権を分け与えて自活させたのがイクター制である"},{"key":"c","text":"イクター制は農民に土地を分配する制度で、マムルークとは無関係であった"},{"key":"d","text":"マムルークは自由身分の遊牧民で、征服地をそのまま私有地として与えられた"}]'::jsonb,
+   '"b"'::jsonb, 'マムルークはトルコ系を中心とする軍人奴隷で、当初は現金で俸給を受けた。財政が行きづまるとブワイフ朝がイクター制を始め、俸給のかわりに一定地域の徴税権を与えた。土地そのものの所有権を与えたのではない点が重要で、セルジューク朝がこれを整備して各地に広めた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5b21b536-a95c-328f-b3bd-92ebfc57c543', 'kc.turkiran.mamluk_and_iqta', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('da6557bd-1903-30fe-8d6c-8b6421c030b7', NULL, 'mcq4', 'トルコ系勢力のアナトリア進出について正しいものはどれか。', '[{"key":"a","text":"マンジケルトの戦いでビザンツ軍を破り、内陸にルーム=セルジューク朝が立った"},{"key":"b","text":"ニハーヴァンドの戦いに勝ち、アナトリア全域をただちに支配下に置いた"},{"key":"c","text":"タラス河畔の戦いに勝利し、一挙にアナトリア西岸まで進出していった"},{"key":"d","text":"カタラウヌムの戦いに勝ち、アナトリアからバルカンへ領域を広げた"}]'::jsonb,
+   '"a"'::jsonb, '1071年のマンジケルトの戦いでセルジューク朝がビザンツ皇帝を捕虜とし、アナトリア内陸への移住が本格化した。分派のルーム=セルジューク朝がコンヤを都に建った。ニハーヴァンド（642年、対ササン朝）、タラス河畔（751年、対唐）、カタラウヌム（451年、対フン）はいずれも別の戦いである。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('da6557bd-1903-30fe-8d6c-8b6421c030b7', 'kc.turkiran.anatolia_turkification_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('a663a4b0-c03f-3c7e-bc5b-37edd6853a88', NULL, 'mcq4', 'ガズナ朝の侵入が北インドに与えた影響として正しいものはどれか。', '[{"key":"a","text":"たび重なる略奪でヒンドゥー諸王権が弱まり、後のイスラーム政権進出の道が開かれた"},{"key":"b","text":"北インド一帯が直接統治され、住民の大半がただちにイスラーム教へ改宗した"},{"key":"c","text":"仏教が手厚く保護されて復興し、ナーランダー僧院が最盛期をむかえた"},{"key":"d","text":"ヒンドゥー諸王権がかえって結束を強め、以後の侵入は完全に止まった"}]'::jsonb,
+   '"a"'::jsonb, 'ガズナ朝は10世紀末から十数回にわたり北インドへ侵入したが、目的は略奪であって恒久支配ではなかった。しかしラージプート諸勢力が消耗し、続くゴール朝が拠点を築き、その部将が奴隷王朝（1206年）を開いてデリー=スルタン朝の時代が始まる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('a663a4b0-c03f-3c7e-bc5b-37edd6853a88', 'kc.turkiran.ghaznavid_india_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6c938b0a-dfb8-3b7c-9205-cedc19358b70', NULL, 'mcq4', '主権国家体制が中世ヨーロッパの秩序と異なる点として正しいものはどれか。', '[{"key":"a","text":"各国の君主が教皇から戴冠を受けて、はじめて正統性を得るとされた点"},{"key":"b","text":"封建的な主従関係がむしろ強まり、諸侯が国王と対等の権利をもった点"},{"key":"c","text":"国境が定まらず、君主の私領の寄せ集めとして領域が扱われていた点"},{"key":"d","text":"教皇や皇帝の普遍的権威を認めず、対等な主権をもつ国家が並び立つ点"}]'::jsonb,
+   '"d"'::jsonb, '三十年戦争を終えたウェストファリア条約（1648年）で、神聖ローマ帝国の諸邦にほぼ完全な主権が認められ、教皇と皇帝の普遍的権威は事実上否定された。国境で区切られた領域を排他的に支配し、対等な立場で外交を行う国家の集まりが生まれ、これを主権国家体制とよぶ。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6c938b0a-dfb8-3b7c-9205-cedc19358b70', 'kc.absolutism.sovereign_state', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e69d5637-1b65-3574-b7fc-88168b400290', NULL, 'mcq4', '絶対王政を支えた仕組みとして正しいものはどれか。', '[{"key":"a","text":"議会が軍事と財政を管理し、国王は儀礼だけを担当する立場であった"},{"key":"b","text":"都市の自治組織が官僚を選任し、国王はその決定に従うだけであった"},{"key":"c","text":"官僚制と常備軍を国王が直接握り、その費用を重商主義政策でまかなった"},{"key":"d","text":"諸侯の私兵に軍事をゆだね、徴税も諸侯の裁量にまかせきりであった"}]'::jsonb,
+   '"c"'::jsonb, '絶対王政の柱は官僚制と常備軍で、いずれも国王に直属し、封建的な主従関係によらない。維持には多額の費用がかかるため、重商主義で国富を増やして税源をつくった。王権神授説はこれを正当化する理論であって、仕組みそのものではない。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e69d5637-1b65-3574-b7fc-88168b400290', 'kc.absolutism.machinery', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ca94f1b3-f6d8-3faa-ab5f-947bbdb51f61', NULL, 'mcq4', '重商主義の2つの型についての説明として正しいものはどれか。', '[{"key":"a","text":"前期は貿易の差額を重んじ、後期は金銀の直接の獲得へと重点が移っていった"},{"key":"b","text":"いずれの時期も自由貿易を原則とし、国家の介入は最小限にとどめられた"},{"key":"c","text":"前期は農業を重んじ、後期は商工業を否定して自給自足の体制をめざした"},{"key":"d","text":"前期は金銀の獲得そのものを重んじ、後期は輸出超過による差額の獲得を重んじた"}]'::jsonb,
+   '"d"'::jsonb, '前期の重金主義はスペインのように金銀そのものの獲得をめざした。後期の貿易差額主義は、コルベールに代表されるように国内の産業を保護育成し、輸出を輸入より多くして差額で富を蓄えようとした。自由貿易を説いたのは重商主義を批判したアダム=スミスの側である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ca94f1b3-f6d8-3faa-ab5f-947bbdb51f61', 'kc.absolutism.mercantilism_types', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('479bdc97-3619-32e7-b607-e2e2d147e646', NULL, 'mcq4', 'ヨーロッパの覇権が移った順序として正しいものはどれか。', '[{"key":"a","text":"スペイン → フランス → イギリス → オランダ"},{"key":"b","text":"スペイン → オランダ → フランス → イギリス"},{"key":"c","text":"オランダ → スペイン → イギリス → フランス"},{"key":"d","text":"フランス → スペイン → オランダ → イギリス"}]'::jsonb,
+   '"b"'::jsonb, '16世紀はフェリペ2世のスペイン、17世紀前半は中継貿易で栄えたオランダ、17世紀後半はルイ14世のフランスが優位に立った。しかし英仏の植民地戦争を経て、七年戦争とパリ条約（1763年）でイギリスの優位が確定する。オランダは英蘭戦争で、フランスは七年戦争で後退した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('479bdc97-3619-32e7-b607-e2e2d147e646', 'kc.absolutism.hegemony_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('31eee001-58f6-337d-a4df-5ceaa73a206e', NULL, 'mcq4', 'イギリスで議会が王権に勝った因果の説明として正しいものはどれか。', '[{"key":"a","text":"国王が外国との戦争に敗れ、講和の条件として議会に権限を譲りわたした"},{"key":"b","text":"教皇が国王を破門したため、貴族が議会側について王権が打倒された"},{"key":"c","text":"農民反乱が長く続いて国王が退位し、共和政がそのまま定着していった"},{"key":"d","text":"課税をめぐる対立から内戦となり、名誉革命を経て権利の章典が定められた"}]'::jsonb,
+   '"d"'::jsonb, '権利の請願（1628年）に始まる課税と信仰をめぐる対立がピューリタン革命に発展し、クロムウェルの共和政をはさんで王政復古となった。ジェームズ2世の専制に対し議会が招いた名誉革命（1688年）は流血なく成功し、権利の章典（1689年）で議会が課税と立法の権限を握った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('31eee001-58f6-337d-a4df-5ceaa73a206e', 'kc.absolutism.english_revolution', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('de9600ec-489b-38dd-9c42-e64120265cde', NULL, 'mcq4', '18世紀初頭のヨーロッパ列強の版図について正しいものはどれか。', '[{"key":"a","text":"プロイセンはシュレジエンを失い、東方のわずかな領土だけが残された"},{"key":"b","text":"オーストリアは第2次ウィーン包囲を退け、ハンガリーを回復していった"},{"key":"c","text":"オスマン帝国がウィーンを占領し、ドナウ川の流域を長く支配し続けた"},{"key":"d","text":"ロシアは北方戦争に敗れて、バルト海への出口を完全に失ってしまった"}]'::jsonb,
+   '"b"'::jsonb, '1683年の第2次ウィーン包囲を撃退したオーストリアは、カルロヴィッツ条約（1699年）でハンガリーを獲得した。ロシアはピョートル1世が北方戦争（1700〜21）でスウェーデンに勝ち、バルト海に出てペテルブルクを築いた。シュレジエンはむしろ1740年代にプロイセンが獲得した地である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('de9600ec-489b-38dd-9c42-e64120265cde', 'kc.absolutism.europe_1700_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6e24fa77-41dd-3387-b51d-662cb7c10748', NULL, 'mcq4', '産業革命がイギリスで最初に起きた要因として最も適切なものはどれか。', '[{"key":"a","text":"ギルドの規制が強く、熟練職人の技術が全国で手厚く保護されていたため"},{"key":"b","text":"人口が減り続けており、労働力の不足を補うために機械化が急がれたため"},{"key":"c","text":"囲い込みが生んだ労働力、広い植民地市場、豊富な石炭と資本がそろっていた"},{"key":"d","text":"国家が工場を直接建設し、技術者を養成して生産を管理していたためである"}]'::jsonb,
+   '"c"'::jsonb, '第2次囲い込みで土地を失った農民が賃金労働者となり、大西洋三角貿易と植民地が資本と市場を用意し、鉄鉱石と石炭が近接して産出した。加えて名誉革命後の安定した議会政治と特許制度が投資を促した。ギルド規制の弱さは促進要因であって、強さではない。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6e24fa77-41dd-3387-b51d-662cb7c10748', 'kc.industrial.why_britain', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b9ececdd-ea5e-3a53-afd3-96df9ca179ac', NULL, 'mcq4', '綿工業の技術革新を古いものから順に並べたものはどれか。', '[{"key":"a","text":"力織機 → 飛び杼 → ジェニー紡績機 → ミュール紡績機 → 水力紡績機"},{"key":"b","text":"飛び杼 → 力織機 → 水力紡績機 → ジェニー紡績機 → ミュール紡績機"},{"key":"c","text":"飛び杼 → ジェニー紡績機 → 水力紡績機 → ミュール紡績機 → 力織機"},{"key":"d","text":"ジェニー紡績機 → 飛び杼 → 力織機 → 水力紡績機 → ミュール紡績機"}]'::jsonb,
+   '"c"'::jsonb, 'ジョン=ケイの飛び杼（1733年）で織布が速くなり糸が不足した。これに応えてハーグリーヴズのジェニー紡績機（1764年ごろ）、アークライトの水力紡績機（1769年）、両者を合わせたクロンプトンのミュール紡績機（1779年）が続き、今度は糸が余ったのでカートライトの力織機（1785年）が生まれた。不足が次の発明を呼ぶ連鎖である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b9ececdd-ea5e-3a53-afd3-96df9ca179ac', 'kc.industrial.textile_inventions', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0c407190-d9dc-3be1-9bf5-67517e12f688', NULL, 'mcq4', '蒸気機関が交通革命を生んだ因果の説明として正しいものはどれか。', '[{"key":"a","text":"ワットの改良で回転運動が得られるようになり、機関車と汽船に応用された"},{"key":"b","text":"ニューコメンの機関がそのまま機関車に転用され、鉄道の開通につながった"},{"key":"c","text":"電動機の発明がまず先にあり、それを蒸気機関がしだいに置きかえていった"},{"key":"d","text":"運河の建設が各地で止まったため、やむをえず蒸気機関の利用が始まった"}]'::jsonb,
+   '"a"'::jsonb, 'ニューコメンの機関は炭鉱の排水用で往復運動しか生まないうえ効率も低かった。ワットが分離凝縮器と回転運動への変換を加えたことで動力源として広く使えるようになり、フルトンの汽船（1807年）とスティーヴンソンの蒸気機関車（1814年、実用化1825年）につながった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0c407190-d9dc-3be1-9bf5-67517e12f688', 'kc.industrial.steam_to_transport', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d092bbd4-d2f0-31f9-a1a1-4312dec33ce6', NULL, 'mcq4', '産業革命の前と後の社会構造の違いとして正しいものはどれか。', '[{"key":"a","text":"職人のギルドが力を強めて、機械を使う工場の設立を長く抑えこんだ"},{"key":"b","text":"地主貴族が消滅してしまい、農村には自作農だけが残ることになった"},{"key":"c","text":"家内工業の職人が減り、産業資本家と賃金労働者の2階級が中心となった"},{"key":"d","text":"農村の人口が増え続ける一方で、都市の人口はむしろ減少していった"}]'::jsonb,
+   '"c"'::jsonb, '問屋制家内工業やマニュファクチュアにかわって工場制機械工業が広まり、生産手段をもつ産業資本家と、労働力を売る賃金労働者という関係が社会の軸になった。同時にマンチェスターなど工業都市へ人口が集中し、住宅と衛生の問題が生じた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d092bbd4-d2f0-31f9-a1a1-4312dec33ce6', 'kc.industrial.social_change', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('34a6bee4-42ce-363c-87b6-426debd057b1', NULL, 'mcq4', 'イギリスの工業地帯の位置について正しいものはどれか。', '[{"key":"a","text":"ロンドンが綿工業の、リヴァプールが製鉄業の中心地として発達をとげた"},{"key":"b","text":"綿工業も製鉄業も、いずれも南部の農業地帯にそろって集中していった"},{"key":"c","text":"石炭の産地から遠い東の海岸に、工業都市がまとまって発達していった"},{"key":"d","text":"マンチェスターが綿工業、バーミンガムが鉄工業の中心地となっていった"}]'::jsonb,
+   '"d"'::jsonb, '炭田の位置が工業地帯を決めた。ランカシャー地方のマンチェスターが綿工業、その外港リヴァプールが原綿の輸入と綿布の輸出を担い、中部のバーミンガムと北部の炭田地帯が製鉄と機械工業の中心となった。人口と富の重心が南部の農業地帯から北へ移った点が重要である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('34a6bee4-42ce-363c-87b6-426debd057b1', 'kc.industrial.regions_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('f8a89182-5457-30cb-8771-a3852f79b59d', NULL, 'mcq4', '労働問題から社会主義が生まれた因果の説明として正しいものはどれか。', '[{"key":"a","text":"工場法が最初に定められ、それへの反発として機械打ちこわしが起こった"},{"key":"b","text":"労働者の生活が急速に改善したため、社会主義はしだいに支持を失った"},{"key":"c","text":"機械打ちこわしから労働組合と工場法へ進み、やがて社会主義思想が現れた"},{"key":"d","text":"社会主義の思想がまず広まり、それに促されて労働組合が各国で禁じられた"}]'::jsonb,
+   '"c"'::jsonb, '長時間労働と児童労働に対し、まず機械打ちこわし（1811年ごろ）という直接的な抵抗が起き、団結禁止法の廃止（1824年）で労働組合が公認され、工場法（1833年）が保護を定めた。オーウェンらの初期社会主義を経て、マルクスとエンゲルスの共産党宣言（1848年）が科学的社会主義を掲げた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('f8a89182-5457-30cb-8771-a3852f79b59d', 'kc.industrial.labour_to_socialism', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0e063cb1-8cc0-3d45-ba56-439ff7f81fa4', NULL, 'mcq4', '本国と13植民地の対立が深まった要因として正しいものはどれか。', '[{"key":"a","text":"本国が植民地の自治を広げ、議会への代表を認めたことが混乱を招いた"},{"key":"b","text":"植民地の側が本国への輸出を独占しようとして、関税を一方的に上げた"},{"key":"c","text":"本国が奴隷制を廃止したため、南部の農園主が反発して独立を求めた"},{"key":"d","text":"戦費を植民地に負担させる課税が、代表なくして課税なしと反発された"}]'::jsonb,
+   '"d"'::jsonb, 'フレンチ=インディアン戦争の戦費を埋めるため、本国は砂糖法・印紙法（1765年）・茶法（1773年）と課税を重ねた。植民地は本国議会に代表を送っていないことを理由に「代表なくして課税なし」と主張した。奴隷制の廃止は独立後も長く実現していない。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0e063cb1-8cc0-3d45-ba56-439ff7f81fa4', 'kc.usrev.causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cf3bb1dc-596a-39e1-9a25-e2975a29bb54', NULL, 'mcq4', 'アメリカ独立戦争の経過を古いものから順に並べたものはどれか。', '[{"key":"a","text":"茶会事件 → レキシントンの戦い → 独立宣言 → ヨークタウンの戦い → パリ条約"},{"key":"b","text":"独立宣言 → 茶会事件 → レキシントンの戦い → パリ条約 → ヨークタウンの戦い"},{"key":"c","text":"レキシントンの戦い → 茶会事件 → ヨークタウンの戦い → 独立宣言 → パリ条約"},{"key":"d","text":"茶会事件 → 独立宣言 → レキシントンの戦い → パリ条約 → ヨークタウンの戦い"}]'::jsonb,
+   '"a"'::jsonb, 'ボストン茶会事件（1773年）への弾圧が対立を決定的にし、レキシントンとコンコードの武力衝突（1775年）で開戦、独立宣言（1776年）で目的が独立と定まった。ヨークタウンの戦い（1781年）で事実上決着し、パリ条約（1783年）でイギリスが独立を承認した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cf3bb1dc-596a-39e1-9a25-e2975a29bb54', 'kc.usrev.war_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6a30a918-8d8a-3f24-a97f-75dc43eae1e6', NULL, 'mcq4', '独立宣言と合衆国憲法の性格の違いとして正しいものはどれか。', '[{"key":"a","text":"宣言は抵抗権を掲げた理念、憲法は連邦制と三権分立を定めた統治の枠組み"},{"key":"b","text":"宣言が統治の機構を定め、憲法は独立の理由を列挙した文書となっている"},{"key":"c","text":"いずれの文書も、奴隷制の即時の廃止を明記している点で共通している"},{"key":"d","text":"宣言は各邦の主権を否定し、憲法は逆に各邦の完全な独立を認めている"}]'::jsonb,
+   '"a"'::jsonb, '独立宣言（1776年）はロックの思想を受け、自然権と社会契約、政府が権利を侵すときの抵抗権を掲げた理念の文書である。合衆国憲法（1787年制定、1788年発効）は連邦制・三権分立・人民主権を制度として定めた。理念と統治機構という役割の違いをおさえる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6a30a918-8d8a-3f24-a97f-75dc43eae1e6', 'kc.usrev.declaration_vs_constitution', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0110877b-4bb0-38a2-ab2b-b2b6440c5032', NULL, 'mcq4', 'アメリカ独立が世界に与えた影響として正しいものはどれか。', '[{"key":"a","text":"奴隷貿易が各国で即時に禁止され、大西洋の三角貿易もそこで終わりを告げた"},{"key":"b","text":"人民主権と共和政の実例となり、フランス革命やラテンアメリカ独立を刺激した"},{"key":"c","text":"ヨーロッパ諸国がかえって君主政を強め、革命の動きは各地で完全に止まった"},{"key":"d","text":"イギリスが植民地の経営から手を引き、以後は帝国を拡大しなくなっていった"}]'::jsonb,
+   '"b"'::jsonb, '独立は、君主をもたない共和政と成文憲法が現実に成り立つことを示した。参戦したフランスは財政難に陥り、帰国した義勇兵が理念を持ちこんで革命の一因となった。ラテンアメリカの独立運動もこれを手本とした。一方イギリスはインドやアフリカへ重心を移し、帝国は縮小していない。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0110877b-4bb0-38a2-ab2b-b2b6440c5032', 'kc.usrev.world_impact', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b409dcd2-f147-3f2d-8cdf-91a60d3b4b19', NULL, 'mcq4', 'アメリカ独立を助けた外国の動きとして正しいものはどれか。', '[{"key":"a","text":"フランスとスペインが参戦し、ロシアは武装中立同盟を提唱していった"},{"key":"b","text":"ロシアとオーストリアが参戦し、フランスは最後まで中立を保っていた"},{"key":"c","text":"オランダが単独で参戦し、そのほかの国はすべてイギリスを支援した"},{"key":"d","text":"プロイセンが参戦し、フランスはイギリスの側に立って戦いを進めた"}]'::jsonb,
+   '"a"'::jsonb, '七年戦争で植民地を失ったフランスが1778年に参戦し、スペインとオランダも続いた。ロシアのエカチェリーナ2世は1780年に武装中立同盟を提唱し、イギリスの海上封鎖を牽制した。イギリスが外交的に孤立したことが独立の成功を大きく助けた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b409dcd2-f147-3f2d-8cdf-91a60d3b4b19', 'kc.usrev.foreign_support', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d09ca3e8-3340-3abc-b984-1dff6f152e01', NULL, 'mcq4', '13植民地の位置と性格について正しいものはどれか。', '[{"key":"a","text":"いずれの植民地も王領地であり、自治的な植民地議会は置かれなかった"},{"key":"b","text":"13植民地はすべて太平洋の岸に位置し、内陸への進出は行われなかった"},{"key":"c","text":"北部は商工業と自営農、南部は奴隷制のプランテーションが中心であった"},{"key":"d","text":"北部にプランテーションが集中し、南部では商工業のほうが発達していた"}]'::jsonb,
+   '"c"'::jsonb, '13植民地は大西洋岸に南北に並び、北部のニューイングランドは造船・海運・自営農、中部は穀物、南部はタバコと米、のちに綿花のプランテーションを奴隷労働で営んだ。各植民地は独自の議会をもち、自治の伝統が独立の基盤になった。この南北差がのちの南北戦争へつながる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d09ca3e8-3340-3abc-b984-1dff6f152e01', 'kc.usrev.thirteen_colonies_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5d7ab80e-38e8-3d2c-a3db-dcd6384695f1', NULL, 'mcq4', 'フランス革命が起きた要因として最も適切なものはどれか。', '[{"key":"a","text":"農業の生産が長く豊作で、余裕を得た農民が政治への参加を求めた"},{"key":"b","text":"対外戦争にすべて勝利し、増えた領土の統治をめぐって対立が生じた"},{"key":"c","text":"財政難から特権身分への課税が試みられ、身分制の矛盾が表面化した"},{"key":"d","text":"国王が第三身分に有利な改革を進め、それに貴族だけが強く反発した"}]'::jsonb,
+   '"c"'::jsonb, 'アメリカ独立戦争への参戦などで財政が破綻し、ネッケルらが免税特権をもつ第一・第二身分への課税を試みた。特権身分がこれを拒んで三部会の開催を求めたことが、かえって第三身分の政治的自覚を呼び、国民議会の結成へつながった。凶作と物価高も背景にある。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5d7ab80e-38e8-3d2c-a3db-dcd6384695f1', 'kc.frrev.causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4fb95138-8911-3e3e-9cc6-285ec5943465', NULL, 'mcq4', 'フランス革命の主導勢力の交代を古いものから順に並べたものはどれか。', '[{"key":"a","text":"ジャコバン派 → ジロンド派 → フイヤン派 → 総裁政府"},{"key":"b","text":"ジロンド派 → 総裁政府 → ジャコバン派 → フイヤン派"},{"key":"c","text":"総裁政府 → フイヤン派 → ジャコバン派 → ジロンド派"},{"key":"d","text":"フイヤン派 → ジロンド派 → ジャコバン派 → 総裁政府"}]'::jsonb,
+   '"d"'::jsonb, '立憲君主政をめざすフイヤン派が1791年憲法を成立させ、次に立法議会でジロンド派が優位に立ち対外戦争を始めた。王政廃止後の国民公会ではジャコバン派（山岳派）が権力を握って恐怖政治を行い、テルミドールの反動（1794年）で倒れて総裁政府（1795年）に移った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4fb95138-8911-3e3e-9cc6-285ec5943465', 'kc.frrev.stages_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('661c53c9-0173-38c9-8014-62582c5aac95', NULL, 'mcq4', '人権宣言とナポレオン法典の違いとして正しいものはどれか。', '[{"key":"a","text":"宣言は自由と平等の理念を掲げ、法典は私有財産と契約の自由を条文にした"},{"key":"b","text":"宣言が民法の条文そのものであり、法典は革命の理念を掲げた宣言文である"},{"key":"c","text":"いずれの文書も、女性に男性と同等の権利を認めている点で一致している"},{"key":"d","text":"法典は身分制を復活させており、宣言の原則を全面的に否定している"}]'::jsonb,
+   '"a"'::jsonb, '人権宣言（1789年）は自由・平等・国民主権・私有財産の不可侵を理念として掲げた。ナポレオン法典（1804年）はこれを民法典の条文にし、法の前の平等、私有財産の不可侵、契約の自由を定めて革命の成果を固定した。ただし妻の無能力を定めるなど、女性の権利は認めていない。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('661c53c9-0173-38c9-8014-62582c5aac95', 'kc.frrev.declaration_vs_code', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e4a63c3a-9392-3047-9631-11fe5750e31a', NULL, 'mcq4', '恐怖政治が生まれた因果の説明として正しいものはどれか。', '[{"key":"a","text":"対外戦争と内乱で危機が高まり、公安委員会が非常の措置を重ねていった"},{"key":"b","text":"対外的な平和が長く続いたため、内政の引き締めだけが強められていった"},{"key":"c","text":"王政が復活したことにより、王党派が反対派を大量に処刑していった"},{"key":"d","text":"総裁政府が安定を失っていき、その混乱のなかで処刑が始まっていった"}]'::jsonb,
+   '"a"'::jsonb, '第1回対仏大同盟との戦争、ヴァンデーの反乱、物価高という三重の危機のなかで、ロベスピエールらの公安委員会が徴兵・最高価格令・反対派の処刑という非常措置をとった。危機が去るとその正当性も失われ、テルミドールの反動で彼自身が処刑された。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e4a63c3a-9392-3047-9631-11fe5750e31a', 'kc.frrev.terror_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('09b53107-a23f-30f8-96d0-ab75f07022db', NULL, 'mcq4', 'ナポレオン支配下のヨーロッパについて正しいものはどれか。', '[{"key":"a","text":"ライン同盟の結成で神聖ローマ帝国が消滅し、のちに大陸封鎖令が出された"},{"key":"b","text":"神聖ローマ帝国は存続しており、その皇帝はナポレオンの同盟者となった"},{"key":"c","text":"イギリスの本土が占領され、大陸封鎖令はその地から発せられていった"},{"key":"d","text":"スペインは同盟国として、最後までナポレオンを支持し続けていった"}]'::jsonb,
+   '"a"'::jsonb, '1806年、西南ドイツ諸邦を集めたライン同盟が結成され、これにより神聖ローマ帝国は消滅した。同年ベルリンで大陸封鎖令を発しイギリスとの通商を禁じたが、経済的な打撃はむしろ大陸側に及んだ。スペインでは1808年から反乱が続き、これが没落の一因となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('09b53107-a23f-30f8-96d0-ab75f07022db', 'kc.frrev.napoleonic_europe_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('f537adbf-3557-30eb-961c-c7f71214998b', NULL, 'mcq4', 'ナポレオンが没落した要因として正しいものはどれか。', '[{"key":"a","text":"国内で王党派が多数を占めるようになり、議会の議決で皇帝の位を失った"},{"key":"b","text":"海軍がトラファルガーで勝ちながら、陸上の戦いで連敗して退位に至った"},{"key":"c","text":"大陸封鎖令への不満とロシア遠征の失敗が、諸国民の抵抗を呼び起こした"},{"key":"d","text":"大陸封鎖令が成功しすぎ、イギリスとの和解によってかえって権威を失った"}]'::jsonb,
+   '"c"'::jsonb, '大陸封鎖令は各国の経済を圧迫し、これを破ったロシアへの遠征（1812年）が壊滅的な失敗に終わった。これを機にライプツィヒの戦い（1813年、諸国民戦争）で解放戦争が起こり退位、復位ののちワーテルローで敗れた。トラファルガー（1805年）は逆にイギリス海軍の勝利である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('f537adbf-3557-30eb-961c-c7f71214998b', 'kc.frrev.napoleon_fall', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ea55d5ff-8130-3e42-8278-e941b12701bf', NULL, 'mcq4', 'ウィーン体制の正統主義と勢力均衡の違いとして正しいものはどれか。', '[{"key":"a","text":"正統主義は革命前の王朝と秩序の復活、勢力均衡は大国間の力の釣り合いを指す"},{"key":"b","text":"正統主義が大国間の力の釣り合いを、勢力均衡が旧王朝の復活を指している"},{"key":"c","text":"いずれも国民主権を原則として掲げており、両者の内容に違いは特にない"},{"key":"d","text":"正統主義は民族自決を認めるもので、勢力均衡は植民地の再分配を定めた"}]'::jsonb,
+   '"a"'::jsonb, 'タレーランが唱えた正統主義は、フランス革命前の王朝と国際秩序を正統とみなして復活させる原則である。勢力均衡は特定の国が突出しないよう領土を配分する考え方で、両者を組みあわせてウィーン体制が築かれた。国民主権や民族自決はむしろ体制が抑えこもうとしたものである。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ea55d5ff-8130-3e42-8278-e941b12701bf', 'kc.vienna.principles', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('f056bcd3-e167-373f-a98b-126659cb8821', NULL, 'mcq4', 'ウィーン議定書の後のヨーロッパの版図について正しいものはどれか。', '[{"key":"a","text":"イタリアは統一王国となって、オーストリアの勢力は半島から退いた"},{"key":"b","text":"ドイツ連邦が置かれ、オランダは南ネーデルラントを併せることになった"},{"key":"c","text":"ドイツは単一の帝国として統一され、連邦という形は解消されていった"},{"key":"d","text":"ポーランドは完全に独立を回復し、ロシアの影響から脱していった"}]'::jsonb,
+   '"b"'::jsonb, '神聖ローマ帝国は復活せず、35の君主国と4自由市からなるドイツ連邦が置かれた。オランダは南ネーデルラント（のちのベルギー）を併せ、フランスへの備えとされた。ポーランドはロシア皇帝が国王を兼ねる立憲王国とされ、イタリアは分裂したままオーストリアがロンバルディアなどを支配した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('f056bcd3-e167-373f-a98b-126659cb8821', 'kc.vienna.map_1815_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('692cc23c-f008-3794-aae0-0af233963917', NULL, 'mcq4', '自由主義・ナショナリズムの運動を古いものから順に並べたものはどれか。', '[{"key":"a","text":"スペイン立憲革命 → ギリシア独立戦争 → デカブリストの乱 → 七月革命 → 二月革命"},{"key":"b","text":"デカブリストの乱 → スペイン立憲革命 → 七月革命 → ギリシア独立戦争 → 二月革命"},{"key":"c","text":"ギリシア独立戦争 → 七月革命 → スペイン立憲革命 → 二月革命 → デカブリストの乱"},{"key":"d","text":"七月革命 → 二月革命 → スペイン立憲革命 → デカブリストの乱 → ギリシア独立戦争"}]'::jsonb,
+   '"a"'::jsonb, 'スペイン立憲革命（1820年）とギリシア独立戦争の開始（1821年）が最初期で、ロシアのデカブリストの乱（1825年）が続く。いずれも列強の干渉で挫折または限定的だったが、ギリシアだけは独立を達成した。フランスの七月革命（1830年）と二月革命（1848年）が体制を大きく揺るがした。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('692cc23c-f008-3794-aae0-0af233963917', 'kc.vienna.liberal_movements_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('62fafaf9-8878-348f-b13d-ab913eae341d', NULL, 'mcq4', '二月革命がヨーロッパへ波及した因果の説明として正しいものはどれか。', '[{"key":"a","text":"ウィーンの三月革命がまず起こり、それがパリの二月革命を引き起こしていった"},{"key":"b","text":"各国が事前に憲法を定めていたため、革命はフランス国内だけにとどまった"},{"key":"c","text":"二月革命でメッテルニヒが亡命し、フランスに帝政が復活して波及が止まった"},{"key":"d","text":"パリの王政打倒がウィーンとベルリンの三月革命を誘い、ウィーン体制が崩れた"}]'::jsonb,
+   '"d"'::jsonb, '1848年2月のパリで七月王政が倒れ第二共和政が生まれると、3月にはウィーンとベルリンで革命が起こり、メッテルニヒが亡命してウィーン体制は崩壊した。ハンガリーやイタリアでも民族運動が起き、この一連の動きを諸国民の春とよぶ。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('62fafaf9-8878-348f-b13d-ab913eae341d', 'kc.vienna.1848_spread', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('20701548-662d-3c75-a0a6-673c2b9bc228', NULL, 'mcq4', 'ラテンアメリカ諸国が独立できた要因として正しいものはどれか。', '[{"key":"a","text":"本国がナポレオンに占領されて統制がゆるみ、イギリスと合衆国が干渉に反対した"},{"key":"b","text":"ウィーン体制の列強が独立を積極的に支援し、そろって軍隊を派遣していった"},{"key":"c","text":"本国が自発的に独立を承認したため、戦うことなく主権が移譲されていった"},{"key":"d","text":"先住民が独立運動を主導して蜂起し、白人はすべて大陸から追放されていった"}]'::jsonb,
+   '"a"'::jsonb, 'ナポレオンによるスペイン占領で本国の統制が弱まり、クリオーリョが主導して独立戦争を起こした。市場を求めるイギリスの外相カニングと、合衆国のモンロー宣言（1823年）が列強の干渉に反対したことが決定的だった。運動を担ったのは先住民ではなく現地生まれの白人である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('20701548-662d-3c75-a0a6-673c2b9bc228', 'kc.vienna.latin_america', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5f11c725-9879-37b9-af3b-5b8036bf737f', NULL, 'mcq4', '19世紀前半のイギリスの自由主義的改革の内容として正しいものはどれか。', '[{"key":"a","text":"穀物法がかえって強化されて、地主の利益を守る保護貿易が確立していった"},{"key":"b","text":"国教会以外の信仰が禁じられ、宗教にかかわる制限がむしろ強まっていった"},{"key":"c","text":"審査法の廃止・カトリック教徒解放法・第1回選挙法改正・穀物法の廃止が進んだ"},{"key":"d","text":"選挙法改正で男性の普通選挙が実現し、チャーティスト運動は不要になった"}]'::jsonb,
+   '"c"'::jsonb, '審査法廃止（1828年）とカトリック教徒解放法（1829年）で宗教的な差別が緩み、第1回選挙法改正（1832年）で腐敗選挙区が廃されて産業資本家に選挙権が広がった。穀物法廃止（1846年）と航海法廃止（1849年）で自由貿易が確立する。労働者には選挙権が及ばず、チャーティスト運動が続いた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5f11c725-9879-37b9-af3b-5b8036bf737f', 'kc.vienna.british_reforms', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d2019204-9501-3445-9d3f-3bc24fb7a839', NULL, 'mcq4', 'イタリア統一とドイツ統一の主導勢力の違いとして正しいものはどれか。', '[{"key":"a","text":"いずれも民衆の蜂起だけで達成され、君主国の関与はほとんどなかった"},{"key":"b","text":"イタリアはナポリ王国が、ドイツはバイエルンが中心となって統一した"},{"key":"c","text":"イタリアはサルデーニャ王国、ドイツはプロイセンが主導して統一を進めた"},{"key":"d","text":"イタリアは教皇領が、ドイツはオーストリアが主導して統一を進めていった"}]'::jsonb,
+   '"c"'::jsonb, 'イタリアはカヴールの外交とヴィットーリオ=エマヌエーレ2世のサルデーニャ王国が核となり、ドイツはビスマルクの鉄血政策とプロイセンが核となった。いずれも上からの統一だが、イタリアではガリバルディの義勇軍という下からの動きが加わった点が異なる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d2019204-9501-3445-9d3f-3bc24fb7a839', 'kc.unification.italy_vs_germany', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6f2fb654-1f51-33c8-8734-da617c54e64a', NULL, 'mcq4', 'ドイツ統一に至る3つの戦争を古いものから順に並べたものはどれか。', '[{"key":"a","text":"プロイセン=オーストリア戦争 → プロイセン=フランス戦争 → デンマーク戦争"},{"key":"b","text":"デンマーク戦争 → プロイセン=フランス戦争 → プロイセン=オーストリア戦争"},{"key":"c","text":"デンマーク戦争 → プロイセン=オーストリア戦争 → プロイセン=フランス戦争"},{"key":"d","text":"プロイセン=フランス戦争 → デンマーク戦争 → プロイセン=オーストリア戦争"}]'::jsonb,
+   '"c"'::jsonb, 'デンマーク戦争（1864年）でシュレスヴィヒとホルシュタインを奪い、その処理をめぐるプロイセン=オーストリア戦争（1866年、普墺戦争）でオーストリアを排して北ドイツ連邦を作った。プロイセン=フランス戦争（1870〜71年、普仏戦争）の勝利で南ドイツ諸邦も加わり、ドイツ帝国が成立した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6f2fb654-1f51-33c8-8734-da617c54e64a', 'kc.unification.three_wars', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('f0469aac-60b1-3a78-8f17-664b597fb7ee', NULL, 'mcq4', 'ガリバルディの行動がイタリア統一を早めた因果の説明として正しいものはどれか。', '[{"key":"a","text":"ヴェネツィアを占領したのち、これをオーストリアに返還して和平を実現した"},{"key":"b","text":"ローマ教皇と同盟を結び、教皇領を中心とする統一国家の建設をめざした"},{"key":"c","text":"両シチリア王国を征服し、その地をサルデーニャ王に献上して南北の統一が実現した"},{"key":"d","text":"両シチリア王国に自身の共和国を建て、サルデーニャ王国と長く対立し続けた"}]'::jsonb,
+   '"c"'::jsonb, 'カヴールが北イタリアを固めた一方、ガリバルディは千人隊を率いてシチリアからナポリへ進み、両シチリア王国を倒した。共和主義者でありながら征服地を国王に献上したため、南北が一つの王国にまとまり、1861年にイタリア王国が成立した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('f0469aac-60b1-3a78-8f17-664b597fb7ee', 'kc.unification.garibaldi', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4c8478ef-5153-3b39-b45d-239cac88f098', NULL, 'mcq4', 'イタリア統一後に残された未回収の地について正しいものはどれか。', '[{"key":"a","text":"ミラノとトリノがオーストリア領にとどまり、統一後も返還されなかった"},{"key":"b","text":"南チロルとトリエステがオーストリア領にとどまり、回復が求め続けられた"},{"key":"c","text":"シチリア島とサルデーニャ島がフランス領にとどまり、回復が求められた"},{"key":"d","text":"ヴェネツィアとローマがともに未回収のまま、第二次世界大戦まで残った"}]'::jsonb,
+   '"b"'::jsonb, 'ヴェネツィアは1866年、ローマは1870年に併合されたが、南チロル（トレンティーノ）とトリエステはイタリア語話者が多いままオーストリア領に残り、未回収のイタリアとよばれた。この領土要求が、三国同盟に加わりながら第一次世界大戦で連合国側に転じた理由になる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4c8478ef-5153-3b39-b45d-239cac88f098', 'kc.unification.irredenta_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6d405193-cd49-32e7-9764-0236f482e7cd', NULL, 'mcq4', 'ビスマルク外交がフランスを孤立させた因果の説明として正しいものはどれか。', '[{"key":"a","text":"三帝同盟と三国同盟を結んでフランスに同盟相手を与えず、報復を封じこめた"},{"key":"b","text":"フランスと同盟を結ぶことで、ロシアとオーストリアを同時に孤立させた"},{"key":"c","text":"植民地の獲得を最優先し、ヨーロッパでの同盟関係は一切結ばなかった"},{"key":"d","text":"イギリスと軍事同盟を結び、フランスの海外植民地を直接に奪っていった"}]'::jsonb,
+   '"a"'::jsonb, 'アルザス・ロレーヌを奪われたフランスの報復を恐れたビスマルクは、三帝同盟（1873年）、独墺同盟（1879年）、三国同盟（1882年）、再保障条約（1887年）を重ねて同盟相手を与えなかった。彼の引退後にドイツが再保障条約を更新せず、露仏同盟が成立して包囲網が崩れる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6d405193-cd49-32e7-9764-0236f482e7cd', 'kc.unification.bismarck_system', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('3ead2986-96de-3bc4-8d5c-cba836b541d2', NULL, 'mcq4', 'アメリカ合衆国の領土拡大を古いものから順に並べたものはどれか。', '[{"key":"a","text":"ルイジアナ買収 → フロリダ買収 → テキサス併合 → カリフォルニア獲得 → アラスカ買収"},{"key":"b","text":"テキサス併合 → ルイジアナ買収 → アラスカ買収 → フロリダ買収 → カリフォルニア獲得"},{"key":"c","text":"フロリダ買収 → ルイジアナ買収 → カリフォルニア獲得 → アラスカ買収 → テキサス併合"},{"key":"d","text":"ルイジアナ買収 → テキサス併合 → フロリダ買収 → アラスカ買収 → カリフォルニア獲得"}]'::jsonb,
+   '"a"'::jsonb, 'フランスからのルイジアナ買収（1803年）、スペインからのフロリダ買収（1819年）、テキサス併合（1845年）と続き、アメリカ=メキシコ戦争の結果カリフォルニアなどを得て（1848年）太平洋に達した。ロシアからのアラスカ買収（1867年）は南北戦争の後である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('3ead2986-96de-3bc4-8d5c-cba836b541d2', 'kc.c19soc.us_expansion_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('adf8b7a6-e269-3909-b2dd-3e75d759fd36', NULL, 'mcq4', '南北戦争が起きた要因として最も適切なものはどれか。', '[{"key":"a","text":"北部が奴隷制の拡大を求め、これに南部が反対して戦争へと発展していった"},{"key":"b","text":"外国の介入によって連邦が二分され、内部の対立はもともと存在しなかった"},{"key":"c","text":"先住民との戦争に南部だけが動員されたため、連邦からの離脱が起こった"},{"key":"d","text":"奴隷制と関税をめぐる南北の対立が、西部の新州の性格をめぐって決裂した"}]'::jsonb,
+   '"d"'::jsonb, '奴隷制のプランテーションと自由貿易を望む南部と、商工業のため保護貿易と自由労働力を望む北部が対立した。ミズーリ協定（1820年）以来、新しい州を自由州とするか奴隷州とするかが争点となり、リンカンの当選を機に南部諸州が離脱して開戦した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('adf8b7a6-e269-3909-b2dd-3e75d759fd36', 'kc.c19soc.civil_war_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('c3b74b7a-7579-3d69-818a-04d84833d1d4', NULL, 'mcq4', 'アメリカの北部と南部の経済構造の違いとして正しいものはどれか。', '[{"key":"a","text":"北部は商工業で保護貿易を望み、南部は綿花輸出のため自由貿易を望んだ"},{"key":"b","text":"北部は綿花の輸出で栄え、南部は工業製品の輸入に頼る構造となっていた"},{"key":"c","text":"いずれも工業が中心で、経済構造そのものに大きな違いは存在しなかった"},{"key":"d","text":"北部が自由貿易を、南部が保護貿易を望むという逆の組みあわせであった"}]'::jsonb,
+   '"a"'::jsonb, '南部はイギリスへ綿花を輸出しイギリス製品を買う経済で、関税は不利になるため自由貿易と奴隷労働力を望んだ。北部は自国の工業を守る保護貿易と、賃金労働者となる自由な労働力を望んだ。経済構造の違いが奴隷制をめぐる対立と重なった点が重要である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('c3b74b7a-7579-3d69-818a-04d84833d1d4', 'kc.c19soc.north_vs_south', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4064f089-fa24-37c0-9e04-3d7b1230a936', NULL, 'mcq4', 'ロシアで農奴解放が行われた因果の説明として正しいものはどれか。', '[{"key":"a","text":"デカブリストの乱が成功したため、革命政権が農奴解放令を発布していった"},{"key":"b","text":"産業革命が完成して労働力が余ったため、農奴を解放する必要が生じた"},{"key":"c","text":"日露戦争の敗北を受けて、皇帝が農奴解放令を出すことを約束していった"},{"key":"d","text":"クリミア戦争の敗北で後進性が露呈し、アレクサンドル2世が改革に踏みきった"}]'::jsonb,
+   '"d"'::jsonb, 'クリミア戦争（1853〜56年）の敗北で軍事・産業の後進性が明らかになり、アレクサンドル2世が1861年に農奴解放令を出した。ただし土地は有償で、重い買い戻し金がミールに課されたため農民の生活は改善せず、のちのナロードニキ運動やロシア革命の背景となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4064f089-fa24-37c0-9e04-3d7b1230a936', 'kc.c19soc.russian_reform', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('9bb055da-d527-3120-ad44-e0385b5222b1', NULL, 'mcq4', '19世紀の科学と思想について正しいものはどれか。', '[{"key":"a","text":"ニュートンが万有引力を発見し、それが19世紀の科学革命の出発点となった"},{"key":"b","text":"コペルニクスの地動説がこの世紀に初めて発表され、教会と対立していった"},{"key":"c","text":"アインシュタインの相対性理論が発表され、古典物理学が完全に否定された"},{"key":"d","text":"ダーウィンが進化論を、マルクスが史的唯物論を唱え、実証主義が広まった"}]'::jsonb,
+   '"d"'::jsonb, 'ダーウィンの種の起源（1859年）、マルクスとエンゲルスの史的唯物論、コントの実証主義が19世紀を代表する。メンデルの遺伝法則、パストゥールとコッホの細菌学、ファラデーの電磁誘導も同世紀である。ニュートンは17世紀、コペルニクスは16世紀、相対性理論は20世紀に属する。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('9bb055da-d527-3120-ad44-e0385b5222b1', 'kc.c19soc.science_and_thought', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('194aa8a1-2554-336f-b011-068eccc50772', NULL, 'mcq4', '19世紀後半の移民の流れについて正しいものはどれか。', '[{"key":"a","text":"アフリカからの移民が自由な労働者として合衆国へ渡り、都市に定着した"},{"key":"b","text":"移民の受け入れはオーストラリアだけに限られ、合衆国は入国を禁じていた"},{"key":"c","text":"南欧・東欧から合衆国へ、また中国とインドから東南アジアや南北アメリカへ向かった"},{"key":"d","text":"合衆国からヨーロッパへ大量の移民が向かい、ヨーロッパの人口が急増した"}]'::jsonb,
+   '"c"'::jsonb, '19世紀前半はイギリス・ドイツ・アイルランドなど西北欧からの移民が主で、後半になるとイタリアやロシアなど南欧・東欧からの新移民が増えた。同時に奴隷貿易の廃止を受け、中国人やインド人が年季契約労働者として東南アジアやカリブ海、南北アメリカへ渡った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('194aa8a1-2554-336f-b011-068eccc50772', 'kc.c19soc.migration_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('8e5df831-88b6-30c3-9e9c-35b128efacd7', NULL, 'mcq4', 'オスマン帝国の改革を古いものから順に並べたものはどれか。', '[{"key":"a","text":"ギュルハネ勅令によるタンジマート → 青年トルコ革命 → ミドハト憲法"},{"key":"b","text":"ギュルハネ勅令によるタンジマート → ミドハト憲法 → 青年トルコ革命"},{"key":"c","text":"ミドハト憲法 → ギュルハネ勅令によるタンジマート → 青年トルコ革命"},{"key":"d","text":"青年トルコ革命 → ミドハト憲法 → ギュルハネ勅令によるタンジマート"}]'::jsonb,
+   '"b"'::jsonb, 'アブデュルメジト1世のギュルハネ勅令（1839年）で始まるタンジマートが西欧化改革を進め、ミドハト=パシャが起草した憲法（1876年）でアジア初の議会が開かれた。しかしアブデュルハミト2世が露土戦争を口実に停止し、青年トルコ革命（1908年）が憲法を復活させた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('8e5df831-88b6-30c3-9e9c-35b128efacd7', 'kc.westasia19.reform_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5c73342a-03b9-39e8-ac60-a32a5c82c4a9', NULL, 'mcq4', '東方問題が列強の介入を招いた因果の説明として正しいものはどれか。', '[{"key":"a","text":"オスマン帝国が急速に強大化したため、列強が結束してこれを抑えこんだ"},{"key":"b","text":"列強が帝国内の少数民族を保護するため、事前に協定を結んで分割を進めた"},{"key":"c","text":"オスマン帝国が自ら領土の分割を申し出たため、列強が調停に乗り出した"},{"key":"d","text":"オスマン帝国の弱体化で生じた空白に、南下するロシアと阻むイギリスが争った"}]'::jsonb,
+   '"d"'::jsonb, '東方問題とは、衰えるオスマン帝国の領土をどう処理するかという列強の外交課題である。不凍港を求めて南下するロシアと、インドへの道を守ろうとするイギリスが正面から対立し、ギリシア独立、エジプト=トルコ戦争、クリミア戦争、露土戦争と介入が繰り返された。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5c73342a-03b9-39e8-ac60-a32a5c82c4a9', 'kc.westasia19.eastern_question', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('51a76051-d28a-31d6-80a3-e156a4752019', NULL, 'mcq4', 'ベルリン条約の後のバルカン半島について正しいものはどれか。', '[{"key":"a","text":"ギリシアだけが独立し、そのほかの民族は自治すら認められなかった"},{"key":"b","text":"セルビアなど3国が独立し、ブルガリアは領土を削られて自治国にとどまった"},{"key":"c","text":"バルカン半島の全域がロシアの直接統治下に入り、独立国は生まれなかった"},{"key":"d","text":"オーストリアが半島から完全に手を引き、勢力争いはそこで終わりを告げた"}]'::jsonb,
+   '"b"'::jsonb, 'サン=ステファノ条約でロシアが大ブルガリアを得ると、ビスマルクの調停によるベルリン条約（1878年）で修正され、ブルガリアは縮小されたオスマン帝国内の自治国となった。セルビア・モンテネグロ・ルーマニアが独立し、オーストリアはボスニアの行政権を得て、後の火種が残った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('51a76051-d28a-31d6-80a3-e156a4752019', 'kc.westasia19.balkan_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cdcabe7e-3294-3361-bcc1-5a05103d083a', NULL, 'mcq4', 'エジプトとイランの半植民地化のされ方の違いとして正しいものはどれか。', '[{"key":"a","text":"いずれもフランス一国の植民地とされ、他の列強は関与しなかった"},{"key":"b","text":"エジプトは独立を保ち、イランだけがオスマン帝国の属領に組みこまれた"},{"key":"c","text":"エジプトは運河と負債を背景にイギリスが保護下に置き、イランは英露が勢力圏を分けた"},{"key":"d","text":"エジプトは英露が勢力圏を分けあい、イランはイギリス一国が保護国とした"}]'::jsonb,
+   '"c"'::jsonb, 'ムハンマド=アリー朝はスエズ運河の建設で財政が破綻し、株式をイギリスに売却、ウラービーの反乱鎮圧を機に事実上の保護国となった。カージャール朝イランではタバコ=ボイコット運動や立憲革命が起きたが、英露協商（1907年）で北をロシア、南をイギリスが勢力圏とした。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cdcabe7e-3294-3361-bcc1-5a05103d083a', 'kc.westasia19.egypt_vs_iran', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('31624331-606d-35e6-ba2c-8f29b39fa6c5', NULL, 'mcq4', 'ワッハーブ運動とパン=イスラーム主義の違いとして正しいものはどれか。', '[{"key":"a","text":"いずれも西欧の立憲政治の全面的な導入を主張した点で共通している"},{"key":"b","text":"前者はオスマン帝国の支持を受け、後者はこれに反対する運動であった"},{"key":"c","text":"前者は原初の教えへの回帰を説き、後者は列強に対する全ムスリムの連帯を説いた"},{"key":"d","text":"前者は全ムスリムの政治的連帯を説き、後者は神秘主義への回帰を説いた"}]'::jsonb,
+   '"c"'::jsonb, 'ワッハーブ運動（18世紀半ば）は神秘主義や聖者崇拝を排して原初のイスラームに帰ることを説き、豪族サウード家と結んでワッハーブ王国を建てた。アフガーニーのパン=イスラーム主義（19世紀後半）は、列強の支配に対抗するためムスリムの政治的連帯を訴えた。時期も目的も異なる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('31624331-606d-35e6-ba2c-8f29b39fa6c5', 'kc.westasia19.islamic_revival', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('77e50a7b-8cff-3a54-bc25-c4918dbac3c3', NULL, 'mcq4', 'イギリスによるインド支配の過程を古いものから順に並べたものはどれか。', '[{"key":"a","text":"プラッシーの戦い → マイソール戦争 → マラーター戦争 → シク戦争 → インド帝国成立"},{"key":"b","text":"マラーター戦争 → プラッシーの戦い → インド帝国成立 → シク戦争 → マイソール戦争"},{"key":"c","text":"シク戦争 → マイソール戦争 → プラッシーの戦い → マラーター戦争 → インド帝国成立"},{"key":"d","text":"プラッシーの戦い → シク戦争 → マラーター戦争 → マイソール戦争 → インド帝国成立"}]'::jsonb,
+   '"a"'::jsonb, 'プラッシーの戦い（1757年）でフランスとベンガル太守の連合軍を破って足場を固め、南のマイソール戦争、中部のマラーター戦争、西北のシク戦争と征服が進んだ。シパーヒーの反乱後にムガル皇帝が廃されて東インド会社が解散し、1877年にインド帝国が成立した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('77e50a7b-8cff-3a54-bc25-c4918dbac3c3', 'kc.indiacol.conquest_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('60ef03fa-44f0-3008-9f51-30205e0e587e', NULL, 'mcq4', 'シパーヒーの反乱が支配体制を変えた因果の説明として正しいものはどれか。', '[{"key":"a","text":"反乱が成功してムガル帝国が再興され、イギリスはインドから撤退していった"},{"key":"b","text":"反乱を機に東インド会社の権限がかえって拡大し、直接統治は見送られた"},{"key":"c","text":"反乱をきっかけにインドの自治が認められ、責任内閣制が導入されていった"},{"key":"d","text":"反乱の鎮圧後に東インド会社が解散され、本国政府の直接統治へと切りかわった"}]'::jsonb,
+   '"d"'::jsonb, '1857年、傭兵シパーヒーの蜂起が北インド一帯の反英闘争に広がった。鎮圧後、イギリスはムガル皇帝を廃して東インド会社を解散し（1858年）、本国政府による直接統治に切りかえた。1877年にヴィクトリア女王が皇帝を兼ねるインド帝国が成立する。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('60ef03fa-44f0-3008-9f51-30205e0e587e', 'kc.indiacol.sepoy_mutiny', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e2eb5e2c-b915-3343-b46f-9bbcb77f0bb3', NULL, 'mcq4', 'インドの地税制度の2つの型の違いとして正しいものはどれか。', '[{"key":"a","text":"ザミンダーリーは現物納、ライヤットワーリーは労役による納入を定めていた"},{"key":"b","text":"ザミンダーリーは領主層に、ライヤットワーリーは耕作農民に納税義務を負わせた"},{"key":"c","text":"ザミンダーリーは耕作農民に、ライヤットワーリーは領主層に納税義務を課した"},{"key":"d","text":"いずれも共同体を単位として課税する制度で、個人には納税義務がなかった"}]'::jsonb,
+   '"b"'::jsonb, 'ベンガルなど北部ではザミンダーリー制（1793年）がとられ、領主層のザミンダールに土地所有権を認めて納税義務を負わせた。南部と西部ではライヤットワーリー制がとられ、耕作農民から直接徴収した。いずれも貨幣での納入を求めたため農民が高利貸しに依存する原因になった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e2eb5e2c-b915-3343-b46f-9bbcb77f0bb3', 'kc.indiacol.zamindari_vs_ryotwari', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('18b17a2f-a50a-3e36-8d7a-55bef8e5b549', NULL, 'mcq4', 'インドが原料供給地に変えられた因果の説明として正しいものはどれか。', '[{"key":"a","text":"インドで石炭が産出しなかったので、工業化がまったく行われなかった"},{"key":"b","text":"イギリスがインドに重工業を移し、原料はすべて本国から輸出されていった"},{"key":"c","text":"安価な機械織の綿布が流入して手織業が壊滅し、かわりに原綿の輸出地となった"},{"key":"d","text":"インドの綿工業が機械化に成功したため、イギリスが輸入を禁止して衰退した"}]'::jsonb,
+   '"c"'::jsonb, '東インド会社の貿易独占が廃止（1813年）されると、産業革命で安くなったイギリス製の機械織綿布が流入し、ダッカなどの手織業が壊滅した。インドは綿布の輸出国から原綿・アヘン・藍などの原料供給地へ転落し、イギリス製品の市場となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('18b17a2f-a50a-3e36-8d7a-55bef8e5b549', 'kc.indiacol.deindustrialization', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e728d6d0-6159-3d79-8fba-05513a01758f', NULL, 'mcq4', 'インド国民会議の性格の変化について正しいものはどれか。', '[{"key":"a","text":"創立当初から農民と労働者が主体で、知識人はほとんど参加していなかった"},{"key":"b","text":"当初は穏健な協力機関であったが、ベンガル分割令を機に反英の運動体へ転じた"},{"key":"c","text":"当初から独立を掲げる急進的な組織で、のちに親英的な団体へと変質した"},{"key":"d","text":"イギリスが解散させたため、以後の民族運動は全ムスリム連盟が担った"}]'::jsonb,
+   '"b"'::jsonb, '1885年の創立時はイギリスが親英的な世論をつくる場として認めた穏健な組織だった。しかしベンガル分割令（1905年）への反発でカルカッタ大会（1906年）が英貨排斥・スワデーシ・スワラージ・民族教育の4綱領を採択し、反英の民族運動団体へ転換した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e728d6d0-6159-3d79-8fba-05513a01758f', 'kc.indiacol.congress_shift', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('910b5eef-531e-3357-8ff4-a3b03945c509', NULL, 'mcq4', 'アヘン戦争が起きた要因として最も適切なものはどれか。', '[{"key":"a","text":"清がイギリスの自由貿易の要求をすべて受け入れたため、他国が反発した"},{"key":"b","text":"イギリスがアヘンの取引を自ら禁止し、清がその継続を強く求めたため"},{"key":"c","text":"片貿易による赤字をアヘン輸出で埋めようとしたイギリスと、清の禁圧が衝突した"},{"key":"d","text":"清がイギリスへアヘンを輸出しようとして、イギリス側がこれを拒んだため"}]'::jsonb,
+   '"c"'::jsonb, '茶の輸入で銀が流出したイギリスは、インド産アヘンを清へ売る三角貿易で赤字を埋めた。清では銀が流出し中毒が広がったため林則徐がアヘンを没収・廃棄し、これを口実にイギリスが開戦した。南京条約（1842年）で5港開港と香港島割譲が決まった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('910b5eef-531e-3357-8ff4-a3b03945c509', 'kc.qingfall.opium_war_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('a8c3b419-3ef4-3c38-b115-7a7330d1474b', NULL, 'mcq4', '清が結んだ不平等条約を古いものから順に並べたものはどれか。', '[{"key":"a","text":"南京条約 → 虎門寨追加条約 → 天津条約 → 北京条約"},{"key":"b","text":"北京条約 → 天津条約 → 南京条約 → 虎門寨追加条約"},{"key":"c","text":"天津条約 → 南京条約 → 北京条約 → 虎門寨追加条約"},{"key":"d","text":"南京条約 → 天津条約 → 虎門寨追加条約 → 北京条約"}]'::jsonb,
+   '"a"'::jsonb, '南京条約（1842年）で開港と割譲が決まり、翌年の虎門寨追加条約で領事裁判権・協定関税・片務的最恵国待遇が加わって不平等が完成した。アロー戦争の結果、天津条約（1858年）と北京条約（1860年）でさらに開港地が増え、外国公使の北京駐在が認められた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('a8c3b419-3ef4-3c38-b115-7a7330d1474b', 'kc.qingfall.unequal_treaties', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('1aa0409c-ff11-3995-b979-2af8ef217c40', NULL, 'mcq4', '太平天国の乱が清を変質させた因果の説明として正しいものはどれか。', '[{"key":"a","text":"外国軍だけが鎮圧を担ったため、清の領土がそのまま分割されていった"},{"key":"b","text":"乱が成功して清朝が倒れ、その地に共和政の政権が樹立されていった"},{"key":"c","text":"正規軍が無力で漢人官僚の郷勇が鎮圧したため、地方の実力者が台頭した"},{"key":"d","text":"正規軍が独力で鎮圧に成功し、清の中央集権はかえって強化されていった"}]'::jsonb,
+   '"c"'::jsonb, '洪秀全の太平天国に対し、八旗と緑営は無力だった。曾国藩の湘軍、李鴻章の淮軍という漢人官僚の郷勇が鎮圧を担い、常勝軍も加わった。この結果、軍事力と財源をもつ地方の漢人官僚が力を得て、洋務運動の担い手となる一方、清の中央集権は弱まった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('1aa0409c-ff11-3995-b979-2af8ef217c40', 'kc.qingfall.taiping', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('328ca9c6-41a6-32ff-beda-c93d58ac110e', NULL, 'mcq4', '洋務運動と明治維新の違いとして正しいものはどれか。', '[{"key":"a","text":"洋務運動が政治制度を改め、明治維新は技術の導入だけにとどまっていた"},{"key":"b","text":"いずれも憲法を制定し、議会を開設した点でほぼ同じ内容の改革であった"},{"key":"c","text":"洋務運動は民間が主導し、明治維新は旧幕府がそのまま主導して進められた"},{"key":"d","text":"洋務運動は中体西用で技術のみを導入し、明治維新は政治制度そのものを改めた"}]'::jsonb,
+   '"d"'::jsonb, '洋務運動は中体西用を掲げ、儒教的な体制はそのままに軍需産業や紡績など西洋の技術だけを導入した。明治維新は廃藩置県・徴兵制・地租改正・憲法制定と統治の仕組みそのものを作りかえた。この違いが日清戦争（1894〜95年）の結果に表れたとされる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('328ca9c6-41a6-32ff-beda-c93d58ac110e', 'kc.qingfall.yangwu_vs_meiji', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('7cccae1a-37b7-3c2f-bee3-833a5f7395fd', NULL, 'mcq4', '日清戦争後の列強による中国分割について正しいものはどれか。', '[{"key":"a","text":"フランスが単独で全土を勢力範囲とし、他の列強は進出を見送っていった"},{"key":"b","text":"合衆国が広州湾を租借して、門戸開放宣言に自ら反する行動をとっていった"},{"key":"c","text":"ドイツが膠州湾、ロシアが旅順・大連、イギリスが威海衛と九竜半島を租借した"},{"key":"d","text":"イギリスが膠州湾を、ドイツが威海衛を租借して、ロシアは関与しなかった"}]'::jsonb,
+   '"c"'::jsonb, '日清戦争の敗北で清の弱体が明らかになり、1898年前後にドイツが膠州湾、ロシアが旅順・大連、フランスが広州湾、イギリスが威海衛と九竜半島を租借し、それぞれ勢力範囲を定めた。出遅れた合衆国は国務長官ジョン=ヘイの名で門戸開放・機会均等・領土保全を唱えた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('7cccae1a-37b7-3c2f-bee3-833a5f7395fd', 'kc.qingfall.spheres_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('1c7b53b6-3fbe-3f00-84a9-787874204fe1', NULL, 'mcq4', '東アジアの開国が連鎖した因果の説明として正しいものはどれか。', '[{"key":"a","text":"朝鮮がまず開国し、それを見た日本と清が相次いで条約を結んでいった"},{"key":"b","text":"日本が最初に開国し、その圧力によって清がアヘン戦争を戦うことになった"},{"key":"c","text":"三国がほぼ同時に開国したため、たがいに条約を結ぶことはなかった"},{"key":"d","text":"清の敗北を見た日本が開国し、その日本が朝鮮に不平等条約を押しつけた"}]'::jsonb,
+   '"d"'::jsonb, 'アヘン戦争での清の敗北はペリー来航（1853年）と日米和親条約・日米修好通商条約を受け入れる判断に影響した。開国した日本は江華島事件を起こし、日朝修好条規（1876年）で朝鮮に領事裁判権と無関税を認めさせた。自らが押しつけられた不平等条約を隣国に転嫁した構図である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('1c7b53b6-3fbe-3f00-84a9-787874204fe1', 'kc.qingfall.opening_chain', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5ae2a21c-b7e9-39ca-b5cf-fa279379e217', NULL, 'mcq4', '帝国主義が生まれた要因として最も適切なものはどれか。', '[{"key":"a","text":"自由貿易が徹底されたため、関税をなくす目的で植民地が獲得されていった"},{"key":"b","text":"独占資本が生まれ、余った資本の投下先と原料・市場を求めて対外進出が進んだ"},{"key":"c","text":"各国で資本が不足したため、外国から資本を導入する目的で植民地を求めた"},{"key":"d","text":"人口が急激に減少し、労働力を確保するために海外への進出が行われた"}]'::jsonb,
+   '"b"'::jsonb, '1873年からの大不況を経て企業の集中が進み、カルテルやトラストなど独占資本と銀行資本が結びついた。国内で消化しきれない資本の投下先、原料の供給地、製品の市場として植民地が求められた。これに国民国家の威信やナショナリズムが加わって領土獲得競争となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5ae2a21c-b7e9-39ca-b5cf-fa279379e217', 'kc.imperialism.causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('f51dd50f-3e60-3c78-ba7a-c48be4f17db5', NULL, 'mcq4', '第1次産業革命と第2次産業革命の違いとして正しいものはどれか。', '[{"key":"a","text":"いずれも綿工業を中心としており、動力源にも大きな違いは存在しない"},{"key":"b","text":"前者はドイツとアメリカが、後者はイギリスが先頭に立って進めていった"},{"key":"c","text":"前者は石炭と蒸気による軽工業、後者は石油と電力による重化学工業が中心である"},{"key":"d","text":"前者は石油と電力による重化学工業で、後者は石炭と蒸気による軽工業である"}]'::jsonb,
+   '"c"'::jsonb, '第1次産業革命は石炭・蒸気機関・綿工業と製鉄が中心で、イギリスが先行した。第2次産業革命（1870年代以降）は石油と電力を動力とし、鉄鋼・化学・電機・自動車といった重化学工業が中心で、ドイツとアメリカが先頭に立った。巨額の資本が必要なため独占が進んだ。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('f51dd50f-3e60-3c78-ba7a-c48be4f17db5', 'kc.imperialism.second_industrial', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('76e82132-f48e-303f-8005-cdc59433d74a', NULL, 'mcq4', '第一次世界大戦前の同盟関係の成立を古いものから順に並べたものはどれか。', '[{"key":"a","text":"三国同盟 → 露仏同盟 → 日英同盟 → 英仏協商 → 英露協商"},{"key":"b","text":"露仏同盟 → 三国同盟 → 英露協商 → 日英同盟 → 英仏協商"},{"key":"c","text":"日英同盟 → 英仏協商 → 三国同盟 → 露仏同盟 → 英露協商"},{"key":"d","text":"三国同盟 → 英仏協商 → 露仏同盟 → 英露協商 → 日英同盟"}]'::jsonb,
+   '"a"'::jsonb, 'ビスマルクの三国同盟（1882年）が先行し、彼の引退後にドイツが再保障条約を更新しなかったため露仏同盟（1894年）が成立した。光栄ある孤立を捨てたイギリスが日英同盟（1902年）、英仏協商（1904年）、英露協商（1907年）と結び、三国協商が形をとった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('76e82132-f48e-303f-8005-cdc59433d74a', 'kc.imperialism.alliance_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('711306af-f263-36b6-891e-39a640d1d849', NULL, 'mcq4', 'ドイツの世界政策が対立を激化させた因果の説明として正しいものはどれか。', '[{"key":"a","text":"大海軍の建設と中東への進出がイギリスの権益を脅かし、建艦競争を招いた"},{"key":"b","text":"ドイツが植民地の獲得を放棄したため、かえって列強の不信を招いていった"},{"key":"c","text":"ドイツがイギリスと軍事同盟を結んだため、フランスとロシアが接近した"},{"key":"d","text":"ドイツが海軍を削減したことにより、イギリスとの対立が急速に深まった"}]'::jsonb,
+   '"a"'::jsonb, 'ヴィルヘルム2世はビスマルクの慎重な大陸政策を捨て、世界政策を掲げてティルピッツのもとで大海軍を建設した。これは海上の優位を国是とするイギリスを刺激して建艦競争となり、バグダード鉄道を軸とする中東進出も加わって、モロッコ事件を経て両国の対立が決定的になった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('711306af-f263-36b6-891e-39a640d1d849', 'kc.imperialism.weltpolitik', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('31ceeca6-c3e8-395e-bd08-87423671113c', NULL, 'mcq4', '3B政策と3C政策の経路について正しいものはどれか。', '[{"key":"a","text":"いずれもアフリカ大陸の内部だけを結ぶ計画で、アジアには及ばなかった"},{"key":"b","text":"フランスが3B政策を、ロシアが3C政策を掲げて両者が正面から対立した"},{"key":"c","text":"ドイツがベルリン・ビザンティウム・バグダードを、イギリスがカイロ・ケープタウン・カルカッタを結ぼうとした"},{"key":"d","text":"ドイツがカイロとケープタウンを、イギリスがベルリンとバグダードを結ぼうとした"}]'::jsonb,
+   '"c"'::jsonb, '3B政策はベルリン・ビザンティウム（イスタンブル）・バグダードを鉄道で結ぶドイツの構想で、ペルシア湾への出口を求めるものだった。3C政策はカイロ・ケープタウン・カルカッタを結ぶイギリスの構想で、アフリカ縦断政策とインド支配を結ぶ。両者は西アジアで正面から衝突した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('31ceeca6-c3e8-395e-bd08-87423671113c', 'kc.imperialism.3b_3c_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('3f696342-7782-3204-ac33-ea3875a3e16e', NULL, 'mcq4', 'アメリカとロシアの膨張の方向の違いとして正しいものはどれか。', '[{"key":"a","text":"アメリカはバルカン半島へ、ロシアはカリブ海へと勢力を伸ばしていった"},{"key":"b","text":"いずれもアフリカの分割を主な目的とし、そこで正面から衝突していった"},{"key":"c","text":"アメリカは領土を求めず、ロシアも東方への進出を完全に断念していった"},{"key":"d","text":"アメリカはカリブ海と太平洋へ、ロシアは東アジアとバルカン半島へ向かった"}]'::jsonb,
+   '"d"'::jsonb, 'アメリカはアメリカ=スペイン戦争（1898年）でフィリピンとプエルトリコを得てグアムを領有し、ハワイを併合、カリブ海では棍棒外交でパナマ運河地帯を確保した。ロシアはシベリア鉄道で東アジアへ南下して日露戦争に敗れ、以後はバルカン半島でパン=スラヴ主義を掲げた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('3f696342-7782-3204-ac33-ea3875a3e16e', 'kc.imperialism.us_vs_russia', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('016c0f3d-b379-3070-8277-baed9f04fe0c', NULL, 'mcq4', 'アフリカ分割に関わる出来事を古いものから順に並べたものはどれか。', '[{"key":"a","text":"ベルリン会議 → 英仏協商 → ファショダ事件 → モロッコ事件の決着 → 南アフリカ戦争の終結"},{"key":"b","text":"ベルリン会議 → ファショダ事件 → 英仏協商 → 南アフリカ戦争の終結 → モロッコ事件の決着"},{"key":"c","text":"ファショダ事件 → ベルリン会議 → 南アフリカ戦争の終結 → モロッコ事件の決着 → 英仏協商"},{"key":"d","text":"英仏協商 → ベルリン会議 → ファショダ事件 → モロッコ事件の決着 → 南アフリカ戦争の終結"}]'::jsonb,
+   '"b"'::jsonb, 'ビスマルクが開いたベルリン会議（1884〜85年）が先占の原則を定め、分割が加速した。縦断と横断が衝突したファショダ事件（1898年）でフランスが譲り、南アフリカ戦争（1899〜1902年）を経て英仏協商（1904年）が成立、これに反発したドイツの2度のモロッコ事件（1905年・1911年）は失敗に終わった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('016c0f3d-b379-3070-8277-baed9f04fe0c', 'kc.partition.africa_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('37eb81cc-3622-34c2-a6ad-6fa39dbd8f9f', NULL, 'mcq4', 'アフリカの縦断政策と横断政策の経路について正しいものはどれか。', '[{"key":"a","text":"イギリスがカイロとケープタウンを南北に、フランスがサハラからジブチへ東西に結ぼうとした"},{"key":"b","text":"イギリスがサハラからジブチへ東西に、フランスがカイロとケープタウンを南北に結ぼうとした"},{"key":"c","text":"いずれも大陸の西岸だけを対象としており、内陸に及ぶ計画ではなかった"},{"key":"d","text":"ドイツが縦断政策を、ベルギーが横断政策を掲げて正面から対立していった"}]'::jsonb,
+   '"a"'::jsonb, 'イギリスはエジプトのカイロと南アフリカのケープタウンを結ぶ縦断政策をとり、フランスは西アフリカのサハラからジブチへ向かう横断政策をとった。両者は1898年にスーダンのファショダで遭遇し、ドイツを警戒するフランスが撤退して衝突を避けた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('37eb81cc-3622-34c2-a6ad-6fa39dbd8f9f', 'kc.partition.longitudinal_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('699c7bc8-c5cf-3ff2-bcd0-cd0e10f90171', NULL, 'mcq4', '20世紀初頭のアフリカで独立を保っていた2国はどれか。', '[{"key":"a","text":"エチオピア帝国とリベリア共和国"},{"key":"b","text":"エジプト王国とモロッコ王国"},{"key":"c","text":"リベリア共和国とチュニジア王国"},{"key":"d","text":"エチオピア帝国とアルジェリア王国"}]'::jsonb,
+   '"a"'::jsonb, 'エチオピアはメネリク2世がアドワの戦い（1896年）でイタリア軍を破って独立を守った。リベリアは解放奴隷が建てた共和国で、合衆国の後ろ盾により独立を保った。エジプトはイギリス、モロッコとチュニジアとアルジェリアはフランスなどの支配下に入った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('699c7bc8-c5cf-3ff2-bcd0-cd0e10f90171', 'kc.partition.two_independent', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('a400ed35-5dc4-3b04-a953-1c7a1f2c3635', NULL, 'mcq4', '南アフリカ戦争が起きた要因として正しいものはどれか。', '[{"key":"a","text":"オランダ本国が軍を派遣してきたため、イギリスがこれを迎え撃つ形となった"},{"key":"b","text":"奴隷制の廃止をイギリスが強制したことに、先住民の側が反発したため"},{"key":"c","text":"ブール人の共和国で金とダイヤモンドが見つかり、イギリスがその併合をはかった"},{"key":"d","text":"ブール人がイギリス領のケープ植民地に侵攻して、これを占領しようとしたため"}]'::jsonb,
+   '"c"'::jsonb, 'ブール人（アフリカーナー）のトランスヴァール共和国とオレンジ自由国でダイヤモンドと金が発見されると、ケープ植民地首相ローズと植民地相ジョゼフ=チェンバレンが併合をはかった。1899年に開戦し、イギリスは苦戦の末に併合したが、国際的な批判を浴びて孤立を深めた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('a400ed35-5dc4-3b04-a953-1c7a1f2c3635', 'kc.partition.boer_war', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4e6e48c1-527e-346d-b68f-6e594f1500e6', NULL, 'mcq4', '太平洋地域の分割について正しいものはどれか。', '[{"key":"a","text":"フランスがオーストラリアを、ドイツがニュージーランドを植民地としていった"},{"key":"b","text":"太平洋の島々はいずれも独立を保ち、列強の分割の対象にはならなかった"},{"key":"c","text":"ロシアがハワイを併合し、合衆国は太平洋への進出を見送っていった"},{"key":"d","text":"イギリスがオーストラリアとニュージーランド、合衆国がハワイとフィリピンを支配した"}]'::jsonb,
+   '"d"'::jsonb, 'イギリスはオーストラリアとニュージーランドを自治領とし、合衆国はハワイを併合（1898年）してアメリカ=スペイン戦争でフィリピンとグアムを得た。ドイツはビスマルク諸島やマーシャル諸島、フランスはニューカレドニアとタヒチを領有し、太平洋はほぼ分割し尽くされた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4e6e48c1-527e-346d-b68f-6e594f1500e6', 'kc.partition.pacific_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('bec72278-d77f-3d52-b993-7615c5732326', NULL, 'mcq4', '東南アジアの植民地化の型の違いとして正しいものはどれか。', '[{"key":"a","text":"オランダは中継貿易を、イギリスは強制栽培制度を基礎として支配を進めた"},{"key":"b","text":"いずれの国も直接統治を避け、現地の王朝に完全な自治をゆだねていった"},{"key":"c","text":"タイをのぞく全域がフランス一国の支配下に置かれ、他国は進出しなかった"},{"key":"d","text":"オランダは強制栽培制度、イギリスは海峡植民地の中継貿易を基礎に支配した"}]'::jsonb,
+   '"d"'::jsonb, 'オランダはジャワで強制栽培制度（1830年）を敷き、コーヒーやサトウキビを作らせた。イギリスはペナン・マラッカ・シンガポールの海峡植民地を中継貿易の拠点とし、マレー半島ではスズとゴムを開発した。フランスはインドシナ連邦を作り、タイは英仏の緩衝地帯として独立を保った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('bec72278-d77f-3d52-b993-7615c5732326', 'kc.partition.sea_colonies', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('fa6aec21-457b-3636-b689-18e8b6e283eb', NULL, 'mcq4', '義和団事件が清の運命を決めた因果の説明として正しいものはどれか。', '[{"key":"a","text":"列強の出兵と巨額の賠償金・軍隊駐屯で主権が失われ、清朝の権威が崩れた"},{"key":"b","text":"義和団が列強を撃退したため、清の権威がかえって高まることになった"},{"key":"c","text":"事件を機に列強が中国から撤退し、清は完全な主権を回復していった"},{"key":"d","text":"清が義和団を最初から弾圧したため、列強との関係はむしろ改善した"}]'::jsonb,
+   '"a"'::jsonb, '扶清滅洋を掲げた義和団に清朝が同調して列強へ宣戦したが、8か国連合軍に敗れた。北京議定書（1901年）で巨額の賠償金と外国軍の北京駐屯を認めさせられ、清は半植民地化した。権威を失った清は光緒新政に踏みきるが、それが辛亥革命の条件を整えることになる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('fa6aec21-457b-3636-b689-18e8b6e283eb', 'kc.asianation.boxer', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cda23ec8-4d83-3f7c-883f-86e4c27c403e', NULL, 'mcq4', '辛亥革命に至る出来事を古いものから順に並べたものはどれか。', '[{"key":"a","text":"義和団事件 → 日清戦争 → 戊戌の変法 → 武昌蜂起 → 中国同盟会の結成"},{"key":"b","text":"日清戦争 → 義和団事件 → 戊戌の変法 → 武昌蜂起 → 中国同盟会の結成"},{"key":"c","text":"日清戦争 → 戊戌の変法 → 義和団事件 → 中国同盟会の結成 → 武昌蜂起"},{"key":"d","text":"戊戌の変法 → 日清戦争 → 中国同盟会の結成 → 義和団事件 → 武昌蜂起"}]'::jsonb,
+   '"c"'::jsonb, '日清戦争の敗北（1895年）が康有為らの戊戌の変法（1898年）を促したが西太后の政変で挫折した。義和団事件（1900年）で清の権威が崩れ、孫文が東京で中国同盟会を結成（1905年）、鉄道国有化への反発から武昌で蜂起（1911年）が起き、翌年に中華民国が成立した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cda23ec8-4d83-3f7c-883f-86e4c27c403e', 'kc.asianation.xinhai_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('66da12d2-ca25-301c-a267-3f0e18e4258c', NULL, 'mcq4', '20世紀初頭のアジアの民族運動の担い手の違いとして正しいものはどれか。', '[{"key":"a","text":"いずれの国でも農民が単独で運動を主導し、知識人はほとんど加わらなかった"},{"key":"b","text":"いずれの国でも旧来の王朝が自ら運動を主導し、民間の運動は起きなかった"},{"key":"c","text":"インドは軍人が、中国は農民が、イランは外国人の商人がそれぞれ主導した"},{"key":"d","text":"インドは国民会議派の知識人、中国は留学生と新軍、イランは宗教指導者と商人が担った"}]'::jsonb,
+   '"d"'::jsonb, 'インドではイギリス式教育を受けた知識人の国民会議派がベンガル分割令に反発し、全ムスリム連盟も生まれた。中国では日本への留学生と近代的な新軍が革命の主体となった。イランではタバコ=ボイコット運動以来、ウラマーとバーザールの商人が結んで立憲革命（1905年）を起こした。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('66da12d2-ca25-301c-a267-3f0e18e4258c', 'kc.asianation.leaders', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('338d89fe-d047-3630-95eb-b0c7cfda75d2', NULL, 'mcq4', '日露戦争がアジアに与えた影響として正しいものはどれか。', '[{"key":"a","text":"アジア各地の民族運動が沈静化し、列強の支配がかえって安定していった"},{"key":"b","text":"日本がアジア諸国の独立を支援したため、各地でただちに独立が実現した"},{"key":"c","text":"ロシアがアジアから完全に撤退し、以後の列強の進出も止まっていった"},{"key":"d","text":"アジアの国が列強に勝った例として各地の民族運動を刺激した一方、韓国は保護国とされた"}]'::jsonb,
+   '"d"'::jsonb, '日本の勝利はイランやトルコの立憲運動、インドのスワラージ要求、ベトナムのドンズー運動を刺激した。しかし同時に日本は韓国を保護国とし（1905年）、のちに併合した（1910年）。解放の希望と新たな支配が同時に現れた点をおさえる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('338d89fe-d047-3630-95eb-b0c7cfda75d2', 'kc.asianation.russo_japanese_impact', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e85235c4-517e-3468-8e56-cd5316ebb0d9', NULL, 'mcq4', '孫文が唱えた三民主義の内容として正しいものはどれか。', '[{"key":"a","text":"民主、民本、民力の3つを柱として掲げるものである"},{"key":"b","text":"自由、平等、友愛の3つを中国語に置きかえたものである"},{"key":"c","text":"農地の均分、工業の国有、教育の普及の3つからなる"},{"key":"d","text":"民族の独立、民権の伸張、民生の安定の3つからなる"}]'::jsonb,
+   '"d"'::jsonb, '孫文は中国同盟会の綱領として三民主義を掲げた。民族主義は満洲人の清朝を倒し外国の支配を排すること、民権主義は共和政の樹立、民生主義は地権の平均による貧富の差の是正を指す。のちに連ソ・容共・扶助工農を加えた新三民主義へ発展する。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e85235c4-517e-3468-8e56-cd5316ebb0d9', 'kc.asianation.three_principles', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cb3b1733-fe60-34ac-9982-c1edc8147920', NULL, 'mcq4', '第一次世界大戦が起きた要因として最も適切なものはどれか。', '[{"key":"a","text":"ロシアが日露戦争の報復として、オーストリアへ宣戦したことが発端となった"},{"key":"b","text":"植民地をめぐる英仏の対立が原因で、ドイツは当初中立を保っていた"},{"key":"c","text":"二つの同盟の対立にバルカンの民族問題が重なり、サライェヴォ事件が引き金となった"},{"key":"d","text":"ドイツがフランスへ突然侵攻したことが唯一の原因で、同盟関係は無関係であった"}]'::jsonb,
+   '"c"'::jsonb, '三国同盟と三国協商の対立、建艦競争、そしてパン=スラヴ主義とパン=ゲルマン主義が衝突するヨーロッパの火薬庫バルカンという構造があった。1914年6月のサライェヴォ事件でオーストリアがセルビアに宣戦すると、同盟の連鎖で各国が次々に参戦した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cb3b1733-fe60-34ac-9982-c1edc8147920', 'kc.ww1.causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d220b7e0-b71b-3022-bc84-62f3ca63bec6', NULL, 'mcq4', '従来の戦争と総力戦の違いとして正しいものはどれか。', '[{"key":"a","text":"職業軍人だけが戦い、国民の生活には影響が及ばない形の戦争であった"},{"key":"b","text":"戦費をすべて戦勝国からの賠償でまかない、国内での増税は行わなかった"},{"key":"c","text":"植民地からの動員をいっさい行わず、本国の兵士だけで戦うものであった"},{"key":"d","text":"国民経済と国民生活の全体を戦争へ動員し、女性の労働力も本格的に用いた"}]'::jsonb,
+   '"d"'::jsonb, '総力戦では兵士だけでなく産業・食糧・言論までが戦争に動員される。挙国一致内閣、配給制、統制経済、戦時公債、そして戦時プロパガンダが登場した。男性が出征した職場に女性が進出したことが、戦後の女性参政権の実現につながった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d220b7e0-b71b-3022-bc84-62f3ca63bec6', 'kc.ww1.total_war', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('78790ea7-d926-349e-95d1-740cdc4af4bc', NULL, 'mcq4', '第一次世界大戦の転機を古いものから順に並べたものはどれか。', '[{"key":"a","text":"アメリカ参戦 → マルヌの戦い → ドイツ革命 → 無制限潜水艦作戦 → ロシアの単独講和"},{"key":"b","text":"ロシアの単独講和 → マルヌの戦い → アメリカ参戦 → 無制限潜水艦作戦 → ドイツ革命"},{"key":"c","text":"マルヌの戦い → アメリカ参戦 → 無制限潜水艦作戦 → ドイツ革命 → ロシアの単独講和"},{"key":"d","text":"マルヌの戦い → 無制限潜水艦作戦 → アメリカ参戦 → ロシアの単独講和 → ドイツ革命"}]'::jsonb,
+   '"d"'::jsonb, 'マルヌの戦い（1914年）で短期決戦の計画が崩れ塹壕戦となった。ドイツの無制限潜水艦作戦（1917年2月）がアメリカの参戦（同年4月）を招き、十月革命後のロシアはブレスト=リトフスク条約（1918年3月）で単独講和した。同年11月のドイツ革命で休戦が成立した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('78790ea7-d926-349e-95d1-740cdc4af4bc', 'kc.ww1.turning_points', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ca6688ba-3abf-3808-a006-c5fe675e350e', NULL, 'mcq4', 'イギリスの三枚舌外交とよばれる約束の組みあわせとして正しいものはどれか。', '[{"key":"a","text":"フセイン=マクマホン協定、サイクス=ピコ協定、バルフォア宣言"},{"key":"b","text":"ローザンヌ条約、セーヴル条約、ヴェルサイユ条約"},{"key":"c","text":"ロンドン秘密条約、ラパロ条約、ロカルノ条約"},{"key":"d","text":"三国協商、英露協商、日英同盟の三つの取り決め"}]'::jsonb,
+   '"a"'::jsonb, 'フセイン=マクマホン協定（1915年）でアラブ人に独立を約束し、サイクス=ピコ協定（1916年）で英仏露による分割を密約し、バルフォア宣言（1917年）でユダヤ人の民族的郷土建設を支持した。相互に矛盾するこれらの約束が、現在まで続くパレスチナ問題の出発点となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ca6688ba-3abf-3808-a006-c5fe675e350e', 'kc.ww1.british_promises', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('2f86cc58-cdcb-3c41-81ff-b6a8ad1404ba', NULL, 'mcq4', '第一次世界大戦の戦線について正しいものはどれか。', '[{"key":"a","text":"西部戦線は塹壕で膠着し、東部戦線は広く移動をともなう戦いとなった"},{"key":"b","text":"西部戦線が広く移動する戦いで、東部戦線は塹壕で膠着することとなった"},{"key":"c","text":"戦闘はヨーロッパの内部に限られ、アジアやアフリカには及ばなかった"},{"key":"d","text":"海上での戦闘はまったく起こらず、戦いは陸上だけに限定されていた"}]'::jsonb,
+   '"a"'::jsonb, 'シュリーフェン計画が破れた西部戦線は、北海からスイスまで塹壕が続く消耗戦となり、機関銃・毒ガス・戦車が投入された。東部戦線はタンネンベルクの戦いなど広い戦域で移動をともなった。またオスマン帝国領やアフリカの植民地、日本の参戦による青島攻略など戦域は世界に及んだ。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('2f86cc58-cdcb-3c41-81ff-b6a8ad1404ba', 'kc.ww1.fronts_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('8b9b71fa-c3a1-37ff-baed-716d50254730', NULL, 'mcq4', '大戦が帝国を解体させた因果の説明として正しいものはどれか。', '[{"key":"a","text":"総力戦の負担が支配の正統性を崩し、ロシア・ドイツ・オーストリア・オスマンの4帝国が倒れた"},{"key":"b","text":"4つの帝国はいずれも戦勝国となったが、財政難のため自ら解体を選んだ"},{"key":"c","text":"帝国が解体したのは講和会議の決定によるもので、内部の要因はなかった"},{"key":"d","text":"オスマン帝国だけが解体し、他の3帝国は大戦後も存続することになった"}]'::jsonb,
+   '"a"'::jsonb, '長期の総力戦が食糧難と厭戦気分を生み、ロシアでは二月革命と十月革命、ドイツではキール軍港の水兵反乱に始まるドイツ革命が起きた。オーストリア=ハンガリーは諸民族の独立で分解し、オスマン帝国はセーヴル条約後の解放戦争を経てトルコ共和国となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('8b9b71fa-c3a1-37ff-baed-716d50254730', 'kc.ww1.empires_collapse', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('3b2aa869-c3f0-353d-894c-674698bb1b07', NULL, 'mcq4', 'ロシア革命の経過を古いものから順に並べたものはどれか。', '[{"key":"a","text":"十月革命 → 二月革命 → 四月テーゼ → 臨時政府の成立 → ブレスト=リトフスク条約"},{"key":"b","text":"四月テーゼ → 二月革命 → 十月革命 → ブレスト=リトフスク条約 → 臨時政府の成立"},{"key":"c","text":"二月革命 → 十月革命 → 臨時政府の成立 → 四月テーゼ → ブレスト=リトフスク条約"},{"key":"d","text":"二月革命 → 臨時政府の成立 → 四月テーゼ → 十月革命 → ブレスト=リトフスク条約"}]'::jsonb,
+   '"d"'::jsonb, '1917年3月（ロシア暦2月）の二月革命で帝政が倒れ臨時政府ができたが、ソヴィエトと併存する二重権力となった。帰国したレーニンが四月テーゼですべての権力をソヴィエトへと訴え、11月（ロシア暦10月）の十月革命で政権を握り、翌年ブレスト=リトフスク条約で戦争から離脱した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('3b2aa869-c3f0-353d-894c-674698bb1b07', 'kc.rusrev.two_revolutions', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('bab42a0c-d783-3313-a65f-a46c18814cba', NULL, 'mcq4', 'ボリシェヴィキが権力を握れた要因として最も適切なものはどれか。', '[{"key":"a","text":"臨時政府が戦争を続けたのに対し、平和・土地・パンを掲げて支持を集めた"},{"key":"b","text":"臨時政府が即時の講和を実現したため、その成果を横取りする形となった"},{"key":"c","text":"外国の軍隊がボリシェヴィキを支援し、政権を直接に樹立させたため"},{"key":"d","text":"臨時政府が土地の分配をすでに終えており、農民の支持が不要だったため"}]'::jsonb,
+   '"a"'::jsonb, '臨時政府は連合国との関係から戦争継続を選び、土地問題も先送りした。ボリシェヴィキは平和・土地・パンという分かりやすい要求を掲げてソヴィエトで多数を占め、コルニーロフの反乱の鎮圧で信望を得た。十月革命の直後に平和に関する布告と土地に関する布告を出している。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('bab42a0c-d783-3313-a65f-a46c18814cba', 'kc.rusrev.bolshevik_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d0c11187-05b0-34ec-a788-7695eb56e354', NULL, 'mcq4', '戦時共産主義とネップの違いとして正しいものはどれか。', '[{"key":"a","text":"前者が自由な販売を認め、後者は穀物の強制的な徴発に切りかえた"},{"key":"b","text":"いずれも私企業を全面的に禁止した点で、内容に違いはなかった"},{"key":"c","text":"前者は農業を、後者は工業を対象とする政策で、対象が異なっていた"},{"key":"d","text":"前者は穀物を強制徴発し、後者は税を納めた残りの自由な販売を認めた"}]'::jsonb,
+   '"d"'::jsonb, '内戦と干渉戦のなかでとられた戦時共産主義は、穀物の強制徴発と企業の国有化、労働の義務化を行い、生産が激減した。1921年に始まる新経済政策（ネップ）は徴発を現物税に改めて余剰の販売を認め、小企業と小商業を復活させたため生産は戦前の水準に戻った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d0c11187-05b0-34ec-a788-7695eb56e354', 'kc.rusrev.war_communism_vs_nep', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('9fef7a99-b41a-3f93-a961-5cc782db8bf9', NULL, 'mcq4', '諸外国の干渉が革命政権を固めた因果の説明として正しいものはどれか。', '[{"key":"a","text":"対外戦争という構図が愛国心を呼び、赤軍の組織と一党支配の正当化につながった"},{"key":"b","text":"干渉によって革命政権は倒れ、そのあと帝政が復活することになった"},{"key":"c","text":"干渉軍が革命政権を支援したため、内戦は起こらないまま終わった"},{"key":"d","text":"干渉が行われなかったため、赤軍が組織される必要はまったくなかった"}]'::jsonb,
+   '"a"'::jsonb, 'シベリア出兵をふくむ対ソ干渉戦争と白軍との内戦に対し、トロツキーが赤軍を組織した。外国の侵略に抗するという構図が政権への支持を集め、非常時を理由にチェカによる統制と共産党の一党支配が固定された。内戦の勝利が、その後の体制の性格を決めることになる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('9fef7a99-b41a-3f93-a961-5cc782db8bf9', 'kc.rusrev.intervention', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('41d981a1-80ce-3970-9d07-ed073385f795', NULL, 'mcq4', 'ソ連の成立とコミンテルンについて正しいものはどれか。', '[{"key":"a","text":"ソ連が1919年に成立し、その後1922年にコミンテルンが結成された"},{"key":"b","text":"コミンテルンは各国の政府の代表からなる国際機関として設立された"},{"key":"c","text":"ソ連は単一の共和国として成立し、連邦という形式はとらなかった"},{"key":"d","text":"コミンテルンが1919年に、ソヴィエト社会主義共和国連邦が1922年に成立した"}]'::jsonb,
+   '"d"'::jsonb, '世界革命をめざす共産主義インターナショナル（コミンテルン）が1919年にモスクワで結成され、各国の共産党を指導した。1922年にロシア・ウクライナ・ベラルーシ・ザカフカースの4共和国が集まってソヴィエト社会主義共和国連邦が成立し、翌年に憲法が定められた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('41d981a1-80ce-3970-9d07-ed073385f795', 'kc.rusrev.ussr_and_comintern', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b907334b-534b-3ce3-8d0a-e138518f794c', NULL, 'mcq4', 'ヴェルサイユ体制とワシントン体制の違いとして正しいものはどれか。', '[{"key":"a","text":"前者は軍縮を主題とし、後者は賠償金の額を決めることを主題とした"},{"key":"b","text":"前者はヨーロッパの戦後秩序、後者はアジア太平洋の秩序と海軍軍縮を定めた"},{"key":"c","text":"前者がアジア太平洋の秩序を、後者がヨーロッパの戦後秩序を定めていた"},{"key":"d","text":"いずれも同じ会議で同時に定められたもので、地域による違いはない"}]'::jsonb,
+   '"b"'::jsonb, 'パリ講和会議に基づくヴェルサイユ体制はドイツへの制裁と東欧の新国家、国際連盟を柱とするヨーロッパの秩序である。ワシントン会議（1921〜22年）は海軍軍縮条約、太平洋の現状維持を定める四か国条約、中国の主権尊重を定める九か国条約からなり、日英同盟は解消された。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b907334b-534b-3ce3-8d0a-e138518f794c', 'kc.versailles.two_systems', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('81def6eb-d27e-35bd-a106-95a1b1d04b26', NULL, 'mcq4', 'ヴェルサイユ条約がドイツに課したものとして正しいものはどれか。', '[{"key":"a","text":"軍備の制限はなく、賠償金の支払いだけが求められるものであった"},{"key":"b","text":"全植民地の放棄、アルザス・ロレーヌの返還、軍備の制限と巨額の賠償金"},{"key":"c","text":"植民地の保持を認めるかわりに、本国の領土の半分を割譲させるもの"},{"key":"d","text":"賠償金を課さないかわりに、20年間の軍事占領を受け入れさせるもの"}]'::jsonb,
+   '"b"'::jsonb, 'ドイツは全植民地を失い、アルザス・ロレーヌをフランスに返還し、ラインラントは非武装とされた。徴兵制は禁じられ陸軍は10万に制限された。賠償金は1921年に1320億金マルクと決まり、支払い不能がルール占領とインフレを招いて、のちのナチス台頭の土壌となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('81def6eb-d27e-35bd-a106-95a1b1d04b26', 'kc.versailles.german_terms', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('9c31922b-3585-3f5b-9f3c-17797eb9e284', NULL, 'mcq4', '国際連盟が機能しなかった要因として最も適切なものはどれか。', '[{"key":"a","text":"合衆国が主導しすぎたため、他の国が反発して脱退していったこと"},{"key":"b","text":"軍事的な制裁の権限が強すぎて、加盟国が参加をためらったこと"},{"key":"c","text":"本部が置かれなかったため、会議を開くことができなかったこと"},{"key":"d","text":"合衆国が不参加で、決議は全会一致を要し、制裁の手段が経済制裁に限られた"}]'::jsonb,
+   '"d"'::jsonb, '提唱国の合衆国が上院の反対で加盟せず、ソ連とドイツも当初は排除された。総会の議決は全会一致を要して機動性を欠き、制裁は経済制裁にとどまり軍事力をもたなかった。満洲事変やエチオピア侵攻を止められなかったのはこの限界の表れである。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('9c31922b-3585-3f5b-9f3c-17797eb9e284', 'kc.versailles.league_weakness', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('8716a0ac-9d20-39f2-b7a6-ff58db085709', NULL, 'mcq4', '第一次世界大戦後の東欧に生まれた国として正しいものはどれか。', '[{"key":"a","text":"ロシア帝国の領土がそのまま維持され、新しい独立国は生まれなかった"},{"key":"b","text":"ハンガリーがオーストリアを併合し、東欧の全域を統治することになった"},{"key":"c","text":"ポーランド、チェコスロヴァキア、ユーゴスラヴィア、フィンランドなどが独立した"},{"key":"d","text":"ドイツとオーストリアが合併し、大ドイツという単一の国家が生まれた"}]'::jsonb,
+   '"c"'::jsonb, '民族自決の原則により、ロシア・ドイツ・オーストリア=ハンガリーの解体後にポーランド、チェコスロヴァキア、ハンガリー、ユーゴスラヴィア、フィンランドとバルト三国が独立した。ただし国境と民族分布は一致せず、少数民族問題とドイツ人居住地の帰属がのちの火種となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('8716a0ac-9d20-39f2-b7a6-ff58db085709', 'kc.versailles.new_states_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('7c554816-77cd-3d6c-a52b-25436908c82b', NULL, 'mcq4', '委任統治がアラブの不信を生んだ因果の説明として正しいものはどれか。', '[{"key":"a","text":"アラブ側が委任統治を自ら要請したのに、列強がこれを拒んだため"},{"key":"b","text":"委任統治によって即時の独立が実現したのに、国境が広すぎたため"},{"key":"c","text":"オスマン帝国が委任統治領を統治し続けたことに、アラブが反発したため"},{"key":"d","text":"独立の約束に反して英仏の統治下に置かれ、密約どおりの分割が実現したため"}]'::jsonb,
+   '"d"'::jsonb, 'フセイン=マクマホン協定はアラブの独立を約束していたが、実際にはサイクス=ピコ協定に沿ってシリアとレバノンがフランス、イラクとトランスヨルダンとパレスチナがイギリスの委任統治領とされた。バルフォア宣言の履行も重なり、列強への不信が中東の紛争の根に残った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('7c554816-77cd-3d6c-a52b-25436908c82b', 'kc.versailles.mandate_system', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0cbb0484-0182-3f36-acd0-fa36bbf3f384', NULL, 'mcq4', '1920年代の国際協調に関する出来事を古いものから順に並べたものはどれか。', '[{"key":"a","text":"ロカルノ条約 → ドーズ案 → 不戦条約 → ヤング案 → ドイツの国際連盟加盟"},{"key":"b","text":"不戦条約 → ドーズ案 → ロカルノ条約 → ドイツの国際連盟加盟 → ヤング案"},{"key":"c","text":"ドーズ案 → 不戦条約 → ヤング案 → ロカルノ条約 → ドイツの国際連盟加盟"},{"key":"d","text":"ドーズ案 → ロカルノ条約 → ドイツの国際連盟加盟 → 不戦条約 → ヤング案"}]'::jsonb,
+   '"d"'::jsonb, 'アメリカ資本を導入するドーズ案（1924年）が賠償問題を緩め、ロカルノ条約（1925年）で国境の相互保障が成立し、ドイツの国際連盟加盟（1926年）につながった。不戦条約（1928年、ケロッグ=ブリアン協定）が戦争放棄を宣言し、ヤング案（1929年）が賠償額を減額した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0cbb0484-0182-3f36-acd0-fa36bbf3f384', 'kc.versailles.cooperation_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('2265301d-a4cc-3ab7-b96d-321b9de50bd6', NULL, 'mcq4', '世界恐慌が世界へ広がった因果の説明として正しいものはどれか。', '[{"key":"a","text":"ソ連の五か年計画が失敗したため、その影響が世界に広がっていった"},{"key":"b","text":"アメリカが資金を引きあげたため、それに依存していたドイツから各国へ波及した"},{"key":"c","text":"ヨーロッパで恐慌が始まり、そこからアメリカへ波及していく形をとった"},{"key":"d","text":"各国が金本位制を維持し続けたため、恐慌は自国内だけにとどまった"}]'::jsonb,
+   '"b"'::jsonb, 'ニューヨーク株式市場の暴落（1929年10月）で銀行が資金を回収すると、ドーズ案でアメリカ資本に依存していたドイツが直撃を受け、賠償と戦債の連鎖を通じて各国に波及した。ソ連は五か年計画の途上で世界市場と切り離されていたため、ほとんど影響を受けなかった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('2265301d-a4cc-3ab7-b96d-321b9de50bd6', 'kc.depression.spread', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0eb0a754-9bfe-3ea0-8249-a4d85253f745', NULL, 'mcq4', '各国の世界恐慌への対策の違いとして正しいものはどれか。', '[{"key":"a","text":"各国とも軍備を縮小することで支出を減らし、恐慌からの回復をはかった"},{"key":"b","text":"英仏はブロック経済、アメリカはニューディール、日独伊は対外進出で打開をはかった"},{"key":"c","text":"英仏がニューディールを、アメリカがブロック経済をそれぞれ採用していった"},{"key":"d","text":"いずれの国も自由貿易を維持し、政府の介入は最小限にとどめられた"}]'::jsonb,
+   '"b"'::jsonb, '広い植民地をもつイギリスとフランスは排他的な経済圏をつくるブロック経済（スターリング=ブロックなど）をとり、アメリカはフランクリン=ローズヴェルトのニューディールで公共事業と労働者保護を進めた。持たざる国とされた日本・ドイツ・イタリアは対外進出に活路を求め、それが第二次世界大戦につながった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0eb0a754-9bfe-3ea0-8249-a4d85253f745', 'kc.depression.responses', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('956a4122-bd74-30e5-9b5d-1b3413b4a019', NULL, 'mcq4', 'ファシズムが支持された要因として最も適切なものはどれか。', '[{"key":"a","text":"経済が繁栄して余裕が生まれたため、対外進出への支持が高まったこと"},{"key":"b","text":"議会政治がきわめて安定していたため、その延長として選ばれたこと"},{"key":"c","text":"労働者だけが支持し、中間層はこれに一貫して反対し続けたこと"},{"key":"d","text":"恐慌下の失業と中間層の没落を背景に、強い指導と敵の名指しが支持を集めた"}]'::jsonb,
+   '"d"'::jsonb, '大量失業と中間層の没落、議会の無力、共産主義への恐怖が背景にある。ファシズムは民族や国家の栄光を掲げ、ユダヤ人や共産主義者を敵と名指しして不満を吸収した。ドイツではナチ党が1932年の選挙で第一党となり、翌年ヒトラーが合法的に首相となっている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('956a4122-bd74-30e5-9b5d-1b3413b4a019', 'kc.depression.fascism_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('de65851f-993f-3e0e-966c-b2555f94fc37', NULL, 'mcq4', 'イタリアとドイツのファシズムの違いとして正しいものはどれか。', '[{"key":"a","text":"イタリアは1922年に成立して君主政を残し、ドイツは1933年に成立し人種主義を柱とした"},{"key":"b","text":"イタリアが1933年に、ドイツが1922年に政権を握るという順序であった"},{"key":"c","text":"いずれも人種主義を最大の柱としており、思想の内容に違いはなかった"},{"key":"d","text":"イタリアは君主政を廃止し、ドイツは君主政を復活させる形をとった"}]'::jsonb,
+   '"a"'::jsonb, 'ムッソリーニはローマ進軍（1922年）で政権を握り、国王を戴いたまま一党独裁を築いた。ヒトラーは1933年に首相となり全権委任法で独裁を確立し、反ユダヤ主義と生存圏という人種主義を政策の柱に据えた。成立の時期・君主政の扱い・人種主義の比重が異なる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('de65851f-993f-3e0e-966c-b2555f94fc37', 'kc.depression.italy_vs_germany', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d72139bb-f87d-38fd-860a-87d6058d4ce9', NULL, 'mcq4', 'ドイツが条約を破棄していく過程を古いものから順に並べたものはどれか。', '[{"key":"a","text":"ラインラント進駐 → 国際連盟脱退 → 再軍備宣言 → チェコスロヴァキア解体 → オーストリア併合"},{"key":"b","text":"国際連盟脱退 → ラインラント進駐 → 再軍備宣言 → チェコスロヴァキア解体 → オーストリア併合"},{"key":"c","text":"国際連盟脱退 → 再軍備宣言 → ラインラント進駐 → オーストリア併合 → チェコスロヴァキア解体"},{"key":"d","text":"再軍備宣言 → 国際連盟脱退 → オーストリア併合 → ラインラント進駐 → チェコスロヴァキア解体"}]'::jsonb,
+   '"c"'::jsonb, '国際連盟脱退（1933年）、徴兵制を復活させる再軍備宣言（1935年）、ロカルノ条約を破るラインラント進駐（1936年）と段階を踏み、オーストリア併合（1938年3月）、ミュンヘン会談を経てズデーテンを併合、翌1939年3月にチェコスロヴァキアを解体した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d72139bb-f87d-38fd-860a-87d6058d4ce9', 'kc.depression.german_revision', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6d44684d-6c5c-3a36-a4f2-d7096e2493ed', NULL, 'mcq4', '宥和政策がとられた因果の説明として正しいものはどれか。', '[{"key":"a","text":"英仏がドイツより軍事的に劣っていたため、降伏を前提として譲歩したこと"},{"key":"b","text":"ソ連と同盟していた英仏が、その要請に従ってドイツに譲歩したこと"},{"key":"c","text":"ドイツの要求が条約の範囲内であったため、譲歩とはならなかったこと"},{"key":"d","text":"大戦の再発を避けたい世論と共産主義への警戒から、英仏がドイツの要求を認めた"}]'::jsonb,
+   '"d"'::jsonb, '第一次世界大戦の惨禍への反省から戦争を避けたい世論が強く、またドイツを共産主義ソ連への防壁とみなす見方があった。ミュンヘン会談（1938年）で英仏はズデーテン割譲を認めたが、翌年ドイツはチェコスロヴァキアを解体し、宥和政策の失敗が明らかになった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6d44684d-6c5c-3a36-a4f2-d7096e2493ed', 'kc.depression.appeasement', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('735a856d-a700-3af8-81dc-ec0f1841dbb4', NULL, 'mcq4', '第二次世界大戦の経過を古いものから順に並べたものはどれか。', '[{"key":"a","text":"ポーランド侵攻 → 独ソ不可侵条約 → 真珠湾攻撃 → 独ソ戦の開始 → スターリングラードの戦い"},{"key":"b","text":"独ソ戦の開始 → 独ソ不可侵条約 → ポーランド侵攻 → スターリングラードの戦い → 真珠湾攻撃"},{"key":"c","text":"独ソ不可侵条約 → 独ソ戦の開始 → ポーランド侵攻 → スターリングラードの戦い → 真珠湾攻撃"},{"key":"d","text":"独ソ不可侵条約 → ポーランド侵攻 → 独ソ戦の開始 → 真珠湾攻撃 → スターリングラードの戦い"}]'::jsonb,
+   '"d"'::jsonb, '独ソ不可侵条約（1939年8月）で東西からの挟撃を避けたドイツが9月にポーランドへ侵攻して開戦した。1941年6月に独ソ戦が始まり、12月の真珠湾攻撃で戦争は世界規模になった。スターリングラードの戦い（1942〜43年）でドイツが敗れ、以後は連合国が優位に立つ。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('735a856d-a700-3af8-81dc-ec0f1841dbb4', 'kc.ww2.turning_points', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('77acf4d7-d39a-3304-b354-76fff55757dd', NULL, 'mcq4', '枢軸国と連合国の性格の違いとして正しいものはどれか。', '[{"key":"a","text":"いずれも同じ政治体制の国どうしの結合で、性格の違いはとくになかった"},{"key":"b","text":"連合国は資本主義国だけの結合で、ソ連は最後まで中立を保ち続けた"},{"key":"c","text":"枢軸国は現状打破と一党独裁、連合国は反ファシズムで結んだ体制の異なる連合であった"},{"key":"d","text":"枢軸国が反ファシズムを掲げ、連合国が現状打破を掲げるという構図であった"}]'::jsonb,
+   '"c"'::jsonb, '日独伊の枢軸国はヴェルサイユ・ワシントン体制の打破と一党独裁という共通点をもった。連合国は自由主義のイギリス・アメリカと社会主義のソ連、そして植民地や中国を含む体制の異なる連合で、反ファシズムという一点で結ばれた。この違いが戦後の冷戦の伏線となる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('77acf4d7-d39a-3304-b354-76fff55757dd', 'kc.ww2.axis_vs_allies', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('40219508-3969-3bb8-b959-c3e3cee2b3bd', NULL, 'mcq4', '1942年ごろの枢軸国の最大勢力圏について正しいものはどれか。', '[{"key":"a","text":"ドイツはヨーロッパの内部にとどまり、アフリカへはまったく進出しなかった"},{"key":"b","text":"日本は中国大陸にとどまり、東南アジアへは進出していなかった"},{"key":"c","text":"ドイツが大西洋岸からヴォルガ川と北アフリカまで、日本が東南アジアと西太平洋まで広げた"},{"key":"d","text":"ドイツがウラル山脈以東まで進出し、日本はインド全域を占領していた"}]'::jsonb,
+   '"c"'::jsonb, 'ドイツはフランス・北欧・バルカンを制圧し、東はヴォルガ川のスターリングラード、南はロンメルの北アフリカ戦線まで達した。日本はミッドウェー海戦（1942年6月）までに東南アジアと西太平洋の島々を占領した。いずれもこの年を頂点に後退へ転じる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('40219508-3969-3bb8-b959-c3e3cee2b3bd', 'kc.ww2.axis_extent_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('13095286-3d7f-3cf7-a717-175f32007eb1', NULL, 'mcq4', '独ソ戦が戦局を決めた因果の説明として正しいものはどれか。', '[{"key":"a","text":"ドイツ軍の主力が東部戦線で消耗し、その間に連合国が反攻の準備を整えた"},{"key":"b","text":"独ソ戦は小規模な戦闘にとどまり、戦争全体への影響はほとんどなかった"},{"key":"c","text":"ドイツが独ソ戦に勝利したのち、西部戦線で連合国に敗れることとなった"},{"key":"d","text":"ソ連が早期に降伏したため、ドイツは西部戦線に全力を注ぐことができた"}]'::jsonb,
+   '"a"'::jsonb, '第二次世界大戦のドイツ軍の損害の多くは東部戦線で生じた。スターリングラードの戦いとクルスクの戦い（1943年）で主導権を失い、その間に連合国は北アフリカとイタリアを制圧し、ノルマンディー上陸（1944年）で西部に第二戦線を開いた。東西からの挟撃がドイツの敗北を決めた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('13095286-3d7f-3cf7-a717-175f32007eb1', 'kc.ww2.eastern_front', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e3c6922a-b359-329e-9ac8-55a9b6c5ff36', NULL, 'mcq4', '第二次世界大戦中の戦後構想を決めた会談について正しいものはどれか。', '[{"key":"a","text":"大西洋上会談で理念を示し、テヘラン・ヤルタ・ポツダムの各会談で処理を決めた"},{"key":"b","text":"ヤルタ会談が最初に開かれ、そのあとで大西洋上会談が行われていった"},{"key":"c","text":"ポツダム会談で開戦が決まり、そののちに大西洋上会談が開かれていった"},{"key":"d","text":"すべての会談が終戦後に開かれたため、戦時の作戦とは無関係であった"}]'::jsonb,
+   '"a"'::jsonb, 'ローズヴェルトとチャーチルの大西洋上会談（1941年）が大西洋憲章で戦後の理念を示し、テヘラン会談（1943年）で第二戦線が決まった。ヤルタ会談（1945年2月）でドイツの分割管理とソ連の対日参戦が密約され、ポツダム会談（同年7月）で日本への降伏勧告が出された。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e3c6922a-b359-329e-9ac8-55a9b6c5ff36', 'kc.ww2.conferences', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d3ef73d7-5a21-3adf-bf07-db3fe4829377', NULL, 'mcq4', 'ホロコーストに至る段階の説明として正しいものはどれか。', '[{"key":"a","text":"ニュルンベルク法による差別、水晶の夜、ゲットーへの隔離を経て絶滅政策に至った"},{"key":"b","text":"開戦と同時に絶滅政策が始まり、それ以前に差別的な法律は存在しなかった"},{"key":"c","text":"ドイツ国内では迫害がなく、占領地においてのみ迫害が行われていた"},{"key":"d","text":"国際連盟が阻止に成功したため、計画は実行に移されることはなかった"}]'::jsonb,
+   '"a"'::jsonb, 'ニュルンベルク法（1935年）が市民権を奪い、水晶の夜（1938年）で暴力が公然化した。開戦後は占領地でゲットーへ隔離され、ヴァンゼー会議（1942年）以後アウシュヴィッツなどでの組織的な殺害に至った。段階を追って進んだ点が重要で、そのどの段階でも止められた可能性があった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d3ef73d7-5a21-3adf-bf07-db3fe4829377', 'kc.ww2.holocaust', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('630e035c-c83c-3133-9ad0-86a821525564', NULL, 'mcq4', '冷戦が始まった要因として最も適切なものはどれか。', '[{"key":"a","text":"ソ連とアメリカが同盟を結んだため、他の諸国がこれに反発したこと"},{"key":"b","text":"国際連合が機能しなくなったため、両国が直接戦火を交えたこと"},{"key":"c","text":"ドイツが再軍備を行ったため、米ソが共同で介入を始めたこと"},{"key":"d","text":"東欧でのソ連の勢力拡大に対し、アメリカが封じこめ政策で対抗したこと"}]'::jsonb,
+   '"d"'::jsonb, '戦後の東欧に親ソ政権が生まれると、チャーチルが鉄のカーテン演説（1946年）で警告した。アメリカはトルーマン=ドクトリンとマーシャル=プラン（1947年）で封じこめ政策をとり、ソ連はコミンフォルムとコメコンで対抗した。直接の戦火を交えないという意味で冷戦とよばれる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('630e035c-c83c-3133-9ad0-86a821525564', 'kc.coldwar.origin', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5d6574ff-7b03-34aa-99aa-e01187b2d035', NULL, 'mcq4', 'マーシャル=プランとコメコンの対応関係として正しいものはどれか。', '[{"key":"a","text":"いずれもアメリカが主導した計画で、対抗関係にはあたらなかった"},{"key":"b","text":"コメコンは軍事同盟であり、経済の分野とは無関係の組織であった"},{"key":"c","text":"アメリカの欧州復興援助に対し、ソ連が東側の経済相互援助会議で対抗した"},{"key":"d","text":"ソ連の援助計画に対し、アメリカが経済相互援助会議で対抗する形であった"}]'::jsonb,
+   '"c"'::jsonb, 'マーシャル=プラン（1947年）はヨーロッパの経済復興を援助して共産主義の浸透を防ぐ狙いをもち、ソ連と東欧は参加を拒否した。ソ連はコミンフォルム（1947年）で各国共産党を結び、経済相互援助会議コメコン（1949年）を作って東側の経済圏を築いた。軍事面の対応は北大西洋条約機構とワルシャワ条約機構である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5d6574ff-7b03-34aa-99aa-e01187b2d035', 'kc.coldwar.marshall_vs_comecon', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('54b8cd69-09a8-3f60-af4b-71c8cf713a20', NULL, 'mcq4', '東西両陣営の分布について正しいものはどれか。', '[{"key":"a","text":"西側がワルシャワ条約機構に、東側が北大西洋条約機構に結集する形であった"},{"key":"b","text":"両陣営の境界はアジアだけに存在し、ヨーロッパでは分断は生じなかった"},{"key":"c","text":"ユーゴスラヴィアは東側陣営の中心として、ソ連と一体に行動していった"},{"key":"d","text":"西側は北大西洋条約機構、東側はワルシャワ条約機構に結集し、ドイツで境界が接した"}]'::jsonb,
+   '"d"'::jsonb, '北大西洋条約機構（1949年）に西欧と北米が、ワルシャワ条約機構（1955年）に東欧が結集し、分断されたドイツで両者が直接に接した。ユーゴスラヴィアはティトーが独自路線をとってコミンフォルムを除名され、のちに非同盟諸国の中心となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('54b8cd69-09a8-3f60-af4b-71c8cf713a20', 'kc.coldwar.blocs_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('eada7d52-c15b-3572-8aa2-2fbc3aff31bb', NULL, 'mcq4', 'ドイツと朝鮮の分断が生まれた因果の説明として正しいものはどれか。', '[{"key":"a","text":"米ソによる分割占領が固定され、それぞれの陣営に属する2つの国家が生まれた"},{"key":"b","text":"住民投票の結果によって分断が決まり、外部の勢力は関与していなかった"},{"key":"c","text":"いずれも戦前から2つの国家であり、大戦によって統一が試みられた"},{"key":"d","text":"国際連合の決議で分断が決まり、米ソはこれに一貫して反対していた"}]'::jsonb,
+   '"a"'::jsonb, 'ドイツは米英仏ソの分割占領のもと、通貨改革をめぐる対立からベルリン封鎖（1948〜49年）が起こり、ドイツ連邦共和国とドイツ民主共和国が成立した。朝鮮も北緯38度線で米ソが分割占領し、大韓民国と朝鮮民主主義人民共和国が成立して、朝鮮戦争（1950〜53年）で分断が固定された。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('eada7d52-c15b-3572-8aa2-2fbc3aff31bb', 'kc.coldwar.german_division', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('09db2df1-7bf3-36a7-9c99-6b3d60ad9184', NULL, 'mcq4', '中華人民共和国の成立と冷戦の関係について正しいものはどれか。', '[{"key":"a","text":"建国後の中国は中立を宣言し、米ソのいずれとも条約を結ばなかった"},{"key":"b","text":"中国はアメリカと同盟を結び、朝鮮戦争では国連軍の側で参戦していった"},{"key":"c","text":"内戦に勝った共産党が建国し、中ソ友好同盟相互援助条約で東側陣営に加わった"},{"key":"d","text":"国民党が内戦に勝って建国し、そのうえでソ連と同盟を結ぶこととなった"}]'::jsonb,
+   '"c"'::jsonb, '国共内戦に勝利した共産党が1949年に中華人民共和国を建国し、国民党は台湾へ移った。翌1950年の中ソ友好同盟相互援助条約で東側陣営に加わり、朝鮮戦争には人民義勇軍を送って北側で参戦した。アジアにおける冷戦の構図がこれで固まった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('09db2df1-7bf3-36a7-9c99-6b3d60ad9184', 'kc.coldwar.china_prc', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b2382261-354c-37e6-9ab3-2b8c6541b05f', NULL, 'mcq4', '核開発競争が抑止へ転じた経過として正しいものはどれか。', '[{"key":"a","text":"ソ連の原爆保有と水爆開発で均衡が生まれ、キューバ危機を機に管理へ向かった"},{"key":"b","text":"アメリカが核を独占し続けたため、ソ連は核開発を最後まで断念していた"},{"key":"c","text":"キューバ危機で実際に核兵器が使用され、その反省から管理が始まった"},{"key":"d","text":"核兵器の開発は米ソ以外の国が先行し、両国はあとから追随していった"}]'::jsonb,
+   '"a"'::jsonb, 'アメリカの独占はソ連の原爆実験（1949年）で崩れ、双方が水爆をもって恐怖の均衡が生まれた。キューバ危機（1962年）で全面戦争の一歩手前まで進んだ経験から、米ソ首脳を結ぶホットラインが設けられ、部分的核実験禁止条約（1963年）と核拡散防止条約（1968年）へ進んだ。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b2382261-354c-37e6-9ab3-2b8c6541b05f', 'kc.coldwar.arms_race', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('df9b7d7d-75e5-39f6-bfcd-6ca57039170b', NULL, 'mcq4', 'インドが分離独立した因果の説明として正しいものはどれか。', '[{"key":"a","text":"ガンディーの主張どおりに分離が行われ、宗教間の対立は解消していった"},{"key":"b","text":"独立の直後に両国が合併し、ひとつの連邦国家が成立することとなった"},{"key":"c","text":"全ムスリム連盟がパキスタンを要求し、宗教別の分離のまま独立が実現した"},{"key":"d","text":"イギリスが統一を強く求めたため、単一の国家としてまず独立していった"}]'::jsonb,
+   '"c"'::jsonb, '国民会議派が統一インドを、ジンナーの全ムスリム連盟が分離を主張した。イギリスの統治法とインド独立法（1947年）のもと、ヒンドゥー教徒のインドとイスラーム教徒のパキスタンが分離独立した。境界地帯で大規模な難民の移動と衝突が起こり、統一を説いたガンディーは暗殺され、カシミール問題が残った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('df9b7d7d-75e5-39f6-bfcd-6ca57039170b', 'kc.decolonize.india_partition', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('c33fb5b4-6f3a-3ab3-ba17-4fd6ba521a49', NULL, 'mcq4', '東南アジアの独立の型の違いとして正しいものはどれか。', '[{"key":"a","text":"いずれの国も独立戦争に敗れ、独立は1970年代まで実現しなかった"},{"key":"b","text":"インドネシアとベトナムは武力闘争を経て、フィリピンは協定によって独立した"},{"key":"c","text":"インドネシアが協定で独立し、フィリピンは長い武力闘争を経て独立した"},{"key":"d","text":"いずれの国も宗主国との戦争を経ておらず、平和裏に独立を達成した"}]'::jsonb,
+   '"b"'::jsonb, 'インドネシアはスカルノが独立を宣言し、オランダとの4年の戦いを経て承認された（1949年）。ベトナムはホー=チ=ミンが独立を宣言し、インドシナ戦争でフランスを破ってジュネーヴ休戦協定（1954年）に至った。フィリピンは合衆国との取り決めどおり1946年に独立している。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('c33fb5b4-6f3a-3ab3-ba17-4fd6ba521a49', 'kc.decolonize.sea_independence', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('7b8e708e-3169-3ce2-9a1a-1a954cc1b732', NULL, 'mcq4', 'アフリカ諸国の独立について正しいものはどれか。', '[{"key":"a","text":"アフリカ諸国の独立はすべて1970年代に入ってから実現したものである"},{"key":"b","text":"ガーナが1957年に独立し、1960年には17か国が独立してアフリカの年とよばれた"},{"key":"c","text":"アフリカの年とは1960年に17か国が同時に植民地化された年を指している"},{"key":"d","text":"アフリカで最初に独立したのは南アフリカ共和国で、1960年のことである"}]'::jsonb,
+   '"b"'::jsonb, 'エンクルマ（ンクルマ）に率いられたガーナがサハラ以南で最初に独立し（1957年）、1960年にはナイジェリアやコンゴなど17か国が独立してアフリカの年とよばれた。1963年にはアフリカ統一機構が結成された。一方アルジェリアは8年に及ぶ戦争を経て1962年に独立している。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('7b8e708e-3169-3ce2-9a1a-1a954cc1b732', 'kc.decolonize.africa_year_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4ebd0a26-dcd6-3925-b30a-2428238902b1', NULL, 'mcq4', '第三勢力が形をとる過程を古いものから順に並べたものはどれか。', '[{"key":"a","text":"非同盟諸国首脳会議 → 平和五原則 → アジア=アフリカ会議"},{"key":"b","text":"平和五原則 → 非同盟諸国首脳会議 → アジア=アフリカ会議"},{"key":"c","text":"平和五原則 → アジア=アフリカ会議 → 非同盟諸国首脳会議"},{"key":"d","text":"アジア=アフリカ会議 → 平和五原則 → 非同盟諸国首脳会議"}]'::jsonb,
+   '"c"'::jsonb, '周恩来とネルーが平和五原則（1954年）を発表し、翌1955年にインドネシアのバンドンでアジア=アフリカ会議が開かれて平和十原則を採択した。1961年にはユーゴスラヴィアのベオグラードで第1回非同盟諸国首脳会議が開かれ、米ソのいずれにも与しない第三勢力が形をとった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4ebd0a26-dcd6-3925-b30a-2428238902b1', 'kc.decolonize.bandung', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('530bda07-2fd4-3f32-bae9-617637dd66ed', NULL, 'mcq4', '植民地の境界がそのまま国境になった因果の説明として正しいものはどれか。', '[{"key":"a","text":"旧宗主国が国境を管理し続けたため、独立国どうしの紛争は起きなかった"},{"key":"b","text":"民族の分布と一致しない直線的な国境が残り、内戦と難民の原因となった"},{"key":"c","text":"独立の際に民族ごとの国境が引き直されたため、民族問題は解消された"},{"key":"d","text":"国境が定められないまま独立したため、国家の領域は存在しなかった"}]'::jsonb,
+   '"b"'::jsonb, 'ベルリン会議以来の分割は経緯度による直線が多く、民族の分布を無視していた。独立にあたって既存の境界を維持する原則がとられたため、ひとつの国に複数の民族が、ひとつの民族が複数の国に分かれた。ビアフラ戦争やルワンダの虐殺、コンゴ動乱の背景にはこの構造がある。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('530bda07-2fd4-3f32-bae9-617637dd66ed', 'kc.decolonize.artificial_borders', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('01135692-e97e-3cc1-923f-cc5dd2d82a2b', NULL, 'mcq4', 'アパルトヘイトの成立と廃止について正しいものはどれか。', '[{"key":"a","text":"国際連合が制度の導入を勧告し、南アフリカがこれに従って実施した"},{"key":"b","text":"白人と黒人の完全な平等を定めた制度で、批判を受けることはなかった"},{"key":"c","text":"1948年に法制化され、国際的な批判と国内の抵抗を経て1990年代に撤廃された"},{"key":"d","text":"19世紀に成立した制度で、第二次世界大戦の終結とともに撤廃された"}]'::jsonb,
+   '"c"'::jsonb, '南アフリカでは1948年に人種隔離が法制化され、居住地・結婚・教育が人種で分けられた。国際的な経済制裁とアフリカ民族会議の抵抗が続き、デクラーク大統領のもとで関係法が撤廃され、1994年の全人種参加の選挙でマンデラが大統領となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('01135692-e97e-3cc1-923f-cc5dd2d82a2b', 'kc.decolonize.apartheid', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('3914d80b-5546-3e9f-badd-a47e6280872c', NULL, 'mcq4', '中東戦争で動いた領域について正しいものはどれか。', '[{"key":"a","text":"イスラエルが第1次でシナイ半島を失い、以後は領域が縮小し続けていった"},{"key":"b","text":"ヨルダン川西岸は一貫してイスラエルの領域で、占領という事実はない"},{"key":"c","text":"ゴラン高原はエジプト領であり、シナイ半島はシリア領にあたっている"},{"key":"d","text":"イスラエルが第3次でシナイ半島・ガザ・ヨルダン川西岸・ゴラン高原を占領した"}]'::jsonb,
+   '"d"'::jsonb, '第3次中東戦争（1967年、6日戦争）でイスラエルはエジプトからシナイ半島とガザ、ヨルダンからヨルダン川西岸と東エルサレム、シリアからゴラン高原を奪った。シナイ半島はエジプト=イスラエル平和条約（1979年）で返還されたが、他は占領が続き現在の対立の核心となっている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('3914d80b-5546-3e9f-badd-a47e6280872c', 'kc.regionalwar.middle_east_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('9cf43b26-087b-3356-8d19-2cc99cb5bf85', NULL, 'mcq4', '中東戦争を古いものから順に並べたものはどれか。', '[{"key":"a","text":"6日戦争 → スエズ戦争 → イスラエル建国と第1次 → 第4次と石油戦略"},{"key":"b","text":"イスラエル建国と第1次 → 6日戦争 → スエズ戦争 → 第4次と石油戦略"},{"key":"c","text":"イスラエル建国と第1次 → スエズ戦争 → 6日戦争 → 第4次と石油戦略"},{"key":"d","text":"スエズ戦争 → イスラエル建国と第1次 → 第4次と石油戦略 → 6日戦争"}]'::jsonb,
+   '"c"'::jsonb, 'イスラエル建国（1948年）に伴う第1次でパレスチナ難民が生まれ、ナセルのスエズ運河国有化に対する第2次（スエズ戦争、1956年）で英仏が失敗した。第3次（6日戦争、1967年）でイスラエルが占領を広げ、第4次（1973年）でアラブ産油国が石油戦略を発動して石油危機が起きた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('9cf43b26-087b-3356-8d19-2cc99cb5bf85', 'kc.regionalwar.middle_east_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('58e5a907-b356-389b-89a4-fb6158987b5a', NULL, 'mcq4', 'ベトナム戦争が長期化した要因として最も適切なものはどれか。', '[{"key":"a","text":"南ベトナム政府が国民の広い支持を得ており、戦力が拮抗したこと"},{"key":"b","text":"解放勢力が住民の支持を得たゲリラ戦を続け、北爆でも戦意を折れなかった"},{"key":"c","text":"アメリカが兵力を投入しなかったため、戦線が動かないまま推移した"},{"key":"d","text":"ソ連と中国が北ベトナムへの援助を拒み、戦力が均衡し続けたこと"}]'::jsonb,
+   '"b"'::jsonb, 'ジュネーヴ休戦協定後の統一選挙が実施されず、南ベトナム解放民族戦線がゲリラ戦を展開した。アメリカは北爆（1965年）と50万を超える派兵で応じたが、住民に支持された戦いを正規軍で制圧できなかった。厭戦気分と反戦運動の高まりを受け、パリ和平協定（1973年）で撤退した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('58e5a907-b356-389b-89a4-fb6158987b5a', 'kc.regionalwar.vietnam_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b2afb1a2-0b57-3f98-87e2-2df04081f841', NULL, 'mcq4', '石油危機が世界経済を変えた因果の説明として正しいものはどれか。', '[{"key":"a","text":"危機を機に各国が石炭へ全面的に回帰し、石油の消費はほぼ消滅した"},{"key":"b","text":"原油価格の高騰が不況と物価上昇を同時に招き、先進国は省エネと産業転換へ向かった"},{"key":"c","text":"原油価格が下落したため、産油国の経済だけが打撃を受けることとなった"},{"key":"d","text":"石油危機の影響は中東地域にとどまり、先進国の経済に影響はなかった"}]'::jsonb,
+   '"b"'::jsonb, '第4次中東戦争を機にアラブ産油国が石油戦略を発動し、原油価格が約4倍になった（1973年）。先進国は不況と物価上昇が同時に進むスタグフレーションに陥り、高度成長が終わった。省エネルギー技術と知識集約型産業への転換が進み、第1回先進国首脳会議（1975年）が開かれた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b2afb1a2-0b57-3f98-87e2-2df04081f841', 'kc.regionalwar.oil_shock', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ed73b062-80ee-3044-ae9e-ea6d3fcbf2ea', NULL, 'mcq4', '中ソ対立が冷戦の構図を崩した因果の説明として正しいものはどれか。', '[{"key":"a","text":"中ソ対立によってソ連が崩壊し、その時点で冷戦が終わることとなった"},{"key":"b","text":"中ソ対立は思想上の論争にとどまり、国際関係には影響を与えなかった"},{"key":"c","text":"社会主義陣営が一枚岩でなくなり、米中の接近という新しい三角関係が生まれた"},{"key":"d","text":"中ソが結束を強めたため、アメリカが孤立して冷戦が終結へ向かった"}]'::jsonb,
+   '"c"'::jsonb, 'スターリン批判と平和共存路線（1956年）をめぐって中ソが対立し、国境で武力衝突（1969年）にまで至った。ソ連を共通の脅威とみた米中が接近し、ニクソン訪中（1972年）と国交正常化（1979年）が実現した。米ソの二極という冷戦の図式がここで崩れた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ed73b062-80ee-3044-ae9e-ea6d3fcbf2ea', 'kc.regionalwar.sino_soviet', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('47e058d9-0c12-316b-8a37-960b88915fd6', NULL, 'mcq4', 'ラテンアメリカが冷戦の場になった経緯について正しいものはどれか。', '[{"key":"a","text":"キューバ革命が失敗したため、ラテンアメリカに社会主義政権は生まれなかった"},{"key":"b","text":"チリのアジェンデ政権は軍事クーデタで生まれ、選挙によって倒されていった"},{"key":"c","text":"ラテンアメリカは冷戦の影響を受けず、米ソの介入はまったくなかった"},{"key":"d","text":"キューバ革命後に社会主義を宣言し、チリでは選挙で生まれた政権が軍に倒された"}]'::jsonb,
+   '"d"'::jsonb, 'カストロとゲバラのキューバ革命（1959年）が親米政権を倒し、アメリカの経済封鎖を受けて社会主義を宣言、キューバ危機（1962年）につながった。チリでは選挙で成立したアジェンデ政権（1970年）がピノチェトの軍事クーデタ（1973年）で倒され、軍政が続いた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('47e058d9-0c12-316b-8a37-960b88915fd6', 'kc.regionalwar.latin_america_coldwar', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('32543266-a59e-3628-add1-b7c212f2ff0e', NULL, 'mcq4', '緊張緩和が進んだ要因として最も適切なものはどれか。', '[{"key":"a","text":"キューバ危機の反省と核の均衡、そして米ソそれぞれの陣営内部の分化が背景にある"},{"key":"b","text":"米ソのいずれかが核兵器を放棄したため、対立の根拠が失われたこと"},{"key":"c","text":"国際連合が強力な軍隊をもち、両国に軍縮を強制的に命じたこと"},{"key":"d","text":"両国の経済が急速に成長し、軍事費の負担が問題にならなくなったこと"}]'::jsonb,
+   '"a"'::jsonb, 'キューバ危機で全面戦争の危険を実感した米ソは、部分的核実験禁止条約（1963年）や戦略兵器制限交渉へ進んだ。加えて西側ではフランスが独自路線をとり、東側では中ソが対立して、それぞれの陣営が一枚岩でなくなったことが緊張緩和を後押しした。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('32543266-a59e-3628-add1-b7c212f2ff0e', 'kc.detente.detente_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e7af512d-4336-31df-a67a-1a54339c01b7', NULL, 'mcq4', '緊張緩和が一度崩れた因果の説明として正しいものはどれか。', '[{"key":"a","text":"ソ連のアフガニスタン侵攻に西側が反発し、レーガンが対決姿勢を強めた"},{"key":"b","text":"アメリカがアフガニスタンへ侵攻し、これにソ連が反発して対立が再燃した"},{"key":"c","text":"中東での石油の増産をめぐって米ソが対立し、軍拡が再開されていった"},{"key":"d","text":"ソ連が戦略兵器の全廃を提案したため、かえって不信が高まったこと"}]'::jsonb,
+   '"a"'::jsonb, 'ソ連のアフガニスタン侵攻（1979年）に対し、西側はモスクワ五輪をボイコットし、戦略兵器制限交渉の批准が見送られた。レーガン政権は戦略防衛構想を掲げて軍拡を進め、この時期は新冷戦とよばれる。軍事費の負担がソ連経済を圧迫し、のちの改革の背景となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e7af512d-4336-31df-a67a-1a54339c01b7', 'kc.detente.second_cold_war', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('fd3617a1-9ec7-3bad-8711-278eda0d7566', NULL, 'mcq4', 'ペレストロイカが体制を崩した因果の説明として正しいものはどれか。', '[{"key":"a","text":"ゴルバチョフが改革を撤回したため、かえって連邦の解体が早まったこと"},{"key":"b","text":"情報公開と民主化が共産党の権威を弱め、連邦内の民族運動を抑えられなくなった"},{"key":"c","text":"経済改革が成功しすぎたため、共産党が自ら解散を決めることとなった"},{"key":"d","text":"改革が軍事部門だけに限られたため、市民生活には影響が及ばなかった"}]'::jsonb,
+   '"b"'::jsonb, 'ゴルバチョフはペレストロイカとグラスノスチ（情報公開）を進め、新思考外交で冷戦を終わらせた。しかし情報公開は共産党の正統性を掘り崩し、経済は混乱し、バルト三国などの独立運動が高まった。保守派のクーデタ失敗（1991年8月）を経て同年末にソ連は解体した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('fd3617a1-9ec7-3bad-8711-278eda0d7566', 'kc.detente.perestroika', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b2e86a8c-b452-3ef0-aa62-ed5b4ed0b9ac', NULL, 'mcq4', '東欧革命とその後の経過を古いものから順に並べたものはどれか。', '[{"key":"a","text":"ベルリンの壁の開放 → マルタ会談 → ドイツ統一 → ソ連の解体"},{"key":"b","text":"マルタ会談 → ドイツ統一 → ベルリンの壁の開放 → ソ連の解体"},{"key":"c","text":"ドイツ統一 → ベルリンの壁の開放 → ソ連の解体 → マルタ会談"},{"key":"d","text":"ソ連の解体 → ベルリンの壁の開放 → マルタ会談 → ドイツ統一"}]'::jsonb,
+   '"a"'::jsonb, 'ポーランドの自主管理労組の政権参加から連鎖が始まり、ベルリンの壁が開放され（1989年11月）、同年12月のマルタ会談でブッシュとゴルバチョフが冷戦の終結を宣言した。翌1990年に東西ドイツが統一され、1991年末にソ連が解体して独立国家共同体が生まれた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b2e86a8c-b452-3ef0-aa62-ed5b4ed0b9ac', 'kc.detente.east_europe_1989', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('582d2ba9-a15e-358e-8151-d55026d45fb7', NULL, 'mcq4', '冷戦終結で変わった地図について正しいものはどれか。', '[{"key":"a","text":"ソ連は解体したが、その領域はすべてロシア一国に引きつがれていった"},{"key":"b","text":"チェコスロヴァキアはユーゴスラヴィアと合併して1つの国家となった"},{"key":"c","text":"ドイツが統一され、ソ連が15の共和国に分かれ、チェコスロヴァキアも2国に分かれた"},{"key":"d","text":"ドイツが2つに分かれ、ソ連は単一の国家として存続することとなった"}]'::jsonb,
+   '"c"'::jsonb, '東ドイツが西ドイツに編入される形で統一が実現し（1990年）、ソ連はロシア・ウクライナ・バルト三国など15の共和国に分かれた。チェコスロヴァキアは話しあいでチェコとスロヴァキアに分離した（1993年）。ユーゴスラヴィアだけが流血をともなう解体となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('582d2ba9-a15e-358e-8151-d55026d45fb7', 'kc.detente.germany_and_ussr_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b4c23f29-53ed-368a-af3c-910f7945d774', NULL, 'mcq4', 'ユーゴスラヴィアが解体した要因として最も適切なものはどれか。', '[{"key":"a","text":"経済が急速に発展したため、各共和国が独立しても支障がなくなったこと"},{"key":"b","text":"単一の民族からなる国家であったため、地域ごとの対立が起きたこと"},{"key":"c","text":"ティトーの死と冷戦の終結で結合の要が失われ、共和国ごとの民族主義が噴出した"},{"key":"d","text":"外国の軍隊が侵攻して国土を分割したため、内部の要因は存在しなかった"}]'::jsonb,
+   '"c"'::jsonb, '多民族・多宗教のユーゴスラヴィアはティトーの指導力と非同盟という立場で結束していたが、その死（1980年）と冷戦の終結でこの要が失われた。1991年以降スロヴェニアやクロアティアが独立し、ボスニア=ヘルツェゴヴィナとコソヴォで民族浄化とよばれる惨事が起きた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b4c23f29-53ed-368a-af3c-910f7945d774', 'kc.detente.yugoslavia_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('36a5a46a-64e3-37d4-adf7-e16bbd0c5099', NULL, 'mcq4', 'ヨーロッパ統合の過程を古いものから順に並べたものはどれか。', '[{"key":"a","text":"欧州共同体 → 欧州連合 → 欧州石炭鉄鋼共同体 → 欧州経済共同体 → ユーロの流通"},{"key":"b","text":"欧州石炭鉄鋼共同体 → 欧州共同体 → 欧州経済共同体 → ユーロの流通 → 欧州連合"},{"key":"c","text":"欧州石炭鉄鋼共同体 → 欧州経済共同体 → 欧州共同体 → 欧州連合 → ユーロの流通"},{"key":"d","text":"欧州経済共同体 → 欧州石炭鉄鋼共同体 → 欧州連合 → 欧州共同体 → ユーロの流通"}]'::jsonb,
+   '"c"'::jsonb, 'シューマンの提案による欧州石炭鉄鋼共同体（1952年）が独仏の資源を共同管理して戦争の再発を防いだ。ローマ条約の欧州経済共同体（1958年）を経て欧州共同体（1967年）に統合され、マーストリヒト条約で欧州連合（1993年）となり、ユーロの現金流通（2002年）に至った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('36a5a46a-64e3-37d4-adf7-e16bbd0c5099', 'kc.global.eu_integration_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0906d013-c601-3c21-85be-d7dcfeada3e5', NULL, 'mcq4', '冷戦後の秩序が多極化した因果の説明として正しいものはどれか。', '[{"key":"a","text":"合衆国の力が一貫して高まり続けたため、単独支配の体制が固まったこと"},{"key":"b","text":"ソ連が復活して米ソの二極構造がそのまま維持されることになったこと"},{"key":"c","text":"国際連合が世界政府となったため、主権国家が消滅していったこと"},{"key":"d","text":"唯一の超大国となった合衆国の力が相対的に低下し、中国やインドが台頭した"}]'::jsonb,
+   '"d"'::jsonb, '冷戦の終結で合衆国が唯一の超大国となったが、イラク戦争の泥沼化とリーマン=ショック（2008年）で威信が揺らいだ。改革開放で成長した中国、インドやブラジルなどの新興国、統合を進める欧州連合が台頭し、国家の枠を超える多国籍企業や非政府組織も力をもつようになった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0906d013-c601-3c21-85be-d7dcfeada3e5', 'kc.global.multipolar', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d3cc7267-beb6-3e7b-9e16-097da8df1018', NULL, 'mcq4', '地域経済統合の枠組みについて正しいものはどれか。', '[{"key":"a","text":"地域統合はヨーロッパだけの現象であり、アジアや南米では見られない"},{"key":"b","text":"東南アジア諸国連合は冷戦の終結後に、軍事同盟として結成されたものである"},{"key":"c","text":"南米南部共同市場は北米の国だけが参加する枠組みとして作られている"},{"key":"d","text":"東南アジア諸国連合、アジア太平洋経済協力、南米南部共同市場などが作られた"}]'::jsonb,
+   '"d"'::jsonb, '東南アジア諸国連合（1967年）は当初は反共の色をもったが、のちに経済協力の枠組みへ転じ加盟国を広げた。アジア太平洋経済協力（1989年）、北米自由貿易協定（1994年）、南米南部共同市場（1995年）などが生まれ、世界貿易機関のもとで地域統合が重なりあう構図になった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d3cc7267-beb6-3e7b-9e16-097da8df1018', 'kc.global.regional_blocs_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('1b3ef7cc-a1a0-3035-b059-f170d73760e2', NULL, 'mcq4', '9・11以後の介入が生んだものについて正しいものはどれか。', '[{"key":"a","text":"アフガニスタンとイラクへの攻撃が長期の混乱を招き、過激派の拡散を止められなかった"},{"key":"b","text":"両国への攻撃によって速やかに安定が実現し、地域の紛争は終息していった"},{"key":"c","text":"合衆国は軍事的な介入を行わず、経済制裁だけで対応することを選んだ"},{"key":"d","text":"国際連合の決議に基づいてイラク戦争が行われ、各国が一致して支持した"}]'::jsonb,
+   '"a"'::jsonb, '同時多発テロ（2001年）を受けた合衆国はアフガニスタンを攻撃し、大量破壊兵器の保有を理由にイラク戦争（2003年）を起こしたが、その根拠は確認されなかった。フセイン政権崩壊後の混乱は宗派対立と過激派の拡大を招き、アラブの春の挫折とも重なって難民問題を深刻にした。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('1b3ef7cc-a1a0-3035-b059-f170d73760e2', 'kc.global.terror_and_intervention', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('99483154-acea-3a08-89c4-4d76edd07e87', NULL, 'mcq4', '人類共通の課題の広がりについて正しいものはどれか。', '[{"key":"a","text":"これらの課題はいずれも一国だけで解決できるため、国際的な枠組みは不要である"},{"key":"b","text":"環境問題への国際的な取り組みは、21世紀に入ってから初めて始まったものである"},{"key":"c","text":"人口の増加は先進国で著しく、発展途上国ではむしろ減少が続いている"},{"key":"d","text":"環境・人口・格差・感染症など国境を越える課題に、国際的な枠組みで取り組んでいる"}]'::jsonb,
+   '"d"'::jsonb, '国連人間環境会議（1972年）に始まり、地球サミット（1992年）、京都議定書（1997年）、パリ協定（2015年）と枠組みが積み重ねられた。人口爆発は発展途上国で著しく先進国は少子高齢化に向かう。南北問題に加えて途上国間の南南問題も生じ、持続可能な開発目標が掲げられている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('99483154-acea-3a08-89c4-4d76edd07e87', 'kc.global.common_issues', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e65182d4-bb38-3ecf-8a47-d944cddb804f', NULL, 'mcq4', 'ルター派とカルヴァン派の違いとして正しいものはどれか。', '[{"key":"a","text":"いずれも教皇の首位権を認めており、教義に違いは存在しなかった"},{"key":"b","text":"ルターは商工業者に、カルヴァンは領邦君主にだけ支持を広げていった"},{"key":"c","text":"ルターは信仰のみを説き、カルヴァンは予定説を説いて職業労働を肯定した"},{"key":"d","text":"カルヴァンが信仰のみを説き、ルターが予定説を唱えるという関係であった"}]'::jsonb,
+   '"c"'::jsonb, 'ルターは信仰のみ・聖書のみを掲げ、救いは信仰によると説いた。カルヴァンは救われる者があらかじめ定まっているという予定説を唱え、職業を神の召命とみて勤勉と蓄財を肯定した。この倫理が商工業者に受け入れられ、ジュネーヴから西欧各地へ広まった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e65182d4-bb38-3ecf-8a47-d944cddb804f', 'kc.reformation.luther_vs_calvin', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('f6bcda3b-6db5-38dc-bf71-3e87efd8b905', NULL, 'mcq4', '宗教改革が政治的に決着していく過程を古いものから順に並べたものはどれか。', '[{"key":"a","text":"ナントの王令 → ヴォルムス帝国議会 → アウクスブルクの和議 → ウェストファリア条約"},{"key":"b","text":"ヴォルムス帝国議会 → ナントの王令 → ウェストファリア条約 → アウクスブルクの和議"},{"key":"c","text":"ヴォルムス帝国議会 → アウクスブルクの和議 → ナントの王令 → ウェストファリア条約"},{"key":"d","text":"アウクスブルクの和議 → ヴォルムス帝国議会 → ウェストファリア条約 → ナントの王令"}]'::jsonb,
+   '"c"'::jsonb, 'ヴォルムス帝国議会（1521年）でルターが追放され、アウクスブルクの和議（1555年）で諸侯にカトリックかルター派かの選択権が認められた。フランスではナントの王令（1598年）がユグノーに信仰を認め、ウェストファリア条約（1648年）でカルヴァン派も公認された。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('f6bcda3b-6db5-38dc-bf71-3e87efd8b905', 'kc.reformation.settlement_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('9823f493-31d6-3a71-8f8e-85041bf674e3', NULL, 'mcq4', 'イギリス国教会の成立の特殊性として正しいものはどれか。', '[{"key":"a","text":"民衆の信仰運動から始まったため、国王はこれに一貫して反対していた"},{"key":"b","text":"教義を全面的にカルヴァン派へ改め、司教の制度も同時に廃止していった"},{"key":"c","text":"教皇の首位権を認めたまま、儀式だけを英語に改めたにとどまっている"},{"key":"d","text":"教義の対立ではなく国王の離婚問題から始まり、組織はカトリックに近く残った"}]'::jsonb,
+   '"d"'::jsonb, 'ヘンリ8世が離婚を認められず、首長法（1534年）で国王を教会の首長と定めたことが出発点である。エドワード6世の一般祈祷書、メアリ1世によるカトリック復帰をはさみ、エリザベス1世の統一法（1559年）で確立した。教義はプロテスタント寄り、司教制など組織はカトリック的という中間的性格をもつ。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('9823f493-31d6-3a71-8f8e-85041bf674e3', 'kc.reformation.anglican', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6a68340f-faaf-3d64-9678-cd53ebafb0c4', NULL, 'mcq4', '対抗宗教改革が生んだものとして正しいものはどれか。', '[{"key":"a","text":"宗教裁判と禁書目録は廃止され、信仰の自由が全面的に認められていった"},{"key":"b","text":"トリエント公会議で教皇の権威を再確認し、イエズス会が海外布教を担った"},{"key":"c","text":"トリエント公会議でプロテスタントの教義を全面的に受け入れることとなった"},{"key":"d","text":"教皇の権威が否定され、各国の教会が完全に独立していくこととなった"}]'::jsonb,
+   '"b"'::jsonb, 'トリエント公会議（1545〜63年）は教皇の首位権と従来の教義を確認し、聖職者の規律を正した。宗教裁判の強化と禁書目録が定められる一方、イグナティウス=ロヨラとザビエルらのイエズス会がアジアやアメリカで布教し、カトリック圏がヨーロッパの外へ広がった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6a68340f-faaf-3d64-9678-cd53ebafb0c4', 'kc.reformation.counter_reformation', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('32fd11b8-698c-3303-afda-699447237177', NULL, 'mcq4', '宗教戦争が主権国家を用意した因果の説明として正しいものはどれか。', '[{"key":"a","text":"諸侯の力が強まり、国王の権力はかえって弱められることとなった"},{"key":"b","text":"信仰では秩序を保てないと分かり、国家の利害を優先する政治が正当化された"},{"key":"c","text":"宗教戦争によって教皇の権威が高まり、各国がその指導に従うようになった"},{"key":"d","text":"戦争が短期間で終わったため、国家の統合が進まないまま推移した"}]'::jsonb,
+   '"b"'::jsonb, 'ユグノー戦争や三十年戦争は、宗教が一致しなくても国家は成り立つことを示した。アンリ4世やリシュリューは信仰よりも国家理性を優先し、カトリック国のフランスが三十年戦争でプロテスタント側に立った。ウェストファリア条約が主権国家体制を確定させる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('32fd11b8-698c-3303-afda-699447237177', 'kc.reformation.wars_to_state', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('060188c6-3d3e-344c-824c-13e3914da49c', NULL, 'mcq4', '16〜17世紀のヨーロッパの宗派の分布について正しいものはどれか。', '[{"key":"a","text":"イギリスはカトリック、スペインはカルヴァン派として定着していった"},{"key":"b","text":"北欧はルター派、オランダとスコットランドはカルヴァン派、南欧はカトリックが優勢となった"},{"key":"c","text":"北欧がカトリック、南欧がルター派、オランダがイスラームの地域となった"},{"key":"d","text":"ヨーロッパの全域がカルヴァン派となり、カトリックは完全に姿を消した"}]'::jsonb,
+   '"b"'::jsonb, 'ルター派は北ドイツと北欧、カルヴァン派はオランダ（ゴイセン）、スコットランド（プレスビテリアン）、フランス（ユグノー）、イングランド（ピューリタン）に広がった。イタリア・スペイン・フランス王権・南ドイツ・ポーランドはカトリックにとどまり、この分布が現在まで残っている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('060188c6-3d3e-344c-824c-13e3914da49c', 'kc.reformation.confession_map_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('28b93cc3-4e7d-3ff7-8586-96d8c6429371', NULL, 'mcq4', 'オリエントを統一した2つの帝国の版図について正しいものはどれか。', '[{"key":"a","text":"アッシリアとアケメネス朝がともにエジプトからイランまでを支配下に置いた"},{"key":"b","text":"アッシリアはエジプトに達せず、アケメネス朝はイランだけを支配していた"},{"key":"c","text":"いずれの帝国もメソポタミアの内部にとどまり、エジプトには及ばなかった"},{"key":"d","text":"アケメネス朝はギリシア本土まで併合し、アテネを直接に統治していった"}]'::jsonb,
+   '"a"'::jsonb, 'アッシリアは前7世紀にエジプトを含むオリエントを初めて統一したが、支配が過酷で短命に終わり4国に分裂した。アケメネス朝はダレイオス1世のときエーゲ海からインダス川に及び、サトラップと王の目・王の耳、王の道で統治した。ギリシア本土の征服にはペルシア戦争で失敗している。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('28b93cc3-4e7d-3ff7-8586-96d8c6429371', 'kc.orient.unification_extent_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('61785465-6967-3048-b48e-4cca1650ecdd', NULL, 'mcq4', '戦国七雄の位置について正しいものはどれか。', '[{"key":"a","text":"秦が西の関中、斉が東の山東、楚が南の長江流域に位置していた"},{"key":"b","text":"秦が東の山東に、斉が西の関中に、楚が北の草原地帯に位置していた"},{"key":"c","text":"七雄はいずれも黄河の下流域に集中しており、長江流域には及ばなかった"},{"key":"d","text":"燕が南方の広東に、趙が江南に位置し、北方には勢力がなかった"}]'::jsonb,
+   '"a"'::jsonb, '秦は西方の関中（渭水盆地）に拠って函谷関で守り、斉は東の山東半島、楚は南の長江中流域を占めた。韓・魏・趙は晋が分かれた中原の三国、燕は北方の現在の北京付近にあった。西の辺境にあった秦が有利な地形と商鞅の変法で力を蓄え、統一を果たした。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('61785465-6967-3048-b48e-4cca1650ecdd', 'kc.china.warring_states_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0e26860b-6c26-32f4-9370-2d8a9ba895ec', NULL, 'mcq4', 'フランク王国の分割について正しいものはどれか。', '[{"key":"a","text":"分割によってイギリスとスペインの原型が生まれることとなった"},{"key":"b","text":"分割は行われず、フランク王国はそのまま神聖ローマ帝国となった"},{"key":"c","text":"ヴェルダン条約とメルセン条約による分割が、のちの独・仏・伊の原型となった"},{"key":"d","text":"分割は1度だけ行われ、その境界は現在まで変わっていない"}]'::jsonb,
+   '"c"'::jsonb, 'ヴェルダン条約（843年）で東・中部・西フランクに分かれ、メルセン条約（870年）で中部フランクの北半分が東西に分けられた。東フランクがドイツ、西フランクがフランス、イタリア半島部が北イタリアの原型となった。中部を分けた境界が現在まで独仏の係争地となる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0e26860b-6c26-32f4-9370-2d8a9ba895ec', 'kc.euro.frankish_partition_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cc2f15e6-0be8-3bec-9805-fb20fd79cc2d', NULL, 'mcq4', '黒死病が広がった経路について正しいものはどれか。', '[{"key":"a","text":"感染は地中海沿岸だけにとどまり、アルプス以北には広がらなかった"},{"key":"b","text":"中央アジアから交易路と船で地中海に入り、数年で西欧・北欧まで達した"},{"key":"c","text":"西欧で発生し、そこから交易路をさかのぼって中央アジアへ広がった"},{"key":"d","text":"アフリカ大陸の内部で発生し、そこから直接に北欧へ伝わっていった"}]'::jsonb,
+   '"b"'::jsonb, 'モンゴル帝国が結んだ交易路を通って中央アジアからクリミアに達し、ジェノヴァの船でシチリアへ持ちこまれた（1347年）。イタリアからフランス・イングランド・北欧へ3〜4年で広がり、ヨーロッパの人口の3分の1前後が失われた。労働力の不足が農奴解放と荘園制の解体を早めた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cc2f15e6-0be8-3bec-9805-fb20fd79cc2d', 'kc.medcult.plague_route_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('21484325-dcb3-3b8b-b5d9-bb0641e9aefb', NULL, 'mcq4', '東南アジアの大陸部と諸島部の国家の性格の違いとして正しいものはどれか。', '[{"key":"a","text":"大陸部は稲作をもとにした農業国家、諸島部は交易を軸とする港市国家が多い"},{"key":"b","text":"大陸部が港市国家、諸島部が稲作をもとにした農業国家として発展した"},{"key":"c","text":"いずれの地域も遊牧を基盤としており、農業と交易は行われなかった"},{"key":"d","text":"大陸部と諸島部のいずれも中国の直接統治下に置かれ続けていた"}]'::jsonb,
+   '"a"'::jsonb, '大陸部のクメール（アンコール）、パガン、アユタヤ、大越は灌漑による稲作と人口を基盤とした農業国家である。諸島部のシュリーヴィジャヤ、マジャパヒト、マラッカは海上交通の要衝を押さえて交易で栄えた港市国家であった。地理的な条件が国家の性格を分けた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('21484325-dcb3-3b8b-b5d9-bb0641e9aefb', 'kc.sea.mainland_vs_island', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e067b122-129a-30dc-a85e-4b17afca5b2d', NULL, 'mcq4', 'ベトナムが中国から自立していく過程を古いものから順に並べたものはどれか。', '[{"key":"a","text":"徴姉妹の反乱 → 唐の安南都護府 → 前漢の支配 → 李朝の成立 → 黎朝の明軍撃退"},{"key":"b","text":"前漢の支配 → 唐の安南都護府 → 徴姉妹の反乱 → 黎朝の明軍撃退 → 李朝の成立"},{"key":"c","text":"前漢の支配 → 徴姉妹の反乱 → 唐の安南都護府 → 李朝の成立 → 黎朝の明軍撃退"},{"key":"d","text":"李朝の成立 → 前漢の支配 → 徴姉妹の反乱 → 黎朝の明軍撃退 → 唐の安南都護府"}]'::jsonb,
+   '"c"'::jsonb, '前漢の武帝が南越を滅ぼして郡県を置き（前111年）、徴姉妹の反乱（40年）は鎮圧された。唐は安南都護府を置いたが、その滅亡後に自立し、李朝（1009年）が大越として国号を定めた。明の永楽帝が一時併合すると黎利がこれを撃退し、黎朝を開いた（1428年）。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e067b122-129a-30dc-a85e-4b17afca5b2d', 'kc.sea.vietnam_independence', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('c859e201-d7ba-3e44-8b35-e4ac96ad7a6f', NULL, 'mcq4', '律令を受け入れた国とその受け入れ方の違いとして正しいものはどれか。', '[{"key":"a","text":"日本は科挙を採らず氏族の秩序を残し、新羅は骨品制を保ったまま制度を導入した"},{"key":"b","text":"日本と新羅はいずれも科挙を全面的に導入し、中国と同じ官僚制を築いた"},{"key":"c","text":"いずれの国も律令をそのまま用い、独自の修正はまったく加えなかった"},{"key":"d","text":"律令を受け入れたのは日本だけで、朝鮮半島には伝わっていない"}]'::jsonb,
+   '"a"'::jsonb, '唐の律令・漢字・儒教・仏教が東アジア文化圏の共通の要素となったが、受容の形は国ごとに違う。日本は律令制を導入しながら科挙を採らず、氏族的な貴族の秩序を残した。新羅も骨品制という身分制を保ったまま制度を用いた。渤海も同様に唐の制度を取り入れている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('c859e201-d7ba-3e44-8b35-e4ac96ad7a6f', 'kc.eastasia.ritsuryo_reception', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('38c88cc3-1b8b-3a74-8f99-07b83a0a6fd2', NULL, 'mcq4', '冊封体制が成り立った理由の説明として正しいものはどれか。', '[{"key":"a","text":"周辺国が中国に対して一方的に貢納を強いる仕組みであったため成立した"},{"key":"b","text":"中国と周辺国が対等な条約を結ぶ制度であったため、長く続くこととなった"},{"key":"c","text":"中国は権威を、周辺国は君主の正統性と交易の利益を得るという利害が一致した"},{"key":"d","text":"中国が軍事力で周辺国を征服し、直接統治する体制であったため成立した"}]'::jsonb,
+   '"c"'::jsonb, '周辺国の君主が朝貢して中国の皇帝から王号や官爵を受ける形をとる。中国は華夷秩序の中心という権威を、周辺国の君主は国内での正統性と、朝貢貿易による返礼品という実利を得た。双方に利があったため長く続いたが、対等な主権国家の関係ではない点が近代に問題となる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('38c88cc3-1b8b-3a74-8f99-07b83a0a6fd2', 'kc.eastasia.tributary_logic', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('c6275a34-bd9e-340a-b771-3a4fe478ca70', NULL, 'mcq4', '東アジア文化圏の広がりについて正しいものはどれか。', '[{"key":"a","text":"インドを中心とする文化圏であり、中国はその周縁に位置づけられる"},{"key":"b","text":"モンゴル高原の遊牧民が中心となり、そこから中国へ広がっていった"},{"key":"c","text":"広がりは中国の国内に限られ、周辺の諸国には及んでいなかった"},{"key":"d","text":"中国を中心に朝鮮・日本・ベトナムに及び、漢字と儒教と仏教が共有された"}]'::jsonb,
+   '"d"'::jsonb, '東アジア文化圏は漢字・儒教・律令・大乗仏教という4つの要素を共有する範囲を指し、中国・朝鮮半島・日本・ベトナムがこれに含まれる。ベトナムは東南アジアに位置しながら中国文化の影響が強く、インド文化圏の他の東南アジア諸国とは性格が異なる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('c6275a34-bd9e-340a-b771-3a4fe478ca70', 'kc.eastasia.sphere_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('549b65b7-b2b6-373d-adb8-3f72c8bbc8a7', NULL, 'mcq4', '遊牧国家が興亡した地域について正しいものはどれか。', '[{"key":"a","text":"モンゴル高原を中心とし、匈奴・鮮卑・柔然・突厥・ウイグルが交替した"},{"key":"b","text":"インダス川の流域を中心として、遊牧国家が次々に興亡していった"},{"key":"c","text":"遊牧国家は華北の農耕地帯にのみ成立し、草原地帯には存在しなかった"},{"key":"d","text":"チベット高原だけが遊牧国家の舞台であり、モンゴル高原には及ばない"}]'::jsonb,
+   '"a"'::jsonb, 'モンゴル高原の草原地帯では、匈奴（前3世紀〜）、鮮卑、柔然、突厥、ウイグル、契丹、モンゴルと支配勢力が交替した。南の農耕地帯とタリム盆地のオアシス都市を結ぶ位置にあり、交易路の支配が国家の富の源となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('549b65b7-b2b6-373d-adb8-3f72c8bbc8a7', 'kc.innerasia.steppe_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('861555a5-89be-3a70-a798-11897f610e78', NULL, 'mcq4', '遊牧国家が軍事的に強かった理由として正しいものはどれか。', '[{"key":"a","text":"日常の騎馬と狩猟がそのまま騎射の訓練となり、全成年男子が戦力となった"},{"key":"b","text":"常備の歩兵軍を大規模に編成し、これを農耕民から徴発していたため"},{"key":"c","text":"鉄製の武器を独占的に生産し、農耕地帯には流通させなかったため"},{"key":"d","text":"城壁で囲んだ都市に立てこもり、長期の籠城戦を得意としていたため"}]'::jsonb,
+   '"a"'::jsonb, '遊牧民は日常の移動と狩猟が騎射の訓練にあたり、成年男子がそのまま騎兵となった。機動力が高く補給も家畜に頼れるため長距離の遠征に強い。一方で人口は農耕地帯より少なく、統合には有力な指導者を要したので、王の死後に分裂しやすい弱さもあった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('861555a5-89be-3a70-a798-11897f610e78', 'kc.innerasia.nomad_military', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('1ea6307b-165a-3349-80fd-4527d831ad0b', NULL, 'mcq4', 'ユーラシアの東西を伝わったものの向きについて正しいものはどれか。', '[{"key":"a","text":"伝播はすべて西から東への一方向で、西へ伝わったものは存在しない"},{"key":"b","text":"西へは製紙法・火薬・羅針盤・絹が、東へは仏教・ガラス・葡萄などが伝わった"},{"key":"c","text":"西へは仏教とガラスが、東へは製紙法と火薬が伝わるという向きであった"},{"key":"d","text":"伝播はすべて東から西への一方向で、東へ伝わったものは存在しない"}]'::jsonb,
+   '"b"'::jsonb, '中国からは絹・製紙法・火薬・羅針盤・活版印刷が西へ伝わり、ヨーロッパの社会を大きく変えた。逆に西方からは仏教（インド経由）、ガラス製品、葡萄やゴマなどの作物、ゾロアスター教やネストリウス派キリスト教が東へ伝わった。双方向の交流であった点が重要である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('1ea6307b-165a-3349-80fd-4527d831ad0b', 'kc.trade.two_directions', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('46f7666d-c009-3bfd-8aed-af2b9f288ba2', NULL, 'mcq4', '製紙法が西へ伝わった経緯として正しいものはどれか。', '[{"key":"a","text":"モンゴルの西征のときに初めて伝わり、それ以前は西方に知られていなかった"},{"key":"b","text":"大航海時代にヨーロッパ人が中国から直接に持ち帰ったものである"},{"key":"c","text":"ローマ帝国の時代にすでに伝わっており、羊皮紙より先に普及していた"},{"key":"d","text":"タラス河畔の戦いで唐の捕虜からイスラーム世界へ伝わり、のちヨーロッパへ及んだ"}]'::jsonb,
+   '"d"'::jsonb, 'タラス河畔の戦い（751年）でアッバース朝が唐に勝ち、捕虜のなかの紙漉き工から製紙法が伝わったとされる。サマルカンドやバグダードに製紙工場ができ、12世紀ごろイベリア半島やシチリアを経てヨーロッパへ広まった。高価な羊皮紙にかわり、のちの活版印刷の前提となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('46f7666d-c009-3bfd-8aed-af2b9f288ba2', 'kc.trade.paper_westward', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('7b598c25-4982-343b-9b6f-5bd8d15aa4ca', NULL, 'mcq4', 'ビザンツ帝国が1000年続いた要因として最も適切なものはどれか。', '[{"key":"a","text":"西ヨーロッパの封建制をいち早く導入し、諸侯の力に依存したためである"},{"key":"b","text":"イスラーム勢力と同盟を結び、その保護のもとに置かれ続けたためである"},{"key":"c","text":"コンスタンティノープルの地の利と貨幣経済・官僚制、そしてギリシア正教の結束"},{"key":"d","text":"周囲に敵がまったく存在せず、対外戦争を経験しなかったためである"}]'::jsonb,
+   '"c"'::jsonb, '三方を海に囲まれたコンスタンティノープルは難攻不落で、東西交易の富が集まった。ローマ以来の官僚制と貨幣経済が続き、ギリシア正教と皇帝教皇主義が社会をまとめた。ユスティニアヌス帝の一時的な地中海回復のあとも縮小しつつ存続し、1453年にオスマン帝国に滅ぼされた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('7b598c25-4982-343b-9b6f-5bd8d15aa4ca', 'kc.euro.byzantine_longevity', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('f4744f70-8d58-341f-84f6-03b701e30ecf', NULL, 'mcq4', 'ロシアが自立するまでの過程を古いものから順に並べたものはどれか。', '[{"key":"a","text":"キエフ公国 → ノヴゴロド国 → モスクワ大公国の自立 → モンゴルの支配"},{"key":"b","text":"モンゴルの支配 → ノヴゴロド国 → キエフ公国 → モスクワ大公国の自立"},{"key":"c","text":"ノヴゴロド国 → モンゴルの支配 → キエフ公国 → モスクワ大公国の自立"},{"key":"d","text":"ノヴゴロド国 → キエフ公国 → モンゴルの支配 → モスクワ大公国の自立"}]'::jsonb,
+   '"d"'::jsonb, 'ノルマン人のリューリクが建てたノヴゴロド国（862年ごろ）に続き、キエフ公国が成立してウラディミル1世がギリシア正教を受け入れた。バトゥの遠征後キプチャク=ハン国の支配（タタールのくびき）が約240年続き、イヴァン3世がこれを脱してモスクワ大公国が自立した（1480年）。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('f4744f70-8d58-341f-84f6-03b701e30ecf', 'kc.euro.russia_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('330de794-c5e8-3251-b0e7-6cf98130a9cf', NULL, 'mcq4', '修道院と司教座教会の役割の違いとして正しいものはどれか。', '[{"key":"a","text":"修道院が都市で信徒の司牧を担い、司教座教会が開墾と写本を担っていた"},{"key":"b","text":"いずれも同じ役割を果たしており、組織のうえでも区別はなかった"},{"key":"c","text":"修道院は世俗の領主が運営する施設で、宗教とは無関係の組織であった"},{"key":"d","text":"修道院は祈りと労働・写本と開墾を担い、司教座教会は都市で信徒の司牧を担った"}]'::jsonb,
+   '"d"'::jsonb, 'ベネディクトゥスが定めた戒律の祈り働けに従い、修道院は写本による古典の保存と、森林の開墾など大規模な農業経営を担った。司教座教会は都市に置かれ、司教が周辺の教区を統括して信徒の司牧と教育を担った。のちにシトー修道会が大開墾運動を、托鉢修道会が都市の布教を担う。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('330de794-c5e8-3251-b0e7-6cf98130a9cf', 'kc.euro.monastery_vs_church', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cdc5467d-aadc-3e4a-ace9-b6332fc8bbae', NULL, 'mcq4', '教会が世俗の権力をもつに至った因果の説明として正しいものはどれか。', '[{"key":"a","text":"教会が国王に任命されたため、その代理として権力を行使していた"},{"key":"b","text":"教会が交易を独占していたため、経済力だけで権力を得ることができた"},{"key":"c","text":"寄進で広大な所領を得て封建領主となり、破門という制裁で君主を従えた"},{"key":"d","text":"教会は所領をもたず、もっぱら軍事力によって君主を従えていた"}]'::jsonb,
+   '"c"'::jsonb, '信徒や君主からの寄進で教会と修道院は広大な所領をもち、十分の一税を徴収して封建領主となった。加えて秘跡を停止する破門と聖務禁止という制裁は、キリスト教社会において君主の正統性を直接に脅かした。カノッサの屈辱（1077年）とインノケンティウス3世の時代がその頂点である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cdc5467d-aadc-3e4a-ace9-b6332fc8bbae', 'kc.euro.church_power', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('1843bb8f-c3d7-3a86-a3db-9fb04e334e51', NULL, 'mcq4', '年代の表し方の違いについて正しいものはどれか。', '[{"key":"a","text":"世紀は50年をひと区切りとする単位で、西暦とは無関係の数え方である"},{"key":"b","text":"元号は西暦を漢字に置きかえたもので、区切り方に違いはない"},{"key":"c","text":"西暦は通年、世紀は100年の区切り、元号は君主や治世を単位とする数え方である"},{"key":"d","text":"西暦と世紀は同じ数え方で、元号だけが100年ごとの区切りを表している"}]'::jsonb,
+   '"c"'::jsonb, '西暦は連続する通年で、世紀は100年をひと区切りとする（1801〜1900年が19世紀）。元号は君主の治世などを単位とし、日本では明治以降1代1元となった。イスラーム暦は太陰暦なので西暦とずれが生じる。資料の年代表記がどの体系かを見きわめないと、比較そのものが成り立たない。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('1843bb8f-c3d7-3a86-a3db-9fb04e334e51', 'kc.ghsource.chronology_tools', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ade70f2e-8b93-39c0-8abc-3d1b49243b8c', NULL, 'mcq4', '統計資料を読むときの落とし穴として正しいものはどれか。', '[{"key":"a","text":"統計に現れない事象は存在しなかったとみなしてよい"},{"key":"b","text":"定義や範囲、集計の主体が変われば数字は比較できなくなる"},{"key":"c","text":"統計は数字であるから、出典を確かめなくても比較して差しつかえない"},{"key":"d","text":"グラフの縦軸の目盛りをどう取っても、読み手の印象は変わらない"}]'::jsonb,
+   '"b"'::jsonb, '同じ人口でも、領土の範囲や植民地を含むかどうか、誰が何のために集計したかで数字は変わる。縦軸の起点をずらせば同じ数字が急増にも横ばいにも見える。さらに、記録されなかったもの（無戸籍の人、非公式の取引）は統計に現れない。出典と定義の確認が最初の作業になる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ade70f2e-8b93-39c0-8abc-3d1b49243b8c', 'kc.ghsource.statistics_reading', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('41f634f1-bded-32c5-9378-500ebb6d079a', NULL, 'mcq4', '地図が主張を含むということの説明として正しいものはどれか。', '[{"key":"a","text":"地名の表記は国によって異なるが、地図の内容には影響を与えない"},{"key":"b","text":"図法の違いは面積の見え方を変えるだけで、主張とは無関係である"},{"key":"c","text":"図法・中心の置き方・地名の表記の選択そのものが、作り手の立場を反映する"},{"key":"d","text":"地図は測量に基づくので、どの地図も同じ事実を中立に示している"}]'::jsonb,
+   '"c"'::jsonb, 'メルカトル図法は高緯度の面積を大きく見せ、ペータース図法は面積を保つかわりに形をゆがめる。自国を中心に置く配置、係争地の帰属の描き方、地名を日本海と呼ぶか東海と呼ぶかといった選択は、いずれも作り手の立場を含む。地図も読み解くべき史料である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('41f634f1-bded-32c5-9378-500ebb6d079a', 'kc.ghsource.map_as_argument', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cbc449c2-9f9f-353a-8b2b-719aac966471', NULL, 'mcq4', '同じ出来事が立場によって違って見えることの説明として正しいものはどれか。', '[{"key":"a","text":"公文書は中立であるから、私的な記録を参照する必要はない"},{"key":"b","text":"当事者の証言はつねに正確なので、他の史料と照合する必要はない"},{"key":"c","text":"記録を残す立場が偏るため、複数の史料を突きあわせる必要が生じる"},{"key":"d","text":"史料が食い違うときは、より新しい史料を採ればつねに正しくなる"}]'::jsonb,
+   '"c"'::jsonb, '同じ戦争でも侵略・進出・解放と呼び方が変わり、記録を残せるのは文字と権力をもつ側に偏る。当事者の証言は生々しいが記憶違いや利害が入り、公文書も作成の目的をもつ。時期・作者・目的の異なる複数の史料を突きあわせ、なぜ食い違うのかを問うことが歴史の方法である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cbc449c2-9f9f-353a-8b2b-719aac966471', 'kc.ghsource.multiple_perspectives', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('73f5af12-07d7-3545-8717-08a016da0dc7', NULL, 'mcq4', '18世紀のアジアの3帝国の状態について正しいものはどれか。', '[{"key":"a","text":"3帝国ともすでに滅亡しており、18世紀には存在していなかった"},{"key":"b","text":"清だけが衰退し、ムガル帝国とオスマン帝国は最盛期をむかえていた"},{"key":"c","text":"清は最盛期、ムガル帝国は分裂へ向かい、オスマン帝国は領土を失い始めていた"},{"key":"d","text":"3帝国とも18世紀に最盛期をむかえ、いずれも領土を拡大し続けていた"}]'::jsonb,
+   '"c"'::jsonb, '清は康熙・雍正・乾隆の時代に最大版図を実現し、人口も急増した。ムガル帝国はアウラングゼーブの死（1707年）後に地方勢力が自立して分裂へ向かった。オスマン帝国は第2次ウィーン包囲の失敗（1683年）とカルロヴィッツ条約で後退を始めた。同じ18世紀でも状態は異なる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('73f5af12-07d7-3545-8717-08a016da0dc7', 'kc.asia18.three_empires_prosperity', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('9f1b0a54-c6e2-3c3e-afd9-82351ee0661b', NULL, 'mcq4', '18世紀の銀と物産の流れについて正しいものはどれか。', '[{"key":"a","text":"銀の流れは大西洋の内部で完結しており、アジアには及ばなかった"},{"key":"b","text":"アメリカ大陸の銀はすべてスペイン国内にとどまり、外へは出なかった"},{"key":"c","text":"アメリカ大陸の銀がヨーロッパと太平洋を経て中国へ流れ、茶や絹が逆に流れ出た"},{"key":"d","text":"中国の銀がヨーロッパへ流れ、その見返りに毛織物が中国へ流れこんでいた"}]'::jsonb,
+   '"c"'::jsonb, 'ポトシなどの銀はスペイン経由でヨーロッパへ、またアカプルコとマニラを結ぶガレオン貿易で太平洋を渡り、大量に中国へ吸収された。中国は銀で税を納める体制（一条鞭法・地丁銀）にあり銀を求め、茶・絹・陶磁器を輸出した。世界の一体化を銀の動きで捉える見方である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('9f1b0a54-c6e2-3c3e-afd9-82351ee0661b', 'kc.asia18.silver_flow_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('70a225fc-6693-3988-8690-8edecf3bee82', NULL, 'mcq4', '江戸幕府の対外関係の実態について正しいものはどれか。', '[{"key":"a","text":"国外との関係を完全に断ち、いかなる交易も行われていなかった"},{"key":"b","text":"ヨーロッパのすべての国との交易が、幕末まで自由に認められていた"},{"key":"c","text":"交易の窓口は長崎だけで、朝鮮や琉球との関係は存在しなかった"},{"key":"d","text":"長崎・対馬・薩摩・松前の4つの窓口を通じて、対外関係は継続していた"}]'::jsonb,
+   '"d"'::jsonb, 'いわゆる鎖国は、幕府が対外関係を独占的に管理する体制を指す。長崎でオランダと中国、対馬藩を介して朝鮮、薩摩藩を介して琉球、松前藩を介してアイヌと関係が続いた。4つの口とよばれるこの構造を押さえると、幕末の開国が絶対的な断絶ではないことが分かる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('70a225fc-6693-3988-8690-8edecf3bee82', 'kc.asia18.edo_isolation', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e5fbf7b1-a8c9-3720-afc0-65ae1a096431', NULL, 'mcq4', '18世紀にアジア域内の交易が活発だった要因として最も適切なものはどれか。', '[{"key":"a","text":"各国が貨幣を使わず物々交換に徹していたため、交易が容易だったため"},{"key":"b","text":"人口増加と都市化が需要を生み、各地の特産と銀の流入が交換を支えた"},{"key":"c","text":"ヨーロッパ諸国がアジア域内の交易を全面的に管理していたため"},{"key":"d","text":"アジア各国が同じ産物を作っていたため、交換の必要が大きかったため"}]'::jsonb,
+   '"b"'::jsonb, '清やインド、日本、東南アジアで人口が増え都市が発展して需要が生まれた。米・砂糖・木綿・陶磁器・海産物などの特産が地域ごとに異なり、銀が決済手段として行き渡っていたため交換が成り立った。ヨーロッパ勢力はこの域内交易に参入した側であって、支配していたわけではない。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e5fbf7b1-a8c9-3720-afc0-65ae1a096431', 'kc.asia18.asian_trade_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('04eb21d6-785c-3fab-a604-99c539e3b98c', NULL, 'mcq4', '18世紀の繁栄が19世紀の危機に転じた因果の説明として正しいものはどれか。', '[{"key":"a","text":"人口が急減したため労働力が不足し、そこへ列強の圧力が加わったこと"},{"key":"b","text":"繁栄がそのまま続いたため、列強の進出は問題にならなかったこと"},{"key":"c","text":"列強の圧力だけが原因で、アジア諸国の内部に問題は存在しなかったこと"},{"key":"d","text":"人口増加が土地を圧迫し、財政難と社会不安が広がるところへ列強の圧力が加わった"}]'::jsonb,
+   '"d"'::jsonb, '清では人口が18世紀に3億を超えて耕地が不足し、白蓮教徒の乱（1796年）など社会不安が現れた。財政の悪化と官僚の腐敗も進んだ。そこへ産業革命を終えた列強が市場を求めて到来したため、内部の危機と外部の圧力が重なった。外圧だけでも内因だけでもない点が重要である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('04eb21d6-785c-3fab-a604-99c539e3b98c', 'kc.asia18.prosperity_to_crisis', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('bb0a857f-19a3-3a5e-a2fa-bfd68d656f5c', NULL, 'mcq4', '大西洋の奴隷貿易の規模と経路について正しいものはどれか。', '[{"key":"a","text":"奴隷貿易は東アフリカからヨーロッパへ向かう経路だけで行われていた"},{"key":"b","text":"送られた人数は数万人程度で、社会への影響はほとんどなかった"},{"key":"c","text":"奴隷貿易はアメリカ大陸の内部だけで完結しており、大西洋を越えなかった"},{"key":"d","text":"約400年で1000万人を超える人々が西アフリカからアメリカ大陸へ送られた"}]'::jsonb,
+   '"d"'::jsonb, '16世紀から19世紀にかけて、西アフリカのギニア湾岸などから1000万人を超える人々が大西洋を越えて運ばれた。ヨーロッパから武器や綿織物をアフリカへ、アフリカから奴隷をアメリカへ、アメリカから砂糖・綿花・タバコをヨーロッパへ、という三角貿易の一辺をなした。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('bb0a857f-19a3-3a5e-a2fa-bfd68d656f5c', 'kc.triangle.slave_trade_scale', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('1feb9404-d0dd-3bfa-8ae4-69b635ca6860', NULL, 'mcq4', 'プランテーションの成り立ちの説明として正しいものはどれか。', '[{"key":"a","text":"大農園は自給用の作物を作る農場で、輸出向けの単一栽培は行われなかった"},{"key":"b","text":"先住民の人口が激減したため、アフリカからの奴隷労働に頼る大農園が広がった"},{"key":"c","text":"先住民の人口が増えたため、その労働力によって大農園が成り立っていた"},{"key":"d","text":"ヨーロッパからの移民が自ら耕作し、奴隷労働は用いられていなかった"}]'::jsonb,
+   '"b"'::jsonb, '征服と持ちこまれた疫病で先住民の人口が激減し、労働力が不足した。カリブ海やブラジルでは砂糖、のちに合衆国南部では綿花を単一栽培する大農園が作られ、アフリカからの奴隷が労働力とされた。輸出向けの単一栽培という構造が、独立後まで経済の偏りとして残る。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('1feb9404-d0dd-3bfa-8ae4-69b635ca6860', 'kc.triangle.plantation_system', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('db50837b-bf55-359f-ad9e-b7c18a8858c9', NULL, 'mcq4', '奴隷貿易がアフリカに与えた影響として正しいものはどれか。', '[{"key":"a","text":"アフリカの内部にはまったく影響が及ばず、沿岸だけの現象にとどまった"},{"key":"b","text":"アフリカ側の勢力は関与しておらず、すべてヨーロッパ人が直接に捕えた"},{"key":"c","text":"若い働き手が失われて人口構成がゆがみ、武器の流入で内陸の抗争が激化した"},{"key":"d","text":"奴隷貿易によってアフリカの人口が増え、社会は安定へ向かっていった"}]'::jsonb,
+   '"c"'::jsonb, '連れ去られたのは労働力となる若い世代が中心で、人口の構成そのものがゆがんだ。銃と交換されたことで沿岸の王国が内陸へ襲撃を繰り返し、抗争が激化した。捕獲の実務はアフリカ側の勢力が担った例も多く、そのことが地域の政治構造を長く歪めることになった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('db50837b-bf55-359f-ad9e-b7c18a8858c9', 'kc.triangle.africa_impact', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('35c97947-5b93-30df-b982-1ab2cd4f7aaf', NULL, 'mcq4', '奴隷貿易と奴隷制の廃止を古いものから順に並べたものはどれか。', '[{"key":"a","text":"合衆国の奴隷解放宣言 → イギリスの奴隷貿易廃止 → イギリスの奴隷制廃止 → ブラジルの奴隷制廃止"},{"key":"b","text":"ブラジルの奴隷制廃止 → 合衆国の奴隷解放宣言 → イギリスの奴隷制廃止 → イギリスの奴隷貿易廃止"},{"key":"c","text":"イギリスの奴隷貿易廃止 → イギリスの奴隷制廃止 → 合衆国の奴隷解放宣言 → ブラジルの奴隷制廃止"},{"key":"d","text":"イギリスの奴隷制廃止 → イギリスの奴隷貿易廃止 → ブラジルの奴隷制廃止 → 合衆国の奴隷解放宣言"}]'::jsonb,
+   '"c"'::jsonb, 'イギリスは奴隷貿易を1807年に、植民地の奴隷制を1833年に廃止した。合衆国はリンカンの奴隷解放宣言（1863年）と憲法修正で廃止し、ブラジルは1888年と最後になった。貿易の禁止と制度の廃止は別の段階であり、前者が先に来る点をおさえる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('35c97947-5b93-30df-b982-1ab2cd4f7aaf', 'kc.triangle.abolition_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0ee19e1f-caee-34ae-9e04-6c2ff5629f71', NULL, 'mcq4', '三角貿易の利益が産業革命を支えた因果の説明として正しいものはどれか。', '[{"key":"a","text":"リヴァプールなどに集まった利益が資本となり、綿工業の原料と市場も同時に用意された"},{"key":"b","text":"三角貿易の利益はすべて浪費され、産業への投資には回らなかった"},{"key":"c","text":"産業革命の資本はすべて国家が用意し、貿易の利益とは無関係であった"},{"key":"d","text":"三角貿易で扱われたのは工業製品だけで、原料の供給には関わらなかった"}]'::jsonb,
+   '"a"'::jsonb, 'リヴァプールやブリストルの商人が得た利益が銀行や工場への投資に回った。加えてアメリカの奴隷制プランテーションが原綿を供給し、アフリカと西インド諸島が綿製品の市場となった。資本・原料・市場の3つを同時に用意したという意味で、産業革命と分かちがたく結びついている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0ee19e1f-caee-34ae-9e04-6c2ff5629f71', 'kc.triangle.capital_to_industry', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('db4ef3d5-34a0-3ae7-91ac-c30f899d1e71', NULL, 'mcq4', '工場労働が生活を変えた因果の説明として正しいものはどれか。', '[{"key":"a","text":"時計に従う規律ある労働が持ちこまれ、仕事と生活の場が切り離された"},{"key":"b","text":"日の出から日没までという農村の時間感覚が、そのまま工場に持ちこまれた"},{"key":"c","text":"労働時間は各自の裁量にゆだねられ、規律は求められていなかった"},{"key":"d","text":"仕事と生活の場が同じ建物に統合され、通勤という概念が消滅した"}]'::jsonb,
+   '"a"'::jsonb, '農村では季節と日照が仕事の区切りだったが、工場は機械の稼働に合わせた定時の始業と終業を求めた。遅刻に罰金を科すなど時間の規律が持ちこまれ、家内工業では一体だった仕事場と住まいが分離した。通勤・週休・余暇という近代的な生活の区分がここから生まれる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('db4ef3d5-34a0-3ae7-91ac-c30f899d1e71', 'kc.indsoc.work_and_time', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b821e56b-733c-3981-ba88-3d7fcefb5bbb', NULL, 'mcq4', '19世紀の都市化が生んだ問題として正しいものはどれか。', '[{"key":"a","text":"過密な住宅と上下水道の不備からコレラなどが流行し、公衆衛生の課題が生じた"},{"key":"b","text":"都市の人口が減少したため、住宅が余って荒廃する問題が生じた"},{"key":"c","text":"都市の衛生状態はきわめて良好で、感染症の流行は起こらなかった"},{"key":"d","text":"都市問題は20世紀に入ってから初めて生じ、19世紀には見られなかった"}]'::jsonb,
+   '"a"'::jsonb, '工業都市に人口が集中し、労働者は日光も換気もない過密な住宅に住んだ。上下水道が整わず、コレラや結核が繰り返し流行した。イギリスでは公衆衛生法（1848年）が制定され、都市計画と衛生行政という新しい行政分野が生まれた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b821e56b-733c-3981-ba88-3d7fcefb5bbb', 'kc.indsoc.urban_problems', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('74d73d03-0df3-3833-a59c-db436fa79104', NULL, 'mcq4', '性別役割分業が形をとった因果の説明として正しいものはどれか。', '[{"key":"a","text":"女性が工場労働から完全に排除されたため、この分業が成立していった"},{"key":"b","text":"家内工業の時代からこの分業は存在し、産業革命は影響を与えなかった"},{"key":"c","text":"中間層より先に労働者の家庭で成立し、中間層へ広がっていった"},{"key":"d","text":"仕事場と家庭が分離し、男性が賃金を稼ぎ女性が家庭を担うという規範が広がった"}]'::jsonb,
+   '"d"'::jsonb, '家内工業では家族全員が同じ場で働いていたが、工場制になって仕事場と家庭が分かれた。まず中間層で、男性が外で稼ぎ女性が家庭を守るという規範が理想とされ、のちに労働者層へ広がった。実際には低賃金の女性労働と児童労働が広く用いられており、規範と実態にはずれがあった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('74d73d03-0df3-3833-a59c-db436fa79104', 'kc.indsoc.family_and_gender', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('91efb59a-96f3-3f63-aa6e-dc089e0589d2', NULL, 'mcq4', '産業革命が各国へ広がった順序と地域について正しいものはどれか。', '[{"key":"a","text":"フランスに始まり、そこからイギリスとドイツへ広がっていった"},{"key":"b","text":"アメリカに始まり、遅れてイギリスとヨーロッパ大陸へ広がっていった"},{"key":"c","text":"イギリス以外の国では産業革命は起こらず、工業化は20世紀まで進まなかった"},{"key":"d","text":"イギリスに始まり、ベルギー・フランス・ドイツ・アメリカ、続いて日本とロシアへ及んだ"}]'::jsonb,
+   '"d"'::jsonb, '18世紀後半のイギリスに始まり、19世紀前半にベルギーとフランス、19世紀半ばからドイツとアメリカ、19世紀後半に日本とロシアへ広がった。後発国ほど国家が主導し、鉄道や重工業から始める傾向が強い。この時期の差が19世紀末の国際的な力関係を規定した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('91efb59a-96f3-3f63-aa6e-dc089e0589d2', 'kc.indsoc.spread_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('3ee5ad1a-bddb-3e30-b811-24c30f7d33fe', NULL, 'mcq4', '労働運動と社会政策の対応について正しいものはどれか。', '[{"key":"a","text":"労働組合は各国で最後まで非合法とされ、20世紀まで公認されなかった"},{"key":"b","text":"労働者の団結と要求に対し、工場法や社会保険といった政策が応じる形で進んだ"},{"key":"c","text":"社会政策がまず整えられたため、労働運動は起こる必要がなかった"},{"key":"d","text":"労働運動はすべて弾圧され、政策として応じられることはなかった"}]'::jsonb,
+   '"b"'::jsonb, 'イギリスでは団結禁止法の廃止（1824年）と工場法（1833年）が続き、ドイツではビスマルクが社会主義者鎮圧法と同時に疾病・災害・養老の社会保険を整えた（アメとムチ）。運動が要求を突きつけ、国家が制度で応じるという往復のなかで労働者の権利が形になった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('3ee5ad1a-bddb-3e30-b811-24c30f7d33fe', 'kc.indsoc.labour_movement', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('54c4c615-7ec7-36ae-a229-05035f9b4412', NULL, 'mcq4', '国民国家という枠組みの新しさについて正しいものはどれか。', '[{"key":"a","text":"領域を定めない点が新しく、国境という考え方をもたない枠組みである"},{"key":"b","text":"宗教の一致を成員の条件とする点が、それ以前の国家と異なっている"},{"key":"c","text":"身分ではなく国民という同質の成員を想定し、その主権に統治の根拠を置く点"},{"key":"d","text":"君主の血統に統治の根拠を置く点で、それ以前の王国と共通している"}]'::jsonb,
+   '"c"'::jsonb, 'それ以前の国家は君主と諸身分の結びつきの集まりで、住民は臣民であった。国民国家は身分を廃し、共通の言語・歴史・法のもとに等質な国民を想定し、その主権に統治の正統性を置く。想像の共同体とよばれるように、国民は自然にあるものではなく作られるものである。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('54c4c615-7ec7-36ae-a229-05035f9b4412', 'kc.nationstate.what_is_nation', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('7ea14811-74b2-3e33-aa5c-0bb3d84fa0b5', NULL, 'mcq4', '国民を作る仕組みとして正しいものはどれか。', '[{"key":"a","text":"義務教育・徴兵制・国語の統一・国旗と国歌・鉄道と新聞が国民意識を育てた"},{"key":"b","text":"国民意識は自然に生まれるもので、国家が関与する仕組みは存在しなかった"},{"key":"c","text":"国民を作る仕組みは20世紀に入ってから初めて登場したものである"},{"key":"d","text":"方言を保護し地域ごとの独自性を強めることが、国民の形成を促した"}]'::jsonb,
+   '"a"'::jsonb, '義務教育が国語と自国史を教え、徴兵制が各地の若者を同じ隊列に並べ、国旗・国歌・記念日が帰属意識を可視化した。鉄道と新聞が時間と情報を全国で共通にし、標準語の普及が方言を後退させた。フランスの第三共和政や明治日本がその典型である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('7ea14811-74b2-3e33-aa5c-0bb3d84fa0b5', 'kc.nationstate.making_citizens', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('bac646a6-6755-3a7c-9e88-353d3496e551', NULL, 'mcq4', '参政権の拡大を古いものから順に並べたものはどれか。', '[{"key":"a","text":"男性普通選挙の広がり → 女性参政権 → イギリス第1回選挙法改正"},{"key":"b","text":"イギリス第1回選挙法改正 → 女性参政権 → 男性普通選挙の広がり"},{"key":"c","text":"イギリス第1回選挙法改正 → 男性普通選挙の広がり → 第一次世界大戦後の女性参政権"},{"key":"d","text":"女性参政権 → イギリス第1回選挙法改正 → 男性普通選挙の広がり"}]'::jsonb,
+   '"c"'::jsonb, '財産による制限を少しずつ緩める形で進んだ。イギリスの第1回選挙法改正（1832年）は産業資本家に、以後の改正が都市労働者と農業労働者に及び、男性普通選挙が19世紀末から20世紀初頭に広がった。女性参政権は総力戦への貢献を経て第一次世界大戦後に各国で実現する。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('bac646a6-6755-3a7c-9e88-353d3496e551', 'kc.nationstate.suffrage_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b09a801d-43a5-3dd8-b2ab-bcdba0473e89', NULL, 'mcq4', 'ナショナリズムの2つの顔について正しいものはどれか。', '[{"key":"a","text":"排除と膨張だけをもたらす思想で、解放に働いた例は存在しない"},{"key":"b","text":"19世紀には解放にのみ働き、20世紀には排除にのみ働いたと区別できる"},{"key":"c","text":"抑圧からの解放を導く一方、少数者の排除と対外膨張にも結びつく"},{"key":"d","text":"解放を導く働きだけをもち、排除や膨張とは無関係の思想である"}]'::jsonb,
+   '"c"'::jsonb, 'イタリアやドイツの統一、東欧諸民族やアジア諸国の独立ではナショナリズムが解放の力として働いた。同じ論理が、国内の少数民族を同化・排除し、他民族の支配を正当化する側にも働く。帝国主義とファシズムはその延長にある。同じ時期に両面が現れる点が重要である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b09a801d-43a5-3dd8-b2ab-bcdba0473e89', 'kc.nationstate.nationalism_two_faces', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('45529dfc-8962-3326-95c3-829f335b6802', NULL, 'mcq4', '日本の国民国家化の特徴として正しいものはどれか。', '[{"key":"a","text":"数百年をかけて緩やかに進み、外国からの圧力とは無関係であった点"},{"key":"b","text":"身分制を維持したまま進められ、四民平等は実現しなかった点"},{"key":"c","text":"外圧への対応として上から急速に進められ、天皇を統合の軸に据えた点"},{"key":"d","text":"市民革命によって下から進められ、君主は象徴的な存在にとどまった点"}]'::jsonb,
+   '"c"'::jsonb, '欧米の圧力に対抗する必要から、明治政府が版籍奉還・廃藩置県・四民平等・徴兵令・学制・地租改正を10年ほどで実施した。市民革命を経ずに上から進められたため、天皇を統合の軸に据え、教育勅語で臣民の道徳を定めた。速さと上からの性格が特徴である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('45529dfc-8962-3326-95c3-829f335b6802', 'kc.nationstate.japan_comparison', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('8159124b-3f7c-3a97-adbc-b33620a2451b', NULL, 'mcq4', '日本が開国した要因として最も適切なものはどれか。', '[{"key":"a","text":"捕鯨と対中貿易の寄港地を求める合衆国の圧力に、アヘン戦争の情報が重なった"},{"key":"b","text":"幕府が自ら通商の利益を求め、諸外国に開国を働きかけたためである"},{"key":"c","text":"ロシアが軍事的に侵攻して江戸を占領し、開国を強制したためである"},{"key":"d","text":"国内の飢饉を救うため、食糧の輸入を目的として開国したためである"}]'::jsonb,
+   '"a"'::jsonb, '太平洋の捕鯨と対中貿易のため、合衆国は薪水と石炭を補給する寄港地を必要としていた。ペリーが軍艦を率いて来航（1853年）し、幕府はアヘン戦争での清の敗北を知っていたため武力衝突を避けた。翌年の日米和親条約で下田と箱館を開いた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('8159124b-3f7c-3a97-adbc-b33620a2451b', 'kc.bakumatsu.opening_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('60b49538-320f-31ea-8f5a-508053487298', NULL, 'mcq4', '日米和親条約と日米修好通商条約の違いとして正しいものはどれか。', '[{"key":"a","text":"いずれも通商条約であり、内容にほとんど違いはなかった"},{"key":"b","text":"前者に領事裁判権の規定があり、後者にはこれが含まれていなかった"},{"key":"c","text":"前者は寄港と補給を認めるにとどまり、後者が通商を開き不平等な内容を含んだ"},{"key":"d","text":"前者が通商を開き、後者は寄港と補給を認めるにとどまる内容であった"}]'::jsonb,
+   '"c"'::jsonb, '日米和親条約（1854年）は下田と箱館の開港、薪水と食料の供給、領事の駐在を認めたが通商は開かなかった。日米修好通商条約（1858年）が5港を開いて自由貿易を認め、領事裁判権を認め関税自主権を欠く不平等な内容を含んだ。この改正が明治政府の課題となる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('60b49538-320f-31ea-8f5a-508053487298', 'kc.bakumatsu.two_treaties', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('76cf7bd3-970a-381d-a10a-0e96d58f80b4', NULL, 'mcq4', '貿易の開始が経済を混乱させた因果の説明として正しいものはどれか。', '[{"key":"a","text":"貿易額がわずかであったため、国内の経済には影響が及ばなかった"},{"key":"b","text":"金貨が大量に流入したため、貨幣の価値が急激に上昇していった"},{"key":"c","text":"生糸の輸出で品不足と物価高が生じ、金銀比価の差から金貨が大量に流出した"},{"key":"d","text":"輸入が輸出を大きく上回ったため、物価が下落して不況が広がった"}]'::jsonb,
+   '"c"'::jsonb, '生糸と茶が輸出の中心となり、国内で品不足と物価高が起きた。また日本の金銀比価が外国と異なっていたため、銀を持ちこんで金貨に換える取引で金が大量に流出した。幕府が貨幣の質を落として対応したことがさらに物価を押し上げ、攘夷運動を勢いづけた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('76cf7bd3-970a-381d-a10a-0e96d58f80b4', 'kc.bakumatsu.trade_impact', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('49f56de8-d560-32d8-9191-5ab4e12208ad', NULL, 'mcq4', '尊王攘夷から倒幕へ転じた因果の説明として正しいものはどれか。', '[{"key":"a","text":"薩英戦争と下関砲撃で攘夷の不可能を知り、雄藩が幕府にかわる政権をめざした"},{"key":"b","text":"攘夷が成功して外国船を撃退したため、その勢いで幕府が倒されていった"},{"key":"c","text":"幕府が攘夷を成功させたため、雄藩がその指導力を認めて従っていった"},{"key":"d","text":"外国が倒幕を直接に指示したため、雄藩がこれに従って挙兵したこと"}]'::jsonb,
+   '"a"'::jsonb, '薩英戦争（1863年）と四国艦隊下関砲撃事件（1864年）で薩摩と長州は列強の力を思い知り、攘夷の実行が不可能だと悟った。目標は外国の排除から、外国に対抗できる統一的な政権の樹立へ移り、薩長同盟（1866年）を経て倒幕へ進んだ。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('49f56de8-d560-32d8-9191-5ab4e12208ad', 'kc.bakumatsu.sonno_joi_shift', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('67d591c6-08cf-3648-81b3-ba79b88d4dd0', NULL, 'mcq4', '開港場の位置と役割について正しいものはどれか。', '[{"key":"a","text":"横浜が最大の貿易港となり、居留地が置かれて日本人の居住区と分けられた"},{"key":"b","text":"長崎が唯一の開港場とされ、他の港はいずれも閉じられたままであった"},{"key":"c","text":"開港場は日本海の側にのみ置かれ、太平洋の側には設けられなかった"},{"key":"d","text":"開港場では外国人と日本人が同じ区画に住み、居留地は置かれなかった"}]'::jsonb,
+   '"a"'::jsonb, '神奈川（実際には横浜）・長崎・箱館・新潟・兵庫（神戸）が開かれ、江戸と大坂は開市とされた。生糸の産地に近い横浜が最大の貿易港となった。開港場には外国人の居留地が置かれ、領事裁判権と結びついて日本の主権が及ばない区域となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('67d591c6-08cf-3648-81b3-ba79b88d4dd0', 'kc.bakumatsu.treaty_ports_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('19fa1fc4-7cd7-37fd-b210-59875de333aa', NULL, 'mcq4', '版籍奉還と廃藩置県の違いとして正しいものはどれか。', '[{"key":"a","text":"版籍奉還は旧藩主を知藩事として残し、廃藩置県で藩を廃して府県を置いた"},{"key":"b","text":"廃藩置県で旧藩主を知藩事とし、その後の版籍奉還で藩が廃止された"},{"key":"c","text":"いずれも同じ内容の政策であり、名称が異なるだけである"},{"key":"d","text":"版籍奉還で藩が廃止され、廃藩置県は土地の測量を定めた政策である"}]'::jsonb,
+   '"a"'::jsonb, '版籍奉還（1869年）は土地と人民を朝廷に返させたが、旧藩主がそのまま知藩事となり実態は変わらなかった。廃藩置県（1871年）で藩を廃して府県を置き、中央から府知事と県令を派遣した。ここで初めて中央集権が実現し、徴税と徴兵の基礎ができた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('19fa1fc4-7cd7-37fd-b210-59875de333aa', 'kc.meiji.centralization', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('61147630-1c70-396c-a4cb-65a36115956d', NULL, 'mcq4', '地租改正・徴兵令・学制の目的として正しいものはどれか。', '[{"key":"a","text":"3つとも外国からの要求に応じて、やむなく実施されたものである"},{"key":"b","text":"いずれも農村の生活を豊かにすることだけを目的としていた"},{"key":"c","text":"安定した財源、近代的な軍隊、均質な国民という近代国家の3つの基礎を作ること"},{"key":"d","text":"いずれも旧来の身分制を維持し、士族の特権を守ることを目的としていた"}]'::jsonb,
+   '"c"'::jsonb, '地租改正（1873年）は地価の3％を現金で納めさせ、豊凶に左右されない財源を作った。徴兵令（1873年）は士族にかわる国民皆兵の軍隊を、学制（1872年）は国語と算術を身につけた国民を用意した。財政・軍事・教育という近代国家の3つの基礎を同時に据える政策である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('61147630-1c70-396c-a4cb-65a36115956d', 'kc.meiji.three_reforms', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('745c9d0b-e077-3351-a7c1-24570f2ad9c1', NULL, 'mcq4', '文明開化が及んだ範囲について正しいものはどれか。', '[{"key":"a","text":"全国のすべての階層に同時に、かつ一様に及んでいった"},{"key":"b","text":"農村に先に及び、都市はむしろ旧来の生活を保ち続けていた"},{"key":"c","text":"外国人居留地の内部にとどまり、日本人の生活には及ばなかった"},{"key":"d","text":"都市の上層に先に及び、農村には旧来の生活が長く残るという差があった"}]'::jsonb,
+   '"d"'::jsonb, '洋服・断髪・れんが造り・ガス灯・太陽暦は東京など都市の上層から広がった。農村では和服と旧暦の行事が長く続き、新暦や徴兵、学制への負担から一揆が起きた例もある。近代化が一様でなく地域と階層で差をもって進んだことが、この時代を読むときの鍵になる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('745c9d0b-e077-3351-a7c1-24570f2ad9c1', 'kc.meiji.westernization_limits', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b056ec79-661a-3bd4-ab52-b76a3b4e641d', NULL, 'mcq4', '士族反乱と自由民権運動の違いとして正しいものはどれか。', '[{"key":"a","text":"いずれも武力蜂起であり、政府はこれを同じ方法で鎮圧した"},{"key":"b","text":"いずれも士族だけの運動で、農民や豪農はまったく参加しなかった"},{"key":"c","text":"前者は武力による特権回復の動き、後者は言論と結社で国会開設を求める運動である"},{"key":"d","text":"前者が言論による運動で、後者が武力による運動という関係であった"}]'::jsonb,
+   '"c"'::jsonb, '征韓論政変で下野した勢力のうち、武力に訴えたのが佐賀の乱から西南戦争（1877年）に至る士族反乱である。板垣退助らは民撰議院設立の建白書（1874年）を出し、言論と結社で国会開設を求めた。後者には豪農や商工業者も加わって全国に広がり、国会開設の勅諭（1881年）を引き出した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b056ec79-661a-3bd4-ab52-b76a3b4e641d', 'kc.meiji.opposition', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d68d2e64-bd33-3446-ad63-5e09a10a9d78', NULL, 'mcq4', '条約改正が長引いた因果の説明として正しいものはどれか。', '[{"key":"a","text":"条約に改正の規定がなく、法的に改正が不可能であったこと"},{"key":"b","text":"法体系と裁判制度の整備が条件とされ、憲法と諸法典の完成まで時間を要した"},{"key":"c","text":"日本側が改正を望まなかったため、交渉そのものが行われなかったこと"},{"key":"d","text":"列強が最初から改正に同意しており、手続きだけに時間がかかったこと"}]'::jsonb,
+   '"b"'::jsonb, '列強は領事裁判権の撤廃の条件として、近代的な法典と裁判制度の整備を求めた。鹿鳴館の欧化政策や外国人判事の任用案は国内の反発を招き（ノルマントン号事件が世論を後押しした）、大日本帝国憲法と諸法典の完成後、1894年に領事裁判権が撤廃され、関税自主権の回復は1911年となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d68d2e64-bd33-3446-ad63-5e09a10a9d78', 'kc.meiji.treaty_revision', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('9f08b051-c54e-3b76-8d62-b0c4f30cd84c', NULL, 'mcq4', 'ドイツ型の憲法を選んだ因果の説明として正しいものはどれか。', '[{"key":"a","text":"フランスの共和政憲法を範として、大統領制の導入がめざされたこと"},{"key":"b","text":"合衆国憲法を範として、連邦制と厳格な三権分立が採用されたこと"},{"key":"c","text":"君主権の強い体制が政府の方針に合い、伊藤博文が調査してこれを範とした"},{"key":"d","text":"イギリス型の議院内閣制を範とし、君主の権限を儀礼的なものにとどめた"}]'::jsonb,
+   '"c"'::jsonb, '自由民権派はイギリス型やフランス型を主張したが、政府は君主の権限が強く議会の権限が限られたプロイセン型を選んだ。伊藤博文がベルリンとウィーンでシュタインらに学び、これを範として起草した。天皇が定めて国民に与える欽定憲法という形式もここから来る。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('9f08b051-c54e-3b76-8d62-b0c4f30cd84c', 'kc.constitution.model_choice', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e9bfa93e-edcf-3998-9ef6-19f6026a5094', NULL, 'mcq4', '天皇大権と議会の権限の関係として正しいものはどれか。', '[{"key":"a","text":"天皇の大権は存在せず、内閣が議会に対して責任を負う制度であった"},{"key":"b","text":"統帥権など広い大権が天皇に属し、議会の権限は法律と予算の協賛にとどまった"},{"key":"c","text":"議会が国政の最高機関とされ、天皇の権限は儀礼的なものにとどめられた"},{"key":"d","text":"議会には予算を審議する権限がまったく与えられていなかった"}]'::jsonb,
+   '"b"'::jsonb, '大日本帝国憲法は天皇を統治権の総攬者とし、統帥権・宣戦講和・条約締結・緊急勅令などを大権とした。帝国議会は法律と予算に協賛する立場で、内閣は議会ではなく天皇に対して責任を負った。統帥権が内閣から独立していたことが、のちの軍部の台頭を許す制度的な穴となる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e9bfa93e-edcf-3998-9ef6-19f6026a5094', 'kc.constitution.emperor_and_diet', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('c3983ab0-257f-3934-8da2-afca68a66169', NULL, 'mcq4', '初期議会で対立した争点として正しいものはどれか。', '[{"key":"a","text":"政府と民党の主張は一致しており、対立は生じていなかった"},{"key":"b","text":"民党が政費節減と民力休養を掲げ、軍備拡張をめざす政府と予算をめぐって争った"},{"key":"c","text":"民党が軍備拡張を求め、政府がこれを抑えるという構図で対立していた"},{"key":"d","text":"憲法の改正をめぐって対立し、予算が争点になることはなかった"}]'::jsonb,
+   '"b"'::jsonb, '第1回総選挙で民党が過半数を占め、地租の軽減につながる政費節減と民力休養を掲げた。軍備拡張のための予算を求める政府と正面から対立し、議会の解散が繰り返された。日清戦争を境に政府と政党の提携が進み、のちの政党内閣への道が開かれる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('c3983ab0-257f-3934-8da2-afca68a66169', 'kc.constitution.early_diet_conflict', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('f2ae7319-286b-39b0-b7eb-3454ab69565b', NULL, 'mcq4', '教育勅語が果たした役割の説明として正しいものはどれか。', '[{"key":"a","text":"忠君愛国と家族道徳を国民の徳目として示し、学校儀式を通じて浸透させた"},{"key":"b","text":"学問の自由を保障する文書で、国家による道徳教育を否定していた"},{"key":"c","text":"西洋の個人主義を教育の基本に据えることを定めた文書である"},{"key":"d","text":"軍隊の内部だけで用いられ、学校教育とは関わりをもたなかった"}]'::jsonb,
+   '"a"'::jsonb, '教育勅語（1890年）は忠君愛国と孝行など儒教的な家族道徳を国民の守るべき徳目として示した。学校では御真影とともに祝日の儀式で奉読され、修身の教科と結びついて浸透した。国民統合の思想的な支柱として、1948年に排除・失効が決議されるまで用いられた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('f2ae7319-286b-39b0-b7eb-3454ab69565b', 'kc.constitution.education_rescript', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('1dc53681-0d5a-3931-a01d-6231cf54f815', NULL, 'mcq4', 'アジアの立憲運動との比較について正しいものはどれか。', '[{"key":"a","text":"いずれの国でも憲法が長く維持され、停止された例は存在しない"},{"key":"b","text":"オスマン帝国の憲法は停止され、日本は憲法と議会を継続させた点が異なる"},{"key":"c","text":"アジアで最初に憲法を制定したのは日本で、オスマン帝国はこれに続いた"},{"key":"d","text":"アジアで憲法を制定したのは日本だけで、他の地域に立憲運動はなかった"}]'::jsonb,
+   '"b"'::jsonb, 'アジア最初の憲法はオスマン帝国のミドハト憲法（1876年）だが、翌々年に停止された。日本の大日本帝国憲法（1889年）は制定後も議会とともに継続した。清の憲法大綱（1908年）やイランの立憲革命（1905年）も同時期で、日露戦争後にこの動きが加速している。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('1dc53681-0d5a-3931-a01d-6231cf54f815', 'kc.constitution.compare_asia', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ad311e0c-b4f7-33e1-843c-10c8458650b2', NULL, 'mcq4', '日清戦争が起きた要因として最も適切なものはどれか。', '[{"key":"a","text":"清が日本本土へ侵攻したため、日本がこれを迎え撃つ形で開戦したこと"},{"key":"b","text":"ロシアの要請を受けた日本が、清に対して宣戦したことが原因であること"},{"key":"c","text":"朝鮮が日本に対して宣戦したため、清がこれを支援して参戦したこと"},{"key":"d","text":"朝鮮の支配をめぐる日清の対立に、甲午農民戦争への出兵が重なって開戦した"}]'::jsonb,
+   '"d"'::jsonb, '日朝修好条規（1876年）以降、朝鮮をめぐって日清が対立し、壬午軍乱と甲申政変を経て天津条約で出兵時の事前通告が定められた。甲午農民戦争（1894年）で両国が出兵し、撤兵をめぐる交渉が決裂して開戦した。朝鮮を独立国とみなすか属国とみなすかの対立でもあった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ad311e0c-b4f7-33e1-843c-10c8458650b2', 'kc.jpwars.sino_japanese_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('81a17cfb-2136-3d64-b0aa-e8344df97a6c', NULL, 'mcq4', '下関条約と三国干渉の帰結として正しいものはどれか。', '[{"key":"a","text":"遼東半島を得たが露独仏の干渉で返還し、賠償金は軍備拡張と工業に用いられた"},{"key":"b","text":"遼東半島は返還されず、賠償金も支払われないまま終わることとなった"},{"key":"c","text":"三国干渉によって台湾も返還され、日本の領土は増えなかった"},{"key":"d","text":"干渉を行ったのは英米仏で、ロシアは日本の側に立って支持していた"}]'::jsonb,
+   '"a"'::jsonb, '下関条約（1895年）で清は朝鮮の独立を認め、遼東半島・台湾・澎湖諸島を割譲し、2億両の賠償金を支払った。ロシア・ドイツ・フランスの三国干渉で遼東半島を返還し、臥薪嘗胆の世論が高まった。賠償金は軍備拡張と八幡製鉄所の建設などに投じられた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('81a17cfb-2136-3d64-b0aa-e8344df97a6c', 'kc.jpwars.shimonoseki_and_triple', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('a91e2cd0-225d-31a6-9897-cda5940c56c2', NULL, 'mcq4', '日露戦争が起きた要因として最も適切なものはどれか。', '[{"key":"a","text":"イギリスがロシアに宣戦したため、同盟国の日本が自動的に参戦したこと"},{"key":"b","text":"義和団事件後もロシアが満洲に駐兵し、韓国をめぐる交渉が決裂したこと"},{"key":"c","text":"ロシアが日本本土へ侵攻したため、日本が防衛のために開戦したこと"},{"key":"d","text":"清の要請を受けた日本が、満洲の回復のために宣戦したこと"}]'::jsonb,
+   '"b"'::jsonb, '義和団事件（1900年）の出兵後もロシアが満洲に軍を残したため、日本は日英同盟（1902年）を結んで対抗した。満洲におけるロシアの権益と韓国における日本の権益を相互に認める交渉が決裂し、1904年に開戦した。ロシアの南下を警戒するイギリスとアメリカが日本を財政的に支えた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('a91e2cd0-225d-31a6-9897-cda5940c56c2', 'kc.jpwars.russo_japanese_causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d4b93763-a406-3a4f-8c53-162d86df5a95', NULL, 'mcq4', 'ポーツマス条約の内容と国内の反発について正しいものはどれか。', '[{"key":"a","text":"韓国の指導権と樺太の南半分などを得たが賠償金がなく、日比谷焼打ち事件が起きた"},{"key":"b","text":"巨額の賠償金を得たにもかかわらず、領土が得られず反発が起きたこと"},{"key":"c","text":"樺太の全島を得たため、国内では条約を歓迎する声だけが上がったこと"},{"key":"d","text":"韓国に関する規定は置かれず、日本の権益は認められなかったこと"}]'::jsonb,
+   '"a"'::jsonb, 'ポーツマス条約（1905年）で日本は韓国における指導権、旅順と大連の租借権、長春以南の鉄道、北緯50度以南の樺太を得たが、賠償金は取れなかった。増税に耐えた国民の期待とずれたため、講和反対の国民大会から日比谷焼打ち事件（1905年）に発展した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d4b93763-a406-3a4f-8c53-162d86df5a95', 'kc.jpwars.portsmouth_limits', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('2253c17c-2d02-3b1c-837e-ad6041a04f75', NULL, 'mcq4', '韓国併合に至る段階を古いものから順に並べたものはどれか。', '[{"key":"a","text":"第1次日韓協約 → 第2次日韓協約と統監府 → ハーグ密使事件と軍隊解散 → 韓国併合"},{"key":"b","text":"韓国併合 → 第1次日韓協約 → 第2次日韓協約と統監府 → ハーグ密使事件と軍隊解散"},{"key":"c","text":"第2次日韓協約と統監府 → 第1次日韓協約 → 韓国併合 → ハーグ密使事件と軍隊解散"},{"key":"d","text":"ハーグ密使事件と軍隊解散 → 韓国併合 → 第1次日韓協約 → 第2次日韓協約と統監府"}]'::jsonb,
+   '"a"'::jsonb, '第1次日韓協約（1904年）で顧問を送り、第2次（1905年）で外交権を奪って統監府を置いた。皇帝がハーグ万国平和会議へ密使を送った事件（1907年）を理由に第3次協約で内政権を奪い軍隊を解散させ、義兵闘争を鎮圧して1910年に併合した。段階を追って主権が奪われた点をおさえる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('2253c17c-2d02-3b1c-837e-ad6041a04f75', 'kc.jpwars.korea_annexation', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5f0fe82b-1533-32b2-9f4a-dd77af846239', NULL, 'mcq4', '日清・日露戦争で動いた勢力範囲について正しいものはどれか。', '[{"key":"a","text":"日本は台湾のみを得て、大陸には権益をまったく持たなかった"},{"key":"b","text":"日本が満洲の全域を領有し、ロシアは沿海州から撤退していった"},{"key":"c","text":"日本は北樺太を得たが、南樺太はロシアが保持し続けていた"},{"key":"d","text":"日本が台湾・南樺太・関東州と南満洲鉄道を得て、大陸への足がかりを築いた"}]'::jsonb,
+   '"d"'::jsonb, '日清戦争で台湾と澎湖諸島、日露戦争で北緯50度以南の樺太、旅順と大連を含む関東州の租借権、長春以南の鉄道（のちの南満洲鉄道）を得た。韓国併合と合わせ、朝鮮半島から南満洲へ連なる勢力圏ができた。この権益の維持が以後の対外政策を規定することになる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5f0fe82b-1533-32b2-9f4a-dd77af846239', 'kc.jpwars.northeast_asia_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('14b7d1e3-8792-3da1-ab64-bec98c4e7cc2', NULL, 'mcq4', '日本の第一次世界大戦への関わり方として正しいものはどれか。', '[{"key":"a","text":"ドイツの側に立って参戦し、連合国と各地で交戦することとなった"},{"key":"b","text":"日英同盟を理由に参戦し、ヨーロッパの主戦場からは離れて権益の拡大をはかった"},{"key":"c","text":"ヨーロッパの西部戦線に主力を送り、そこで最大の損害を出していった"},{"key":"d","text":"中立を保ち、大戦のあいだ交戦国のいずれとも関係をもたなかった"}]'::jsonb,
+   '"b"'::jsonb, '日本は日英同盟を理由に連合国側で参戦し、ドイツの拠点である青島と南洋諸島を占領した。ヨーロッパの主戦場からは遠く、地中海への艦艇派遣を除けば人的な損害は少なかった。総力戦を経験しないまま戦勝国となったことが、のちの国際情勢の読み違いにつながる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('14b7d1e3-8792-3da1-ab64-bec98c4e7cc2', 'kc.totalwar.japan_ww1', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6c098c5e-78e2-3836-855a-b666dfc1c45a', NULL, 'mcq4', '二十一か条の要求とその帰結について正しいものはどれか。', '[{"key":"a","text":"要求は経済の援助に関するもので、権益とは無関係の内容であった"},{"key":"b","text":"中国に山東の権益などを認めさせたが、反日感情が高まり五・四運動につながった"},{"key":"c","text":"中国がすべての要求を拒んだため、日本は権益を得られないまま終わった"},{"key":"d","text":"要求は列強の支持を受け、国際的に高く評価されることとなった"}]'::jsonb,
+   '"b"'::jsonb, '大隈内閣は大戦でヨーロッパ列強の目が離れた機を捉え、山東のドイツ権益の継承や旅順・大連の租借期限の延長などを袁世凱政府に迫り、最後通牒で大部分を認めさせた（1915年）。中国では国恥として記憶され、パリ講和会議での山東問題と合わせて五・四運動（1919年）を招いた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6c098c5e-78e2-3836-855a-b666dfc1c45a', 'kc.totalwar.21_demands', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('bce697c1-abdc-35ac-a364-1507a4bb8ef2', NULL, 'mcq4', '民族自決がアジアで運動を呼んだ因果の説明として正しいものはどれか。', '[{"key":"a","text":"原則が実際にはヨーロッパにしか適用されず、その落差が各地の運動を呼んだ"},{"key":"b","text":"原則がアジアにも適用されたため、大戦の直後に各国が独立を達成した"},{"key":"c","text":"民族自決の原則はアジアにまったく知られておらず、影響はなかった"},{"key":"d","text":"アジアでは民族自決に反対する運動が起き、植民地の維持が求められた"}]'::jsonb,
+   '"a"'::jsonb, 'ウィルソンの十四か条とロシア革命の呼びかけが民族自決を掲げたが、実際に適用されたのは敗戦国の支配下にあった東欧で、戦勝国の植民地には及ばなかった。この落差が朝鮮の三・一独立運動、中国の五・四運動、インドの非暴力・不服従運動を呼び起こした（いずれも1919年前後）。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('bce697c1-abdc-35ac-a364-1507a4bb8ef2', 'kc.totalwar.self_determination_asia', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('141adb90-6459-3d12-b9f3-6289644f736b', NULL, 'mcq4', '国際連盟における日本の位置として正しいものはどれか。', '[{"key":"a","text":"最後まで加盟を続け、第二次世界大戦後まで理事国であり続けた"},{"key":"b","text":"常任理事国となったが、人種差別撤廃の提案は退けられ、のちに脱退した"},{"key":"c","text":"加盟を認められず、国際連盟の外にとどまり続けることとなった"},{"key":"d","text":"常任理事国とならず、総会にだけ参加する立場にとどまっていた"}]'::jsonb,
+   '"b"'::jsonb, '日本は英仏伊とともに常任理事国となり、新渡戸稲造が事務次長を務めた。パリ講和会議で規約に人種差別撤廃を盛りこむ提案をしたが、多数の賛成を得ながら議長の裁定で採用されなかった。満洲事変をめぐるリットン報告書の採択を受けて1933年に脱退を通告した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('141adb90-6459-3d12-b9f3-6289644f736b', 'kc.totalwar.japan_league', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('00cda04c-f7c7-3f88-87cd-0e675696c6d3', NULL, 'mcq4', '大戦景気とその反動について正しいものはどれか。', '[{"key":"a","text":"大戦景気によって物価が下がり、労働者の生活が大きく改善していった"},{"key":"b","text":"大戦景気は農村にのみ及び、都市の工業には影響を与えなかった"},{"key":"c","text":"ヨーロッパの後退で輸出が伸びて債権国となったが、大戦後に反動不況に陥った"},{"key":"d","text":"大戦中は不況で、大戦が終わってから好況をむかえることとなった"}]'::jsonb,
+   '"c"'::jsonb, 'ヨーロッパ諸国がアジア市場から後退した分を日本製品が埋め、海運と造船が空前の利益をあげて債務国から債権国に転じた。一方で物価が急騰して米騒動（1918年）が起きた。大戦が終わり列強が市場に戻ると1920年に反動不況となり、震災と金融恐慌へ続いていく。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('00cda04c-f7c7-3f88-87cd-0e675696c6d3', 'kc.totalwar.wartime_boom', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('7f883c74-9e9d-38dd-9bed-6964e396aa55', NULL, 'mcq4', '第一次世界大戦後に日本が得た地域について正しいものはどれか。', '[{"key":"a","text":"赤道以北の旧ドイツ領南洋諸島を委任統治領とし、山東の権益を継承した"},{"key":"b","text":"ドイツ本土の一部を占領地として獲得し、これを統治することとなった"},{"key":"c","text":"フィリピンを合衆国から譲り受け、委任統治領として統治していった"},{"key":"d","text":"インドシナをフランスから引きつぎ、委任統治のもとに置いていった"}]'::jsonb,
+   '"a"'::jsonb, 'ヴェルサイユ条約で日本は赤道以北のマリアナ・カロリン・マーシャル諸島を委任統治領とし、南洋庁を置いた。山東のドイツ権益も継承したが、中国の反発とワシントン会議での交渉により1922年に返還した。南洋諸島はのちに太平洋戦争の主要な戦場となる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('7f883c74-9e9d-38dd-9bed-6964e396aa55', 'kc.totalwar.japan_mandate_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('49796a08-056f-3901-87fd-a39a6e2526ee', NULL, 'mcq4', '大衆社会が成立した要因として最も適切なものはどれか。', '[{"key":"a","text":"身分制が強化されたため、限られた層だけが政治に参加するようになったこと"},{"key":"b","text":"人口が減少して都市が縮小し、社会の均質化が進んだこと"},{"key":"c","text":"新聞やラジオが普及しなかったため、口伝えの情報が力を持ったこと"},{"key":"d","text":"総力戦の動員と普通選挙、義務教育とメディアの普及が大衆を政治の主体にした"}]'::jsonb,
+   '"d"'::jsonb, '総力戦が女性と労働者を動員し、その見返りとして参政権が拡大した。義務教育が識字率を高め、新聞・ラジオ・映画が同じ情報を同時に多数へ届けた。都市化と大量生産・大量消費が生活様式を均質にし、匿名の多数者である大衆が政治と市場を動かすようになった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('49796a08-056f-3901-87fd-a39a6e2526ee', 'kc.masssoc.causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('1e9ae9d2-81e3-371b-b71f-35828babccbd', NULL, 'mcq4', '1920年代のアメリカの繁栄の光と影として正しいものはどれか。', '[{"key":"a","text":"自動車の普及は進まず、繁栄は金融の分野だけにとどまっていた"},{"key":"b","text":"自動車と家電の大量消費が広がる一方、移民制限と人種差別、農業不況が続いた"},{"key":"c","text":"繁栄はすべての層に均等に及び、社会に不平等は存在しなかった"},{"key":"d","text":"移民の受け入れが拡大し、人種による差別は解消へ向かっていった"}]'::jsonb,
+   '"b"'::jsonb, 'フォードの流れ作業による大量生産で自動車が普及し、電化製品と月賦販売、ラジオと映画が大衆消費社会を作った。一方で禁酒法、移民法（1924年）による日本人などの排斥、クー=クラックス=クランの復活、そして農産物価格の低迷が続き、繁栄の裏に恐慌の芽があった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('1e9ae9d2-81e3-371b-b71f-35828babccbd', 'kc.masssoc.us_1920s', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('5e6c5ab7-a4af-3a11-9a4e-feeb04b94286', NULL, 'mcq4', '1920年代の日本の大衆文化について正しいものはどれか。', '[{"key":"a","text":"新聞は発行されていたが、ラジオ放送は戦後まで始まらなかった"},{"key":"b","text":"都市の生活様式に変化はなく、江戸時代のままが続いていた"},{"key":"c","text":"ラジオ放送と円本、大衆雑誌が広がり、都市に新しい生活様式が現れた"},{"key":"d","text":"文化は上流階級にとどまり、大衆に向けた出版や放送は存在しなかった"}]'::jsonb,
+   '"c"'::jsonb, 'ラジオ放送の開始（1925年）、1冊1円の円本や岩波文庫、大衆雑誌キングが読者を広げた。都市ではデパート、洋食、映画、職業婦人といった新しい生活が現れた。同時に活字と放送が世論を作る力をもち、のちに戦時の動員に用いられることになる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5e6c5ab7-a4af-3a11-9a4e-feeb04b94286', 'kc.masssoc.japan_culture', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('41b5b07d-6739-398f-8c99-b373a58b54b2', NULL, 'mcq4', '女性参政権が広がった因果の説明として正しいものはどれか。', '[{"key":"a","text":"女性の社会進出が進まなかったため、権利がかえって早く認められたこと"},{"key":"b","text":"19世紀のうちに主要国のすべてで実現しており、大戦とは無関係であること"},{"key":"c","text":"第二次世界大戦後まで、どの国でも女性参政権は実現していないこと"},{"key":"d","text":"総力戦での労働と社会進出が権利要求を後押しし、大戦後に各国で実現した"}]'::jsonb,
+   '"d"'::jsonb, '総力戦で男性が出征した職場を女性が担い、その貢献が権利要求を後押しした。イギリス（1918年に一部、1928年に平等）、ドイツとアメリカ（1918〜20年）で実現した。日本では新婦人協会や市川房枝らの運動が続いたが実現は第二次世界大戦後（1945年）である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('41b5b07d-6739-398f-8c99-b373a58b54b2', 'kc.masssoc.womens_suffrage', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ade93ea9-53df-31bf-a87b-9bf20714f9ed', NULL, 'mcq4', 'メディアが世論を作る力について正しいものはどれか。', '[{"key":"a","text":"メディアは事実を伝えるだけなので、世論を動かす力はもたない"},{"key":"b","text":"メディアの力は民主主義を強める方向にのみ働き、独裁とは結びつかない"},{"key":"c","text":"ラジオは娯楽の手段にとどまり、政治に用いられたことはない"},{"key":"d","text":"同じ情報を同時に多数へ届ける力は、動員と宣伝にも用いられる両義的なものである"}]'::jsonb,
+   '"d"'::jsonb, '新聞・ラジオ・映画は多数の人に同じ情報を同時に届ける。この力は世論による政治参加を支える一方、ナチスの宣伝相ゲッベルスによる利用や、日本の戦時の大本営発表のように動員と統制の道具にもなった。誰が何のために発信しているかを問う姿勢が必要になる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ade93ea9-53df-31bf-a87b-9bf20714f9ed', 'kc.masssoc.media_power', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('b0480d76-e77d-3ee0-9e2d-d2dca022e443', NULL, 'mcq4', '日本の政党政治の展開を古いものから順に並べたものはどれか。', '[{"key":"a","text":"五・一五事件 → 第1次護憲運動 → 米騒動と原敬内閣 → 第2次護憲運動と憲政の常道"},{"key":"b","text":"第2次護憲運動と憲政の常道 → 第1次護憲運動 → 原敬内閣 → 五・一五事件"},{"key":"c","text":"第1次護憲運動 → 米騒動と原敬内閣 → 第2次護憲運動と憲政の常道 → 五・一五事件"},{"key":"d","text":"原敬内閣 → 第1次護憲運動 → 五・一五事件 → 第2次護憲運動と憲政の常道"}]'::jsonb,
+   '"c"'::jsonb, '第1次護憲運動（1912〜13年）が閥族打破・憲政擁護を掲げて内閣を倒し、米騒動（1918年）のあと本格的な政党内閣である原敬内閣が成立した。第2次護憲運動（1924年）以後は衆議院の多数党が組閣する憲政の常道が慣行となったが、五・一五事件（1932年）で終わった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('b0480d76-e77d-3ee0-9e2d-d2dca022e443', 'kc.taisho.party_politics_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0d5d8dc1-5877-33c2-922d-2e80c0de7d9b', NULL, 'mcq4', '普通選挙法と治安維持法が同じ年に成立した因果の説明として正しいものはどれか。', '[{"key":"a","text":"両法は無関係に成立したもので、同じ年になったのは偶然にすぎない"},{"key":"b","text":"治安維持法が普通選挙を実現するための手続きを定めた法律であること"},{"key":"c","text":"普通選挙法によって共産主義政党が合法化されたため、対の法が不要となったこと"},{"key":"d","text":"有権者の急増に伴う体制の動揺を抑えるため、社会運動を取り締まる法を同時に用意した"}]'::jsonb,
+   '"d"'::jsonb, '1925年、25歳以上の男性による普通選挙法が成立し有権者は約4倍になった。同時に、日ソ基本条約による共産主義の流入への警戒もあって治安維持法が制定され、国体の変革と私有財産制の否認を目的とする結社を禁じた。参加の拡大と統制の強化が同時に進んだ点が重要である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0d5d8dc1-5877-33c2-922d-2e80c0de7d9b', 'kc.taisho.two_laws', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cd512ed5-6cfb-3a77-b5d8-1f31c43848d2', NULL, 'mcq4', '1920年代の社会運動の担い手の違いとして正しいものはどれか。', '[{"key":"a","text":"社会運動はすべて政府が主導したもので、民間の団体は関わっていない"},{"key":"b","text":"女性の運動はまったく存在せず、男性だけが運動を担っていた"},{"key":"c","text":"労働運動は日本労働総同盟、農民は日本農民組合、被差別部落は全国水平社が担った"},{"key":"d","text":"いずれの運動も同一の団体が担っており、担い手に違いはなかった"}]'::jsonb,
+   '"c"'::jsonb, '友愛会から発展した日本労働総同盟が労働争議を、日本農民組合が小作争議を担った。全国水平社（1922年）が被差別部落の解放を宣言し、新婦人協会と赤瀾会が女性の権利を求めた。それぞれ別の課題をもつ運動が、普通選挙の要求という点で重なった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cd512ed5-6cfb-3a77-b5d8-1f31c43848d2', 'kc.taisho.social_movements', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('3c09c30f-f9ff-3f1d-93c6-24ffba3e7d78', NULL, 'mcq4', '大正デモクラシーを支えた思想について正しいものはどれか。', '[{"key":"a","text":"天皇機関説は当時から違憲とされ、学説として認められていなかった"},{"key":"b","text":"思想的な裏づけはなく、運動は感情的な高まりだけで進んでいった"},{"key":"c","text":"吉野作造の民本主義と美濃部達吉の天皇機関説が、憲法の枠内で民意を重んじた"},{"key":"d","text":"主権が国民にあると明言する主権在民論が、当時の主流の学説であった"}]'::jsonb,
+   '"c"'::jsonb, '吉野作造の民本主義は、主権の所在を問わずに政治の目的を民衆の利益に置き普通選挙と政党内閣を説いた。美濃部達吉の天皇機関説は天皇を国家という法人の最高機関と捉え、議会の役割を根拠づけた。いずれも当時は通説だったが、1935年の国体明徴声明で天皇機関説は排撃される。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('3c09c30f-f9ff-3f1d-93c6-24ffba3e7d78', 'kc.taisho.minpon', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('9905d235-8931-3bd2-af77-8fd8a5af9627', NULL, 'mcq4', '関東大震災が社会に与えた影響として正しいものはどれか。', '[{"key":"a","text":"経済に打撃を与えて金融恐慌の一因となり、混乱のなかで朝鮮人らの虐殺が起きた"},{"key":"b","text":"被害が小さかったため、経済にも社会にも影響はほとんど及ばなかった"},{"key":"c","text":"復興需要によって好況となり、以後の経済はきわめて順調に推移したこと"},{"key":"d","text":"震災を機に治安が改善し、社会運動への弾圧も緩められていったこと"}]'::jsonb,
+   '"a"'::jsonb, '1923年の震災は首都圏の経済に打撃を与え、決済不能となった震災手形の処理が金融恐慌（1927年）の一因となった。混乱のなかで流言が広がり、朝鮮人と中国人が多数虐殺され、大杉栄ら社会主義者も殺害された。危機のときに差別と暴力がどう現れるかを示す出来事である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('9905d235-8931-3bd2-af77-8fd8a5af9627', 'kc.taisho.great_quake', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e31743d3-22da-31d1-965f-4300a5dd4019', NULL, 'mcq4', '日本の政党政治と欧米の議会政治の違いとして正しいものはどれか。', '[{"key":"a","text":"憲政の常道は憲法の規定ではなく慣行にとどまり、統帥権が内閣の外にあった"},{"key":"b","text":"日本では政党内閣が憲法に明記されており、欧米より制度が強固であった"},{"key":"c","text":"欧米でも政党内閣は慣行にとどまり、日本との違いは存在しなかった"},{"key":"d","text":"日本では軍が内閣に完全に従属しており、統帥権の独立は存在しなかった"}]'::jsonb,
+   '"a"'::jsonb, '大日本帝国憲法に議院内閣制の規定はなく、多数党が組閣する憲政の常道は元老の推薦による慣行にすぎなかった。加えて統帥権が内閣から独立し、陸海軍大臣現役武官制が内閣の存立を軍に握らせた。制度の裏づけを欠いたことが、政党政治が短命に終わった一因である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e31743d3-22da-31d1-965f-4300a5dd4019', 'kc.taisho.japan_vs_west', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('02d4a11e-9ddc-3ac8-a3ea-c740d00fcc43', NULL, 'mcq4', '日本が昭和恐慌に陥った因果の説明として正しいものはどれか。', '[{"key":"a","text":"金の輸出を禁じたまま世界恐慌をむかえたため、物価が急騰したこと"},{"key":"b","text":"世界恐慌の影響を受けず、国内の要因だけで不況となったこと"},{"key":"c","text":"軍事費の急増によって財政が破綻し、それだけが原因であったこと"},{"key":"d","text":"金融恐慌で体力を失ったところへ、旧平価での金解禁と世界恐慌が重なった"}]'::jsonb,
+   '"d"'::jsonb, '震災手形の処理に失敗した金融恐慌（1927年）で銀行が整理された。浜口内閣は井上準之助のもとで旧平価による金解禁（1930年）を断行したが、これは実質的な円切り上げで輸出に不利だった。そこへ世界恐慌が重なり、物価下落と失業、農産物価格の暴落が同時に起きた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('02d4a11e-9ddc-3ac8-a3ea-c740d00fcc43', 'kc.jpdep.showa_depression', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('31329a78-a9c2-3dc0-b4c3-ec17d5159439', NULL, 'mcq4', '昭和恐慌期の農村の窮乏の実態として正しいものはどれか。', '[{"key":"a","text":"農村の窮乏は救済され、社会問題として意識されることはなかったこと"},{"key":"b","text":"生糸価格の暴落と米価下落、東北の冷害が重なり、欠食児童と身売りが生じた"},{"key":"c","text":"農産物の価格が上昇したため、農村はむしろ豊かになっていったこと"},{"key":"d","text":"窮乏は都市の労働者に限られ、農村には影響が及ばなかったこと"}]'::jsonb,
+   '"b"'::jsonb, '対米輸出に依存した生糸の価格が暴落し、豊作による米価下落（豊作飢饉）も重なった。1931年と1934年には東北で冷害が起き、欠食児童と娘の身売りが社会問題となった。農村出身の兵士が多い軍のなかで、この窮乏が政党政治と財閥への憤りを生んだ。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('31329a78-a9c2-3dc0-b4c3-ec17d5159439', 'kc.jpdep.rural_crisis', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('84313ce5-c77f-3c5d-b5e4-f896220c736b', NULL, 'mcq4', '恐慌が軍部の台頭を招いた因果の説明として正しいものはどれか。', '[{"key":"a","text":"政党と財閥への不信が高まり、大陸への進出に活路を求める主張が支持を得た"},{"key":"b","text":"恐慌によって軍事費が削られたため、軍部の影響力はむしろ低下したこと"},{"key":"c","text":"政党政治が恐慌を克服したため、軍部は政治から離れていったこと"},{"key":"d","text":"軍部は経済に関心をもたず、恐慌とは無関係に台頭していったこと"}]'::jsonb,
+   '"a"'::jsonb, '恐慌への対応をめぐって政党内閣が信を失い、財閥がドル買いで利益を得たことが憤りを招いた。統帥権干犯問題（1930年）で軍への政治介入が正当化され、農村の窮乏を背景に大陸への進出を説く主張が支持を集めた。血盟団事件と五・一五事件（1932年）で政党内閣が終わる。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('84313ce5-c77f-3c5d-b5e4-f896220c736b', 'kc.jpdep.army_rise', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('715f7935-26b9-38db-8a4c-dd499efd88b7', NULL, 'mcq4', '高橋財政と各国の恐慌対策の比較として正しいものはどれか。', '[{"key":"a","text":"高橋財政は緊縮政策であり、他国の積極財政とは正反対の方向であった"},{"key":"b","text":"日本だけが金本位制を維持し続け、他国はこれを離脱していったこと"},{"key":"c","text":"高橋財政は失敗に終わり、日本の回復は他国より大きく遅れたこと"},{"key":"d","text":"金輸出の再禁止と積極財政で早期に回復した点は、他国の政策と方向が同じである"}]'::jsonb,
+   '"d"'::jsonb, '犬養内閣の高橋是清は金輸出を再禁止して管理通貨制に移り、円安による輸出増、赤字国債による公共事業と軍事費で需要を作った。ケインズ的な政策の先行例とされ、日本は主要国のなかで比較的早く回復した。のちに軍事費の抑制をはかった高橋は二・二六事件で殺害される。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('715f7935-26b9-38db-8a4c-dd499efd88b7', 'kc.jpdep.takahashi', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cc871abb-fef5-363a-9cc0-ca9f118f6d9a', NULL, 'mcq4', '昭和恐慌前後の日本の輸出先の変化について正しいものはどれか。', '[{"key":"a","text":"輸出先はヨーロッパに集中しており、アジアや北米とは取引がなかったこと"},{"key":"b","text":"輸出そのものが停止され、日本は自給自足の経済に移行したこと"},{"key":"c","text":"対米生糸輸出が激減し、綿製品をアジアへ輸出する構造へ重心が移った"},{"key":"d","text":"対米生糸輸出が増加し、アジア向けの輸出は減少していったこと"}]'::jsonb,
+   '"c"'::jsonb, '恐慌でアメリカ向けの生糸が激減した一方、円安と低賃金を背景に綿織物の輸出が伸び、中国・インド・東南アジアで市場を広げてイギリスと競合した。列強はブロック経済で対抗し、市場から締め出される不安が満洲と華北への進出を正当化する論理に用いられた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cc871abb-fef5-363a-9cc0-ca9f118f6d9a', 'kc.jpdep.export_shift_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('a56dbc01-680c-3809-8fcf-5f0c60b64da5', NULL, 'mcq4', '満洲事変から国際連盟脱退までを古いものから順に並べたものはどれか。', '[{"key":"a","text":"柳条湖事件 → 満洲国の建国 → 五・一五事件 → リットン報告書 → 国際連盟脱退"},{"key":"b","text":"満洲国の建国 → 柳条湖事件 → 国際連盟脱退 → リットン報告書 → 五・一五事件"},{"key":"c","text":"リットン報告書 → 柳条湖事件 → 満洲国の建国 → 五・一五事件 → 国際連盟脱退"},{"key":"d","text":"柳条湖事件 → 五・一五事件 → 国際連盟脱退 → 満洲国の建国 → リットン報告書"}]'::jsonb,
+   '"a"'::jsonb, '関東軍が柳条湖で鉄道を爆破して軍事行動を起こし（1931年9月）、翌1932年3月に満洲国を建国した。5月の五・一五事件で犬養首相が殺害されて政党内閣が終わり、リットン報告書に基づく総会の勧告を不服として1933年3月に国際連盟からの脱退を通告した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('a56dbc01-680c-3809-8fcf-5f0c60b64da5', 'kc.manchuria.order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('8d7164fa-fe16-3c55-ac79-a4fd63e11583', NULL, 'mcq4', '満洲事変が国内政治を変えた因果の説明として正しいものはどれか。', '[{"key":"a","text":"事変を機に軍縮が進み、軍事費はむしろ削減されていったこと"},{"key":"b","text":"軍の独断が世論に支持されて政府が追認し、政党政治とテロへの歯止めが失われた"},{"key":"c","text":"軍の独断が世論の批判を受け、以後は政府の統制が強まっていったこと"},{"key":"d","text":"事変は国内に知らされなかったため、政治への影響はなかったこと"}]'::jsonb,
+   '"b"'::jsonb, '関東軍の行動は政府の不拡大方針に反していたが、新聞が戦果を熱狂的に報じ世論が支持したため政府は追認した。統帥権の独立と世論の支持を背景に軍が政治を主導する構図ができ、五・一五事件と二・二六事件（1936年）を経て政党内閣は復活しなかった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('8d7164fa-fe16-3c55-ac79-a4fd63e11583', 'kc.manchuria.domestic_impact', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('367958bf-e3b7-34e2-8832-fb61a9fc234b', NULL, 'mcq4', '満洲国の建前と実態の違いとして正しいものはどれか。', '[{"key":"a","text":"住民の投票によって建国が決まり、日本人の官吏は置かれなかった"},{"key":"b","text":"五族協和と王道楽土を掲げたが、実権は関東軍と日本人官吏が握っていた"},{"key":"c","text":"独立国として国際的に広く承認され、日本の関与はきわめて限られていた"},{"key":"d","text":"清朝が自らの意思で再興した国家であり、日本は関与していなかった"}]'::jsonb,
+   '"b"'::jsonb, '清朝最後の皇帝である溥儀を執政（のち皇帝）に迎え、五族協和と王道楽土を掲げた。しかし実権は関東軍と日本人の次長級官吏が握り、経済も日本に統合された。国際連盟は主権が中国にあるとして承認せず、承認したのは日本・ドイツ・イタリアなどに限られた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('367958bf-e3b7-34e2-8832-fb61a9fc234b', 'kc.manchuria.puppet_state', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('53092a91-4604-3102-b02c-9b076f689141', NULL, 'mcq4', '満洲と華北の位置関係について正しいものはどれか。', '[{"key":"a","text":"満洲は中国の東北部で、その南に万里の長城をはさんで華北が広がる"},{"key":"b","text":"満洲は中国の南部にあり、華北はその西方に位置している"},{"key":"c","text":"満洲と華北はいずれも長江の南に位置する地域である"},{"key":"d","text":"満洲は朝鮮半島の南に位置し、華北とは海で隔てられている"}]'::jsonb,
+   '"a"'::jsonb, '満洲は遼寧・吉林・黒竜江にあたる中国東北部で、南は万里の長城をはさんで華北（河北・山東など）に接し、東は朝鮮半島、北はソ連と国境を接する。満洲事変後、日本は長城を越えて華北の分離工作を進め、盧溝橋事件（1937年）で全面的な戦争へ拡大した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('53092a91-4604-3102-b02c-9b076f689141', 'kc.manchuria.geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e7e6c128-2882-3612-b1c4-0d2977b060a0', NULL, 'mcq4', '国際連盟の無力が示された因果の説明として正しいものはどれか。', '[{"key":"a","text":"侵略を認定しても制裁の手段を欠き、当事国の脱退を止められなかった"},{"key":"b","text":"連盟が軍事制裁を行ったが、それでも侵略を止められなかったこと"},{"key":"c","text":"連盟が満洲国を承認したため、以後の侵略が正当化されていったこと"},{"key":"d","text":"連盟は満洲事変を調査せず、事実そのものを把握していなかったこと"}]'::jsonb,
+   '"a"'::jsonb, 'リットン調査団は日本の軍事行動を自衛とは認めず、同時に満洲における日本の権益にも配慮した報告を出した。総会は圧倒的多数で勧告を採択したが、経済制裁すら発動されず日本は脱退した。イタリアのエチオピア侵攻でも同じ限界が現れ、集団安全保障の失敗が明らかになった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e7e6c128-2882-3612-b1c4-0d2977b060a0', 'kc.manchuria.league_failure', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0af5aefd-e929-37ce-84cd-b029d8b7b090', NULL, 'mcq4', '日中戦争が長期化した要因として最も適切なものはどれか。', '[{"key":"a","text":"列強がいずれも中国への支援を拒み、戦力が均衡し続けたこと"},{"key":"b","text":"国共合作で抗戦が続き、中国が奥地へ退いて援蒋ルートの支援を受けたため"},{"key":"c","text":"中国側がただちに降伏したにもかかわらず、日本が戦闘を続けたため"},{"key":"d","text":"日本が兵力を投入しなかったため、戦線が動かないまま推移したこと"}]'::jsonb,
+   '"b"'::jsonb, '西安事件（1936年）を経た第2次国共合作で抗日民族統一戦線が成立した。国民政府は南京から武漢、重慶へ退いて抗戦を続け、援蒋ルートを通じて英米ソの支援を受けた。日本は点と線の占領にとどまり、決定的な打撃を与えられないまま兵力を消耗した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0af5aefd-e929-37ce-84cd-b029d8b7b090', 'kc.sinojp.prolongation', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ca497c3c-23be-3fd2-8913-e1b1d36663f7', NULL, 'mcq4', '日中戦争の拡大と和平工作を古いものから順に並べたものはどれか。', '[{"key":"a","text":"盧溝橋事件 → 国民政府を対手とせずの声明 → 南京占領 → 汪兆銘政権の樹立"},{"key":"b","text":"盧溝橋事件 → 第2次上海事変と南京占領 → 国民政府を対手とせずの声明 → 汪兆銘政権の樹立"},{"key":"c","text":"南京占領 → 盧溝橋事件 → 汪兆銘政権の樹立 → 国民政府を対手とせずの声明"},{"key":"d","text":"汪兆銘政権の樹立 → 盧溝橋事件 → 南京占領 → 国民政府を対手とせずの声明"}]'::jsonb,
+   '"b"'::jsonb, '盧溝橋事件（1937年7月）から戦火が上海へ広がり、12月に南京を占領して多数の中国人が殺害された（南京事件）。トラウトマン工作が失敗すると近衛内閣は国民政府を対手とせずと声明して交渉の相手を失い（1938年1月）、重慶を脱出した汪兆銘を担いで南京に政権を作った（1940年）。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ca497c3c-23be-3fd2-8913-e1b1d36663f7', 'kc.sinojp.order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('c9161c78-19be-3e98-b4b2-ac27fae7fd40', NULL, 'mcq4', '援蒋ルートと戦線の広がりについて正しいものはどれか。', '[{"key":"a","text":"援蒋ルートは日本の占領地の内部を通っており、遮断は容易であった"},{"key":"b","text":"日本の戦線は華北にとどまり、華中や華南には及ばなかった"},{"key":"c","text":"ビルマ・仏印・ソ連方面から重慶へ物資が届き、その遮断が南方進出の理由とされた"},{"key":"d","text":"援蒋ルートは存在せず、中国は外部からの支援を受けていなかった"}]'::jsonb,
+   '"c"'::jsonb, '重慶の国民政府へは、ビルマから雲南へ入る援蒋ルート、フランス領インドシナの鉄道、そしてソ連からの西北ルートで物資が届いた。日本はその遮断を理由に北部仏印進駐（1940年）と南部仏印進駐（1941年）を行い、これがアメリカの石油禁輸を招いて開戦への道を開いた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('c9161c78-19be-3e98-b4b2-ac27fae7fd40', 'kc.sinojp.supply_routes_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('29ae6be4-742a-36bb-9336-77122dd85d5e', NULL, 'mcq4', '国家総動員体制の中身として正しいものはどれか。', '[{"key":"a","text":"議会の議決を経なければ動員できず、政党はそのまま存続していた"},{"key":"b","text":"動員は軍需産業に限られ、国民の生活には及ばなかった"},{"key":"c","text":"言論の統制は行われず、新聞と放送は自由な報道を続けていた"},{"key":"d","text":"国家総動員法で議会の議決なしに動員でき、大政翼賛会が政党にかわった"}]'::jsonb,
+   '"d"'::jsonb, '国家総動員法（1938年）は議会の議決を経ない勅令で人と物を動員できるようにし、国民徴用令や価格等統制令が続いた。政党は解散して大政翼賛会（1940年）にまとまり、隣組が生活を統制した。新聞と放送は情報局の統制下に置かれ、切符制と配給制が生活を規定した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('29ae6be4-742a-36bb-9336-77122dd85d5e', 'kc.sinojp.mobilization', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('4e0a3b3c-20d3-3d9c-b69d-520bee6dd564', NULL, 'mcq4', '日本と中国の戦時体制の違いとして正しいものはどれか。', '[{"key":"a","text":"日本は既存の国家機構を軸に統制を強め、中国は国共合作という連合で抗戦した"},{"key":"b","text":"日本が二つの勢力の連合体制をとり、中国が単一の政権で統制を進めた"},{"key":"c","text":"いずれも単一の政党による独裁体制で、内容に違いはなかった"},{"key":"d","text":"中国には戦時体制が存在せず、統制はまったく行われなかった"}]'::jsonb,
+   '"a"'::jsonb, '日本は天皇制のもとで既存の官僚機構と軍が統制を強め、大政翼賛会が上からの一元化をはかった。中国は国民党の重慶政権と共産党の延安の解放区が並存する連合で、共産党は農村で減租減息を進めて支持を広げた。この違いが戦後の国共内戦の帰趨に影響する。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('4e0a3b3c-20d3-3d9c-b69d-520bee6dd564', 'kc.sinojp.two_regimes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ef16d332-1896-3bde-87cb-7a32770ef970', NULL, 'mcq4', '日中戦争が対米関係を悪化させた因果の説明として正しいものはどれか。', '[{"key":"a","text":"合衆国が日本の行動を支持したため、かえって英仏との関係が悪化したこと"},{"key":"b","text":"日本が中国から撤退したにもかかわらず、合衆国が禁輸を続けたこと"},{"key":"c","text":"門戸開放に反する行動と南方進出に対し、合衆国が通商条約破棄と禁輸で応じた"},{"key":"d","text":"合衆国は中国に関心をもたず、日中戦争は米国との関係に影響しなかったこと"}]'::jsonb,
+   '"c"'::jsonb, '日本の行動は九か国条約の門戸開放・機会均等に反すると受けとめられ、合衆国は日米通商航海条約の破棄を通告（1939年）した。日独伊三国同盟（1940年）と南部仏印進駐（1941年）に対しては在米資産の凍結と石油の全面禁輸で応じ、日米交渉の決裂へ進んだ。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ef16d332-1896-3bde-87cb-7a32770ef970', 'kc.sinojp.to_us_conflict', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('42b4dbb3-dab3-33a6-b17f-8733e9e5829b', NULL, 'mcq4', 'アジア太平洋戦争の開戦に至った要因として最も適切なものはどれか。', '[{"key":"a","text":"南部仏印進駐への石油禁輸で日米交渉が行きづまり、開戦が選ばれたこと"},{"key":"b","text":"合衆国が先に日本本土を攻撃したため、日本が応戦したこと"},{"key":"c","text":"日本が中国から撤退したにもかかわらず、合衆国が宣戦を布告したこと"},{"key":"d","text":"ドイツが日本に参戦を命じたため、日本がこれに従ったこと"}]'::jsonb,
+   '"a"'::jsonb, '南部仏印進駐に対する石油の全面禁輸で、日本は備蓄を消費するか要求をのむかの選択を迫られた。ハル=ノートが中国と仏印からの全面撤退を求めたことで交渉は決裂し、1941年12月8日にマレー半島上陸と真珠湾攻撃で開戦した。石油をめぐる資源の問題が直接の引き金である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('42b4dbb3-dab3-33a6-b17f-8733e9e5829b', 'kc.pacificwar.causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('fe73fa7f-bef4-3cb3-8bed-b6af32df8e48', NULL, 'mcq4', '大東亜共栄圏の建前と占領の実態の違いとして正しいものはどれか。', '[{"key":"a","text":"経済的な協力だけを目的としており、軍政は敷かれなかったこと"},{"key":"b","text":"占領地では現地の言語と文化が尊重され、同化の政策はとられなかったこと"},{"key":"c","text":"欧米からの解放を掲げたが、資源の収奪と労務動員、日本語教育が行われた"},{"key":"d","text":"掲げた理念どおりに各地の独立が実現し、日本の統治は行われなかった"}]'::jsonb,
+   '"c"'::jsonb, '欧米の植民地支配からの解放とアジアの共存共栄を掲げ、ビルマとフィリピンの独立を認めた。しかし実際には石油・ゴム・錫などの資源が優先的に収奪され、鉄道建設などへの労務動員で多数の犠牲が出た。日本語教育と宮城遙拝が強いられ、各地で抗日運動が起きた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('fe73fa7f-bef4-3cb3-8bed-b6af32df8e48', 'kc.pacificwar.co_prosperity', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('80ec0f98-770a-37e1-9e66-2f9c360da30a', NULL, 'mcq4', '日本の最大占領範囲とその後の後退について正しいものはどれか。', '[{"key":"a","text":"ハワイとオーストラリア本土を占領し、そこから後退していった"},{"key":"b","text":"開戦から終戦まで占領範囲は変わらず、後退することはなかった"},{"key":"c","text":"西はビルマ、南はニューギニアまで広げたが、ミッドウェー海戦を境に後退した"},{"key":"d","text":"占領範囲は中国大陸にとどまり、東南アジアには及ばなかった"}]'::jsonb,
+   '"c"'::jsonb, '開戦から半年で香港・マレー・シンガポール・フィリピン・蘭印・ビルマを制圧し、ニューギニアとソロモン諸島に達した。ミッドウェー海戦（1942年6月）で主力空母を失い、ガダルカナル島の攻防を境に後退へ転じた。サイパン陥落（1944年）で本土空襲が本格化する。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('80ec0f98-770a-37e1-9e66-2f9c360da30a', 'kc.pacificwar.extent_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('1ed47fdc-ea93-3af6-b401-7e338b89db09', NULL, 'mcq4', '戦時下の国民生活と動員について正しいものはどれか。', '[{"key":"a","text":"空襲がなかったため、都市から地方への疎開は行われなかったこと"},{"key":"b","text":"配給と切符制のもとで学徒出陣と勤労動員が行われ、都市の子どもは疎開した"},{"key":"c","text":"物資は豊富に供給され、生活は戦前と変わらず維持されていたこと"},{"key":"d","text":"学生と女性は動員の対象外とされ、工場での労働は行われなかったこと"}]'::jsonb,
+   '"b"'::jsonb, '米や衣料は配給と切符制になり、金属が供出された。学徒出陣（1943年）で文科系学生が徴集され、学徒勤労動員と女子挺身隊が工場を支えた。都市の児童は学童疎開で親元を離れ、東京大空襲（1945年3月）をはじめとする空襲と沖縄戦で多数の民間人が犠牲になった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('1ed47fdc-ea93-3af6-b401-7e338b89db09', 'kc.pacificwar.home_front', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('8b0c5738-8f52-39fc-a245-c4902a021d1b', NULL, 'mcq4', '終戦に至る出来事を古いものから順に並べたものはどれか。', '[{"key":"a","text":"沖縄戦 → ポツダム宣言 → 広島と長崎への原爆投下とソ連参戦 → 玉音放送 → 降伏文書調印"},{"key":"b","text":"ポツダム宣言 → 沖縄戦 → 玉音放送 → 原爆投下とソ連参戦 → 降伏文書調印"},{"key":"c","text":"原爆投下とソ連参戦 → 沖縄戦 → ポツダム宣言 → 降伏文書調印 → 玉音放送"},{"key":"d","text":"沖縄戦 → 玉音放送 → ポツダム宣言 → 原爆投下とソ連参戦 → 降伏文書調印"}]'::jsonb,
+   '"a"'::jsonb, '沖縄戦（1945年3〜6月）で組織的な抵抗が終わり、7月26日にポツダム宣言が出された。8月6日に広島、8日にソ連が参戦、9日に長崎への原爆投下があり、14日に受諾を決定して15日に玉音放送が流れた。降伏文書の調印は9月2日である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('8b0c5738-8f52-39fc-a245-c4902a021d1b', 'kc.pacificwar.end_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('eb123635-3be2-3c3c-a78c-422ceedcd067', NULL, 'mcq4', '戦後処理が東アジアの分断を生んだ因果の説明として正しいものはどれか。', '[{"key":"a","text":"戦後処理は国際連合が一元的に行い、米ソは関与しなかったこと"},{"key":"b","text":"日本の支配が続いたため、東アジアに分断は生じなかったこと"},{"key":"c","text":"分断は19世紀からのもので、第二次世界大戦とは関係がないこと"},{"key":"d","text":"日本の支配が崩れた地域を米ソが分けて占領し、朝鮮とベトナムに分断が生じた"}]'::jsonb,
+   '"d"'::jsonb, '朝鮮は北緯38度線で米ソが分割占領し、1948年に2つの国家が成立して朝鮮戦争で分断が固定された。ベトナムも独立宣言後の戦争を経て北緯17度線で分けられた。中国では国共内戦の結果、大陸と台湾が分かれた。日本帝国の解体が冷戦と重なって分断が生まれた構図である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('eb123635-3be2-3c3c-a78c-422ceedcd067', 'kc.pacificwar.postwar_division', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('8ef202d9-41db-3a63-b1b7-3159d188a26e', NULL, 'mcq4', '占領初期と後期の政策の違いとして正しいものはどれか。', '[{"key":"a","text":"占領の方針は一貫しており、途中で転換したことはなかった"},{"key":"b","text":"後期には民主化がさらに徹底され、財閥解体が完了へ向かったこと"},{"key":"c","text":"初期は非軍事化と民主化を、冷戦の激化後は経済復興と再軍備を重視した"},{"key":"d","text":"初期は経済復興を、後期は非軍事化と民主化を重視するという順序であった"}]'::jsonb,
+   '"c"'::jsonb, '当初は財閥解体・農地改革・労働組合の育成・憲法制定など非軍事化と民主化が進められた。冷戦の激化と中華人民共和国の成立を受けて、日本を西側の拠点とする逆コースへ転じ、二・一ゼネストの中止、経済安定九原則、公職追放の解除、警察予備隊の創設が続いた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('8ef202d9-41db-3a63-b1b7-3159d188a26e', 'kc.occupation.policy_shift', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0d49271a-351a-3124-a686-9dc0eafd0a41', NULL, 'mcq4', '占領下の三大改革の内容として正しいものはどれか。', '[{"key":"a","text":"通貨改革・関税自主権の放棄・農地の国有化の3つが進められた"},{"key":"b","text":"財閥解体・農地改革・労働の民主化が、経済の民主化として進められた"},{"key":"c","text":"財閥の強化・地主制の維持・労働運動の禁止の3つが進められた"},{"key":"d","text":"徴兵制の再建・地租の復活・義務教育の廃止の3つが進められた"}]'::jsonb,
+   '"b"'::jsonb, '持株会社整理委員会による財閥解体、不在地主の土地を国が買い上げて小作人に売り渡す農地改革、労働三法による労働の民主化が経済の民主化と呼ばれる。農地改革で自作農が広く生まれ、農村の社会構造が大きく変わった。財閥解体は冷戦の影響で途中で緩められた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0d49271a-351a-3124-a686-9dc0eafd0a41', 'kc.occupation.three_reforms', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('f9216c1b-2d39-39ad-89c7-9da2607273cc', NULL, 'mcq4', '大日本帝国憲法と日本国憲法の違いとして正しいものはどれか。', '[{"key":"a","text":"日本国憲法は天皇を統治権の総攬者と定め、帝国憲法は象徴と定めていた"},{"key":"b","text":"日本国憲法は欽定憲法として天皇が定め、国民の関与はなかった"},{"key":"c","text":"主権が天皇から国民へ移り、天皇は象徴となって戦争放棄が定められた"},{"key":"d","text":"いずれも国民主権を定めており、両者に本質的な違いはなかった"}]'::jsonb,
+   '"c"'::jsonb, '帝国憲法は天皇主権で、権利は法律の範囲内で認められる臣民の権利だった。日本国憲法（1946年公布、1947年施行）は国民主権・基本的人権の尊重・平和主義を三原則とし、天皇を日本国および日本国民統合の象徴とした。手続きは帝国憲法の改正として行われた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('f9216c1b-2d39-39ad-89c7-9da2607273cc', 'kc.occupation.two_constitutions', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('c1074280-2cd7-31b0-a1b7-6051b1ed4b72', NULL, 'mcq4', '日本が独立を回復するまでを古いものから順に並べたものはどれか。', '[{"key":"a","text":"日ソ共同宣言と国連加盟 → 朝鮮戦争の勃発 → 自衛隊の発足 → サンフランシスコ平和条約"},{"key":"b","text":"朝鮮戦争の勃発 → 自衛隊の発足 → 日ソ共同宣言と国連加盟 → サンフランシスコ平和条約"},{"key":"c","text":"朝鮮戦争の勃発 → サンフランシスコ平和条約と日米安全保障条約 → 自衛隊の発足 → 日ソ共同宣言と国連加盟"},{"key":"d","text":"サンフランシスコ平和条約 → 朝鮮戦争の勃発 → 日ソ共同宣言と国連加盟 → 自衛隊の発足"}]'::jsonb,
+   '"c"'::jsonb, '朝鮮戦争（1950年）を機に警察予備隊が作られ、サンフランシスコ平和条約と日米安全保障条約（1951年調印、1952年発効）で独立を回復した。保安隊を経て自衛隊が発足し（1954年）、日ソ共同宣言（1956年）でソ連との国交が回復して国際連合への加盟が実現した。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('c1074280-2cd7-31b0-a1b7-6051b1ed4b72', 'kc.occupation.independence_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('976fd3aa-5fd0-39d2-aea5-290e4222dc98', NULL, 'mcq4', '朝鮮戦争が日本の復興を早めた因果の説明として正しいものはどれか。', '[{"key":"a","text":"朝鮮戦争によって輸出が止まり、日本の経済は大きく後退したこと"},{"key":"b","text":"日本が直接に参戦して賠償金を得たため、経済が回復したこと"},{"key":"c","text":"戦争の影響は朝鮮半島にとどまり、日本経済には及ばなかったこと"},{"key":"d","text":"国連軍の特需が生産を押し上げ、経済が戦前の水準へ回復する契機となった"}]'::jsonb,
+   '"d"'::jsonb, 'ドッジ=ラインの緊縮で安定恐慌に陥っていたところへ、国連軍向けの物資とサービスの需要（特需）が生じ、繊維と金属を中心に生産が回復した。これが1955年からの高度経済成長の助走となった。同時に日本は米軍の後方基地となり、再軍備が始まった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('976fd3aa-5fd0-39d2-aea5-290e4222dc98', 'kc.occupation.korean_war_boom', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('df2d92c8-1924-36b5-a859-1da05ef00afc', NULL, 'mcq4', 'サンフランシスコ平和条約で確定しなかった地域について正しいものはどれか。', '[{"key":"a","text":"北方領土は条約でソ連への帰属が明記され、争点にならなかった"},{"key":"b","text":"沖縄と小笠原は米国の施政下に残り、北方領土と竹島の帰属も未解決となった"},{"key":"c","text":"すべての領土の帰属が条約で確定し、未解決の問題は残らなかった"},{"key":"d","text":"沖縄は条約と同時に返還され、施政権が残ることはなかった"}]'::jsonb,
+   '"b"'::jsonb, '日本は台湾・千島・南樺太などを放棄したが、その帰属先は明記されなかった。沖縄と小笠原はアメリカの施政下に置かれ、小笠原は1968年、沖縄は1972年に返還された。ソ連は条約に調印せず、北方領土の問題が残り、竹島と尖閣諸島をめぐる主張も未解決のまま続いている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('df2d92c8-1924-36b5-a859-1da05ef00afc', 'kc.occupation.territory_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('0aa67ebe-8681-35f2-b817-35b15ac14e0c', NULL, 'mcq4', '高度経済成長が可能になった要因として最も適切なものはどれか。', '[{"key":"a","text":"人口が減少して労働力が不足したため、賃金の上昇が成長を導いたこと"},{"key":"b","text":"海外からの援助だけが成長の原因で、国内の要因は存在しなかったこと"},{"key":"c","text":"安価な石油と技術導入、高い貯蓄と設備投資、固定相場と軽い防衛費が重なった"},{"key":"d","text":"軍事費を大幅に増やしたことが需要を生み、成長を支えたこと"}]'::jsonb,
+   '"c"'::jsonb, '中東の安価な石油、欧米からの技術導入、農村からの豊富な労働力、高い貯蓄率に支えられた設備投資が重なった。1ドル360円の固定相場が輸出に有利に働き、防衛費が軽く済んだことも大きい。所得倍増計画（1960年）がこの流れを後押しした。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('0aa67ebe-8681-35f2-b817-35b15ac14e0c', 'kc.growth.causes', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6ac931c0-1686-3e73-a434-c44c17c4e6e8', NULL, 'mcq4', '高度経済成長の光と影として正しいものはどれか。', '[{"key":"a","text":"生活水準が上がる一方で四大公害が起き、過密と過疎の問題も生じた"},{"key":"b","text":"成長の恩恵だけがあり、環境や地域の問題は生じなかったこと"},{"key":"c","text":"公害は都市にのみ生じ、地方には影響が及ばなかったこと"},{"key":"d","text":"公害への対策はまったく行われず、法制度も作られなかったこと"}]'::jsonb,
+   '"a"'::jsonb, '三種の神器から3C（カー・クーラー・カラーテレビ）へと消費が広がった一方、水俣病・新潟水俣病・イタイイタイ病・四日市ぜんそくの四大公害が起きた。都市の過密と農村の過疎も進んだ。公害対策基本法（1967年）と環境庁の設置（1971年）はこれへの対応である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6ac931c0-1686-3e73-a434-c44c17c4e6e8', 'kc.growth.pollution', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('dae0cf79-a754-3f3b-9f5a-574c02957c50', NULL, 'mcq4', '日本が国際社会に復帰していく過程を古いものから順に並べたものはどれか。', '[{"key":"a","text":"沖縄返還 → 日ソ共同宣言と国連加盟 → 日韓基本条約 → 日中平和友好条約 → 日中共同声明"},{"key":"b","text":"日ソ共同宣言と国連加盟 → 日韓基本条約 → 沖縄返還 → 日中共同声明 → 日中平和友好条約"},{"key":"c","text":"日韓基本条約 → 日ソ共同宣言と国連加盟 → 日中共同声明 → 沖縄返還 → 日中平和友好条約"},{"key":"d","text":"日中共同声明 → 日韓基本条約 → 日ソ共同宣言と国連加盟 → 日中平和友好条約 → 沖縄返還"}]'::jsonb,
+   '"b"'::jsonb, '日ソ共同宣言と国連加盟（1956年）で国際社会に復帰し、日韓基本条約（1965年）で韓国と国交を結んだ。沖縄返還（1972年5月）に続き、同年9月の日中共同声明で中華人民共和国と国交を正常化し、日中平和友好条約（1978年）に至った。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('dae0cf79-a754-3f3b-9f5a-574c02957c50', 'kc.growth.diplomacy_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('6e22db71-cd8e-3632-933d-97e2d6ff2462', NULL, 'mcq4', '高度経済成長が終わった因果の説明として正しいものはどれか。', '[{"key":"a","text":"ドル=ショックで固定相場が崩れ、第1次石油危機で1974年に戦後初のマイナス成長となった"},{"key":"b","text":"固定相場が維持されたまま、石油価格の下落によって成長が止まったこと"},{"key":"c","text":"石油危機の影響はなく、国内の政治的な混乱だけが原因であったこと"},{"key":"d","text":"成長は1980年代まで続き、石油危機によって終わることはなかったこと"}]'::jsonb,
+   '"a"'::jsonb, 'ニクソンの金とドルの交換停止（1971年）で固定相場制が崩れ、変動相場制に移って円高が進んだ。第4次中東戦争に伴う第1次石油危機（1973年）で原油価格が急騰し、狂乱物価と1974年の戦後初のマイナス成長を招いた。以後は安定成長へ移り、省エネと減量経営が進む。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('6e22db71-cd8e-3632-933d-97e2d6ff2462', 'kc.growth.end', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('ee7daff8-8f03-329c-8de8-24ff7aeb89ff', NULL, 'mcq4', '高度経済成長期の産業と人口の集中について正しいものはどれか。', '[{"key":"a","text":"農村の人口が増加し、都市の人口はむしろ減少していったこと"},{"key":"b","text":"京浜から北九州に至る太平洋ベルトに工業と人口が集中し、農村は過疎化した"},{"key":"c","text":"工業と人口は日本海側に集中し、太平洋側はむしろ過疎化していったこと"},{"key":"d","text":"工業の立地は全国に均等に分散し、集中は起こらなかったこと"}]'::jsonb,
+   '"b"'::jsonb, '原料の輸入と製品の輸出に有利な臨海部、すなわち京浜・中京・阪神・瀬戸内・北九州を結ぶ太平洋ベルトに石油化学と鉄鋼のコンビナートが並んだ。農村から若者が集団就職で流入し、都市は過密、農村は過疎となった。この不均衡への対応が全国総合開発計画である。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('ee7daff8-8f03-329c-8de8-24ff7aeb89ff', 'kc.growth.belt_geo', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('92936b72-6a45-3747-b2c9-dbdaec017439', NULL, 'mcq4', '冷戦終結が日本の立場を変えた因果の説明として正しいものはどれか。', '[{"key":"a","text":"湾岸戦争で資金協力が評価されず、国際貢献のあり方が問われて法整備が進んだ"},{"key":"b","text":"冷戦終結で国際貢献が不要となり、自衛隊の海外派遣は行われなかったこと"},{"key":"c","text":"日米安全保障条約が破棄され、日本は独自の防衛体制へ移行したこと"},{"key":"d","text":"冷戦の終結は日本に影響を与えず、外交の課題は変わらなかったこと"}]'::jsonb,
+   '"a"'::jsonb, '湾岸戦争（1991年）で日本は多額の資金を拠出したが人的な貢献がないと批判された。これを受けて国連平和維持活動協力法（1992年）が成立し、カンボジアへ自衛隊が派遣された。冷戦下では想定されなかった海外での活動が、憲法との関係を含めて論点となった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('92936b72-6a45-3747-b2c9-dbdaec017439', 'kc.jpcwend.new_role', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('129967a1-441f-316b-b754-0cf2b8dab932', NULL, 'mcq4', 'バブル経済が生まれ崩壊した因果の説明として正しいものはどれか。', '[{"key":"a","text":"プラザ合意後の円高不況に低金利で対応した結果、資産価格が高騰し、引き締めで崩れた"},{"key":"b","text":"高金利政策によって資産価格が高騰し、その後の金融緩和で崩壊したこと"},{"key":"c","text":"実体経済の成長がそのまま資産価格に反映されただけで、投機は関与しなかったこと"},{"key":"d","text":"バブルの崩壊は短期間で収束し、その後の経済に影響は残らなかったこと"}]'::jsonb,
+   '"a"'::jsonb, 'プラザ合意（1985年）後の急激な円高による不況に対し、日本銀行が低金利政策をとった。余った資金が株式と土地に流れて資産価格が実体から離れて高騰した。金融引き締めと土地取引の規制で価格が崩れ、不良債権が金融機関を圧迫して失われた10年とよばれる長期の停滞を招いた。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('129967a1-441f-316b-b754-0cf2b8dab932', 'kc.jpcwend.bubble', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cf8f4614-fe2d-38e5-aea5-cc2710418ee9', NULL, 'mcq4', '55年体制とその終わりについて正しいものはどれか。', '[{"key":"a","text":"55年体制は現在まで続いており、政権交代は一度も起きていない"},{"key":"b","text":"自民党が政権、社会党が野党第一党という構図が続き、1993年に非自民の政権が生まれた"},{"key":"c","text":"社会党が一貫して政権を担い、自民党が野党であり続けた体制を指す"},{"key":"d","text":"複数の政党が交互に政権を担う体制で、政権交代が頻繁に起きていた"}]'::jsonb,
+   '"b"'::jsonb, '保守合同による自由民主党の結成と社会党の統一（1955年）以後、自民党が政権を、社会党が野党第一党を占める構図が続いた。冷戦の終結と政治改革をめぐる分裂により、1993年に細川護熙を首相とする非自民の連立政権が生まれて55年体制は終わった。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cf8f4614-fe2d-38e5-aea5-cc2710418ee9', 'kc.jpcwend.1955_system', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('da7a7bcb-ec2d-366d-a63a-cb07e48da0c7', NULL, 'mcq4', '冷戦終結後の東アジアの動きを古いものから順に並べたものはどれか。', '[{"key":"a","text":"香港の返還 → 天安門事件 → 中国の世界貿易機関加盟 → 韓国とソ連の国交樹立 → 日韓共同宣言"},{"key":"b","text":"中国の世界貿易機関加盟 → 香港の返還 → 天安門事件 → 日韓共同宣言 → 韓国とソ連の国交樹立"},{"key":"c","text":"日韓共同宣言 → 天安門事件 → 韓国とソ連の国交樹立 → 中国の世界貿易機関加盟 → 香港の返還"},{"key":"d","text":"天安門事件 → 韓国とソ連の国交樹立 → 香港の返還 → 日韓共同宣言 → 中国の世界貿易機関加盟"}]'::jsonb,
+   '"d"'::jsonb, '天安門事件（1989年）で中国は民主化を弾圧しつつ経済の開放を進めた。韓国は北方外交でソ連（1990年）と中国（1992年）と国交を結び、香港が返還され（1997年）、日韓共同宣言（1998年）が和解と協力をうたい、中国が世界貿易機関に加盟した（2001年）。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('da7a7bcb-ec2d-366d-a63a-cb07e48da0c7', 'kc.jpcwend.east_asia_order', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('e0ea00f8-9251-33d5-8d45-07884d86533b', NULL, 'mcq4', '少子高齢化が社会保障を圧迫する因果の説明として正しいものはどれか。', '[{"key":"a","text":"社会保障の費用は税だけでまかなわれるため、人口構成とは無関係であること"},{"key":"b","text":"支える側が減り支えられる側が増えるため、年金と医療の負担の均衡が崩れる"},{"key":"c","text":"高齢者が増えると労働力も同時に増えるため、負担の問題は生じないこと"},{"key":"d","text":"少子化と高齢化は無関係の現象で、同時に進むことはないこと"}]'::jsonb,
+   '"b"'::jsonb, '日本の社会保障は現役世代の保険料が高齢者の年金と医療を支える賦課方式を軸とする。出生率の低下で支える側が減り、平均寿命の伸びで支えられる側が増えると均衡が崩れる。介護保険（2000年）や消費税による財源の確保、定年の延長などが対応として進められている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('e0ea00f8-9251-33d5-8d45-07884d86533b', 'kc.jptoday.aging', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('a307813d-aa48-3714-aa11-645872c475ab', NULL, 'mcq4', 'グローバル化が生む利益と格差について正しいものはどれか。', '[{"key":"a","text":"安い財と広い市場をもたらす一方、産業の空洞化と非正規雇用の増加を伴った"},{"key":"b","text":"利益だけをもたらす現象であり、格差の拡大とは無関係であること"},{"key":"c","text":"格差だけをもたらす現象であり、経済的な利益は生じなかったこと"},{"key":"d","text":"グローバル化は先進国にのみ影響し、発展途上国には及ばなかったこと"}]'::jsonb,
+   '"a"'::jsonb, '関税の引き下げと通信・輸送の発達で安価な財と広い市場が生まれた一方、生産拠点の海外移転による空洞化、価格競争のなかでの非正規雇用の増加が起きた。国家間の格差が縮まる一方で国内の格差が広がる傾向があり、この不満が各国の政治的な対立に反映されている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('a307813d-aa48-3714-aa11-645872c475ab', 'kc.jptoday.globalization', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('d77362b2-8f13-375a-b363-4eadefc02bfa', NULL, 'mcq4', '災害と原子力政策の転換について正しいものはどれか。', '[{"key":"a","text":"原発事故の後もエネルギー政策は変更されず、議論も起きなかったこと"},{"key":"b","text":"阪神・淡路大震災を機に原子力政策が転換され、原発は全廃されたこと"},{"key":"c","text":"災害は地域の問題にとどまり、国のエネルギー政策とは無関係であること"},{"key":"d","text":"東日本大震災に伴う原発事故を機に、エネルギー政策の見直しが課題となった"}]'::jsonb,
+   '"d"'::jsonb, '阪神・淡路大震災（1995年）は都市の防災とボランティアの役割を、東日本大震災（2011年）は津波と原子力発電所の事故という複合災害を突きつけた。福島第一原発の事故を受けて全国の原発が停止し、再稼働・再生可能エネルギー・脱炭素をめぐる議論が続いている。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('d77362b2-8f13-375a-b363-4eadefc02bfa', 'kc.jptoday.disaster_energy', 1.0)
+  ON CONFLICT DO NOTHING;
+INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
+                  guess_rate, approved, approved_by, approved_at) VALUES
+  ('cd8c3401-7215-3ffc-be5b-beddd4018a26', NULL, 'mcq4', '現代の日本をめぐる地域の課題について正しいものはどれか。', '[{"key":"a","text":"北方領土・竹島・尖閣諸島の帰属や、朝鮮半島の非核化などの課題が続いている"},{"key":"b","text":"周辺地域との課題はすべて解決しており、未解決の問題は残っていないこと"},{"key":"c","text":"領土に関する課題だけが残り、安全保障に関する課題は存在しないこと"},{"key":"d","text":"これらの課題は21世紀に入って初めて生じたもので、戦後処理とは無関係であること"}]'::jsonb,
+   '"a"'::jsonb, 'サンフランシスコ平和条約が帰属先を明記しなかったことなどを背景に、北方領土（対ロシア）、竹島（対韓国）、尖閣諸島（対中国）をめぐる主張が続く。加えて朝鮮半島の非核化、台湾海峡の緊張、歴史認識をめぐる対話が課題となっている。戦後処理と冷戦の残した構造が根にある。', 0.25, true, 'author', now())
+  ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
+    answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
+    approved = EXCLUDED.approved, approved_by = EXCLUDED.approved_by;
+INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cd8c3401-7215-3ffc-be5b-beddd4018a26', 'kc.jptoday.regional_geo', 1.0)
+  ON CONFLICT DO NOTHING;
 
 -- 動画のチャンネル 0 件（承認されず除外 1）
 
@@ -10245,4 +13917,4 @@ COMMIT;
 --        (SELECT count(*) FROM kc_region) AS kc_region,
 --        (SELECT count(*) FROM canon_event) AS canon_event, (SELECT count(*) FROM person) AS person,
 --        (SELECT count(*) FROM item) AS item, (SELECT count(*) FROM item_kc) AS item_kc;
--- 期待値: era=3 region=24 unit=117 kc=408 kc_region=891 canon_event=1180 person=446 item=0
+-- 期待値: era=3 region=24 unit=117 kc=408 kc_region=891 canon_event=1180 person=446 item=408
