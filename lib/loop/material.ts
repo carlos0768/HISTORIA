@@ -10,6 +10,7 @@
 import type { Sql } from 'postgres'
 import { countsAsRead, requiredDwellMs, estimatedReadMs, CHARS_PER_MIN, READ_DWELL_RATIO }
   from '@/lib/domain/reading'
+import { jstDate } from '@/lib/domain/streak'
 
 /**
  * 「学習イベントとして数える滞在時間」の SQL 側の式。
@@ -30,6 +31,8 @@ export type SectionView = {
   hidden: boolean
   hiddenReason: string | null
   kcLabels: string[]
+  /** そのセクションが扱う KC。動画の推薦に使う（docs/09b §7） */
+  kcIds: string[]
   /** geo の KC が付いているセクションだけ、地図に出す地域の id を持つ */
   geoRegionIds: number[]
   /** 学習イベントとして数えられた読了があるか */
@@ -84,7 +87,8 @@ export async function materialView(db: Sql, userId: string, materialId: string):
 
   const rows = await db<{
     id: string; ord: number; heading: string; body_md: string; char_count: number
-    hidden: boolean; hidden_reason: string | null; kc_labels: string[]
+    hidden: boolean; hidden_reason: string | null
+    kc_labels: string[]; kc_ids: string[]
     geo_region_ids: number[]; read: boolean
   }[]>`
     SELECT s.id, s.ord, s.heading, s.body_md, s.char_count, s.hidden, s.hidden_reason,
@@ -93,6 +97,10 @@ export async function materialView(db: Sql, userId: string, materialId: string):
                 FROM material_section_kc sk JOIN kc k ON k.id = sk.kc_id
                WHERE sk.section_id = s.id),
              ARRAY[]::text[]) AS kc_labels,
+           COALESCE(
+             (SELECT array_agg(sk.kc_id ORDER BY sk.kc_id)
+                FROM material_section_kc sk WHERE sk.section_id = s.id),
+             ARRAY[]::text[]) AS kc_ids,
            -- 位置・版図の KC が付いているときだけ地図を出す。
            -- 全セクションに出すと地図が意味を失い、ただの飾りになる
            COALESCE(
@@ -114,7 +122,8 @@ export async function materialView(db: Sql, userId: string, materialId: string):
     // hidden なセクションは本文を渡さない（誤り報告・ファクトチェックで伏せたもの）
     bodyMd: r.hidden ? '' : r.body_md,
     charCount: r.char_count, hidden: r.hidden, hiddenReason: r.hidden_reason,
-    kcLabels: r.kc_labels, geoRegionIds: r.geo_region_ids, read: r.read,
+    kcLabels: r.kc_labels, kcIds: r.kc_ids,
+    geoRegionIds: r.geo_region_ids, read: r.read,
     requiredMs: requiredDwellMs(r.char_count), estimatedMs: estimatedReadMs(r.char_count),
   }))
 
@@ -150,9 +159,20 @@ export async function recordRead(
   const dwell = Math.max(0, Math.min(Math.round(a.dwellMs), 24 * 3600 * 1000))
   const scroll = a.scrollPct === null ? null : Math.max(0, Math.min(1, a.scrollPct))
 
-  await db`
-    INSERT INTO material_read (user_id, section_id, dwell_ms, scroll_pct, read_at)
-    VALUES (${a.userId}, ${a.sectionId}, ${dwell}, ${scroll}, ${a.now})`
+  // ★ 読了の記録とその日の活動を1つのトランザクションで書く。
+  //   別々に書くと「読んだのにその日の記録が無い」状態が生まれ、
+  //   連続日数（docs/11-ux.md §7）が理由もなく途切れる。
+  await db.begin(async tx => {
+    await tx`
+      INSERT INTO material_read (user_id, section_id, dwell_ms, scroll_pct, read_at)
+      VALUES (${a.userId}, ${a.sectionId}, ${dwell}, ${scroll}, ${a.now})`
+    // 日付は Asia/Tokyo。UTC で入れると日本時間の深夜0〜9時が前日に落ちる
+    await tx`
+      INSERT INTO user_activity (user_id, activity_date, sections_read)
+      VALUES (${a.userId}, ${jstDate(a.now)}, 1)
+      ON CONFLICT (user_id, activity_date)
+        DO UPDATE SET sections_read = user_activity.sections_read + 1`
+  })
 
   const [n] = await db<{ read: string; total: string }[]>`
     SELECT count(*) FILTER (WHERE EXISTS (

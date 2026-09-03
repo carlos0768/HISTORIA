@@ -6,7 +6,10 @@ export default defineConfig({
   test: {
     environment: 'node',
     // proxy.ts は Next の作法で置き場所が決まっているため、試験も根に置く
-    include: ['lib/**/*.test.ts', 'scripts/**/*.test.ts', 'components/**/*.test.ts', 'proxy.test.ts'],
+    // ★ .tsx も拾う。部品を**本物の DOM に載せて**確かめる試験がある
+    //   （components/video-embed.test.tsx。先頭の `@vitest-environment jsdom` で
+    //   その1ファイルだけ環境を切り替える。他は node のまま）
+    include: ['lib/**/*.test.ts', 'scripts/**/*.test.ts', 'components/**/*.test.{ts,tsx}', 'proxy.test.ts'],
 
     /**
      * 実 DB を使うテストは既定の 5 秒では足りない。

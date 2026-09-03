@@ -5,6 +5,10 @@ import { DEFAULT_MAX_DAILY } from '@/lib/domain/scheduler'
 import { Screen, Card } from '@/components/ui'
 import { NotReady } from '@/components/not-ready'
 import { SettingsForm } from './form'
+import { PushToggle } from '@/components/push-toggle'
+import { publicVapidKey } from '@/lib/push/vapid'
+import { subscribePush, unsubscribePush } from './actions'
+import { isAdmin } from '@/lib/auth/admin'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,8 +30,14 @@ export default async function Settings() {
     )
   }
 
-  const [u] = await db<{ max_daily_items: number; display_name: string | null }[]>`
-    SELECT max_daily_items, display_name FROM app_user WHERE id = ${userId}`
+  const [u] = await db<{
+    max_daily_items: number; display_name: string | null; remind_hour: number | null
+  }[]>`
+    SELECT max_daily_items, display_name, remind_hour FROM app_user WHERE id = ${userId}`
+
+  // ★ 鍵が無ければ通知の枠ごと出さない（lib/push/vapid.ts の作法）。
+  //   「押しても何も起きないボタン」を置かない
+  const vapid = publicVapidKey()
 
   return (
     <Screen title="設定" tab="settings">
@@ -35,6 +45,25 @@ export default async function Settings() {
         maxDaily={u?.max_daily_items ?? DEFAULT_MAX_DAILY}
         authEnabled={authEnabled()}
       />
+
+      {vapid && (
+        <PushToggle
+          vapidPublicKey={vapid}
+          remindHour={u?.remind_hour ?? null}
+          subscribe={subscribePush}
+          unsubscribe={unsubscribePush}
+        />
+      )}
+
+      {/* ★ 管理画面への入口。タブには足さない（components/nav.test.ts が3タブを固定しており、
+           あれは「増やすな」という意図の防壁である）。作者以外にはこの行ごと出ない */}
+      {isAdmin(userId) && (
+        <Card>
+          <span className="lv-label">管理</span>
+          <p className="lv-caption">生成の状況・支出・未処理の報告・定時実行の生存。</p>
+          <a className="lv-btn lv-btn--block" href="/admin">管理画面をひらく</a>
+        </Card>
+      )}
 
       <Card>
         <span className="lv-label">この端末に残っているもの</span>

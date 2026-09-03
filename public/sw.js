@@ -101,6 +101,102 @@ self.addEventListener('message', event => {
   if (event.data && event.data.type === 'purge') event.waitUntil(purge())
 })
 
+/**
+ * ────────────────────────────────────────────────
+ * 通知（docs/11-ux.md §7・docs/12-nonfunctional.md §10）
+ *
+ * ★ 本文は配信元（FCM など）を経由する。中身は暗号化されているが、
+ *   誰がいつ受け取ったかは配信元に見える。だから送信側は学習内容を書かない
+ *   （lib/push/send.ts）。ここでは受け取ったものをそのまま出すだけにする。
+ *
+ * ★ 中身が壊れていても通知を出す。payload の JSON.parse に失敗したとき
+ *   何も出さないと、利用者には「通知を許可したのに来ない」としか見えない。
+ *   既定の文面に落として、来ていることだけは分かるようにする。
+ * ────────────────────────────────────────────────
+ */
+
+const NOTIFY_TAG = 'historia-remind'
+const DEFAULT_NOTIFICATION = {
+  title: 'HISTORIA',
+  body: '今日の学習がまだ残っています',
+  url: '/study',
+}
+
+/**
+ * 開いてよい行き先か。
+ *
+ * ★ `url.startsWith('/')` では足りない。`//example.com/phish` も '/' 始まりで、
+ *   openWindow はこれを `https://example.com/phish` として解決する
+ *   （プロトコル相対 URL）。通知1通で任意の場所へ連れて行けることになる。
+ *   実際に試験で通ってしまい、ここで気づいた。
+ *   **解決してから生成元を比べる**のが唯一の確実な形である。
+ */
+function sameOriginPath(url) {
+  if (typeof url !== 'string' || !url.startsWith('/')) return null
+  try {
+    const u = new URL(url, self.location.origin)
+    if (u.origin !== self.location.origin) return null
+    return u.pathname + u.search
+  } catch {
+    return null
+  }
+}
+
+function readPayload(event) {
+  try {
+    const data = event.data && event.data.json()
+    if (!data || typeof data !== 'object') return DEFAULT_NOTIFICATION
+    return {
+      title: typeof data.title === 'string' ? data.title : DEFAULT_NOTIFICATION.title,
+      body: typeof data.body === 'string' ? data.body : DEFAULT_NOTIFICATION.body,
+      url: sameOriginPath(data.url) ?? DEFAULT_NOTIFICATION.url,
+    }
+  } catch {
+    return DEFAULT_NOTIFICATION
+  }
+}
+
+self.addEventListener('push', event => {
+  const n = readPayload(event)
+  event.waitUntil(self.registration.showNotification(n.title, {
+    body: n.body,
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    // ★ tag を固定する。届かなかった夜のぶんが溜まって、
+    //   翌朝に3通並ぶのを防ぐ。最新の1通だけが残る
+    tag: NOTIFY_TAG,
+    // ★ renotify を立てない。同じ tag で置き換えるたびに鳴らすと、
+    //   ただうるさいだけで、内容は変わっていない
+    data: { url: n.url },
+  }))
+})
+
+/**
+ * 通知を押したとき。
+ *
+ * ★ すでに開いている窓があればそれを使う。毎回 openWindow すると
+ *   同じ画面が何枚も開き、どれが今のものか分からなくなる。
+ * ★ 開く先は必ず自分の生成元の中に閉じる（url は '/' 始まりだけ通している）。
+ */
+self.addEventListener('notificationclick', event => {
+  event.notification.close()
+  // ★ ここでも解決し直す。push handler が入れた値しか来ないはずだが、
+  //   「はずだ」に頼らない。通知は他所（配信元）を通って届いたものである
+  const target = sameOriginPath(event.notification.data && event.notification.data.url)
+    ?? DEFAULT_NOTIFICATION.url
+  event.waitUntil((async () => {
+    const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+    for (const c of all) {
+      if (new URL(c.url).origin === self.location.origin) {
+        await c.focus()
+        if ('navigate' in c) await c.navigate(target)
+        return
+      }
+    }
+    await self.clients.openWindow(target)
+  })())
+})
+
 self.addEventListener('fetch', event => {
   const req = event.request
 

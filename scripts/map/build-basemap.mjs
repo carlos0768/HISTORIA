@@ -24,13 +24,33 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { feature, mesh } from 'topojson-client'
 import { geoNaturalEarth1, geoPath, geoGraticule, geoArea, geoCentroid } from 'd3-geo'
 
-const W = 660, H = 340
+/**
+ * ★ 解像度を引数で選べるようにした（2026-09-02）。
+ *
+ *   node scripts/map/build-basemap.mjs        … 110m を lib/map/basemap.ts へ
+ *   node scripts/map/build-basemap.mjs 50m    … 50m を lib/map/basemap-50m.ts へ
+ *
+ * ★ **既定は 110m のまま。** 50m は数倍の大きさになるので、
+ *   モバイルが毎回読む lib/map/basemap.ts には入れない。
+ *   50m はデスクトップの地図ワークスペース（app/map）が動的 import で読む。
+ *   docs/06 の「初回転送量を増やさない」はこの分離で守る。
+ */
+const RES = process.argv[2] === '50m' ? '50m' : '110m'
+const HI = RES === '50m'
+
+// 拡大して見るための図なので、50m は基準の寸法も大きく取る。
+// 縦横比（660:340）は 110m と同じにして、CSS と地域の対応表をそのまま使えるようにする
+const W = HI ? 1320 : 660, H = HI ? 680 : 340
 const PAD = [[10, 12], [W - 10, H - 12]]
 
-const topo = JSON.parse(readFileSync('node_modules/world-atlas/countries-110m.json', 'utf8'))
+const topo = JSON.parse(readFileSync(`node_modules/world-atlas/countries-${RES}.json`, 'utf8'))
 const countries = feature(topo, topo.objects.countries)
 const proj = geoNaturalEarth1().fitExtent(PAD, { type: 'Sphere' })
 const path = geoPath(proj)
+
+// 間引きの強さ。50m は拡大して見るので、110m ほど落とせない
+const STEP = HI ? 0.25 : 0.35
+const RING = HI ? 0.4 : 0.5
 
 /**
  * 投影後の座標で間引く。660×340 で見えない差は落とす。
@@ -65,18 +85,18 @@ const paths = {}, names = {}
 for (const f of countries.features) {
   const d = path(f)
   if (!d) continue
-  const s = simplify(d, 0.35, 0.5)
+  const s = simplify(d, STEP, RING)
   if (!s) continue
   paths[String(f.id)] = s
   names[String(f.id)] = f.properties.name
 }
 
 // ---- 国境（共有辺のみ。海岸線は国土の stroke が描く）----
-const borders = simplify(path(mesh(topo, topo.objects.countries, (a, b) => a !== b)) ?? '', 0.35, 0)
+const borders = simplify(path(mesh(topo, topo.objects.countries, (a, b) => a !== b)) ?? '', STEP, 0)
 
 // ---- 経緯線・球の輪郭 ----
 // 経緯線は背景なので強めに間引く。曲線がわずかに角張っても読めれば足りる
-const graticule = simplify(path(geoGraticule().step([20, 20])()) ?? '', 2.5, 0)
+const graticule = simplify(path(geoGraticule().step([20, 20])()) ?? '', HI ? 1.5 : 2.5, 0)
 const sphere = path({ type: 'Sphere' }) ?? ''
 
 // ---- 極小国：110m に無いものを 10m から拾い、重心に点を打つ ----
@@ -103,7 +123,7 @@ const out = `/**
  *
  * ★ 手で編集しない。scripts/map/build-basemap.mjs が作る。
  *
- * 出典: Natural Earth（パブリックドメイン）。国土と国境は 1:110m、
+ * 出典: Natural Earth（パブリックドメイン）。国土と国境は 1:${RES}、
  *       極小国の位置は 1:10m。
  * 図法: Natural Earth 1（d3.geoNaturalEarth1）をビルド時に適用済み。
  *       実行時の d3 依存は無い。
@@ -133,7 +153,9 @@ export const MICRO_PINS: ReadonlyArray<{ id: string; x: number; y: number }> =
 /** 数値コード → 英語名。地域の対応表を作るときの確認に使う */
 export const COUNTRY_NAMES: Readonly<Record<string, string>> = ${JSON.stringify(names)}
 `
-writeFileSync('lib/map/basemap.ts', out)
+const target = HI ? 'lib/map/basemap-50m.ts' : 'lib/map/basemap.ts'
+writeFileSync(target, out)
+console.log(`${target}（${RES} / ${W}×${H}）`)
 console.log(
   `国 ${Object.keys(paths).length}（陸 ${kb(landBytes)}KB / 国境 ${kb(borders.length)}KB / ` +
   `経緯線 ${kb(graticule.length)}KB）＋ 極小国の点 ${micro.length}`,

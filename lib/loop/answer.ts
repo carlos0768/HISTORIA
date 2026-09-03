@@ -10,9 +10,11 @@
  */
 import type { Sql } from 'postgres'
 import { sm2Update, jitterFromSeed, newKcCard, type KcCard, type Grade } from '@/lib/domain/sm2'
+import { updateElo } from '@/lib/domain/elo'
 import { updateKcState, initialKcState, type KcState } from '@/lib/domain/weakness'
 import { objectiveGrade, flashcardGrade, type FlashcardButton } from '@/lib/domain/grading'
 import { ALGO_VERSION, SCHED_VERSION, GUESS, MISCONCEPTION_HITS, type ItemFormat } from '@/lib/domain/params'
+import { jstDate } from '@/lib/domain/streak'
 
 /** SM-2 を呼ぶ最小の重み。これ未満の KC はその設問が主に問うていない（04b §3.1） */
 export const SM2_MIN_WEIGHT = 0.5
@@ -29,6 +31,12 @@ export type SubmitInput = {
   latencyMs: number | null
   /** フラッシュカードのみ。答えを表示してからの経過 ms */
   msSinceReveal?: number | null
+  /**
+   * 診断のときだけ渡す。その時点のセルθから見た正答確率（docs/04 §5.2 の Elo 較正）。
+   * ★ 呼び出し元（lib/loop/diagnostic.ts）が計算する。ここで計算しないのは、
+   *   セルの事後分布が診断セッションの中にしか無く、DB に置いていないためである。
+   */
+  expectedP?: number | null
   now: Date
 }
 
@@ -39,6 +47,8 @@ export type SubmitResult = {
   answerKey: unknown
   explanation: string | null
   updatedKcs: Array<{ kcId: string; q: Grade; clamped: boolean; dueAt: Date }>
+  /** その解答が紐づく KC。診断の集計に要る（状態は更新していない） */
+  kcIds: string[]
 }
 
 type ItemRow = {
@@ -115,6 +125,50 @@ export async function submitAnswer(db: Sql, input: SubmitInput): Promise<SubmitR
       UPDATE item SET observed_total = observed_total + 1,
                       observed_correct = observed_correct + ${correct ? 1 : 0}
        WHERE id = ${item.id}`
+
+    // --- 3b. その日の活動を数える（ストリークの土台・docs/11-ux.md §7）---
+    // ★ response と同じトランザクションで書く。別にすると「解答は入ったが
+    //   その日の記録が無い」状態が生まれ、連続日数が理由もなく途切れる。
+    // ★ 日付は Asia/Tokyo。UTC で入れると日本時間の深夜0〜9時が前日に落ちる。
+    await tx`
+      INSERT INTO user_activity (user_id, activity_date, responses)
+      VALUES (${input.userId}, ${jstDate(input.now)}, 1)
+      ON CONFLICT (user_id, activity_date)
+        DO UPDATE SET responses = user_activity.responses + 1`
+
+    /**
+     * --- 3c. 診断はここで終える（docs/04-weakness-engine.md §5.4・§5.5）---
+     *
+     * ★ **`user_kc_state` も `kc_card` も触らない。** 診断で測れるのは
+     *   12セルのθであって個々の KC ではない。24問で 800〜900 の KC を
+     *   判定したことにすると、実際には測っていないものを断定することになり、
+     *   初日に信頼を壊す。§5.4 は `n_eff(kc) = 0`（＝ status は unknown のまま）と定める。
+     *   伝播は診断が終わったあとに、セル単位で lib/loop/diagnostic.ts が行う。
+     *
+     * ★ `response` と `user_activity` と item の観測数は**書く**。
+     *   解いた事実は事実であり、Elo の較正はその観測数の上に成り立つ。
+     *
+     * ★ 誤概念（misconception）も記録しない。診断の誤答は「まだ習っていない」が
+     *   最も自然な説明で、それを誤概念として溜めると初日から誤った特徴が付く。
+     */
+    if (input.sessionKind === 'diagnostic') {
+      // Elo の較正は**共有プールだけ**（docs/04b §1.3・docs/04 §5.2）。
+      // ユーザー生成の item は二度と出ないので、歪んだ値だけが残る
+      if (item.user_id === null && typeof input.expectedP === 'number') {
+        const [e] = await tx<{ elo_b: number; elo_n: number }[]>`
+          SELECT elo_b, elo_n FROM item WHERE id = ${item.id} FOR UPDATE`
+        const next = updateElo(
+          { eloB: e!.elo_b, eloN: e!.elo_n }, correct, input.expectedP,
+        )
+        await tx`UPDATE item SET elo_b = ${next.eloB}, elo_n = ${next.eloN}
+                  WHERE id = ${item.id}`
+      }
+      return {
+        responseId, correct,
+        answerKey: item.answer_key, explanation: item.explanation,
+        updatedKcs: [], kcIds: kcs.map(k => k.kc_id),
+      }
+    }
 
     const dk = correct ? null : distractorKey(input.chosen)
     const updatedKcs: SubmitResult['updatedKcs'] = []
@@ -236,6 +290,7 @@ export async function submitAnswer(db: Sql, input: SubmitInput): Promise<SubmitR
       answerKey: item.answer_key, // 採点が終わってから初めて返す
       explanation: item.explanation,
       updatedKcs,
+      kcIds: kcs.map(k => k.kc_id),
     }
   }) as Promise<SubmitResult>
 }

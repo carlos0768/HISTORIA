@@ -145,6 +145,10 @@ CREATE TABLE app_user (
   daily_generation_quota    smallint NOT NULL DEFAULT 10,   -- 1日に生成できる教材ユニット数（08 §7）
   -- ★ 出題の1日上限。ユーザー自身と管理画面の両方から変更できる（05-scheduler.md §9.1）
   max_daily_items           smallint NOT NULL DEFAULT 80 CHECK (max_daily_items BETWEEN 10 AND 300),
+  -- ★ 1日1通のリマインドを送る時刻（Asia/Tokyo の時。NULL は通知しない）。
+  --   docs/11-ux.md §7 は「ユーザーが時刻を選ぶ」「1日1通に固定する」と定めている。
+  --   複数回送ると通知を切られ、二度と届かなくなるので、分は持たせない。
+  remind_hour               smallint CHECK (remind_hour BETWEEN 0 AND 23),
   created_at                timestamptz NOT NULL DEFAULT now(),
   CHECK (
     NOT guardian_consent_required
@@ -170,6 +174,26 @@ CREATE TABLE user_activity (
   sections_read int  NOT NULL DEFAULT 0,
   PRIMARY KEY (user_id, activity_date)
 );
+
+-- ---------------------------------------------------------------------
+-- Web Push の購読先  docs/11-ux.md §7・docs/12-nonfunctional.md §10
+--
+-- ★ 端末ごとに1行。同じ人が携帯と机の両方から購読しうる。
+--   endpoint がブラウザの発行する一意な URL なので、それを主キーにする。
+-- ★ 秘密は持たない。p256dh と auth は**その端末の公開鍵**であって、
+--   漏れても第三者が勝手に通知を送れるわけではない（送信には VAPID 秘密鍵が要る）。
+--   VAPID 秘密鍵はリポジトリにも DB にも置かず、環境変数だけに置く。
+-- ★ 送信して 404 / 410 が返ったら、その行は失効している。消す（§ 送信側の責務）。
+-- ---------------------------------------------------------------------
+CREATE TABLE push_subscription (
+  endpoint   text PRIMARY KEY,
+  user_id    uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  p256dh     text NOT NULL,
+  auth       text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  last_sent_at timestamptz
+);
+CREATE INDEX ON push_subscription (user_id);
 
 -- =====================================================================
 -- 4. 教材                  docs/07-content-pipeline.md
@@ -662,6 +686,23 @@ CREATE TABLE content_report (
 );
 CREATE INDEX ON content_report (status) WHERE status = 'open';
 
+-- ---------------------------------------------------------------------
+-- 定時処理の実行記録  docs/12-nonfunctional.md §7
+--
+-- ★ cron の失敗は UI に出ない（docs/05-scheduler.md §8）。
+--   だから「動いたこと」を残す。24時間記録が無ければ管理画面が警告を出す。
+-- ★ 成功も失敗も1行入れる。失敗だけ記録すると「1度も動いていない」と
+--   「動いて全部成功した」が区別できない。
+-- ---------------------------------------------------------------------
+CREATE TABLE ops_log (
+  id     bigserial PRIMARY KEY,
+  kind   text NOT NULL CHECK (kind IN ('remind','video_healthcheck','reap_reservations')),
+  ok     boolean NOT NULL,
+  detail jsonb,
+  ran_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX ON ops_log (kind, ran_at DESC);
+
 -- =====================================================================
 -- 12. ビュー
 -- =====================================================================
@@ -729,17 +770,19 @@ ALTER TABLE user_activity            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_daily_plan          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE evidence_import          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE content_report           ENABLE ROW LEVEL SECURITY;
+ALTER TABLE push_subscription        ENABLE ROW LEVEL SECURITY;
 
 -- ---- 運用テーブル（意図的に「全行拒否」にする。ポリシーを書かない） ----
 -- ★ ここだけは下の原則の例外である。利用者に見せる必要も書かせる必要も無い。
 --   ポリシーを1つも定義しないことで anon / authenticated からは一切読めなくなり、
 --   service_role（サーバー側）だけが RLS を迂回して読み書きする。
 --   遮断器の上限値をユーザーが読めても書けても困るので、これが正しい状態である。
---   将来この3テーブルに「ポリシーが無い」と指摘されても、追加してはならない。
+--   将来この4テーブルに「ポリシーが無い」と指摘されても、追加してはならない。
 --   同じ理由で item の SELECT と response の INSERT も意図的に存在しない（下記）。
 ALTER TABLE app_setting              ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_budget                ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_spend                 ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ops_log                  ENABLE ROW LEVEL SECURITY;
 
 -- ---- マスタ系（全認証ユーザーが読み取り可・書き込み不可）----
 -- ★ 以前はこの9表で RLS を有効にしていなかった。「RLS を掛けなければ読める」
@@ -852,6 +895,11 @@ CREATE POLICY kc_card_select ON kc_card
 CREATE POLICY misconception_select ON misconception
   FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY user_activity_select ON user_activity
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
+-- ★ push_subscription も SELECT だけ開ける。INSERT を開けない理由は response と同じで、
+--   クライアントに書かせると他人の user_id で購読を作れてしまうためである。
+--   購読の登録・削除は Server Action（service_role）が行う。
+CREATE POLICY push_subscription_select ON push_subscription
   FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY user_daily_plan_select ON user_daily_plan
   FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));

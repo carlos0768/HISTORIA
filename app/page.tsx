@@ -3,12 +3,14 @@ import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { todaysPlan, drillProgressList } from '@/lib/loop/today'
 import { drillMaterials } from '@/lib/loop/material'
+import { streak } from '@/lib/loop/records'
 import { UnitMaterials } from './units'
 import { Screen, Card, TwoBars, Alert, Empty, StatusChip } from '@/components/ui'
 import { NotReady } from '@/components/not-ready'
 import { FakeNotice } from '@/components/fake-warning'
 import { readConfig } from '@/lib/ai/client'
 import { DEFAULT_MAX_DAILY } from '@/lib/domain/scheduler'
+import { hasDiagnostic } from '@/lib/loop/diagnostic'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,9 +27,42 @@ export default async function Home() {
   }
 
   const now = new Date()
-  const [plan, drills] = await Promise.all([
+
+  /**
+   * ★ 診断が未了なら、ホームは診断の導線だけを出す（docs/11-ux.md:80）。
+   *   弱点は確認テストから生まれ、確認テストは特訓の中にあり、特訓の教材は
+   *   弱点から作られる。新規ユーザーはこの環のどこからも起動できないので、
+   *   「今日やること 0問」と「特訓がありません」だけの画面になってしまう
+   *   （docs/04 §5.1 の循環依存）。診断がその環を断ち切る唯一の入口である。
+   *
+   * ★ ただし**素通りできる**ようにする。共有プールが未承認だと診断は始められず、
+   *   そこで足止めすると特訓も教材も使えなくなる。
+   */
+  if (!await hasDiagnostic(db, userId)) {
+    return (
+      <Screen title="HISTORIA" tab="home">
+        <Card>
+          <span className="lv-label">はじめに</span>
+          <p className="lv-body">
+            まず10分ほどの診断テストで、どこから確かめていくかの見当を付けます。
+            点数は付きません。
+          </p>
+          <Link className="lv-btn lv-btn--primary lv-btn--block" href="/diagnostic">
+            診断テストを受ける
+          </Link>
+          <p className="lv-caption">
+            あとで受けても構いません。その場合は範囲と締切を先に決めてください。
+          </p>
+          <Link className="lv-btn lv-btn--block" href="/drills/new">範囲と締切を決める</Link>
+        </Card>
+      </Screen>
+    )
+  }
+
+  const [plan, drills, days] = await Promise.all([
     todaysPlan(db, userId, now, DEFAULT_MAX_DAILY),
     drillProgressList(db, userId, now),
+    streak(db, userId, now),
   ])
   // 特訓ごとに、範囲の単元と教材の状態を引く（生成中・配信不可を隠さない）
   const materials = await Promise.all(drills.map(d => drillMaterials(db, userId, d.drillId)))
@@ -38,7 +73,10 @@ export default async function Home() {
   const usingFake = !cfg.geminiApiKey || !cfg.anthropicApiKey
 
   return (
-    <Screen title="HISTORIA" tab="home">
+    <Screen title="HISTORIA" tab="home"
+            /* ★ 0日のときは出さない。「0日連続」は続けたい気持ちを削ぐだけで、
+                 情報も無い（docs/11-ux.md §7.1 の「罪悪感で離脱を招く」） */
+            trailing={days.current > 0 ? <><b>{days.current}</b>日連続</> : undefined}>
       {usingFake && <FakeNotice />}
       {/* ホームに出す数字は1つだけ。特訓ごとのノルマは出さない（docs/05 §5.1） */}
       <Card>

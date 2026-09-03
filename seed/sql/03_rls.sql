@@ -25,7 +25,7 @@ BEGIN;
 -- ---- 1. ビューを「問い合わせた本人の権限」で評価させる ----
 ALTER VIEW v_weakness_evidence SET (security_invoker = true);
 
--- ---- 2. public の全ての表で RLS を有効にする（42 表）----
+-- ---- 2. public の全ての表で RLS を有効にする（44 表）----
 ALTER TABLE app_user             ENABLE ROW LEVEL SECURITY;
 ALTER TABLE drill                ENABLE ROW LEVEL SECURITY;
 ALTER TABLE drill_kc             ENABLE ROW LEVEL SECURITY;
@@ -46,9 +46,11 @@ ALTER TABLE user_activity        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_daily_plan      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE evidence_import      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE content_report       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE push_subscription    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE app_setting          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_budget            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_spend             ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ops_log              ENABLE ROW LEVEL SECURITY;
 ALTER TABLE era                  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE region               ENABLE ROW LEVEL SECURITY;
 ALTER TABLE person               ENABLE ROW LEVEL SECURITY;
@@ -69,7 +71,7 @@ ALTER TABLE past_exam_element    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE past_exam_kc         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE evidence_claim       ENABLE ROW LEVEL SECURITY;
 
--- ---- 3. ポリシーを貼り直す（34 本）----
+-- ---- 3. ポリシーを貼り直す（35 本）----
 -- ★ ポリシーには CREATE OR REPLACE も IF NOT EXISTS も無い。
 --   DROP IF EXISTS → CREATE が、何度流しても同じにする唯一の書き方である。
 
@@ -148,6 +150,10 @@ DROP POLICY IF EXISTS user_activity_select ON user_activity;
 CREATE POLICY user_activity_select ON user_activity
   FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 
+DROP POLICY IF EXISTS push_subscription_select ON push_subscription;
+CREATE POLICY push_subscription_select ON push_subscription
+  FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
+
 DROP POLICY IF EXISTS user_daily_plan_select ON user_daily_plan;
 CREATE POLICY user_daily_plan_select ON user_daily_plan
   FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
@@ -219,7 +225,7 @@ CREATE POLICY evidence_claim_select ON evidence_claim
 COMMIT;
 
 -- ---- 確認 ----
--- rls_無効な表 が 0、ポリシー本数 が 34 になっていれば当たっている。
+-- rls_無効な表 が 0、ポリシー本数 が 35 になっていれば当たっている。
 SELECT
   (SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
     WHERE n.nspname = 'public' AND c.relkind = 'r' AND NOT c.relrowsecurity) AS rls_無効な表,

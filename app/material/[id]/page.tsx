@@ -7,6 +7,7 @@ import { Screen, Alert } from '@/components/ui'
 import { NotReady } from '@/components/not-ready'
 import { FakeWarning } from '@/components/fake-warning'
 import { Reader } from './reader'
+import { videosForKcs, MAX_PER_SECTION } from '@/lib/loop/video'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,6 +56,21 @@ export default async function MaterialPage({ params }: { params: Promise<{ id: s
     )
   }
 
+  // ★ 動画はサーバー側で引く。Reader はクライアント境界なので DB を触らせない。
+  //   伏せたセクションには出さない（本文が無いのに「理解を助ける動画」は成立しない）。
+  const videos = await Promise.all(
+    m.sections.map(s => (s.hidden || s.kcIds.length === 0)
+      ? Promise.resolve([])
+      : videosForKcs(db, s.kcIds, MAX_PER_SECTION)),
+  )
+  const sections = m.sections.map((s, i) => ({
+    id: s.id, ord: s.ord, heading: s.heading, bodyMd: s.bodyMd,
+    charCount: s.charCount, hidden: s.hidden, hiddenReason: s.hiddenReason,
+    kcLabels: s.kcLabels, geoRegionIds: s.geoRegionIds,
+    read: s.read, requiredMs: s.requiredMs, estimatedMs: s.estimatedMs,
+    videos: videos[i] ?? [],
+  }))
+
   return (
     <Screen title={m.unitLabel} tab="drills">
       {/* ★ 本文より前に出す。読んでから言われても遅い */}
@@ -62,12 +78,7 @@ export default async function MaterialPage({ params }: { params: Promise<{ id: s
       <Reader
         title={m.title}
         totalChars={m.totalChars}
-        sections={m.sections.map(s => ({
-          id: s.id, ord: s.ord, heading: s.heading, bodyMd: s.bodyMd,
-          charCount: s.charCount, hidden: s.hidden, hiddenReason: s.hiddenReason,
-          kcLabels: s.kcLabels, geoRegionIds: s.geoRegionIds,
-          read: s.read, requiredMs: s.requiredMs, estimatedMs: s.estimatedMs,
-        }))}
+        sections={sections}
       />
     </Screen>
   )

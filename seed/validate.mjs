@@ -331,6 +331,65 @@ if (item.length >= 40) {
   }
 }
 
+// ---- 11. 動画（docs/09b-video.md）----
+const channels = load('channel_allowlist.csv');
+const video = load('video.csv');
+const videoKc = load('video_kc.csv');
+
+const chIds = new Set();
+for (const c of channels) {
+  if (!/^UC[\w-]{22}$/.test(c.id ?? '')) {
+    fail(`11: channel_allowlist の id が YouTube のチャンネル id の形をしていない: "${c.id}"`);
+  }
+  if (chIds.has(c.id)) fail(`11: channel_allowlist の id が重複: ${c.id}`);
+  chIds.add(c.id);
+  if (!['world_history', 'japanese_history', 'both'].includes(c.subject_scope)) {
+    fail(`11: subject_scope が不正: ${c.id} = "${c.subject_scope}"`);
+  }
+  if (STRICT && !['○', '×'].includes(c.approve)) {
+    fail(`11: channel_allowlist の approve が未記入または不正: ${c.id}`);
+  }
+}
+
+const videoIds = new Set();
+for (const v of video) {
+  // YouTube の videoId は11文字
+  if (!/^[\w-]{11}$/.test(v.id ?? '')) fail(`11: video の id が11文字の videoId でない: "${v.id}"`);
+  if (videoIds.has(v.id)) fail(`11: video の id が重複: ${v.id}`);
+  videoIds.add(v.id);
+  // ★ 許可リスト方式（docs/09b V2）。載っていないチャンネルの動画を CSV に直接書けない
+  if (!chIds.has(v.channel_id)) {
+    fail(`11: video の channel_id が channel_allowlist にない: ${v.id} → "${v.channel_id}"`);
+  }
+  // ★ 埋め込み禁止と年齢制限は絶対に入れない（docs/09b V5）。
+  //   DB にも CHECK があるが、投入で落ちるより前にここで落とす
+  if (v.embeddable !== 'true') fail(`11: embeddable が true でない動画がある: ${v.id}`);
+  if (v.yt_rating === 'ytAgeRestricted') fail(`11: 年齢制限の動画がある: ${v.id}`);
+  if (!(Number(v.duration_sec) > 0)) fail(`11: duration_sec が正でない: ${v.id}`);
+  if (STRICT && !['○', '×'].includes(v.approve)) {
+    fail(`11: video の approve が未記入または不正: ${v.id}`);
+  }
+}
+
+const seenLink = new Set();
+for (const l of videoKc) {
+  if (!videoIds.has(l.video_id)) fail(`11: video_kc の video_id が video.csv にない: ${l.id}`);
+  if (!ids.has(l.kc_id)) fail(`11: video_kc の kc_id が kc.csv にない: ${l.id} → "${l.kc_id}"`);
+  const key = `${l.video_id}|${l.kc_id}|${l.start_sec || 0}`;
+  if (seenLink.has(key)) fail(`11: video_kc に同じ組が2つある: ${key}`);
+  seenLink.add(key);
+  const rel = Number(l.relevance ?? 1);
+  if (!(rel >= 0 && rel <= 1)) fail(`11: relevance が 0〜1 でない: ${l.id} = ${l.relevance}`);
+  // ★ 頭出しが動画長を超えていたら、押しても何も始まらない（docs/09b §8）
+  const v = video.find(x => x.id === l.video_id);
+  if (v && Number(l.start_sec || 0) >= Number(v.duration_sec)) {
+    fail(`11: start_sec が動画の長さ以上: ${l.id}（${l.start_sec} >= ${v.duration_sec}）`);
+  }
+  if (l.end_sec && Number(l.end_sec) <= Number(l.start_sec || 0)) {
+    fail(`11: end_sec が start_sec 以下: ${l.id}`);
+  }
+}
+
 // ★ 1つの KC に設問が無いと、その KC は永久に出題されない（出題は KC 単位）。
 const kcWithItem = new Set(item.map(t => t.kc_id));
 const kcWithoutItem = kc.filter(k => !kcWithItem.has(k.id));
@@ -338,6 +397,7 @@ const kcWithoutItem = kc.filter(k => !kcWithItem.has(k.id));
 // ---- 結果 ----
 console.log(`era ${era.length} / region ${region.length} / syllabus_unit ${syllabus.length}（節 ${leafUnits.size}） / kc ${kc.length}`);
 console.log(`canon_event ${canon.length} / person ${person.length} / item ${item.length}`);
+console.log(`channel_allowlist ${channels.length} / video ${video.length} / video_kc ${videoKc.length}`);
 console.log(`設問を持つ KC: ${kcWithItem.size} / ${kc.length}（未着手 ${kcWithoutItem.length}）`);
 console.log('kind の分布:');
 for (const k of KINDS) console.log(`  ${k.padEnd(12)} ${String(count[k]).padStart(3)}  ${pct(count[k]).toFixed(1).padStart(5)}%`);

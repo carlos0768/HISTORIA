@@ -107,8 +107,16 @@ try {
     const sharedReady = await mk(null, 'ready')
     const blocked = await mk(A, 'blocked')
 
+    // 通知の購読を2人分。A から B の行が見えないことを検査1で見る
+    for (const [id, ep] of [[A, 'https://push.example/A'], [B, 'https://push.example/B']] as const) {
+      await tx`
+        INSERT INTO push_subscription (endpoint, user_id, p256dh, auth)
+        VALUES (${ep}, ${id}, 'pub', 'secret')`
+    }
+
     // ---- 1. 自分の行だけが見える ----
-    for (const t of ['app_user', 'drill', 'response', 'kc_card', 'user_kc_state', 'material_read']) {
+    for (const t of ['app_user', 'drill', 'response', 'kc_card', 'user_kc_state', 'material_read',
+                     'push_subscription']) {
       const r = await asUser(tx, A, t2 => count(t2, t))
       check(`${t}: 自分の行だけ`, r.ok && r.value <= 1, r.ok ? `${r.value} 行` : r.error)
     }
@@ -117,7 +125,7 @@ try {
     // ★ invite_code と past_exam を必ず含める。
     //   invite_code が読めると招待制（上限10名）が崩れ、
     //   past_exam が読めると第三者著作物の本文が外に出る（docs/10 §2）。
-    for (const t of ['app_setting', 'ai_budget', 'ai_spend', 'item', 'item_kc',
+    for (const t of ['app_setting', 'ai_budget', 'ai_spend', 'ops_log', 'item', 'item_kc',
                      'invite_code', 'past_exam', 'past_exam_element', 'past_exam_kc',
                      'kc_proposal', 'kc_merge', 'channel_allowlist', 'evidence_claim']) {
       const r = await asUser(tx, A, t2 => count(t2, t))
@@ -136,6 +144,16 @@ try {
     check('response: 拒否の理由が RLS である',
       !ins.ok && /row-level security|policy/i.test(ins.error),
       ins.ok ? '' : ins.error.split('\n')[0]!)
+
+    // ---- 3b. push_subscription にも INSERT できない ----
+    // ★ 開けると他人の user_id で購読を作れる＝他人宛の通知を自分の端末に呼べる。
+    //   登録は Server Action（service_role）が行う。
+    const pins = await asUser(tx, A, async t2 => {
+      await t2.unsafe(`INSERT INTO push_subscription (endpoint, user_id, p256dh, auth)
+                       VALUES ('https://push.example/X', '${A}', 'pub', 'secret')`)
+      return true
+    })
+    check('push_subscription: INSERT を拒む', !pins.ok, pins.ok ? '入ってしまった' : '拒まれた')
 
     // ---- 4. 教材の可視範囲 ----
     const mats = await asUser(tx, A, async t2 => {

@@ -10,6 +10,7 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import type { MasteryStatus } from '@/lib/domain/weakness'
+import { CommandPalette, type Command } from './palette'
 
 /**
  * フッタの3タブ（docs/11-ux.md §9）。
@@ -30,7 +31,21 @@ export const TABS = [
  *   デスクトップのサイドバーで別の見出しに置くための印である。
  *   TABS に足すと、モバイルのフッタが4つになって仕様から外れる。
  */
-export type TabKey = typeof TABS[number]['key'] | 'settings'
+export type TabKey = typeof TABS[number]['key'] | 'settings' | typeof DESK[number]['key']
+
+/**
+ * デスクトップにだけ出す画面（docs/06-desktop.md）。
+ *
+ * ★ **TABS には足さない。** components/nav.test.ts が3タブを固定しており、
+ *   あれは「モバイルのフッタを増やすな」という意図の防壁である。
+ *   ここはサイドバー（1440px 以上でしか現れない）専用の一覧で、
+ *   モバイルからは ⌘K か直接の URL でしか行けない。
+ */
+export const DESK = [
+  { key: 'library', href: '/library', label: '教材の一覧' },
+  { key: 'timeline', href: '/timeline', label: '年表と地図' },
+  { key: 'map', href: '/map', label: '地図' },
+] as const
 
 /**
  * 1画面。
@@ -42,12 +57,19 @@ export type TabKey = typeof TABS[number]['key'] | 'settings'
  *   モバイルでは**そもそも並べない**ので、中身の描画費用もかからない。
  */
 export function Screen({
-  title, children, tab, aside,
+  title, children, tab, aside, trailing, commands,
 }: {
   title: string
   children: ReactNode
   tab?: TabKey
   aside?: ReactNode
+  /** 見出しの右端に置くもの（連続日数など）。docs/11-ux.md §7 */
+  trailing?: ReactNode
+  /**
+   * ⌘K でさがせるもの（lib/loop/commands.ts）。
+   * ★ 渡さない画面ではパレットが開かない。ログイン前の画面に渡さないため。
+   */
+  commands?: readonly Command[]
 }) {
   if (!tab) {
     return (
@@ -68,6 +90,16 @@ export function Screen({
             {t.label}
           </Link>
         ))}
+        {/* ★ 広い画面でだけ出す。モバイルのフッタは3つのまま（docs/11 §9） */}
+        <span className="hs-side__label">机の上</span>
+        {DESK.map(d => (
+          <Link key={d.key} href={d.href}
+                className={`hs-side__item${d.key === tab ? ' hs-side__item--active' : ''}`}
+                aria-current={d.key === tab ? 'page' : undefined}>
+            {d.label}
+          </Link>
+        ))}
+
         {/* ★ 設定はタブに入れない。docs/11 §9 が3タブと定めている。
              デスクトップは横に余裕があるので、別の見出しで下に置く。
              モバイルからは記録タブの末尾から入る。 */}
@@ -80,7 +112,10 @@ export function Screen({
       </nav>
 
       <div className="hs-shell__main">
-        <header className="lv-navbar"><span className="lv-navbar__title">{title}</span></header>
+        <header className="lv-navbar">
+          <span className="lv-navbar__title">{title}</span>
+          {trailing && <span className="hs-navbar__trailing">{trailing}</span>}
+        </header>
         <div className="hs-pad">{children}</div>
         <nav className="lv-tabbar" aria-label="メニュー">
           {TABS.map(t => (
@@ -95,6 +130,11 @@ export function Screen({
       </div>
 
       {aside && <aside className="hs-shell__aside">{aside}</aside>}
+
+      {/* ★ 幅で出し分けない。外付けキーボードを繋いだ端末では幅が広くなるので、
+           幅で切ると鍵が急に効かなくなる。開くまで何も描かない部品なので、
+           モバイルに置いてあっても見えるものは増えない */}
+      {commands && commands.length > 0 && <CommandPalette commands={commands} />}
     </div>
   )
 }
@@ -171,4 +211,69 @@ export function Alert({ title, children }: { title: string; children?: ReactNode
 
 export function Empty({ children }: { children: ReactNode }) {
   return <div className="hs-empty">{children}</div>
+}
+
+/**
+ * 資料テーブル（docs/06-desktop.md 03「資料テーブル」）
+ *
+ * ★ リポジトリに `<table>` は1つも無かった。モバイル優先で作ってきたので、
+ *   縦に積む形しか要らなかった。デスクトップでは横に並べたほうが読める。
+ *
+ * ★ 行の高さは 36px、数字は `tabular-nums`（設計系の寸法）。
+ *   年号が桁ごとに揺れると、並んだときに読み比べられない。
+ *
+ * ★ 横溢れは**自前の `overflow-x: auto`** で受ける。画面ごと横スクロールさせない。
+ *   1440px 未満でもこの部品は使えるようにしてある（モバイルで開いても壊れない）。
+ */
+export type Column<T> = {
+  key: string
+  label: string
+  /** 数字の列。等幅にして右に寄せる */
+  numeric?: boolean
+  /** 列幅（CSS grid の値）。省略すると 1fr */
+  width?: string
+  render: (row: T) => ReactNode
+}
+
+export function DataTable<T>({
+  columns, rows, rowKey, empty = 'ありません。', caption,
+}: {
+  columns: readonly Column<T>[]
+  rows: readonly T[]
+  rowKey: (row: T) => string
+  empty?: string
+  /** 表が何であるかを読み上げに伝える。目には見えない */
+  caption?: string
+}) {
+  if (rows.length === 0) return <p className="lv-caption">{empty}</p>
+  const template = columns.map(c => c.width ?? '1fr').join(' ')
+  return (
+    <div className="hs-table__scroll">
+      <table className="hs-table" style={{ ['--hs-table-cols' as string]: template }}>
+        {caption && <caption className="hs-table__caption">{caption}</caption>}
+        <thead>
+          <tr className="hs-table__row">
+            {columns.map(c => (
+              <th key={c.key} scope="col"
+                  className={`hs-table__cell hs-table__cell--head${c.numeric ? ' hs-table__cell--num' : ''}`}>
+                {c.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(r => (
+            <tr className="hs-table__row" key={rowKey(r)}>
+              {columns.map(c => (
+                <td key={c.key}
+                    className={`hs-table__cell${c.numeric ? ' hs-table__cell--num' : ''}`}>
+                  {c.render(r)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
 }
