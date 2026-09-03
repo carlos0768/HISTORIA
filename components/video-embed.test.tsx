@@ -147,3 +147,84 @@ describe('逆対照: 最初から埋め込む部品なら落ちること', () =>
     expect(youtubeRefs().join(' ')).toContain('youtube-nocookie')
   })
 })
+
+/**
+ * 視聴後の retrieval（docs/09b-video.md V6・§6.2）
+ *
+ * ★ この機能は実装も試験もあったのに、**画面に繋がっていなかった**
+ *   （`retrievalAfterVideo` の参照が自ファイルと試験だけだった）。
+ *   ここでは「押してからしか出ない」「2問そろわなければ出ない」を
+ *   本物の DOM で押さえ、配線が外れたら落ちるようにする。
+ */
+describe('視聴後の retrieval（V6）', () => {
+  const ITEMS = [
+    { id: 'i1', stem: 'ウマイヤ朝の都はどこか', choices: [
+      { key: 'a', text: 'ダマスクス' }, { key: 'b', text: 'バグダード' },
+      { key: 'c', text: 'メッカ' }, { key: 'd', text: 'カイロ' }] },
+    { id: 'i2', stem: 'アッバース朝の都はどこか', choices: [
+      { key: 'a', text: 'ダマスクス' }, { key: 'b', text: 'バグダード' },
+      { key: 'c', text: 'メッカ' }, { key: 'd', text: 'カイロ' }] },
+  ]
+
+  const retrieval = (items = ITEMS) => ({
+    fetch: async () => items,
+    answer: async () => ({ correct: true, explanation: '都は移った' }),
+  })
+
+  it('押す前は retrieval が DOM に無い', async () => {
+    await act(async () => root.render(<VideoEmbed {...PROPS} retrieval={retrieval()} />))
+    expect(container.querySelector('.hs-video__quiz')).toBeNull()
+    expect(container.textContent).not.toContain('ウマイヤ朝')
+  })
+
+  it('押すと2問のうち1問目が出る', async () => {
+    await act(async () => root.render(<VideoEmbed {...PROPS} retrieval={retrieval()} />))
+    await act(async () => { container.querySelector('button')!.click() })
+    expect(container.querySelector('.hs-video__quiz')).not.toBeNull()
+    expect(container.textContent).toContain('ウマイヤ朝')
+    // 2問目はまだ出さない（1画面1問）
+    expect(container.textContent).not.toContain('アッバース朝の都')
+    expect(container.textContent).toContain('1 / 2')
+  })
+
+  /** ★ 数合わせに関係ない設問を混ぜない。足りなければ出さない（§6.2） */
+  it('2問そろわなければ何も出さない', async () => {
+    await act(async () => root.render(<VideoEmbed {...PROPS} retrieval={retrieval([])} />))
+    await act(async () => { container.querySelector('button')!.click() })
+    expect(container.querySelector('.hs-video__quiz')).toBeNull()
+  })
+
+  it('retrieval を渡さなければ何も出さない（確認テストの結果画面など）', async () => {
+    await act(async () => root.render(<VideoEmbed {...PROPS} />))
+    await act(async () => { container.querySelector('button')!.click() })
+    expect(container.querySelector('.hs-video__quiz')).toBeNull()
+  })
+
+  it('答えると正誤と解説が出て、次へ進める', async () => {
+    await act(async () => root.render(<VideoEmbed {...PROPS} retrieval={retrieval()} />))
+    await act(async () => { container.querySelector('button')!.click() })
+    const choice = [...container.querySelectorAll('button')]
+      .find(b => b.textContent === 'ダマスクス')!
+    await act(async () => { choice.click() })
+    expect(container.textContent).toContain('正解です')
+    expect(container.textContent).toContain('都は移った')
+
+    const next = [...container.querySelectorAll('button')].find(b => b.textContent === '次の問題')!
+    await act(async () => { next.click() })
+    expect(container.textContent).toContain('アッバース朝の都')
+    expect(container.textContent).toContain('2 / 2')
+  })
+
+  /** ★ retrieval を出しても、2クリックの一線は動かない */
+  it('retrieval があっても初期描画に iframe は無い', async () => {
+    await act(async () => root.render(<VideoEmbed {...PROPS} retrieval={retrieval()} />))
+    expect(document.querySelectorAll('iframe')).toHaveLength(0)
+  })
+
+  it('押したあとは iframe と retrieval が両方ある', async () => {
+    await act(async () => root.render(<VideoEmbed {...PROPS} retrieval={retrieval()} />))
+    await act(async () => { container.querySelector('button')!.click() })
+    expect(document.querySelectorAll('iframe')).toHaveLength(1)
+    expect(container.querySelector('.hs-video__quiz')).not.toBeNull()
+  })
+})
