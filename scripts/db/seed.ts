@@ -279,7 +279,17 @@ export async function seedItem(
   const requireApproval = opts.requireApproval ?? true
   const now = opts.now ?? new Date()
   const rows = readCsv(join(dir, 'item.csv'))
-  const approved = requireApproval ? rows.filter(r => r.approve === '○') : rows
+  const passed = requireApproval ? rows.filter(r => r.approve === '○') : rows
+
+  // ★ **承認済みの KC を指す設問だけを入れる。**
+  //   item_kc.kc_id は kc(id) への外部キーである（docs/schema.sql:320）。
+  //   却下された KC を指す item_kc を入れようとすると外部キー違反で落ちる。
+  //   設問を承認したまま KC を却下する、という組み合わせは作者がいつでも作れる。
+  //   dump-sql.ts の同じ箇所と規則を揃えてある。
+  const kcRows = readCsv(join(dir, 'kc.csv'))
+  const kcIds = new Set(
+    (requireApproval ? kcRows.filter(k => k.approve === '○') : kcRows).map(k => k.id!))
+  const approved = passed.filter(r => kcIds.has(r.kc_id!))
 
   const items = dedupe(approved.map(r => ({
     id: stableUuid(ITEM_NAMESPACE, r.id!),
