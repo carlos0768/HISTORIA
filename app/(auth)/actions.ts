@@ -18,6 +18,7 @@ import { checkBirthDate, ageError } from '@/lib/auth/age'
 import { signup } from '@/lib/auth/signup'
 import { verifySession } from '@/lib/auth/dal'
 import { INVITE_COOKIE, INVITE_MAX_AGE, inviteCookieOptions } from '@/lib/auth/cookie'
+import { dbFailure } from '@/lib/db/error'
 
 type ActionResult = { ok: true } | { ok: false; message: string }
 
@@ -26,14 +27,23 @@ type ActionResult = { ok: true } | { ok: false; message: string }
  *
  * ★ ここでは消し込まない。ログインを終えて生年月日まで入れた人だけが席を取る。
  *   ここで消すと、途中でやめた人のぶんだけ席が死ぬ。
+ *
+ * ★ **投げない。** 2026-09-03 に作者が本番でここを踏んだ。`sql()` は
+ *   DATABASE_URL が無ければ投げ、在っても届かなければ問い合わせが投げる。
+ *   受けずに投げると Next の素の 500 になり、**打った招待コードごと画面が消える。**
+ *   コードを渡された人が最初に触るのがこの1箇所なので、ここは必ず文で返す。
+ *   何が起きたのかは lib/db/error.ts が原因ごとに書き分ける。
  */
 export async function submitInviteAction(code: string): Promise<ActionResult> {
-  const db = sql()
-  const r = await checkInvite(db, code, new Date())
-  if (!r.ok) return { ok: false, message: inviteError(r.reason) }
+  try {
+    const r = await checkInvite(sql(), code, new Date())
+    if (!r.ok) return { ok: false, message: inviteError(r.reason) }
 
-  ;(await cookies()).set(INVITE_COOKIE, code.trim(), { ...inviteCookieOptions, maxAge: INVITE_MAX_AGE })
-  return { ok: true }
+    ;(await cookies()).set(INVITE_COOKIE, code.trim(), { ...inviteCookieOptions, maxAge: INVITE_MAX_AGE })
+    return { ok: true }
+  } catch (e) {
+    return { ok: false, message: dbFailure('invite', e) }
+  }
 }
 
 /** 今のリクエストの生成元。OAuth の戻り先を組み立てるのに使う */
@@ -111,17 +121,23 @@ export async function completeSignupAction(input: {
   const code = jar.get(INVITE_COOKIE)?.value
   if (!code) return { ok: false, message: '招待コードが見つかりません。最初からやり直してください' }
 
-  const r = await signup(sql(), {
-    userId: session.userId,
-    code,
-    birthDate: input.birthDate,
-    displayName: input.displayName?.trim() || null,
-  }, new Date())
+  // ★ 投げない（submitInviteAction と同じ理由）。ここで飛ばされると
+  //   入れた生年月日と表示名が消え、同意のチェックからやり直しになる
+  try {
+    const r = await signup(sql(), {
+      userId: session.userId,
+      code,
+      birthDate: input.birthDate,
+      displayName: input.displayName?.trim() || null,
+    }, new Date())
 
-  if (!r.ok) {
-    if (r.kind === 'age') return { ok: false, message: ageError(r.check) }
-    if (r.kind === 'invite') return { ok: false, message: inviteError(r.check.reason) }
-    return { ok: false, message: '既に登録されています' }
+    if (!r.ok) {
+      if (r.kind === 'age') return { ok: false, message: ageError(r.check) }
+      if (r.kind === 'invite') return { ok: false, message: inviteError(r.check.reason) }
+      return { ok: false, message: '既に登録されています' }
+    }
+  } catch (e) {
+    return { ok: false, message: dbFailure('signup', e) }
   }
 
   // 使い終わった招待コードは残さない

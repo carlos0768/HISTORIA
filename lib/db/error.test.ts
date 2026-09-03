@@ -185,3 +185,67 @@ describe('postgres.js 側の前提', () => {
     expect(src).toContain("socket.on('error', error)")
   })
 })
+
+/**
+ * ★ 直した箇所が元に戻らないようにする。
+ *
+ *   2026-09-03 の障害は「招待コードを送ると Next の素の 500 が出る」で、
+ *   原因は `app/(auth)/actions.ts` が `sql()` を try の外で呼んでいたことだった。
+ *   `app/**` は vitest の include に無いので（vitest.config.ts）、
+ *   ここから字面で見る。手本は lib/loop/video.test.ts（同じやり方で
+ *   components/video-embed.tsx の構造を見ている）。
+ *
+ *   見ているのは**入口の3画面ぶんだけ**である。認証の内側の Server Action は
+ *   投げたままにしてあり（app/error.tsx が受ける）、ここで縛る対象ではない。
+ */
+describe('招待と登録の入口が投げないこと', () => {
+  const actions = readFileSync('app/(auth)/actions.ts', 'utf8')
+
+  it('この分類器を通している', () => {
+    expect(actions).toContain("from '@/lib/db/error'")
+    expect(actions).toContain('dbFailure(')
+  })
+
+  it('sql() を呼ぶ関数は、呼ぶ前に try に入っている', () => {
+    // 関数ごとに切って、sql() より前に try { が在るかを見る
+    const fns = actions.split('export async function ').slice(1)
+    const withSql = fns.filter(f => f.includes('sql()'))
+    // ★ 逆対照の足場。submitInviteAction と completeSignupAction の2つである。
+    //   数が変わったらこの試験ごと見直す合図になる
+    expect(withSql).toHaveLength(2)
+
+    for (const f of withSql) {
+      const name = f.slice(0, f.indexOf('('))
+      const tryAt = f.indexOf('try {')
+      const sqlAt = f.indexOf('sql()')
+      expect(tryAt, `${name}: try が無い`).toBeGreaterThan(-1)
+      expect(tryAt, `${name}: sql() が try の外に在る`).toBeLessThan(sqlAt)
+      expect(f, `${name}: catch が無い`).toContain('catch')
+    }
+  })
+
+  it('入力欄の画面が startTransition の中で受け止めている', () => {
+    // ★ 受けないと error boundary に飛ばされ、打った招待コードや
+    //   生年月日が消える。押し直しではなく打ち直しになる
+    for (const path of ['app/(auth)/invite/form.tsx', 'app/(auth)/profile/form.tsx']) {
+      const src = readFileSync(path, 'utf8')
+      const at = src.indexOf('startTransition(async () => {')
+      expect(at, path).toBeGreaterThan(-1)
+      const body = src.slice(at)
+      expect(body.indexOf('try {'), `${path}: try が無い`).toBeGreaterThan(-1)
+      expect(body.indexOf('try {'), `${path}: await より後に try が在る`)
+        .toBeLessThan(body.indexOf('await '))
+      expect(body, path).toContain('} catch (err) {')
+    }
+  })
+
+  it('layout に載っている部品が投げない（全ページが死ぬ経路）', () => {
+    // ★ layout は error.tsx の外側なので、ここで投げると
+    //   global-error まで飛んで全ページが同時に落ちる
+    const src = readFileSync('app/palette-mount.tsx', 'utf8')
+    const at = src.indexOf('commandsFor(db)')
+    expect(at).toBeGreaterThan(-1)
+    expect(src.lastIndexOf('try {', at), 'commandsFor が try の外に在る').toBeGreaterThan(-1)
+    expect(src).toContain('} catch (e) {')
+  })
+})

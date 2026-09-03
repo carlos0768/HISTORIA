@@ -23,9 +23,16 @@ export function ProfileForm({ email }: { email: string | null }) {
     e.preventDefault()
     setError(null)
     startTransition(async () => {
-      const r = await completeSignupAction({ birthDate, displayName, consent })
-      if (r.ok) router.push('/')
-      else setError(r.message)
+      try {
+        const r = await completeSignupAction({ birthDate, displayName, consent })
+        if (r.ok) router.push('/')
+        else setError(r.message)
+      } catch (err) {
+        // ★ 受け止める理由は invite/form.tsx と同じ。飛ばされると
+        //   入れた生年月日と表示名が消え、同意からやり直しになる
+        console.error(err)
+        setError('登録できませんでした。もう一度お試しください。')
+      }
     })
   }
 
