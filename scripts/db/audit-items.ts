@@ -192,6 +192,10 @@ export type AuditStats = {
   correctIsLongest: number
   /** 「中身を読まず、常に最長の選択肢を選ぶ」だけで取れる正答率。当てずっぽうは 0.25 */
   naiveLongestScore: number
+  /** 同じく「常に最短を選ぶ」。直しすぎて鏡像の癖を作っていないかを見る */
+  naiveShortestScore: number
+  /** 正解が長さで何位か（[最長, 2位, 3位, 最短]）。理想は各 25% */
+  lengthRank: [number, number, number, number]
   itemsPerKc: { kcId: string; n: number }[]
   canonTouched: number
   /** 正典に1件も当たらなかった設問。正典側の網羅の穴でもあるので数だけ持つ */
@@ -211,6 +215,8 @@ export function auditItems(input: AuditInput): { findings: Finding[]; stats: Aud
   let correctIsLongest = 0
   let canonTouched = 0
   let naiveHits = 0
+  let naiveShortHits = 0
+  const lengthRank = [0, 0, 0, 0]
   const canonUntouched: string[] = []
   const perKc = new Map<string, number>()
 
@@ -224,6 +230,19 @@ export function auditItems(input: AuditInput): { findings: Finding[]; stats: Aud
     const longest = Math.max(...choices.map(c => c.text.length))
     const tops = choices.filter(c => c.text.length === longest)
     if (correct.length === longest) { correctIsLongest++; naiveHits += 1 / tops.length }
+
+    // ★ **逆向きも測る。** 「最長を選ぶと当たる」だけを見ていると、
+    //   正解を一律に短くする直し方で数字は下がるが、
+    //   今度は「最短を選ぶと当たる」という鏡像の癖ができる。
+    //   直ったと言えるのは**両方が 25% 前後**になったときだけである。
+    const shortest = Math.min(...choices.map(c => c.text.length))
+    const bottoms = choices.filter(c => c.text.length === shortest)
+    if (correct.length === shortest) naiveShortHits += 1 / bottoms.length
+
+    // 正解が長さで何位か（1位=最長）。理想は各位 25%
+    const rank = [...choices].sort((x, y) => y.text.length - x.text.length || x.key.localeCompare(y.key))
+      .findIndex(c => c.key === t.answer)
+    if (rank >= 0) lengthRank[rank]!++
 
     /* --- A-1 年号の矛盾 ------------------------------------------------ */
     // 設問文・正解選択肢・解説だけを見る。**誤りの選択肢は見ない**
@@ -260,6 +279,23 @@ export function auditItems(input: AuditInput): { findings: Finding[]; stats: Aud
       push('A', '答えが設問文に在る', t.id, `設問文が正解「${correct.slice(0, 24)}」をそのまま含む`)
     }
 
+    /* --- A-3b 並べ替え型で正解だけ要素が多い ----------------------------- */
+    /**
+     * ★ 「古いものから順に並べたもの」型で、正解だけ矢印が1本多いと
+     *   **中身を読まず数を数えるだけで解ける。** 実データで2問見つかった
+     *   （50問中2問。残り48問は4択とも同数だったので、癖ではなく取りこぼしだった）。
+     *   長さの偏りと違って、これは1問ずつ確実に決まるので A 段に置く。
+     */
+    if (choices.some(c => c.text.includes('→'))) {
+      const n = choices.map(c => ({ key: c.key, n: c.text.split('→').length }))
+      const mine = n.find(x => x.key === t.answer)?.n ?? 0
+      const others = n.filter(x => x.key !== t.answer).map(x => x.n)
+      if (others.length > 0 && mine > Math.max(...others)) {
+        push('A', '並べ替えの要素数で解ける', t.id,
+          `正解は ${mine} 要素、誤答は最大 ${Math.max(...others)} 要素。矢印を数えるだけで当たる`)
+      }
+    }
+
     /* --- A-3 「上記すべて」型 ------------------------------------------ */
     for (const c of choices) {
       if (CATCH_ALL.test(c.text.trim())) {
@@ -289,9 +325,12 @@ export function auditItems(input: AuditInput): { findings: Finding[]; stats: Aud
    * ★ 個々の設問は正しくても、束としては歪む。だから A 段に置く。
    */
   const naive = items.length === 0 ? 0 : naiveHits / items.length
-  if (naive >= 0.40) {
+  const naiveShort = items.length === 0 ? 0 : naiveShortHits / items.length
+  // ★ **両方向を見る。** 片方だけを見ていると、直した先で鏡像の癖ができても気づけない
+  if (naive >= 0.40 || naiveShort >= 0.40) {
+    const which = naive >= naiveShort ? ['最長', naive] as const : ['最短', naiveShort] as const
     push('A', '長さで解ける（プール全体）', '(プール全体)',
-      `中身を読まず常に最長を選ぶだけで ${(naive * 100).toFixed(1)}% 取れる` +
+      `中身を読まず常に${which[0]}を選ぶだけで ${(which[1] * 100).toFixed(1)}% 取れる` +
       `（当てずっぽうは 25%、guess_rate の前提も 0.25）`)
   }
 
@@ -324,6 +363,8 @@ export function auditItems(input: AuditInput): { findings: Finding[]; stats: Aud
       answerDist,
       correctIsLongest,
       naiveLongestScore: items.length === 0 ? 0 : naiveHits / items.length,
+      naiveShortestScore: items.length === 0 ? 0 : naiveShortHits / items.length,
+      lengthRank: lengthRank as [number, number, number, number],
       canonTouched,
       canonUntouched,
       itemsPerKc: [...perKc].map(([kcId, n]) => ({ kcId, n })).sort((x, y) => y.n - x.n),
@@ -387,7 +428,11 @@ if (process.argv[1]?.endsWith('audit-items.ts')) {
                 `c ${d.c} (${pct(d.c!)}) / d ${d.d} (${pct(d.d!)})`)
     console.log(`  正解が最長  ${stats.correctIsLongest} 問 (${pct(stats.correctIsLongest)})  ` +
                 `※ 偶然なら 25% 前後`)
-    console.log(`  最長を選ぶだけの正答率  ${(stats.naiveLongestScore * 100).toFixed(1)}%`)
+    console.log(`  最長を選ぶだけの正答率  ${(stats.naiveLongestScore * 100).toFixed(1)}%  ` +
+                `/ 最短 ${(stats.naiveShortestScore * 100).toFixed(1)}%  ※ どちらも 25% 前後が理想`)
+    console.log(`  正解の長さ順位  ` + stats.lengthRank
+      .map((c, i) => `${i + 1}位 ${((c / stats.total) * 100).toFixed(1)}%`).join(' / ')
+      + '  ※ 各 25% が理想')
     console.log(`  正典に触れている  ${stats.canonTouched} 問 (${pct(stats.canonTouched)})`)
     console.log(`  正典に当たらない  ${stats.canonUntouched.length} 問  ` +
                 `※ 史料・先史・日本史など。設問の欠陥ではなく正典側の網羅の穴`)

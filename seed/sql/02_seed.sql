@@ -11114,7 +11114,7 @@ INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('40d8669f-0e3d-357a-b705-f3
   ON CONFLICT DO NOTHING;
 INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
                   guess_rate, approved, approved_by, approved_at) VALUES
-  ('5fe183b8-dbab-3345-ad74-164c23b75bdd', NULL, 'mcq4', '教皇権に関わる出来事を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"大シスマ → コンスタンツ公会議 → アナーニ事件 → 教皇のバビロン捕囚"},{"key":"b","text":"インノケンティウス3世の全盛 → アナーニ事件 → 教皇のバビロン捕囚 → 大シスマ → コンスタンツ公会議"},{"key":"c","text":"アナーニ事件 → インノケンティウス3世の全盛 → 大シスマ → 教皇のバビロン捕囚"},{"key":"d","text":"教皇のバビロン捕囚 → 大シスマ → アナーニ事件 → インノケンティウス3世の全盛"}]'::jsonb,
+  ('5fe183b8-dbab-3345-ad74-164c23b75bdd', NULL, 'mcq4', '教皇権に関わる出来事を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"大シスマ → コンスタンツ公会議 → アナーニ事件 → 教皇のバビロン捕囚 → インノケンティウス3世の全盛"},{"key":"b","text":"インノケンティウス3世の全盛 → アナーニ事件 → 教皇のバビロン捕囚 → 大シスマ → コンスタンツ公会議"},{"key":"c","text":"アナーニ事件 → インノケンティウス3世の全盛 → 大シスマ → 教皇のバビロン捕囚 → コンスタンツ公会議"},{"key":"d","text":"教皇のバビロン捕囚 → 大シスマ → アナーニ事件 → インノケンティウス3世の全盛 → コンスタンツ公会議"}]'::jsonb,
    '"b"'::jsonb, 'インノケンティウス3世（在位1198〜1216年）が教皇権の絶頂を築いた。1303年のアナーニ事件でフランス王フィリップ4世が教皇ボニファティウス8世を捕らえ、1309年から教皇庁がアヴィニョンへ移った（バビロン捕囚）。帰還後に2人の教皇が並立する大シスマとなり、1414年からのコンスタンツ公会議で収拾された。', 0.25, true, 'author', now())
   ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
     answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
@@ -11267,7 +11267,7 @@ INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('5c8ff331-a5cd-36a1-9d69-48
   ON CONFLICT DO NOTHING;
 INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
                   guess_rate, approved, approved_by, approved_at) VALUES
-  ('54b7df44-267a-3b60-9e3e-80d9bdea76f9', NULL, 'mcq4', 'オスマン帝国に関わる出来事を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"第1次ウィーン包囲 → コンスタンティノープル陥落 → 第2次ウィーン包囲 → モハーチの戦い"},{"key":"b","text":"コンスタンティノープル陥落 → モハーチの戦い → 第1次ウィーン包囲 → レパントの海戦 → 第2次ウィーン包囲"},{"key":"c","text":"モハーチの戦い → コンスタンティノープル陥落 → レパントの海戦 → 第1次ウィーン包囲"},{"key":"d","text":"レパントの海戦 → 第2次ウィーン包囲 → コンスタンティノープル陥落 → モハーチの戦い"}]'::jsonb,
+  ('54b7df44-267a-3b60-9e3e-80d9bdea76f9', NULL, 'mcq4', 'オスマン帝国に関わる出来事を、古いものから順に並べたものはどれか。', '[{"key":"a","text":"第1次ウィーン包囲 → コンスタンティノープル陥落 → 第2次ウィーン包囲 → モハーチの戦い → レパントの海戦"},{"key":"b","text":"コンスタンティノープル陥落 → モハーチの戦い → 第1次ウィーン包囲 → レパントの海戦 → 第2次ウィーン包囲"},{"key":"c","text":"モハーチの戦い → コンスタンティノープル陥落 → レパントの海戦 → 第1次ウィーン包囲 → 第2次ウィーン包囲"},{"key":"d","text":"レパントの海戦 → 第2次ウィーン包囲 → コンスタンティノープル陥落 → モハーチの戦い → 第1次ウィーン包囲"}]'::jsonb,
    '"b"'::jsonb, '1453年にメフメト2世がコンスタンティノープルを陥落させてビザンツ帝国を滅ぼした。スレイマン1世が1526年にモハーチでハンガリーを破り、1529年に第1次ウィーン包囲を行った。1571年のレパントの海戦でスペインなどの連合艦隊に敗れ、1683年の第2次ウィーン包囲の失敗から後退が始まる。', 0.25, true, 'author', now())
   ON CONFLICT (id) DO UPDATE SET stem = EXCLUDED.stem, choices = EXCLUDED.choices,
     answer_key = EXCLUDED.answer_key, explanation = EXCLUDED.explanation,
