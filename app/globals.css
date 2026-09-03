@@ -194,3 +194,119 @@ body { margin: 0; background: var(--lv-canvas); }
 }
 .hs-report__row { display: flex; gap: var(--lv-space-2); }
 .hs-report__row > * { flex: 1; }
+
+/* ---- 資料テーブル（docs/06-desktop.md 03） ---- */
+/* ★ 横溢れは自前で受ける。画面ごと横スクロールさせない（.hs-screen が
+     overflow-wrap: anywhere なので、表だけは別に面倒を見る必要がある）。 */
+.hs-table__scroll { overflow-x: auto; border: var(--lv-hairline); border-radius: var(--lv-radius-sm); }
+.hs-table { width: 100%; border-collapse: collapse; background: var(--lv-paper); }
+.hs-table__caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+/* ★ グリッドで列を揃える。table-layout: fixed だと、列幅を CSS 変数で
+     渡せる形にならない（設計系は 90px / 1fr / 130px / 110px のような指定をする）。 */
+.hs-table thead, .hs-table tbody, .hs-table__row { display: contents; }
+.hs-table { display: grid; grid-template-columns: var(--hs-table-cols, 1fr); }
+
+.hs-table__cell {
+  min-height: 36px;
+  display: flex; align-items: center;
+  padding: 8px 14px;
+  border-top: var(--lv-hairline);
+  font: 400 13px/1.5 var(--lv-font-ja);
+  color: var(--lv-ink);
+  text-align: left;
+  min-width: 0;
+}
+.hs-table__row:first-child .hs-table__cell { border-top: 0; }
+.hs-table__cell--head {
+  font: 700 10px/1 var(--lv-font-en);
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--lv-muted);
+  background: var(--lv-canvas);
+}
+/* ★ 数字は等幅で右寄せ。桁が揺れると並べて読み比べられない */
+.hs-table__cell--num { font-family: var(--lv-font-en); font-variant-numeric: tabular-nums; justify-content: flex-end; }
+.hs-table__cell--head.hs-table__cell--num { justify-content: flex-end; }
+
+/* ---- コマンドパレット ⌘K（docs/06-desktop.md 03） ---- */
+.hs-palette__backdrop {
+  position: fixed; inset: 0; z-index: 50;
+  background: color-mix(in srgb, var(--lv-ink) 32%, transparent);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 12vh 16px 16px;
+}
+.hs-palette {
+  width: 100%; max-width: 560px;
+  background: var(--lv-paper);
+  border: 1.5px solid var(--lv-ink);
+  border-radius: var(--lv-radius-sm);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.hs-palette__input {
+  width: 100%; box-sizing: border-box;
+  padding: 14px 16px; border: 0; border-bottom: var(--lv-hairline);
+  background: var(--lv-paper); color: var(--lv-ink);
+  font: 400 15px/1.4 var(--lv-font-ja);
+}
+.hs-palette__input:focus { outline: none; }
+.hs-palette__list { list-style: none; margin: 0; padding: 0; max-height: 46vh; overflow-y: auto; }
+.hs-palette__item {
+  width: 100%; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--lv-space-3);
+  padding: 11px 16px; border: 0; border-top: var(--lv-hairline);
+  background: none; color: var(--lv-ink); cursor: pointer; text-align: left;
+  font: 400 13px/1.5 var(--lv-font-ja);
+}
+.hs-palette__item:first-child { border-top: 0; }
+/* ★ 選択中は朱の塗り＋墨の字。紙 on 朱は 2.70:1 で AA に届かない
+     （overrides A-1 と同じ判断。app/globals.css のサイドバーもそうしている） */
+.hs-palette__item--active { background: var(--lv-accent); color: var(--lv-ink); font-weight: 600; }
+.hs-palette__kind { flex: none; font: 400 11px/1 var(--lv-font-en); color: var(--lv-muted); }
+.hs-palette__item--active .hs-palette__kind { color: var(--lv-ink); }
+.hs-palette__empty { padding: 16px; font: 400 13px/1.7 var(--lv-font-ja); color: var(--lv-muted); }
+.hs-palette__hint {
+  display: flex; gap: var(--lv-space-3); flex-wrap: wrap;
+  padding: 10px 16px; border-top: var(--lv-hairline); background: var(--lv-canvas);
+  font: 400 11px/1.4 var(--lv-font-en); color: var(--lv-muted);
+}
+.hs-kbd {
+  border: var(--lv-hairline); border-radius: 4px; padding: 3px 6px;
+  background: var(--lv-canvas); font: 400 11px/1 var(--lv-font-en);
+}
+
+/* ---- 地図ワークスペース（docs/06-desktop.md 04） ---- */
+.hs-mapws { display: flex; flex-direction: column; gap: var(--lv-space-3); }
+.hs-mapws__stage {
+  border: var(--lv-hairline); border-radius: var(--lv-radius-sm);
+  background: var(--lv-paper); overflow: hidden;
+  touch-action: none;   /* パンを自前で扱う。ブラウザのスクロールと取り合わない */
+  cursor: grab;
+}
+.hs-mapws__stage--dragging { cursor: grabbing; }
+.hs-mapws__stage svg { display: block; width: 100%; height: auto; }
+.hs-mapws__bar { display: flex; gap: var(--lv-space-2); flex-wrap: wrap; align-items: center; }
+.hs-mapws__bar .lv-btn { flex: none; }
+.hs-mapws__zoom { font: 400 12px/1 var(--lv-font-en); color: var(--lv-muted); min-width: 4em; }
+
+/* ---- 年表（docs/06-desktop.md 画面B） ---- */
+.hs-timeline { display: flex; flex-direction: column; }
+.hs-timeline__row {
+  display: grid; grid-template-columns: 76px 1fr;
+  gap: var(--lv-space-3); align-items: baseline;
+  padding: 7px 0; border-top: var(--lv-hairline);
+  width: 100%; border-left: 0; border-right: 0; border-bottom: 0;
+  background: none; cursor: pointer; text-align: left; color: var(--lv-ink);
+}
+.hs-timeline__row:hover { background: var(--lv-canvas); }
+.hs-timeline__row--active { background: var(--lv-accent); }
+.hs-timeline__year { font: 600 13px/1.5 var(--lv-font-en); font-variant-numeric: tabular-nums; }
+.hs-timeline__label { font: 400 13px/1.5 var(--lv-font-ja); min-width: 0; }
+
+/* ⌘⇧H の蛍光ペン。--lv-marker は litverse のトークン（既存の .hs-status--shaky と同じ色） */
+.lv-root mark.lv-mark { background: var(--lv-marker); color: var(--lv-ink); padding: 0 2px; }
+
+/* ⌘⌥I で資料面を畳む。三分割のときだけ意味がある */
+@media (min-width: 1440px) {
+  .hs-aside-hidden .hs-shell__aside { display: none; }
+}
