@@ -156,6 +156,26 @@ describe('A段: 作りの欠陥', () => {
     expect(run([item({})]).findings.filter(f => f.kind === '答えが設問文に在る')).toHaveLength(0)
   })
 
+  it('並べ替えで正解だけ要素が多いと挙げる', () => {
+    // ★ 実データで2問見つかった型。中身を読まず矢印を数えるだけで解ける
+    const { findings } = run([item({
+      stem: '古いものから順に並べたものはどれか。',
+      a: '甲 → 乙 → 丙 → 丁 → 戊', b: '乙 → 甲 → 丙 → 丁',
+      c: '丙 → 甲 → 乙 → 丁', d: '丁 → 丙 → 乙 → 甲', answer: 'a',
+    })])
+    expect(findings.filter(f => f.kind === '並べ替えの要素数で解ける')).toHaveLength(1)
+  })
+
+  it('4択とも要素数が同じなら挙げない', () => {
+    // ★ 逆対照。並べ替え型そのものを挙げてしまうと 50 問が雑音になる
+    const { findings } = run([item({
+      stem: '古いものから順に並べたものはどれか。',
+      a: '甲 → 乙 → 丙 → 丁', b: '乙 → 甲 → 丙 → 丁',
+      c: '丙 → 甲 → 乙 → 丁', d: '丁 → 丙 → 乙 → 甲', answer: 'a',
+    })])
+    expect(findings.filter(f => f.kind === '並べ替えの要素数で解ける')).toHaveLength(0)
+  })
+
   it('「上記すべて」型を挙げる', () => {
     const { findings } = run([item({ d: 'すべて正しい' })])
     expect(findings.filter(f => f.kind === '4択の体を成さない選択肢')).toHaveLength(1)
@@ -246,6 +266,10 @@ describe('いまの seed に当てる', () => {
 
   it('ほぼ重複は無い', () => {
     expect(kinds('ほぼ重複')).toHaveLength(0)
+  })
+
+  it('並べ替えの要素数で解ける設問は無い', () => {
+    expect(kinds('並べ替えの要素数で解ける')).toHaveLength(0)
   })
 
   it('★ 長さで解ける癖が残っている（直したらこの試験を消す）', () => {

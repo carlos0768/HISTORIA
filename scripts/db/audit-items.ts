@@ -279,6 +279,23 @@ export function auditItems(input: AuditInput): { findings: Finding[]; stats: Aud
       push('A', '答えが設問文に在る', t.id, `設問文が正解「${correct.slice(0, 24)}」をそのまま含む`)
     }
 
+    /* --- A-3b 並べ替え型で正解だけ要素が多い ----------------------------- */
+    /**
+     * ★ 「古いものから順に並べたもの」型で、正解だけ矢印が1本多いと
+     *   **中身を読まず数を数えるだけで解ける。** 実データで2問見つかった
+     *   （50問中2問。残り48問は4択とも同数だったので、癖ではなく取りこぼしだった）。
+     *   長さの偏りと違って、これは1問ずつ確実に決まるので A 段に置く。
+     */
+    if (choices.some(c => c.text.includes('→'))) {
+      const n = choices.map(c => ({ key: c.key, n: c.text.split('→').length }))
+      const mine = n.find(x => x.key === t.answer)?.n ?? 0
+      const others = n.filter(x => x.key !== t.answer).map(x => x.n)
+      if (others.length > 0 && mine > Math.max(...others)) {
+        push('A', '並べ替えの要素数で解ける', t.id,
+          `正解は ${mine} 要素、誤答は最大 ${Math.max(...others)} 要素。矢印を数えるだけで当たる`)
+      }
+    }
+
     /* --- A-3 「上記すべて」型 ------------------------------------------ */
     for (const c of choices) {
       if (CATCH_ALL.test(c.text.trim())) {
