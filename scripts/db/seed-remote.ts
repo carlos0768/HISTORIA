@@ -34,7 +34,17 @@ console.log(`接続先: ${shown.host}${shown.pathname}`)
 
 const db = postgres(url, { prepare: false, max: 1, onnotice: () => {} })
 
-type Counts = { kc: string; ksu: string; kr: string; units: string; ce: string; pe: string }
+/**
+ * ★ **item を必ず出す。** 2026-09-03、この道具は KC と正典しか報告せず、
+ *   `item` を一度も画面に出さないまま「完了。」と言っていた。作者が古い
+ *   作業ツリーで流したとき（`cd` に失敗して `git pull` が飛ばされた）、
+ *   0 問しか入っていないのに成功に見えた。**一番知りたい数字が出ない道具は、
+ *   成功と失敗を見分けられない。**
+ */
+type Counts = {
+  kc: string; ksu: string; kr: string; units: string; ce: string; pe: string
+  item: string; ikc: string
+}
 const snapshot = async (): Promise<Counts> => {
   const [r] = await db<Counts[]>`
     SELECT (SELECT count(*) FROM kc)                              AS kc,
@@ -42,12 +52,17 @@ const snapshot = async (): Promise<Counts> => {
            (SELECT count(*) FROM kc_region)                       AS kr,
            (SELECT count(DISTINCT unit_id) FROM kc_syllabus_unit) AS units,
            (SELECT count(*) FROM canon_event)                     AS ce,
-           (SELECT count(*) FROM person)                          AS pe`
+           (SELECT count(*) FROM person)                          AS pe,
+           (SELECT count(*) FROM item WHERE user_id IS NULL)      AS item,
+           (SELECT count(*) FROM item_kc)                         AS ikc`
   return r!
 }
 const show = (label: string, c: Counts) => {
+  const pad = ' '.repeat(label.length)
   console.log(`  ${label}: kc ${c.kc} / kc_syllabus_unit ${c.ksu} / kc_region ${c.kr} / KC を持つ節 ${c.units}`)
-  console.log(`  ${' '.repeat(label.length)}  正典: canon_event ${c.ce} / person ${c.pe}`)
+  console.log(`  ${pad}  正典: canon_event ${c.ce} / person ${c.pe}`)
+  console.log(`  ${pad}  共有設問: item ${c.item} / item_kc ${c.ikc}` +
+    (c.item === '0' ? '  ← 0 問。approve が空のままか、古い作業ツリーで流している' : ''))
 }
 
 try {
@@ -78,6 +93,16 @@ try {
   console.log(`  KC ${counts.kc}（承認されず除外 ${counts.skippedUnapproved}）/ kc_region ${counts.kcRegion}`)
   console.log(`  正典: canon_event ${counts.canonEvent}（除外 ${counts.skippedCanonEvent}）` +
     ` / person ${counts.person}（除外 ${counts.skippedPerson}）`)
+  console.log(`  共有設問: item ${counts.item}（承認されず除外 ${counts.skippedItem}）` +
+    ` / item_kc ${counts.itemKc}`)
+  if (counts.item === 0) {
+    // ★ 黙って 0 件で終わらせない。これが起きるのは approve が空のときか、
+    //   古い作業ツリーで流したときで、どちらも画面には成功に見える
+    console.log('\n  ⚠ 共有設問が 1 問も入っていません。1問も出題されません。')
+    console.log('    seed/item.csv の approve 列が空のままではありませんか。')
+    console.log('    承認済みのはずなら、いま居るディレクトリが古い可能性があります:')
+    console.log(`      git -C . log --oneline -1`)
+  }
 
   const after = await snapshot()
   show('投入後', after)

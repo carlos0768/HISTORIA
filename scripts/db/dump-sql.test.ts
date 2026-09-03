@@ -16,6 +16,16 @@ import { readCsv } from './csv'
 const applySeedSql = (db: Sql, sql: string) =>
   db.begin(tx => tx.unsafe(sql.replace(/^BEGIN;$/m, '').replace(/^COMMIT;$/m, '')))
 
+/** seed を写して item.csv の承認欄だけ全部空にした一時ディレクトリを作る */
+function blankItemApprovalDir(): string {
+  const dir = mkdtempSync(join(tmpdir(), 'historia-dumpsql-blank-'))
+  cpSync(SEED_DIR, dir, { recursive: true })
+  const p = join(dir, 'item.csv')
+  const lines = readFileSync(p, 'utf8').split('\n')
+  writeFileSync(p, lines.map((l, i) => (i > 0 ? l.replace(/^[○×],/, ',') : l)).join('\n'))
+  return dir
+}
+
 /** seed を写して item.csv だけ全件承認にした一時ディレクトリを作る */
 function approvedItemsDir(): string {
   const dir = mkdtempSync(join(tmpdir(), 'historia-dumpsql-item-'))
@@ -90,10 +100,33 @@ describe('Supabase 用の SQL', () => {
   })
 
   it('承認欄が空の共有設問は含めない（作者承認制 docs/02 §5）', () => {
-    // 実データ（起草中＝全件空欄）をそのまま使う
-    const { sql, counts } = buildSeedSql()
+    // ★ 以前は「実データが起草中＝全件空欄」であることに乗って確かめていた。
+    //   2026-09-03 に作者が 408 問を承認した時点でこの試験は落ち、
+    //   **承認そのものを妨げた**。規則を見たいのであって実データの状態を
+    //   見たいのではないので、写しを作って空欄に戻してから確かめる。
+    const { sql, counts } = buildSeedSql(blankItemApprovalDir())
     expect(counts.item).toBe(0)
     expect(sql).not.toContain('INSERT INTO item (')
+  })
+
+  it('KC が未承認の設問は含めない（外部キーで seed 全体が落ちるため）', () => {
+    // ★ item_kc.kc_id は kc(id) への外部キー（docs/schema.sql:320）。
+    //   設問を承認したまま KC だけ却下すると、seed は1つのトランザクションなので
+    //   **丸ごと落ちる**。承認済みの設問でも、KC が通っていなければ出さない。
+    const dir = mkdtempSync(join(tmpdir(), 'historia-dumpsql-orphan-'))
+    cpSync(SEED_DIR, dir, { recursive: true })
+    const items = readCsv(join(SEED_DIR, 'item.csv')).filter(r => r.approve === '○')
+    expect(items.length, '承認済みの設問が無いと、この試験は何も見ていない').toBeGreaterThan(0)
+    const victimKc = items[0]!.kc_id!
+
+    const lines = readFileSync(join(dir, 'kc.csv'), 'utf8').split('\n')
+    writeFileSync(join(dir, 'kc.csv'),
+      lines.map(l => (l.startsWith(`○,${victimKc},`) ? l.replace(/^○,/, ',') : l)).join('\n'))
+
+    const { sql, counts } = buildSeedSql(dir)
+    expect(counts.item).toBe(items.length - 1)
+    expect(sql, `未承認の ${victimKc} を指す item_kc が残っている`)
+      .not.toContain(`, ${JSON.stringify(victimKc).replace(/"/g, "'")}, 1.0)`)
   })
 
   it('単引用符を含む文字列を壊さない', () => {

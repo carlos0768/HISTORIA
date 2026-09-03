@@ -230,10 +230,20 @@ say('')
 //
 // ★ approved_at に生成時刻を焼き込まない。焼き込むと流すたびに SQL が変わり、
 //   生成物の鮮度を見る dump-sql.test.ts が毎回落ちる。SQL の now() に任せる。
+// ★ **承認済みの KC を参照している設問だけを出す。**
+//   item_kc.kc_id は kc(id) への外部キーである（docs/schema.sql:320）。
+//   承認されなかった KC を指す item_kc を出すと外部キー違反になり、
+//   seed 全体が1つのトランザクションなので**丸ごと落ちる**。
+//   設問だけ承認して KC を却下する、という組み合わせは作者がいつでも作れるので、
+//   ここで先に落としておく（落とした数は下の行に出す）。
+const approvedKcIds = new Set(approved.map(k => k.id!))
 const itemRows = readCsv(join(SEED_DIR, 'item.csv'))
-const items = itemRows.filter(r => r.approve === '○')
+const itemsApproved = itemRows.filter(r => r.approve === '○')
+const items = itemsApproved.filter(r => approvedKcIds.has(r.kc_id!))
+const orphanItems = itemsApproved.length - items.length
 const seenItemId = new Set<string>()
-say(`-- 共有設問 ${items.length} 件（承認されず除外 ${itemRows.length - items.length}）`)
+say(`-- 共有設問 ${items.length} 件（承認されず除外 ${itemRows.length - itemsApproved.length}` +
+    `${orphanItems > 0 ? ` / KC が未承認のため除外 ${orphanItems}` : ''}）`)
 for (const t of items) {
   const id = stableUuid(ITEM_NAMESPACE, t.id!)
   if (seenItemId.has(id)) continue          // seed.ts の dedupe と同じ（後勝ちではなく先勝ち）
