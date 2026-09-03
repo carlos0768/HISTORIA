@@ -27,6 +27,57 @@ const arr = (v: string[]): string => (v.length === 0 ? `'{}'::text[]` : `ARRAY[$
 const numArr = (v: number[]): string =>
   v.length === 0 ? `'{}'::smallint[]` : `ARRAY[${v.join(',')}]::smallint[]`
 
+/**
+ * SQL エディタに貼れる大きさの目安（KB）。
+ *
+ * ★ 実測（2026-09-03）: 1016KB の 02_seed.sql は Supabase のエディタで実行できなかった。
+ *   厳密な上限は公表されていないので、余裕を見てこの値で「貼るな」に切り替える。
+ *   seed-remote.ts のヘッダが挙げている 400KB より低めに取ってある。
+ */
+export const PASTE_LIMIT_KB = 300
+
+/**
+ * 投入手順の案内。
+ *
+ * ★ 純粋関数にしてある。**実際に出る文字列を試験できるようにするため**である。
+ *   最初は console.log を直に並べていたが、試験が「ソースにこの語が在るか」しか
+ *   見られず、案内から1行消しても落ちなかった（生成物のヘッダに同じ語があったため）。
+ *   出力そのものを返す形にすれば、その取り違えは起きない。
+ *
+ * ★ ここは**実際に作者を詰まらせた**ので分岐を明示する（2026-09-03）。
+ *   以前は「1. docs/schema.sql（そのまま貼れる）2. seed/sql/02_seed.sql」とだけ出していた。
+ *   どちらも既存の本番DBには当てはまらない:
+ *     - docs/schema.sql は CREATE TABLE 44本すべてが IF NOT EXISTS 無しなので、
+ *       既に流したDBでは最初の era で必ず落ちる（「そのまま貼れる」のは空のDBだけ）
+ *     - 02_seed.sql は承認が進むほど大きくなり、SQL エディタが受け付けなくなる
+ */
+export function deployGuidance(kb: number): string[] {
+  const lines = [
+    'スキーマを入れる（どちらか一方）:',
+    '  新規の空DB   → docs/schema.sql → seed/sql/03_rls.sql をエディタに貼る',
+    '  既に流したDB → seed/sql/04_phase3.sql → seed/sql/03_rls.sql をエディタに貼る',
+    '               （docs/schema.sql は貼らない。era がすでに存在すると言われて止まる）',
+    '  いまどの状態か分からないとき:',
+    "    DATABASE_URL='...' npx tsx scripts/db/check-remote.ts",
+    '',
+    'seed を入れる:',
+  ]
+  if (kb > PASTE_LIMIT_KB) {
+    lines.push(
+      `  ★ ${kb.toFixed(0)}KB あるので SQL エディタには貼れない（上限 ${PASTE_LIMIT_KB}KB 目安）。`,
+      '    貼らずに、CSV から直接 INSERT する:',
+      "      DATABASE_URL='...' npx tsx scripts/db/seed-remote.ts          # 下見",
+      "      DATABASE_URL='...' npx tsx scripts/db/seed-remote.ts --apply  # 実行",
+    )
+  } else {
+    lines.push(
+      `  seed/sql/02_seed.sql をエディタに貼る（${kb.toFixed(0)}KB）`,
+      "  または DATABASE_URL='...' npx tsx scripts/db/seed-remote.ts --apply",
+    )
+  }
+  return lines
+}
+
 export type SeedSql = { sql: string; counts: Record<string, number> }
 
 /**
@@ -43,8 +94,15 @@ const say = (s = '') => out.push(s)
 say('-- HISTORIA seed（自動生成 — 手で編集しない）')
 say('-- 作り直す: npx tsx scripts/db/dump-sql.ts')
 say('--')
-say('-- 先に docs/schema.sql を流しておくこと。')
+say('-- 先にスキーマを入れておくこと。')
+say('--   新規の空DB     : docs/schema.sql')
+say('--   既に流したDB   : seed/sql/04_phase3.sql（docs/schema.sql は貼らない。era で落ちる）')
 say('-- 何度流しても結果は同じになる（ON CONFLICT で上書きする）。')
+say('--')
+say('-- ★ このファイルは**新規DBへの貼り付け用**である。')
+say(`--   Supabase の SQL エディタは ${PASTE_LIMIT_KB}KB を超えると実行できない。`)
+say('--   本番へ入れるときは貼らずに、CSV から直接 INSERT する道具を使う:')
+say("--     DATABASE_URL='...' npx tsx scripts/db/seed-remote.ts --apply")
 say('')
 say('BEGIN;')
 say('')
@@ -286,8 +344,6 @@ if (process.argv[1]?.endsWith('dump-sql.ts')) {
       console.log('    npx tsx scripts/db/approve-kc.ts --file item --all')
     }
     console.log('')
-    console.log('Supabase の SQL エディタに、この順で貼る:')
-    console.log('  1. docs/schema.sql          （そのまま貼れる）')
-    console.log('  2. seed/sql/02_seed.sql')
+    for (const line of deployGuidance(sql.length / 1024)) console.log(line)
   }
 }
