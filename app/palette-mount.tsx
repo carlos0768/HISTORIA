@@ -28,7 +28,26 @@ export async function PaletteMount() {
   const userId = await currentUserId()
   if (!db || !userId) return null
 
-  const commands = await commandsFor(db)
+  // ★ ここは投げてはいけない。**layout は error.tsx の外側にある**
+  //   （Next の作法書 error.md「error.js は同じ segment の layout を包まない」）。
+  //   ここで投げると app/global-error.tsx まで飛び、**全ページが同時に死ぬ。**
+  //
+  // ★ tryDb() では足りない。あれは DATABASE_URL の有無しか見ないので
+  //   （lib/db/optional.ts）、設定されていて**届かない**ときは
+  //   commandsFor が投げる。招待の画面で気づかなかったのは、未認証で
+  //   currentUserId() が null を返し、問い合わせの前に return していたからに
+  //   すぎない。ログインしたあとに DB が届かなくなれば全滅していた。
+  //
+  // ★ 黙って消えてよい。⌘K は近道であって、無くても3タブから全部に行ける。
+  //   1つの近道のために本文を読めなくするほうが悪い。
+  let commands
+  try {
+    commands = await commandsFor(db)
+  } catch (e) {
+    console.error('[palette] 単元の一覧を引けませんでした', e)
+    return null
+  }
+
   if (commands.length === 0) return null
   return <CommandPalette commands={commands} />
 }

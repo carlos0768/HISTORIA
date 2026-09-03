@@ -20,9 +20,20 @@ export function InviteForm() {
     e.preventDefault()
     setError(null)
     startTransition(async () => {
-      const r = await submitInviteAction(code)
-      if (r.ok) router.push('/login')
-      else setError(r.message)
+      try {
+        const r = await submitInviteAction(code)
+        if (r.ok) router.push('/login')
+        else setError(r.message)
+      } catch (err) {
+        // ★ ここで受け止める。startTransition の中の未処理の例外は
+        //   最も近い error boundary へ上がる（Next の作法書 error-handling.md）ため、
+        //   受けないと画面ごと差し替わり、**打った招待コードが消える。**
+        //   コードは手で写している人が多いので、打ち直させない。
+        // ★ err の message は出さない。本番では Server 側の例外は総称に
+        //   置き換わるので、英語の内部文が出るだけである（同 error.md）。
+        console.error(err)
+        setError('確認できませんでした。もう一度お試しください。')
+      }
     })
   }
 

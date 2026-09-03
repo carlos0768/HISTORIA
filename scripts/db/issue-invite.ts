@@ -79,8 +79,12 @@ try {
     }
   }
 
+  // ★ 並べ替えは created_at である。issued_at という列は無い
+  //   （docs/schema.sql の invite_code は code / issued_by / used_by /
+  //   used_at / expires_at / created_at）。issued_by と取り違えていて、
+  //   --issue の無い「一覧だけ」が最初から一度も通っていなかった。
   const rows = await db<Row[]>`
-    SELECT code, used_by, expires_at FROM invite_code ORDER BY issued_at`
+    SELECT code, used_by, expires_at FROM invite_code ORDER BY created_at`
   const [n] = await db<{ users: string }[]>`SELECT count(*) AS users FROM app_user`
 
   console.log(`\n利用者 ${n!.users} / ${MAX_USERS}名`)
