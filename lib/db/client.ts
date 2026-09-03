@@ -6,13 +6,16 @@
  * ローカルとテストは DATABASE_URL をそのまま使う。
  */
 import postgres from 'postgres'
+import { DbNotConfiguredError } from './error'
 
 let _sql: postgres.Sql | null = null
 
 export function sql(): postgres.Sql {
   if (_sql) return _sql
   const url = process.env.DATABASE_URL
-  if (!url) throw new Error('DATABASE_URL が設定されていません')
+  // ★ 名前付きの例外を投げる。呼び出し側（lib/db/error.ts の分類器）が
+  //   文面を比べずに「未設定」だと判別できるようにするため
+  if (!url) throw new DbNotConfiguredError()
   _sql = postgres(url, {
     // transaction モードのプーラーでは prepared statement が使えない
     prepare: false,
