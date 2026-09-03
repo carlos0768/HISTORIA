@@ -6,7 +6,7 @@
  * ★ generativelanguage.googleapis.com を直接叩く。**Vertex AI は経由しない。**
  *   無料枠があるのは AI Studio 系のこの経路だけである（§1.1）。
  */
-import type { Provider, GenerateArgs, GenerateResult, VerifyResult, Claim, Usage } from './types'
+import type { Provider, GenerateArgs, GenerateResult, VerifyResult, Usage } from './types'
 import { fetchWithRetry, type Sleep } from './http'
 import { MaterialOutput, toGeminiSchema } from './schema'
 
@@ -134,7 +134,3 @@ export function createGeminiProvider(o: GeminiOptions): Provider {
     },
   }
 }
-
-/** Claim を検証に渡す形にそろえる（Anthropic 側で使う） */
-export const claimsToText = (claims: Claim[]): string =>
-  claims.map((c, i) => `${i}. [${c.type}] ${c.text}`).join('\n')

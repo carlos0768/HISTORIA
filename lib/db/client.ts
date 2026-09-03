@@ -21,10 +21,3 @@ export function sql(): postgres.Sql {
   })
   return _sql
 }
-
-export async function closeSql(): Promise<void> {
-  if (_sql) {
-    await _sql.end({ timeout: 5 })
-    _sql = null
-  }
-}
