@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { weakKcs, streak } from '@/lib/loop/records'
+import { hasDiagnostic } from '@/lib/loop/diagnostic'
 import { Screen, Card, Empty, StatusChip, MasteryBar } from '@/components/ui'
 import { NotReady } from '@/components/not-ready'
 
@@ -27,7 +28,9 @@ export default async function Records() {
   }
 
   const now = new Date()
-  const [weak, s] = await Promise.all([weakKcs(db, userId, now), streak(db, userId, now)])
+  const [weak, s, tookDiagnostic] = await Promise.all([
+    weakKcs(db, userId, now), streak(db, userId, now), hasDiagnostic(db, userId),
+  ])
 
   const aside = (
     <>
@@ -95,6 +98,30 @@ export default async function Records() {
           ))}
         </>
       )}
+
+      {/* ★ 診断への入口をここに置く（docs/04 §5）。
+           ホーム（app/page.tsx）の案内は「まだ受けていない人」にしか出ないので、
+           一度受けると結果を見返す手段が URL 直打ちしか無くなっていた。
+           記録タブは「自分の状態を見る場所」なので、診断の結果もここに属する。 */}
+      <Card>
+        <span className="lv-label">診断テスト</span>
+        {tookDiagnostic ? (
+          <>
+            <p className="lv-caption">
+              どこから確かめていくかの見当。順番の目安であって、得意不得意の判定ではありません。
+            </p>
+            <Link className="lv-btn lv-btn--block" href="/diagnostic/result">結果を見る</Link>
+            <Link className="lv-btn lv-btn--block" href="/diagnostic">受け直す</Link>
+          </>
+        ) : (
+          <>
+            <p className="lv-caption">
+              最大24問・10分ほど。点数は付きません。受けると出題の順番が決まります。
+            </p>
+            <Link className="lv-btn lv-btn--block" href="/diagnostic">診断テストを受ける</Link>
+          </>
+        )}
+      </Card>
 
       {/* ★ 設定への入口。タブは3つのままにする（docs/11 §9）ので、
            モバイルはここから入る。デスクトップはサイドバーにも出ている */}
