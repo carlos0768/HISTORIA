@@ -385,7 +385,7 @@ approve,id,label,aliases,year_from,year_to,precision,region_ids,note
 ○,ce.rev.spinning_jenny,ジェニー紡績機,,1764,,exact,西欧,ハーグリーヴズ
 ○,ce.rev.watt_steam,ワットの蒸気機関,,1769,,exact,西欧,動力の革新
 ○,ce.rev.power_loom,力織機,,1785,,exact,西欧,カートライト
-○,ce.rev.stephenson_locomotive,スティーヴンソンの蒸気機関車,,1825,,exact,西欧,ストックトン・ダーリントン間
+○,ce.rev.stephenson_locomotive,スティーヴンソンの蒸気機関車,,1814,1825,exact,西欧,1814 最初の機関車ブリュヘル号／1825 ストックトン・ダーリントン鉄道で実用化
 ○,ce.rev.enclosure2,第2次囲い込み,第2次エンクロージャー,1760,,century,西欧,18〜19世紀。議会立法による
 ○,ce.rev.latin_america_independence,ラテンアメリカ諸国の独立,,1810,1826,exact,ラテンアメリカ,シモン・ボリバル・サンマルティン
 ○,ce.rev.monroe_doctrine,モンロー宣言,モンロー主義,1823,,exact,北アメリカ,相互不干渉
@@ -980,7 +980,7 @@ approve,id,label,aliases,year_from,year_to,precision,region_ids,note
 ○,ce.fin.paris_expo,パリ万国博覧会,,1855,,century,西欧,
 ○,ce.fin.department_store,百貨店の出現,,1852,,exact,西欧,ボン・マルシェ
 ○,ce.fin.mass_production,大量生産方式,フォード・システム,1913,,exact,北アメリカ,ベルトコンベア
-○,ce.fin.radio_broadcast,ラジオ放送の開始,,1920,,exact,北アメリカ,大衆社会の到来
+○,ce.fin.radio_broadcast,ラジオ放送の開始,,1920,1925,exact,北アメリカ,米1920 KDKA／日1925 JOAK。名前だけではどちらとも取れるので範囲で持つ
 ○,ce.fin.talkies,トーキー映画,,1927,,exact,北アメリカ,
 ○,ce.fin.television,テレビ放送の開始,,1936,,exact,西欧,
 ○,ce.fin.computer_eniac,ENIAC の完成,,1946,,exact,北アメリカ,
