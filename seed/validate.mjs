@@ -2,7 +2,7 @@
 // seed/*.csv を DB へ投入する前に落とすための検査。依存なし（Node 標準ライブラリのみ）。
 //   node seed/validate.mjs           … 起草中の検査（approve 列は見ない）
 //   node seed/validate.mjs --strict  … 投入前の検査（approve 列の空欄も落とす）
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -422,6 +422,51 @@ if (itemWarnings.length) {
   console.log(`\n△ 設問の作りに注意が要るもの ${itemWarnings.length} 件`);
   for (const w of itemWarnings.slice(0, 20)) console.log('  - ' + w);
   if (itemWarnings.length > 20) console.log(`  … 他 ${itemWarnings.length - 20} 件`);
+}
+
+// ---------------------------------------------------------------------------
+// 12. 書き出した SQL が CSV と食い違っていないか（鮮度）
+//
+// ★ **承認そのものは強制しない。** 承認は作者の判断であって（docs/02 §5）、
+//   道具が代行してはいけない。approve が空でも、それは「まだ承認していない」
+//   という正しい状態である。
+//
+// ★ 捕まえたいのはそこではなく「**承認したのに dump し忘れた**」
+//   「**dump したあとに CSV を触った**」である。この2つは黙って通り、
+//   本番に貼ったときに初めて「1問も出題されない」として現れる。
+//   実際に seed/item.csv 408行が全部空のまま 02_seed.sql に item=0 で焼かれていた。
+//
+// ★ 比べるのは 02_seed.sql の末尾に書いてある期待値の行である。
+//   dump-sql.ts が自分で書いた数なので、CSV から数え直した値と一致していなければ
+//   どちらかが古い。
+const sqlPath = join(DIR, 'sql', '02_seed.sql');
+if (existsSync(sqlPath)) {
+  const sql = readFileSync(sqlPath, 'utf8');
+  const line = sql.split('\n').find(l => l.startsWith('-- 期待値:'));
+  if (!line) {
+    fail('12: seed/sql/02_seed.sql に「-- 期待値:」の行が無い（dump-sql.ts が古い）');
+  } else {
+    const stated = Object.fromEntries(
+      [...line.matchAll(/(\w+)=(\d+)/g)].map(m => [m[1], Number(m[2])]),
+    );
+    const approved = (rows) => rows.filter(r => r.approve === '○').length;
+    const actual = {
+      era: era.length,
+      region: region.length,
+      unit: syllabus.length,
+      kc: approved(kc),
+      canon_event: approved(canon),
+      person: approved(person),
+      item: approved(item),
+    };
+    for (const [k, n] of Object.entries(actual)) {
+      if (stated[k] === undefined) continue;
+      if (stated[k] !== n) {
+        fail(`12: seed/sql/02_seed.sql が古い。${k} は CSV で ${n} 件だが SQL は ${stated[k]} 件`
+           + '（npm run db:dump-sql で書き出し直す）');
+      }
+    }
+  }
 }
 
 if (errors.length) {
