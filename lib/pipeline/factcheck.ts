@@ -44,7 +44,7 @@ export const matchRate = (r: MachineCheckResult): number | null =>
  *   （「ローマの平和 前27〜後180」など）でこれをやると、範囲の後半が
  *   まるごと外れて**正しい年を誤りと判定する**。実データを書いていて気づいた。
  */
-function yearMatches(claimYear: number, canonFrom: number, canonTo: number | null, precision: string): boolean {
+export function yearMatches(claimYear: number, canonFrom: number, canonTo: number | null, precision: string): boolean {
   const to = canonTo ?? canonFrom
   const slack = precision === 'century' ? 100 : precision === 'decade' ? 10 : 0
   return claimYear >= canonFrom - slack && claimYear <= to + slack
