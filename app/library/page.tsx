@@ -3,7 +3,6 @@ import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { Screen, Card, DataTable, type Column } from '@/components/ui'
 import { NotReady } from '@/components/not-ready'
-import { commandsFor } from '@/lib/loop/commands'
 import { MATERIAL_STATUSES, materialLibrary, type LibraryRow } from '@/lib/loop/library'
 
 export const dynamic = 'force-dynamic'
@@ -68,7 +67,7 @@ export default async function Library({
   ]
 
   return (
-    <Screen title="教材の一覧" tab="library" commands={await commandsFor(db)}>
+    <Screen title="教材の一覧" tab="library">
       <Card>
         <span className="lv-label">さがす</span>
         {/* ★ GET のフォームにする。結果の URL がそのまま共有できる */}

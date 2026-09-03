@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { SwRegister } from './sw-register'
+import { PaletteMount } from './palette-mount'
 
 export const metadata: Metadata = {
   title: 'HISTORIA',
@@ -24,6 +25,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <SwRegister />
+        {/* ★ ⌘K は画面ごとではなくここに1つだけ置く。
+             画面ごとに渡す形にしていたときは、人が出発する画面
+             （ホーム・特訓・記録・出題）に渡し忘れていて、
+             「机の上」3画面がモバイルから到達できなかった。
+             layout に置けば渡し忘れという失敗の形が無くなる。 */}
+        <PaletteMount />
       </body>
     </html>
   )

@@ -310,3 +310,13 @@ body { margin: 0; background: var(--lv-canvas); }
 @media (min-width: 1440px) {
   .hs-aside-hidden .hs-shell__aside { display: none; }
 }
+
+/* ---- 視聴後の retrieval（docs/09b-video.md V6） ---- */
+/* ★ 動画の枠の中に置く。本文と地続きに見えると「読み物の続き」と誤解され、
+     思い出す操作だという意図が伝わらない。 */
+.hs-video__quiz {
+  display: flex; flex-direction: column; gap: var(--lv-space-2);
+  margin-top: var(--lv-space-3); padding: var(--lv-space-3);
+  border: var(--lv-hairline); border-radius: var(--lv-radius-sm);
+  background: var(--lv-canvas);
+}

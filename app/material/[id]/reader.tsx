@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic'
 // 基図は約80KBある。geo の KC があるセクションを開いたときだけ読む。
 // 全教材ページに載せると、地図を一度も見ない読者にも毎回送ることになる
 const WorldMap = dynamic(() => import('@/components/world-map').then(m => m.WorldMap))
-import { markRead, report, watchVideo } from './actions'
+import { markRead, report, watchVideo, videoRetrieval, answerRetrieval } from './actions'
 import { ReportButton } from '@/components/report-button'
 import { VideoEmbed } from '@/components/video-embed'
 import type { VideoCard } from '@/lib/loop/video'
@@ -197,6 +197,7 @@ function SectionPane({
             startSec={v.startSec}
             label={`「${v.forKcLabel}」の理解を助ける動画`}
             onPlay={() => { void watchVideo({ videoId: v.id, watchedSec: 0 }) }}
+            retrieval={{ fetch: videoRetrieval, answer: answerRetrieval }}
           />
         ))}
       </div>

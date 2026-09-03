@@ -10,7 +10,6 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import type { MasteryStatus } from '@/lib/domain/weakness'
-import { CommandPalette, type Command } from './palette'
 
 /**
  * フッタの3タブ（docs/11-ux.md §9）。
@@ -57,7 +56,7 @@ export const DESK = [
  *   モバイルでは**そもそも並べない**ので、中身の描画費用もかからない。
  */
 export function Screen({
-  title, children, tab, aside, trailing, commands,
+  title, children, tab, aside, trailing,
 }: {
   title: string
   children: ReactNode
@@ -65,11 +64,6 @@ export function Screen({
   aside?: ReactNode
   /** 見出しの右端に置くもの（連続日数など）。docs/11-ux.md §7 */
   trailing?: ReactNode
-  /**
-   * ⌘K でさがせるもの（lib/loop/commands.ts）。
-   * ★ 渡さない画面ではパレットが開かない。ログイン前の画面に渡さないため。
-   */
-  commands?: readonly Command[]
 }) {
   if (!tab) {
     return (
@@ -131,10 +125,9 @@ export function Screen({
 
       {aside && <aside className="hs-shell__aside">{aside}</aside>}
 
-      {/* ★ 幅で出し分けない。外付けキーボードを繋いだ端末では幅が広くなるので、
-           幅で切ると鍵が急に効かなくなる。開くまで何も描かない部品なので、
-           モバイルに置いてあっても見えるものは増えない */}
-      {commands && commands.length > 0 && <CommandPalette commands={commands} />}
+      {/* ★ ⌘K はここに置かない。app/palette-mount.tsx が layout に1つだけ載せる。
+           画面ごとに渡す形にしていたときは渡し忘れが起き、
+           「机の上」3画面がモバイルから到達できなかった（app/palette-mount.tsx の注記） */}
     </div>
   )
 }

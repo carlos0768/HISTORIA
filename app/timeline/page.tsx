@@ -2,7 +2,6 @@ import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { Screen, Card } from '@/components/ui'
 import { NotReady } from '@/components/not-ready'
-import { commandsFor } from '@/lib/loop/commands'
 import { timeline, TIMELINE_LIMIT } from '@/lib/loop/timeline'
 import { REGION_SHAPES } from '@/lib/map/regions'
 import { TimelineView } from './view'
@@ -43,7 +42,7 @@ export default async function Timeline({
   const events = await timeline(db, { from, to, query: q, regionId })
 
   return (
-    <Screen title="年表と地図" tab="timeline" commands={await commandsFor(db)}>
+    <Screen title="年表と地図" tab="timeline">
       <Card>
         <span className="lv-label">絞る</span>
         <form className="hs-report__row" method="get">

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { readFileSync } from 'node:fs'
+import { globSync } from 'node:fs'
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { CommandPalette, filterCommands, SHORTCUTS, type Command } from './palette'
@@ -317,6 +318,50 @@ describe('地図の表示範囲', () => {
     expect(v.z).toBe(MIN_ZOOM)
     expect(v.x).toBe(0)
     expect(v.y).toBe(0)
+  })
+})
+
+/**
+ * ⌘K がどこから開けるか（docs/06-desktop.md 03）
+ *
+ * ★ これは**実際に踏んだ欠陥**の再発防止である。
+ *   最初は `<Screen commands={...}>` として画面ごとに渡す形にしていたが、
+ *   実際に渡したのは /library・/timeline・/map の3つだけで、
+ *   人が出発する画面（ホーム・特訓・記録・出題）に載っていなかった。
+ *   サイドバーは 1440px 以上でしか出ないので、モバイルでは
+ *   「机の上」3画面が互いからしか開けない孤島になっていた。
+ *
+ * ★ 直し方は「16画面に渡し忘れないよう気をつける」ではなく、
+ *   **渡すという操作そのものを無くす**（layout に1つ置く）。
+ *   ここではその構造を固定する。
+ */
+describe('⌘K の置き場所', () => {
+  const layout = readFileSync('app/layout.tsx', 'utf8')
+  const mount = readFileSync('app/palette-mount.tsx', 'utf8')
+  const ui = readFileSync('components/ui.tsx', 'utf8')
+
+  it('layout に1つだけ載っている', () => {
+    expect(layout).toContain('<PaletteMount />')
+  })
+
+  /** ★ Screen に戻すと、また渡し忘れが起きる */
+  it('Screen は commands を受け取らない', () => {
+    expect(ui).not.toContain('commands')
+    expect(ui).not.toContain('CommandPalette')
+  })
+
+  it('画面から commands を渡している所が1つも無い', () => {
+    const screens = globSync('app/**/page.tsx')
+    expect(screens.length).toBeGreaterThan(10)
+    for (const f of screens) {
+      expect(readFileSync(f, 'utf8'), `${f} が commands を渡している`).not.toContain('commands=')
+    }
+  })
+
+  /** ★ 未認証には出さない。未登録の人に単元名の一覧を見せない */
+  it('未認証には出さない', () => {
+    expect(mount).toContain('currentUserId')
+    expect(mount).toContain('if (!db || !userId) return null')
   })
 })
 

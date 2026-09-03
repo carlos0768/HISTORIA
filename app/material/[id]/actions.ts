@@ -5,7 +5,8 @@ import { sql } from '@/lib/db/client'
 import { currentUserId } from '@/lib/auth/dal'
 import { recordRead, type ReadResult } from '@/lib/loop/material'
 import { reportContent, type ReportTarget } from '@/lib/loop/report'
-import { recordView } from '@/lib/loop/video'
+import { recordView, retrievalAfterVideo, type RetrievalItem } from '@/lib/loop/video'
+import { submitAnswer } from '@/lib/loop/answer'
 
 /**
  * セクションの読了を記録する。
@@ -77,4 +78,46 @@ export async function watchVideo(input: {
     userId, videoId: input.videoId, watchedSec: input.watchedSec, now: new Date(),
   })
   return { counted: r.counted }
+}
+
+/**
+ * 視聴後の retrieval を取りに行く（docs/09b-video.md V6・§6.2）
+ *
+ * ★ **押されてから呼ぶ。** 教材を開いた時点で全動画ぶんの設問を引くと、
+ *   一度も再生されない動画のために毎回問い合わせることになる。
+ *
+ * ★ 2問そろわなければ空が返る（`retrievalAfterVideo` の設計）。
+ *   画面はそのとき何も描かない。1問だけ出して数を埋めない。
+ *
+ * ★ 正答も解説もここでは返さない。採点は `answerRetrieval` が行う（docs/12 §6.1）。
+ */
+export async function videoRetrieval(videoId: string): Promise<RetrievalItem[]> {
+  const userId = await currentUserId()
+  if (!userId) throw new Error('ユーザーが特定できません')
+  return retrievalAfterVideo(sql(), userId, videoId)
+}
+
+/**
+ * retrieval の1問を採点する。
+ *
+ * ★ `session_kind='video_retrieval'` で記録する。型は前から通っていたが、
+ *   呼び出し元が無かった（配線の抜け）。これで docs/09b V6 が閉じる。
+ *
+ * ★ ここは**測定ではなく練習**なので、正誤をその場で返す。
+ *   診断テスト（`app/diagnostic/actions.ts`）が正誤を返さないのと逆の扱いで、
+ *   理由も逆である。あちらは途中で諦めさせないため、こちらは
+ *   間違えたまま次へ進ませないため。
+ */
+export async function answerRetrieval(input: {
+  itemId: string
+  chosen: string
+  latencyMs: number
+}): Promise<{ correct: boolean; explanation: string | null }> {
+  const userId = await currentUserId()
+  if (!userId) throw new Error('ユーザーが特定できません')
+  const r = await submitAnswer(sql(), {
+    userId, itemId: input.itemId, sessionKind: 'video_retrieval',
+    chosen: input.chosen, latencyMs: input.latencyMs, now: new Date(),
+  })
+  return { correct: r.correct, explanation: r.explanation }
 }
