@@ -2,7 +2,6 @@ import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { Screen, Card } from '@/components/ui'
 import { NotReady } from '@/components/not-ready'
-import { commandsFor } from '@/lib/loop/commands'
 import { REGION_SHAPES } from '@/lib/map/regions'
 import { MapLoader } from './loader'
 
@@ -40,7 +39,7 @@ export default async function MapPage({
   const regionIds = asked.filter(n => known.has(n))
 
   return (
-    <Screen title="地図" tab="map" commands={await commandsFor(db)}>
+    <Screen title="地図" tab="map">
       <Card>
         <span className="lv-label">地域を塗る</span>
         <form className="hs-report__row" method="get">
