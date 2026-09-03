@@ -1,8 +1,15 @@
 -- HISTORIA seed（自動生成 — 手で編集しない）
 -- 作り直す: npx tsx scripts/db/dump-sql.ts
 --
--- 先に docs/schema.sql を流しておくこと。
+-- 先にスキーマを入れておくこと。
+--   新規の空DB     : docs/schema.sql
+--   既に流したDB   : seed/sql/04_phase3.sql（docs/schema.sql は貼らない。era で落ちる）
 -- 何度流しても結果は同じになる（ON CONFLICT で上書きする）。
+--
+-- ★ このファイルは**新規DBへの貼り付け用**である。
+--   Supabase の SQL エディタは 300KB を超えると実行できない。
+--   本番へ入れるときは貼らずに、CSV から直接 INSERT する道具を使う:
+--     DATABASE_URL='...' npx tsx scripts/db/seed-remote.ts --apply
 
 BEGIN;
 
