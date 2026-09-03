@@ -164,6 +164,60 @@ DATABASE_URL='postgresql://...' npx tsx scripts/db/issue-invite.ts --issue
 3. `/drills/new` で範囲を選んで特訓を作る
 4. 教材と設問は AI 生成なので、**鍵が無い間は空のまま**（[`08`](./docs/08-ai-architecture.md)）
 
+## 本番のデータベースに入れる
+
+**まず、いまどの状態なのかを読む。** これをやらずに貼ると、下の落とし穴に落ちる。
+
+```bash
+DATABASE_URL='...' npx tsx scripts/db/check-remote.ts
+```
+
+読み取りしかしない（CREATE も INSERT も書かない）。欠けている表と列、
+主要な表の行数、そして**次に何を流せばよいか**まで出る。
+
+### スキーマ（どちらか一方）
+
+| いまの状態 | 貼るもの |
+|---|---|
+| **空のDB** | `docs/schema.sql` → `seed/sql/03_rls.sql` |
+| **既に `schema.sql` を流したDB** | `seed/sql/04_phase3.sql`（3KB）→ `seed/sql/03_rls.sql`（12KB） |
+
+> ★ **既存のDBに `docs/schema.sql` を貼らないこと。** `CREATE TABLE` 44本すべてが
+> `IF NOT EXISTS` を持たないので、**`relation "era" already exists` で必ず止まる**。
+> これは不具合ではなく、そう作ってある。`IF NOT EXISTS` を足すと、列が違う表を
+> 黙って飛ばして**ずれを隠す**ため、あえて落ちるようにしている。
+> 既存のDBには `04_phase3.sql` が正しい入口で、こちらは何度流しても結果が同じになる。
+
+### seed（貼らない）
+
+```bash
+DATABASE_URL='...' npx tsx scripts/db/seed-remote.ts          # 下見
+DATABASE_URL='...' npx tsx scripts/db/seed-remote.ts --apply  # 実行
+```
+
+> ★ **`seed/sql/02_seed.sql` を SQL エディタに貼ろうとしないこと。**
+> 1MB 近くあり、エディタが実行できない（実測・2026-09-03）。
+> あのファイルは新規の小さいDBに貼るためのもので、本番へは
+> `seed-remote.ts` が CSV から直接 INSERT する。DROP も TRUNCATE も書かず、
+> INSERT は全て `ON CONFLICT` なので何度流しても結果は同じになる。
+
+`item` が0件のままだと**1問も出題されない**。承認は作者の判断（[`02`](./docs/02-domain-model.md) §5）なので、
+中身を見てから:
+
+```bash
+npx tsx scripts/db/review-sheet.ts                    # 408問を1枚もので読む
+npx tsx scripts/db/approve-kc.ts --file item --all    # 承認する
+npm run db:dump-sql                                   # 件数を焼き直す
+```
+
+### RLS が効いているか
+
+```bash
+DATABASE_URL='...' npx tsx scripts/db/verify-rls.ts
+```
+
+こちらも何も残さない（1つのトランザクションで行い、最後に必ず戻す）。
+
 ## 検査
 
 ```bash
