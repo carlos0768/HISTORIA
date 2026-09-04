@@ -79,6 +79,40 @@ try {
     process.exit(1)
   }
 
+  /**
+   * ★ **中身を見せてから使う。「繋がった」は「正しい DB だ」ではない。**
+   *
+   *   2026-09-04、作者が**別プロジェクトの接続文字列**を貼った。
+   *   名前解決に失敗したので事故にはならなかったが、通っていれば
+   *   **無関係な DB に教材10本を書き込んでいた**。この道具は接続先の
+   *   ホスト名を出すだけで、そこが正しい DB かを何も確かめていなかった。
+   *
+   *   ref を焼き込んで判定しない（リポジトリに本番の識別子を書かないため）。
+   *   **入っているデータで見分ける。** 見慣れた数字が出れば正しい DB だと
+   *   作者が自分で分かる。
+   */
+  const [c] = await db<{ kc: string; ce: string; pe: string; item: string; unit: string }[]>`
+    SELECT (SELECT count(*) FROM kc)                              AS kc,
+           (SELECT count(*) FROM canon_event)                     AS ce,
+           (SELECT count(*) FROM person)                          AS pe,
+           (SELECT count(*) FROM item WHERE user_id IS NULL)      AS item,
+           (SELECT count(DISTINCT unit_id) FROM kc_syllabus_unit) AS unit`
+  console.log(`中身: kc ${c!.kc} / canon_event ${c!.ce} / person ${c!.pe} / 共有設問 ${c!.item} / KC を持つ節 ${c!.unit}`)
+  console.log('  ↑ 見覚えのない数字なら、接続先が違います\n')
+
+  /**
+   * ★ 正典が空なら `--apply` させない。層2（正典との機械照合）が
+   *   何も照合できないまま 75 本ぶん課金することになる。
+   *   2026-09-04 に測定用の道具で同じ穴を踏んでおり（正典を入れ忘れて
+   *   照合率 0.0% を出した）、こちらは**お金がかかる側**である。
+   */
+  if (apply && (c!.ce === '0' || c!.kc === '0')) {
+    console.error('正典（canon_event）か KC が空です。接続先が違うか、seed がまだです。')
+    console.error('  このまま作ると層2が何も照合できないまま課金だけが進みます。')
+    console.error('  DATABASE_URL=... npx tsx scripts/db/check-remote.ts で本番の状態を確かめてください。')
+    process.exit(1)
+  }
+
   // 済んだものを除いた一覧。数え方は generate.ts に1箇所だけ持つ
   const pending = await pendingUnits(db)
 
