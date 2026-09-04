@@ -215,9 +215,10 @@ try {
 
   if (blocked > 0) {
     console.log(`\n▲ blocked が ${blocked} 本あります。事実確認で誤りが見つかった教材で、配信されません。`)
-    console.log('  中身を見るには:')
-    console.log(`    SELECT unit_id, title, blocked_reason FROM material`)
-    console.log(`     WHERE user_id IS NULL AND status = 'blocked' ORDER BY generated_at DESC;`)
+    console.log('  中身を読むには:')
+    console.log('    DATABASE_URL=... npx tsx scripts/db/approve-material.ts')
+    console.log('  ★ 事実確認の指摘は誤りとは限りません。読んで正しいと判断したら、')
+    console.log('    作り直さずにそのまま配信できます（docs/08 §5.2）。')
     console.log('  正典の側が誤っている場合もあります（seed/canon_event.csv を直して作り直す）。')
   }
 } finally {

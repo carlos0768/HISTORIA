@@ -210,6 +210,34 @@ npx tsx scripts/db/approve-kc.ts --file item --all    # 承認する
 npm run db:dump-sql                                   # 件数を焼き直す
 ```
 
+### 教材を作る／止まったものを配信可能にする
+
+```bash
+DATABASE_URL='...' GEMINI_API_KEY=... ANTHROPIC_API_KEY=... \
+  npx tsx scripts/db/generate-remote.ts                  # 下見（API を1回も呼ばない）
+  npx tsx scripts/db/generate-remote.ts --limit 10 --apply
+```
+
+> ★ 1本あたり実費が約50円かかる（実測・[`08`](./docs/08-ai-architecture.md) §3.4）。
+> **止めてよい。再開できる。** 済んだ単元は下見の対象から外れるので、
+> `Ctrl-C` で止めて直してから続きを流せる。
+
+事実確認で止まった（`blocked`）教材は、本文を読んだうえで作者の判断で配信できる
+（[`08`](./docs/08-ai-architecture.md) §5.2）。**層3の指摘は誤りとは限らない。**
+
+```bash
+DATABASE_URL='...' npx tsx scripts/db/approve-material.ts             # 止まっている一覧
+DATABASE_URL='...' npx tsx scripts/db/approve-material.ts wh.4.1.3    # 中身を読む
+DATABASE_URL='...' npx tsx scripts/db/approve-material.ts wh.4.1.3 --full
+DATABASE_URL='...' npx tsx scripts/db/approve-material.ts wh.4.1.3 \
+  --apply --note "三部会は1614年10月招集・1615年2月閉会。本文の記述は誤りではない"
+```
+
+> ★ `--note` は省略できない。`material.human_edit_log` に残る「**なぜ機械の指摘を
+> 退けたのか**」が、[`10`](./docs/10-legal-risk.md) §8 の求める監修の痕跡そのものである。
+> 設問の `approved_by` は `'author'` になる（`'factcheck'` とは書かない。事実確認は
+> 通っていない）。同じことは管理画面（`/admin`）からもできる。
+
 ### RLS が効いているか
 
 ```bash

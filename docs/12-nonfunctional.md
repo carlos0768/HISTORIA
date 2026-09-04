@@ -172,7 +172,7 @@ RPD（生成側）を使い切った場合:
 | **cron の実行結果** | 実行のたびに `ops_log` に記録し、**24時間記録がなければ次のログイン時に作者へ警告を出す** | cron の失敗は UI に出ないため、能動的に検知する必要がある |
 | **動画の生存** | 週次バッチの結果（`unavailable` になった件数）を記録 | 再生できない動画が放置されるのを防ぐ |
 | **誤り報告** | `content_report (status='open')` の件数をホームに出す（作者のみ） | 誤情報の放置がこの製品で最も重い障害 |
-| **配信できなかった教材** | `material (status='blocked')` の件数と `blocked_reason` を日次で見る | **事実誤り率の代理指標**。増えたら生成品質が落ちている（`08-ai-architecture.md` §5.2） |
+| **配信できなかった教材** | `material (status='blocked')` の件数と `blocked_reason` を日次で見る | **事実誤り率の代理指標**。増えたら生成品質が落ちている（`08-ai-architecture.md` §5 層5） |
 | **AI 支出** | `ai_budget` の当月行（`settled_jpy + reserved_jpy` / `cap_jpy`）。5,000円で作者に通知、10,000円で自動停止 | **暴走を金額で検知する唯一の指標**（`08-ai-architecture.md` §7.1） |
 | **予約の滞留** | `ai_spend (state='reserved')` のうち15分を超えた件数 | 予約が漏れると枠が痩せる。回収ジョブが動いていない兆候 |
 
@@ -183,7 +183,7 @@ RPD（生成側）を使い切った場合:
 | 表示 | 内容 |
 |---|---|
 | 生成の状況 | 当日のリクエスト数（RPD 1,500 に対する消費率）、`generation_job` の失敗件数 |
-| **配信できなかった教材** | `status='blocked'` の一覧と `blocked_reason`。件数の推移 |
+| **配信できなかった教材** | `status='blocked'` の一覧と `blocked_reason`。件数の推移。**本文を読んで配信可能にできる**（`08-ai-architecture.md` §5.2） |
 | 誤り報告 | `content_report (status='open')` の一覧 |
 | **AI 支出と遮断器** | 当月の `settled_jpy` / `reserved_jpy` / `cap_jpy` と残枠、`halted` の状態。内訳を `purpose` 別に出す |
 | 検証の課金 | 当月の二次照合の実行回数と概算金額 |
@@ -203,6 +203,13 @@ RPD（生成側）を使い切った場合:
 | 1日の生成クォータ | |
 | `cap_jpy` / `warn_jpy` / `degrade_jpy`（支出遮断器の閾値） | |
 | `halted` の解除（遮断からの復帰） | |
+| `blocked` の教材を配信可能にする（`08` §5.2） | |
+
+**`blocked` の解除も作者だけができる。** 事実確認（`08` §5 層3）の指摘は誤りとは限らないため、
+本文を読んで配信してよいと判断する道を管理画面に置く（`app/admin/blocked.tsx`）。
+**理由を書かないと押せない。** 記録は `material.human_edit_log` に積み、
+設問の `approved_by` は `'author'` にする（`'factcheck'` とは書かない。`08` §5.2）。
+遠隔から同じことをする道具は `scripts/db/approve-material.ts` で、下見が既定である。
 
 **遮断器の解除は作者だけができる。** `ai_budget` は RLS でポリシーを持たず、
 利用者からは読むことも書くこともできない（`schema.sql` の運用テーブル）。
