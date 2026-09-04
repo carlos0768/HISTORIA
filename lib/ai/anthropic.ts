@@ -14,7 +14,7 @@
  */
 import Anthropic from '@anthropic-ai/sdk'
 import type { Provider, GenerateArgs, GenerateResult, VerifyResult, Claim, Verdict, Usage } from './types'
-import { MaterialOutput, VerdictOutput, verdictJsonSchema, toAnthropicSchema } from './schema'
+import { parseMaterialOutput, VerdictOutput, verdictJsonSchema, toAnthropicSchema } from './schema'
 
 export type AnthropicOptions = {
   apiKey: string
@@ -121,7 +121,8 @@ export function createAnthropicProvider(o: AnthropicOptions): Provider {
       }
 
       // ★ モデルがスキーマを守る保証はどのプロバイダにも無い。必ずこちらで検証する
-      const check = MaterialOutput.safeParse(parsed)
+      // ★ 上限を超えた配列は切り詰めてから検査する（schema.ts の注記）
+      const check = parseMaterialOutput(parsed)
       if (!check.success) {
         throw new GenerateFailedError(
           check.error.issues.slice(0, 5).map(i => `${i.path.join('.')}: ${i.message}`).join(' / '),

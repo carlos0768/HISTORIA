@@ -17,7 +17,7 @@
  */
 import type { Provider, GenerateArgs, GenerateResult, VerifyResult, Claim, Verdict, Usage } from './types'
 import { fetchWithRetry, type Sleep } from './http'
-import { MaterialOutput, VerdictOutput, toGeminiSchema, verdictJsonSchema } from './schema'
+import { parseMaterialOutput, VerdictOutput, toGeminiSchema, verdictJsonSchema } from './schema'
 
 const BASE = 'https://generativelanguage.googleapis.com/v1beta'
 
@@ -125,7 +125,8 @@ export function createGeminiProvider(o: GeminiOptions): Provider {
       }
 
       // ★ モデルがスキーマを守る保証はどのプロバイダにも無い。必ずこちらで検証する
-      const check = MaterialOutput.safeParse(parsed)
+      // ★ 上限を超えた配列は切り詰めてから検査する（schema.ts の注記）
+      const check = parseMaterialOutput(parsed)
       if (!check.success) {
         throw new SchemaViolationError(
           check.error.issues.slice(0, 5).map(i => `${i.path.join('.')}: ${i.message}`).join(' / '),
