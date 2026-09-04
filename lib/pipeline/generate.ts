@@ -62,7 +62,12 @@ export function paramsHash(unitId: string, promptVersion: string, kcIds: string[
     .slice(0, 32)
 }
 
-async function unitFacts(db: Sql, unitId: string): Promise<UnitFacts> {
+/**
+ * 単元まわりの公開情報を引く。プロンプトの差し込みに使う。
+ * ★ export しているのは scripts/measure/render-prompt.ts が同じ問い合わせを
+ *   使うため。写すと、片方だけ直したときにプロンプトが静かに食い違う
+ */
+export async function unitFacts(db: Sql, unitId: string): Promise<UnitFacts> {
   const rows = await db<{ id: string; subject: string; label: string; parent_id: string | null }[]>`
     WITH RECURSIVE up AS (
       SELECT id, subject, label, parent_id, 0 AS depth FROM syllabus_unit WHERE id = ${unitId}

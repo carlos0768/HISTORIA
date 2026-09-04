@@ -30,8 +30,10 @@ const limitArg = process.argv.indexOf('--limit')
 const limit = limitArg >= 0 ? Number(process.argv[limitArg + 1]) : null
 
 const cfg = readConfig()
-if (!cfg.geminiApiKey) {
-  console.error('GEMINI_API_KEY が要ります。')
+// ★ 生成側がどちらのプロバイダかは設定で変わる（2026-09-04 に入れ替わった）。
+//   両方の鍵を求める。生成と検証は必ず別プロバイダなので片方では足りない
+if (!cfg.geminiApiKey || !cfg.anthropicApiKey) {
+  console.error('GEMINI_API_KEY と ANTHROPIC_API_KEY の両方が要ります。')
   console.error('')
   console.error('★ この段を回さなくても診断テストは動きます。')
   console.error('  既存の共有プール（seed/item.csv・408問）だけで12セル全部を測れます。')
