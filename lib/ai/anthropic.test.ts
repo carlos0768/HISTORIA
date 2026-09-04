@@ -198,31 +198,34 @@ describe('生成（教材）', () => {
     p.generate({ prompt: genPrompt, schema: materialJsonSchema(), maxOutputTokens: maxOut })
 
   /**
-   * ★ **実測で分かった制約を試験に固定する。**
+   * ★ **公式の一覧を試験に写す。**
    *
-   *   2026-09-04、作者が実鍵で回して出た 400（request_id req_011CeiPWeKkAjSeaPDzHB2z9）:
+   *   https://platform.claude.com/docs/en/build-with-claude/structured-outputs
+   *   （SDK の `OutputConfig.format` の JSDoc が指している）に、通らないものが
+   *   明記されている。数値の制約・文字列の制約・minItems 以外の配列制約。
    *
-   *     output_config.format.schema: For 'array' type, 'minItems' values other than
-   *     0 or 1 are not supported (got: [6, ∞])
-   *
-   *   教材スキーマは sections(7) / flashcards(10) / mcqs(6) / claims(6) / choices(4) と
-   *   **全ての配列が引っかかる**ので、変換しないと1文字も生成されずに落ちる。
-   *   件数の契約は応答側の zod で守るので、落としても正しさは失われない。
+   *   ★ 2026-09-04、これを**往復で潰そうとして2回失敗した**。API は 400 を
+   *     1件ずつしか返さないので「名指しされていない＝通っている」は成り立たない。
+   *     `minItems` を直したら次に `maxItems` が出た。**一覧を読んで一度に直す。**
    */
-  it('配列の minItems を 1 以下にして送る（Anthropic は 0/1 しか受けない）', async () => {
+  it('サポート外の制約を送らない（公式の一覧どおり）', async () => {
     const cap: { params?: Record<string, unknown> } = {}
     await call(provider(genReply(validMaterial()), cap))
-
     const sent = JSON.stringify((cap.params!.output_config as { format: { schema: unknown } }).format.schema)
+
+    for (const k of ['minimum', 'maximum', 'multipleOf', 'minLength', 'maxLength', 'maxItems']) {
+      expect(sent, `${k} は通らないと明記されている`).not.toContain(`"${k}"`)
+    }
+
+    // minItems は 0 か 1 だけ通る。1 に丸める（0 にすると空配列を素通りさせる）
     const mins = [...sent.matchAll(/"minItems":(\d+)/g)].map(m => Number(m[1]))
     expect(mins.length, 'minItems が1つも無いと、この試験は何も見ていない').toBeGreaterThan(0)
-    expect(mins.every(n => n <= 1), `1 を超える minItems が残っている: ${mins.join(', ')}`).toBe(true)
+    expect(mins.every(n => n === 1), `1 以外の minItems が残っている: ${mins.join(', ')}`).toBe(true)
 
-    // ★ 0 にはしない。空配列を API 側で素通りさせないため
-    expect(mins.every(n => n === 1)).toBe(true)
-    // ★ maxItems は落とさない（上の 400 は minItems だけを名指ししている）
-    expect(sent).toContain('"maxItems":7')
-    expect(sent).toContain('"maxItems":14')
+    // ★ 落としすぎない。enum と additionalProperties:false は通ると明記されており、
+    //   落とすと四択の key や claim の kind が自由文字列になってしまう
+    expect(sent).toContain('"enum"')
+    expect(sent).toContain('"additionalProperties":false')
   })
 
   it('検証の側も同じ変換を通す（片方だけ落ちるのを防ぐ）', async () => {

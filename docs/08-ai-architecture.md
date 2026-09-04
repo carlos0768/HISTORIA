@@ -563,13 +563,22 @@ VERIFY_MODEL    = モデルID                     -- 既定 gemini-3.6-flash（M
 能力の有無はプロバイダの層にある** — これを混ぜない。
 
 ★ **構造化出力のスキーマは、プロバイダごとに削る。** Gemini は OpenAPI 3.0 の
-部分集合しか受けず（`toGeminiSchema`）、Anthropic は**配列の `minItems` に 0 か 1 しか
-許さない**（`toAnthropicSchema`。2026-09-04 に実鍵で観測、request_id
-`req_011CeiPWeKkAjSeaPDzHB2z9`）。教材スキーマは sections(7) / flashcards(10) /
-mcqs(6) / claims(6) / choices(4) と**全ての配列が後者に当たる**ため、変換しないと
-400 で1文字も生成されない。**件数の契約は応答を zod で検査するときに効く**ので、
-送るスキーマから落としても正しさは失われない — スキーマは「守らせるための助言」
-であって保証ではない。
+部分集合しか受けず（`toGeminiSchema`）、Anthropic も一部の制約しか受けない
+（`toAnthropicSchema`）。**どちらも公式に一覧がある。**
+Anthropic 側は SDK の `OutputConfig.format` の JSDoc が
+https://platform.claude.com/docs/en/build-with-claude/structured-outputs を指しており、
+数値の制約（`minimum` / `maximum` / `multipleOf`）・文字列の制約
+（`minLength` / `maxLength`）・`minItems` 以外の配列制約（`maxItems` を含む）が
+通らないと明記されている。教材スキーマはこの全部を持つので、変換しないと
+400 で1文字も生成されない。
+
+★ **一覧を探す前に往復で潰そうとして、2回失敗した**（2026-09-04）。
+API は 400 を1件ずつしか返すため、「名指しされていない＝通っている」は
+成り立たない。`minItems` を直したら次に `maxItems` が出た。
+**制約の一覧が読める場所を先に探すこと。** SDK の型定義に URL が入っていた。
+
+**件数・長さ・範囲の契約は、応答を zod で検査するときに効く**ので、送るスキーマから
+落としても正しさは失われない — スキーマは「守らせるための助言」であって保証ではない。
 
 ★ **`assertConfig` にも守れない層がある。** 同じ 2026-09-04、`resolveProvider` が
 モデルを**役割ではなくベンダーから**選んでいた（`gemini → genModel` /

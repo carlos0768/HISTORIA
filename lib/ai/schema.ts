@@ -131,34 +131,46 @@ export function toGeminiSchema(schema: unknown): unknown {
 /**
  * Anthropic の構造化出力（`output_config.format.schema`）が受け付ける形に直す。
  *
- * ★ **実測で分かった制約**（2026-09-04・request_id `req_011CeiPWeKkAjSeaPDzHB2z9`）:
+ * ★ **公式ドキュメントに一覧がある。** SDK の `OutputConfig.format` の JSDoc が
+ *   指している https://platform.claude.com/docs/en/build-with-claude/structured-outputs
+ *   に、通るものと通らないものが明記されている。**推測しない。**
  *
- *     400 invalid_request_error
- *     output_config.format.schema: For 'array' type, 'minItems' values other than
- *     0 or 1 are not supported (got: [6, ∞])
+ *   通らないと書かれているもの:
+ *     - 数値の制約         minimum / maximum / multipleOf
+ *     - 文字列の制約       minLength / maxLength
+ *     - 配列の制約         minItems の 0・1 以外を含め、minItems 以外すべて（maxItems も）
+ *     - additionalProperties が false 以外
+ *     - 再帰スキーマ、enum の中の複合型、外部 $ref
  *
- *   配列の `minItems` は **0 か 1 しか通らない**。教材スキーマは
- *   sections(7) / flashcards(10) / mcqs(6) / claims(6) / choices(4) と
- *   全部これに当たるので、そのまま送ると1文字も生成されずに落ちる。
+ *   通ると書かれているもの: 基本型 / enum / const / anyOf・allOf / $ref・$defs /
+ *   default / required / additionalProperties: false / 文字列の format /
+ *   minItems（0 か 1 のみ）
  *
- * ★ **落としても正しさは失われない。** 件数の契約は応答を `MaterialOutput`（zod）で
- *   検証するときに効く。スキーマは「守らせるための助言」であって保証ではない、
- *   という `toGeminiSchema` と同じ立場である（両プロバイダとも、モデルが
- *   スキーマを守る保証は無い）。
+ * ★ **2回、往復で潰そうとして失敗した**（2026-09-04）。API は 400 を1件ずつしか
+ *   返さないので、「名指しされていない＝通っている」は成り立たない。実際
+ *   `minItems` を直したら次は `maxItems` が出た（req_011CeiPWeKkAjSeaPDzHB2z9 →
+ *   req_011CeiQ1eGqAYF6NH2DywA8Y）。**一覧が読める場所を先に探すこと。**
  *
- * ★ **0 ではなく 1 に丸める。**「空配列は認めない」という意味は通る範囲で残す。
- *   ここを 0 にすると、空の教材が API 側の検査を素通りしてしまう。
+ * ★ **落としても正しさは失われない。** 件数・長さ・範囲の契約は応答を
+ *   `MaterialOutput`（zod）で検証するときに効く。スキーマは「守らせるための助言」
+ *   であって保証ではない、という `toGeminiSchema` と同じ立場である。
  *
- * ★ `maxItems` は落とさない。上の 400 は `minItems` だけを名指ししており、
- *   上限は通っている。**確かめていないものを推測で削らない** — 削ると
- *   「なぜか件数が増える」の原因が分からなくなる。
+ * ★ **`minItems` は 0 ではなく 1 に丸める。**「空配列は認めない」は通る範囲で残す。
+ *   0 にすると空の教材が API 側の検査を素通りする。
  */
+const ANTHROPIC_UNSUPPORTED = new Set([
+  'minimum', 'maximum', 'multipleOf',   // 数値の制約
+  'minLength', 'maxLength',             // 文字列の制約
+  'maxItems',                           // 配列の制約（minItems だけが例外）
+])
+
 export function toAnthropicSchema(schema: unknown): unknown {
   if (Array.isArray(schema)) return schema.map(toAnthropicSchema)
   if (schema === null || typeof schema !== 'object') return schema
 
   const out: Record<string, unknown> = {}
   for (const [k, v] of Object.entries(schema as Record<string, unknown>)) {
+    if (ANTHROPIC_UNSUPPORTED.has(k)) continue
     if (k === 'minItems' && typeof v === 'number' && v > 1) {
       out[k] = 1
       continue
