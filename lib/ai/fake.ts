@@ -38,8 +38,16 @@ function kcsFromPrompt(user: string): Array<{ id: string; kind: string; label: s
   }))
 }
 
-export function createFakeProvider(name: string, opts: FakeOptions = {}): Provider {
+/**
+ * @param model 呼び出し側が「その役割で使う」と決めたモデル id。
+ *   ★ 結果に載せる。実プロバイダは `o.model` を返すので、フェイクも同じにしないと
+ *     **配線の誤りが鍵の無い試験から見えなくなる**。2026-09-04 に踏んだ穴が
+ *     まさにこれで、resolveProvider が検証側へ生成用のモデルを渡していたのに、
+ *     フェイクが `gemini-fake` としか名乗らないため 940 件の試験を素通りした。
+ */
+export function createFakeProvider(name: string, opts: FakeOptions = {}, model?: string): Provider {
   const wrongRate = opts.wrongRate ?? 0
+  const tag = model ? `fake:${model}` : `${name}-fake`
 
   return {
     /**
@@ -117,7 +125,7 @@ export function createFakeProvider(name: string, opts: FakeOptions = {}): Provid
       return {
         value: value as unknown as T,
         usage: { inputTokens: 600, outputTokens: Math.ceil(chars / 1.8) },
-        model: `${name}-fake`,
+        model: tag,
       }
     },
 
@@ -132,7 +140,7 @@ export function createFakeProvider(name: string, opts: FakeOptions = {}): Provid
       return {
         verdicts,
         usage: { inputTokens: 1200, outputTokens: 400 },
-        model: `${name}-fake`,
+        model: tag,
       }
     },
 
@@ -146,6 +154,9 @@ export function createFakeProvider(name: string, opts: FakeOptions = {}): Provid
         })
       })
       const usage: Usage = { inputTokens: texts.join('').length, outputTokens: 0 }
+      // ★ 埋め込みは vendor 名のままにする（実物は embedModel を返し、それは
+      //   役割ごとに変わらない）。ここが `${name}-` で始まることが、
+      //   「どちらのプロバイダへ回ったか」を試験から見る手掛かりになる
       return { vectors, usage, model: `${name}-fake-embed` }
     },
   }

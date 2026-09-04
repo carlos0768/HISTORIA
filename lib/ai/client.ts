@@ -125,17 +125,40 @@ const priceOf = (model: string): Price =>
 /**
  * 鍵があれば実物、無ければフェイクにする。
  * フェイクは実物と同じ型・同じ制約で動くので、鍵が無くても閉ループは最後まで通る。
+ *
+ * ★ **モデルは呼び出し側から渡す。ベンダーから決めない。**
+ *   2026-09-04 まで、ここは `gemini → cfg.genModel` / `anthropic → cfg.verifyModel` と
+ *   固定していた。旧構成（生成=Gemini / 検証=Anthropic）では正しかったが、
+ *   向きを入れ替えると**ちょうど裏返しになる**:
+ *
+ *     生成（anthropic）に verifyModel = 'gemini-3.x'   → Anthropic が 400
+ *     検証（gemini）に   genModel     = 'claude-opus-5' → /models/claude-opus-5 で 404
+ *
+ *   質が悪いのは、その 404 が「モデル id が間違っている」（M35）と**区別できない**こと。
+ *   鍵でもモデル名でもなく配線の誤りなので、そちらを疑うと永久に直らない。
+ *
+ *   `assertConfig` の食い違い検査もここは守れない。あちらが見るのは
+ *   「設定どうしが揃っているか」であって、**設定を実物へ配る途中で入れ替わること**
+ *   ではないためである。
  */
-function resolveProvider(name: string, cfg: AiConfig, fake: FakeOptions = {}): Provider {
+function resolveProvider(
+  name: string,
+  /** その役割で使うモデル。genProvider には genModel、verifyProvider には verifyModel */
+  model: string,
+  cfg: AiConfig,
+  fake: FakeOptions = {},
+): Provider {
   if (name === 'gemini' && cfg.geminiApiKey) {
     return createGeminiProvider({
-      apiKey: cfg.geminiApiKey, model: cfg.genModel, embedModel: cfg.embedModel,
+      apiKey: cfg.geminiApiKey, model, embedModel: cfg.embedModel,
     })
   }
   if (name === 'anthropic' && cfg.anthropicApiKey) {
-    return createAnthropicProvider({ apiKey: cfg.anthropicApiKey, model: cfg.verifyModel })
+    return createAnthropicProvider({ apiKey: cfg.anthropicApiKey, model })
   }
-  return createFakeProvider(name, fake)
+  // ★ フェイクにも model を渡す。渡さないと結果が `gemini-fake` としか名乗らず、
+  //   配線の誤りが鍵の無い試験から見えなくなる（fake.ts の注記）
+  return createFakeProvider(name, fake, model)
 }
 
 export type GenerateCall = {
@@ -166,8 +189,9 @@ export type Client = {
 
 export function createClient(cfg: AiConfig = readConfig(), fake: FakeOptions = {}): Client {
   assertConfig(cfg)
-  const gen = resolveProvider(cfg.genProvider, cfg, fake)
-  const ver = resolveProvider(cfg.verifyProvider, cfg, fake)
+  // 役割とモデルを対にして渡す。ここがずれると 404 / 400 になる（resolveProvider の注記）
+  const gen = resolveProvider(cfg.genProvider, cfg.genModel, cfg, fake)
+  const ver = resolveProvider(cfg.verifyProvider, cfg.verifyModel, cfg, fake)
   const usingFake = !cfg.geminiApiKey || !cfg.anthropicApiKey
 
   /** 予約 → 呼び出し → 確定。失敗したら解放する */
@@ -222,11 +246,29 @@ export function createClient(cfg: AiConfig = readConfig(), fake: FakeOptions = {
       )
     },
 
+    /**
+     * ★ 埋め込みは**生成側ではなく Gemini 側**へ送る。
+     *   Anthropic に埋め込み API は無い（docs/09 §6）。2026-09-04 まで
+     *   ここは `gen.embed` を呼んでおり、「生成側 = Gemini」を前提にしていた。
+     *   向きを入れ替えると生成側が Anthropic になり、**必ず例外になる**。
+     *   本番の経路からはまだ呼ばれていないので事故にはなっていないが、
+     *   繋いだ瞬間に落ちる。役割ではなく「できるほう」で選ぶのが正しい。
+     */
     async embed(a: EmbedCall) {
+      const geminiSide = cfg.genProvider === 'gemini' ? gen
+        : cfg.verifyProvider === 'gemini' ? ver
+        : null
+      if (!geminiSide) {
+        throw new Error(
+          `埋め込みは Gemini でしか作れません（docs/09 §6）。` +
+            `いまの設定は 生成=${cfg.genProvider} / 検証=${cfg.verifyProvider} で、どちらも gemini ではありません。`,
+        )
+      }
+      const provider = cfg.genProvider === 'gemini' ? cfg.genProvider : cfg.verifyProvider
       const maxIn = Math.ceil(a.texts.join('').length / 1.5)
       const out = await guarded(
-        a.db, a.now, cfg.embedModel, cfg.genProvider, 'embed', maxIn, 0, null,
-        () => gen.embed(a.texts),
+        a.db, a.now, cfg.embedModel, provider, 'embed', maxIn, 0, null,
+        () => geminiSide.embed(a.texts),
       )
       return { vectors: out.vectors, model: out.model }
     },

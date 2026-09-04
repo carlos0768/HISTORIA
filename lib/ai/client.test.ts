@@ -127,6 +127,56 @@ describe('§4 匿名化', () => {
   })
 })
 
+/**
+ * ★ **設定を実物へ配る途中で入れ替わっていないか。**
+ *
+ *   2026-09-04 に踏んだ穴。resolveProvider は
+ *   `gemini → cfg.genModel` / `anthropic → cfg.verifyModel` と固定しており、
+ *   旧構成（生成=Gemini / 検証=Anthropic）でだけ正しかった。向きを入れ替えると
+ *   **ちょうど裏返しになり**、検証（gemini）へ 'claude-opus-5' が渡って 404 になる。
+ *
+ *   `assertConfig` はこれを守れない。あちらが見るのは「設定どうしが揃っているか」
+ *   であって、**配線**ではないためである。だからここで別に固定する。
+ *
+ *   実プロバイダは鍵が要るので、鍵を入れて `genProviderName` / `verifyProviderName` が
+ *   フェイクに落ちないことと、モデルが役割どおりに届くことを見る。
+ */
+describe('プロバイダへの配線', () => {
+  const paid = (o: Partial<AiConfig> = {}) => cfg({
+    genProvider: 'anthropic', genModel: 'claude-opus-5',
+    verifyProvider: 'gemini', verifyModel: 'gemini-3.6-flash',
+    geminiApiKey: 'G', anthropicApiKey: 'A', ...o,
+  })
+
+  it('生成には genModel、検証には verifyModel が届く', () => {
+    const c = createClient(paid())
+    // 実プロバイダに落ちている（フェイクではない）
+    expect(c.genProviderName).toBe('anthropic')
+    expect(c.verifyProviderName).toBe('gemini')
+    // ★ 元帳と予約はこの2つを使う。ここが入れ替わると課金の記録もずれる
+    expect(c.config.genModel).toBe('claude-opus-5')
+    expect(c.config.verifyModel).toBe('gemini-3.6-flash')
+  })
+
+  it('旧構成（生成=Gemini / 検証=Anthropic）でも正しく配られる', () => {
+    const c = createClient(paid({
+      genProvider: 'gemini', genModel: 'gemini-3.6-flash',
+      verifyProvider: 'anthropic', verifyModel: 'claude-sonnet-5',
+    }))
+    expect(c.genProviderName).toBe('gemini')
+    expect(c.verifyProviderName).toBe('anthropic')
+  })
+
+  it('どちらも gemini でなければ、埋め込みは理由を言って落ちる', async () => {
+    const c = createClient(paid({
+      genProvider: 'anthropic', genModel: 'claude-opus-5',
+      verifyProvider: 'openai', verifyModel: 'x',
+    }))
+    await expect(c.embed({ db: null as never, texts: ['x'], now: new Date() }))
+      .rejects.toThrow(/Gemini でしか作れません/)
+  })
+})
+
 describe('フェイクプロバイダ', () => {
   it('決定的（同じ入力なら同じ出力）', async () => {
     const p = createFakeProvider('gemini')
@@ -190,6 +240,43 @@ dbSuite('クライアント（実DB）', () => {
       db, prompt, schema: {}, maxOutputTokens: 12_000, now: NOW,
     })
     expect(r.usage.outputTokens).toBeGreaterThan(0)
+  })
+
+  /**
+   * ★ **役割どおりのモデルが本当にプロバイダへ届いているか。**
+   *
+   *   2026-09-04 に踏んだ穴の再発防止。`resolveProvider` が
+   *   `gemini → genModel` / `anthropic → verifyModel` と固定していたため、
+   *   向きを入れ替えると検証側へ 'claude-opus-5' が渡り、
+   *   `/models/claude-opus-5:generateContent` で 404 になっていた。
+   *
+   *   フェイクが結果に「渡されたモデル」を載せるようにしたので、
+   *   **鍵が無くても配線を観測できる**。載せる前は 940 件の試験を素通りした。
+   */
+  it('役割どおりのモデルがプロバイダへ届く（配線が入れ替わっていない）', async () => {
+    const c = createClient(cfg({
+      genProvider: 'anthropic', genModel: 'claude-opus-5',
+      verifyProvider: 'gemini', verifyModel: 'gemini-3.6-flash',
+    }))
+    const g = await c.generate({ db, prompt, schema: {}, maxOutputTokens: 12_000, now: NOW })
+    const v = await c.verify({ db, claims: [{ type: 'year', text: 'x' }], maxOutputTokens: 400, now: NOW })
+    expect(g.model).toBe('fake:claude-opus-5')
+    expect(v.model).toBe('fake:gemini-3.6-flash')
+
+    // ★ 埋め込みは Anthropic に無いので、生成側が anthropic でも Gemini 側へ回る
+    const e = await c.embed({ db, texts: ['x'], now: NOW })
+    expect(e.model).toBe('gemini-fake-embed')
+  })
+
+  it('旧構成でも同じように届く（向きに依存しない）', async () => {
+    const c = createClient(cfg({
+      genProvider: 'gemini', genModel: 'gemini-3.6-flash',
+      verifyProvider: 'anthropic', verifyModel: 'claude-sonnet-5',
+    }))
+    const g = await c.generate({ db, prompt, schema: {}, maxOutputTokens: 12_000, now: NOW })
+    const v = await c.verify({ db, claims: [{ type: 'year', text: 'x' }], maxOutputTokens: 400, now: NOW })
+    expect(g.model).toBe('fake:gemini-3.6-flash')
+    expect(v.model).toBe('fake:claude-sonnet-5')
   })
 
   it('すべての呼び出しが元帳に載る（生成も検証も埋め込みも。迂回路を作らない）', async () => {
