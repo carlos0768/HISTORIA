@@ -70,6 +70,39 @@ export type GenerateOutcome =
   | { status: 'blocked'; materialId: string; reason: string; check: MachineCheckResult }
   | { status: 'failed'; reason: string }
 
+/**
+ * まだ共有教材を作っていない単元。**一括生成の対象**である。
+ *
+ * ★ ready だけでなく **blocked も除く**。事実確認で誤りが見つかった教材は
+ *   作者の判断待ちであって、黙って作り直す（＝もう一度課金する）ものではない。
+ *   作り直すときは `generateMaterial` の `force` を使う。
+ *
+ * ★ **これが再開の仕組みそのものである。** 75本の生成は4時間かかるので、
+ *   途中で止めて続きを流せることが要る。「済んだものを除いた一覧」を
+ *   ここ1箇所に持ち、道具の側で数え直さない。
+ *
+ * ★ KC を持たない単元は対象外（教材の材料が無いため）。
+ *   docs/08 §3.4 の分母 75 はこの条件で数えたものである。
+ */
+export async function pendingUnits(
+  db: Sql,
+  promptVersion = MATERIAL_PROMPT_VERSION,
+): Promise<Array<{ id: string; label: string; kcs: number }>> {
+  const rows = await db<{ id: string; label: string; kcs: string }[]>`
+    SELECT s.id, s.label, count(*) AS kcs
+      FROM syllabus_unit s
+      JOIN kc_syllabus_unit ku ON ku.unit_id = s.id
+     WHERE NOT EXISTS (
+       SELECT 1 FROM material m
+        WHERE m.unit_id = s.id AND m.user_id IS NULL
+          AND m.prompt_version = ${promptVersion}
+          AND m.status IN ('ready', 'blocked')
+     )
+     GROUP BY s.id, s.label
+     ORDER BY s.id`
+  return rows.map(r => ({ id: r.id, label: r.label, kcs: Number(r.kcs) }))
+}
+
 /** 同じ (user, unit, プロンプト版) の再実行を冪等にする鍵（docs/08 §4） */
 export function paramsHash(unitId: string, promptVersion: string, kcIds: string[]): string {
   return createHash('sha256')

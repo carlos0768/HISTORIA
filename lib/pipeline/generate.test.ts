@@ -4,7 +4,7 @@ import { createTestDb, TEST_DB_URL } from '@/lib/db/test-helper'
 import { seedMasters, seedKc, SEED_DIR } from '@/scripts/db/seed'
 import { createClient, type AiConfig } from '@/lib/ai/client'
 import { ensureBudgetRow, budgetStatus, periodOf } from '@/lib/ai/budget'
-import { generateMaterial, paramsHash, MATERIAL_MAX_OUTPUT_TOKENS, VERIFY_MAX_OUTPUT_TOKENS } from './generate'
+import { generateMaterial, paramsHash, pendingUnits, MATERIAL_MAX_OUTPUT_TOKENS, VERIFY_MAX_OUTPUT_TOKENS } from './generate'
 import { MAX_CHARS } from '@/lib/ai/schema'
 import { machineCheck, extractYear, matchRate } from './factcheck'
 import { createUser } from '@/lib/loop/fixture'
@@ -200,6 +200,51 @@ dbSuite('生成パイプライン（実DB）', () => {
     expect(r.status).toBe('ready')
     const p = await db<{ provider: string }[]>`SELECT provider FROM material`
     expect(p[0]!.provider).toBe('fake:anthropic')   // 画面に警告が出る側
+  })
+
+  /**
+   * ★ **一括生成の再開はこの一覧に乗っている。**
+   *
+   *   75本の生成は約4時間・約 ¥3,900 かかる。途中で止めて続きを流せることが
+   *   要る（`scripts/db/generate-remote.ts`）。ここが間違うと、済んだ単元を
+   *   もう一度作って**払い直す**か、未生成の単元を飛ばして穴を残す。
+   */
+  describe('一括生成の対象', () => {
+    it('KC を持つ単元だけを挙げる', async () => {
+      const all = await pendingUnits(db)
+      expect(all.length).toBeGreaterThan(0)
+      expect(all.every(u => u.kcs > 0)).toBe(true)
+      // 並びが決まっていること。再開のたびに順序が変わると追いづらい
+      expect(all.map(u => u.id)).toEqual([...all.map(u => u.id)].sort())
+    })
+
+    it('ready を作った単元は外れる（払い直さない）', async () => {
+      const before = await pendingUnits(db)
+      expect(before.some(u => u.id === UNIT)).toBe(true)
+      await generateMaterial(db, createClient(cfg), { userId, unitId: UNIT, now: NOW })
+      const after = await pendingUnits(db)
+      expect(after.some(u => u.id === UNIT)).toBe(false)
+      expect(after.length).toBe(before.length - 1)
+    })
+
+    /**
+     * ★ blocked も外す。事実確認で誤りが見つかった教材は**作者の判断待ち**であって、
+     *   黙って作り直す（＝もう一度課金する）ものではない。
+     */
+    it('blocked になった単元も外れる（黙って作り直さない）', async () => {
+      const bad = createClient(cfg, { wrongClaims: ['ウェストファリア条約は1658年'] })
+      const r = await generateMaterial(db, bad, { userId, unitId: UNIT, now: NOW })
+      expect(r.status).toBe('blocked')
+      const after = await pendingUnits(db)
+      expect(after.some(u => u.id === UNIT)).toBe(false)
+    })
+
+    it('プロンプトの版が違えば、また対象になる（作り直しが要るため）', async () => {
+      await generateMaterial(db, createClient(cfg), { userId, unitId: UNIT, now: NOW })
+      expect((await pendingUnits(db)).some(u => u.id === UNIT)).toBe(false)
+      // 版を上げたら、その版では未生成に戻る
+      expect((await pendingUnits(db, 'material_v3')).some(u => u.id === UNIT)).toBe(true)
+    })
   })
 
   it('ready なら item が factcheck 承認で出題可能になる', async () => {
