@@ -42,15 +42,21 @@ const db = postgres(url, { prepare: false, max: 1, onnotice: () => {} })
  *   成功と失敗を見分けられない。**
  */
 type Counts = {
-  kc: string; ksu: string; kr: string; units: string; ce: string; pe: string
-  item: string; ikc: string
+  kc: string; retired: string; ksu: string; kr: string; units: string; live: string
+  ce: string; pe: string; item: string; ikc: string
 }
 const snapshot = async (): Promise<Counts> => {
   const [r] = await db<Counts[]>`
     SELECT (SELECT count(*) FROM kc)                              AS kc,
+           (SELECT count(*) FROM kc WHERE retired)                AS retired,
            (SELECT count(*) FROM kc_syllabus_unit)                AS ksu,
            (SELECT count(*) FROM kc_region)                       AS kr,
            (SELECT count(DISTINCT unit_id) FROM kc_syllabus_unit) AS units,
+           -- ★ 教材を作るのはこちらの数である（generate-remote.ts の pendingUnits）。
+           --   範囲外にした KC しか無い節は入らない（docs/02 §6.1）
+           (SELECT count(DISTINCT ku.unit_id)
+              FROM kc_syllabus_unit ku
+              JOIN kc k ON k.id = ku.kc_id AND NOT k.retired)     AS live,
            (SELECT count(*) FROM canon_event)                     AS ce,
            (SELECT count(*) FROM person)                          AS pe,
            (SELECT count(*) FROM item WHERE user_id IS NULL)      AS item,
@@ -59,7 +65,10 @@ const snapshot = async (): Promise<Counts> => {
 }
 const show = (label: string, c: Counts) => {
   const pad = ' '.repeat(label.length)
-  console.log(`  ${label}: kc ${c.kc} / kc_syllabus_unit ${c.ksu} / kc_region ${c.kr} / KC を持つ節 ${c.units}`)
+  console.log(`  ${label}: kc ${c.kc}（範囲外 ${c.retired}）/ kc_syllabus_unit ${c.ksu} / kc_region ${c.kr}`)
+  // ★ 「KC を持つ節」と「教材を作る節」は違う。後者が生成の分母であり、
+  //   そのまま金額になる（1本あたり約50円）。ここがずれていたら seed がまだである
+  console.log(`  ${pad}  KC を持つ節 ${c.units} / 教材を作る節 ${c.live}`)
   console.log(`  ${pad}  正典: canon_event ${c.ce} / person ${c.pe}`)
   console.log(`  ${pad}  共有設問: item ${c.item} / item_kc ${c.ikc}` +
     (c.item === '0' ? '  ← 0 問。approve が空のままか、古い作業ツリーで流している' : ''))
