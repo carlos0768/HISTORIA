@@ -17,7 +17,7 @@
  */
 import postgres from 'postgres'
 import { applySchema } from '../db/schema'
-import { seedMasters, seedKc, SEED_DIR } from '../db/seed'
+import { seedMasters, seedKc, seedCanonEvent, seedPerson, SEED_DIR } from '../db/seed'
 import { createClient, readConfig } from '@/lib/ai/client'
 import { ensureBudgetRow, periodOf, budgetStatus } from '@/lib/ai/budget'
 import { generateMaterial } from '@/lib/pipeline/generate'
@@ -69,6 +69,20 @@ try {
   await applySchema(db, { pgvector: process.env.PGVECTOR !== 'off' })
   await seedMasters(db, SEED_DIR)
   await seedKc(db, SEED_DIR)
+  /**
+   * ★ **正典を入れる。層2は正典との照合そのものだから。**
+   *
+   *   2026-09-04、これを入れ忘れたまま M2b（機械照合率、目標80%）を測り、
+   *   **0.0% という無意味な数字を出した**。分母の 9 件は全て
+   *   「canon_event に一致する事象がありません」で、モデルの出力ではなく
+   *   こちらの DB が空だっただけである。
+   *
+   *   道具が自分で気づけるよう照合率の下に正典の件数を出してはいたが、
+   *   **そもそも入れておけば済む**。1回 ¥50 かかる実測を無駄にしない。
+   */
+  const ce = await seedCanonEvent(db, SEED_DIR)
+  const pe = await seedPerson(db, SEED_DIR)
+  console.log(`正典: canon_event ${ce.canonEvent} / person ${pe.person}\n`)
 
   const now = new Date()
   await ensureBudgetRow(db, periodOf(now))
