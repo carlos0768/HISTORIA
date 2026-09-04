@@ -303,6 +303,50 @@ body { margin: 0; background: var(--lv-canvas); }
 .hs-timeline__year { font: 600 13px/1.5 var(--lv-font-en); font-variant-numeric: tabular-nums; }
 .hs-timeline__label { font: 400 13px/1.5 var(--lv-font-ja); min-width: 0; }
 
+/* ---- 教材の中の「調べる」（docs/11-ux.md §4.1） ---- */
+.hs-research { display: flex; flex-direction: column; gap: var(--lv-space-3); }
+.hs-research__hit { align-items: start; }
+.hs-research__body { display: flex; flex-direction: column; gap: 2px; }
+.hs-research__kind {
+  border: var(--lv-hairline); border-radius: var(--lv-radius-sm);
+  padding: 1px 5px; font: 600 10px/1.4 var(--lv-font-ja); white-space: nowrap;
+}
+.hs-research__meta { color: var(--lv-sub); }
+.hs-timeline__row--active .hs-research__meta,
+.hs-timeline__row--active .lv-caption { color: var(--lv-ink); }
+
+/* 年表チャート。狭い画面では横に流す（文字を縮めて読めなくするより良い） */
+.hs-chrono { display: flex; flex-direction: column; gap: var(--lv-space-2); }
+.hs-chrono__svg {
+  display: block; width: 100%; min-width: 640px; height: auto;
+  border: var(--lv-hairline); border-radius: var(--lv-radius-sm); background: var(--lv-paper);
+}
+.hs-chrono { overflow-x: auto; }
+.hs-chrono__period { fill: var(--lv-canvas); stroke: var(--lv-ink); stroke-width: 0.5; }
+.hs-chrono__period--alt { fill: var(--lv-paper); }
+.hs-chrono__period-label { font: 600 10px var(--lv-font-ja); fill: var(--lv-ink-soft); }
+.hs-chrono__tick { font: 400 9px var(--lv-font-en); fill: var(--lv-muted); }
+.hs-chrono__grid { stroke: var(--lv-map-graticule); stroke-width: 0.5; }
+.hs-chrono__rule { stroke: var(--lv-ink); stroke-width: 0.6; }
+.hs-chrono__row-label { font: 600 10px var(--lv-font-ja); fill: var(--lv-ink); }
+.hs-chrono__item { cursor: pointer; }
+.hs-chrono__item:focus-visible { outline: none; }
+.hs-chrono__item:focus-visible .hs-chrono__bar { stroke-width: 2; }
+.hs-chrono__bar { stroke: var(--lv-ink); stroke-width: 0.8; }
+.hs-chrono__bar--event { fill: var(--lv-marker); }
+.hs-chrono__bar--kc { fill: var(--lv-canvas); }
+.hs-chrono__bar--approx { stroke-dasharray: 2 1.5; }
+.hs-chrono__bar--selected { fill: var(--lv-accent); }
+.hs-chrono__label { font: 400 11px var(--lv-font-ja); fill: var(--lv-ink); }
+.hs-chrono__label--selected { font-weight: 600; }
+.hs-chrono__legend { display: flex; gap: var(--lv-space-3); flex-wrap: wrap; font: var(--lv-text-caption); color: var(--lv-sub); }
+.hs-chrono__key { display: inline-flex; align-items: center; gap: 4px; }
+.hs-chrono__swatch { width: 14px; height: 8px; border: 1px solid var(--lv-ink); display: inline-block; }
+.hs-chrono__swatch--event { background: var(--lv-marker); }
+.hs-chrono__swatch--kc { background: var(--lv-canvas); }
+.hs-chrono__swatch--approx { background: var(--lv-paper); border-style: dashed; }
+.hs-chrono__swatch--selected { background: var(--lv-accent); }
+
 /* ⌘⇧H の蛍光ペン。--lv-marker は litverse のトークン（既存の .hs-status--shaky と同じ色） */
 .lv-root mark.lv-mark { background: var(--lv-marker); color: var(--lv-ink); padding: 0 2px; }
 

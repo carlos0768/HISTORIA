@@ -159,6 +159,13 @@ export type Client = {
    */
   genProviderName: string
   verifyProviderName: string
+  /**
+   * 埋め込みに実際に使われるプロバイダの名前。フェイクなら `fake:gemini`。
+   * ★ 生成の向きとは独立である（下の embed の注記）。「意味で引けるか」は
+   *   これで判定する。genProviderName で判定すると、生成が Claude のとき
+   *   本物の Gemini の鍵があっても「引けない」と誤る。
+   */
+  embedProviderName: string
   generate<T>(a: GenerateCall): Promise<GenerateResult<T>>
   verify(a: VerifyCall): Promise<VerifyResult>
   embed(a: EmbedCall): Promise<{ vectors: number[][]; model: string }>
@@ -169,6 +176,19 @@ export function createClient(cfg: AiConfig = readConfig(), fake: FakeOptions = {
   const gen = resolveProvider(cfg.genProvider, cfg, fake)
   const ver = resolveProvider(cfg.verifyProvider, cfg, fake)
   const usingFake = !cfg.geminiApiKey || !cfg.anthropicApiKey
+
+  /**
+   * ★ 埋め込みは Gemini にしか無い（anthropic.ts の embed は投げる）。
+   *   2026-09-04 に既定が「生成 Claude / 検証 Gemini」に変わったため、
+   *   「生成側で埋め込む」のままだと既定の構成で埋め込みが**必ず失敗**する
+   *   （教材の中の「調べる」が最初の利用者で、そこで見つかった）。
+   *   生成と検証のどちらであれ Gemini の側を使い、支出もその名前で記録する。
+   *   どちらも Gemini でなければ生成側に落とす（フェイクなら通り、本物なら投げる）。
+   */
+  const [emb, embedProvider] =
+    cfg.genProvider === 'gemini' ? [gen, cfg.genProvider]
+    : cfg.verifyProvider === 'gemini' ? [ver, cfg.verifyProvider]
+    : [gen, cfg.genProvider]
 
   /** 予約 → 呼び出し → 確定。失敗したら解放する */
   async function guarded<R extends { usage: { inputTokens: number; outputTokens: number } }>(
@@ -198,6 +218,7 @@ export function createClient(cfg: AiConfig = readConfig(), fake: FakeOptions = {
     usingFake,
     genProviderName: gen.name,
     verifyProviderName: ver.name,
+    embedProviderName: emb.name,
 
     async generate<T>(a: GenerateCall) {
       // 型だけでなく実行時にも個人識別情報の混入を止める（§4.2）。
@@ -225,8 +246,8 @@ export function createClient(cfg: AiConfig = readConfig(), fake: FakeOptions = {
     async embed(a: EmbedCall) {
       const maxIn = Math.ceil(a.texts.join('').length / 1.5)
       const out = await guarded(
-        a.db, a.now, cfg.embedModel, cfg.genProvider, 'embed', maxIn, 0, null,
-        () => gen.embed(a.texts),
+        a.db, a.now, cfg.embedModel, embedProvider, 'embed', maxIn, 0, null,
+        () => emb.embed(a.texts),
       )
       return { vectors: out.vectors, model: out.model }
     },

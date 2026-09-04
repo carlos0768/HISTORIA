@@ -115,6 +115,9 @@ CREATE TABLE kc_merge (
 );
 
 -- ファクトチェック層2の正典マスタ  docs/08-ai-architecture.md §5
+-- ★ embedding は教材の中の「調べる」（docs/11-ux.md §4.1）の近傍検索に使う。
+--   kc.embedding と同じ 768 次元・同じモデル（EMBED_MODEL）で作る。
+--   NULL のままでも語の一致（ILIKE）では引ける。scripts/db/embed-index.ts が埋める。
 CREATE TABLE canon_event (
   id         text PRIMARY KEY,
   label      text NOT NULL,
@@ -122,8 +125,10 @@ CREATE TABLE canon_event (
   year_from  int      NOT NULL,
   year_to    int,
   precision  text     NOT NULL CHECK (precision IN ('exact','decade','century')),
-  region_ids smallint[] NOT NULL DEFAULT '{}'
+  region_ids smallint[] NOT NULL DEFAULT '{}',
+  embedding  vector(768)
 );
+CREATE INDEX ON canon_event USING hnsw (embedding vector_cosine_ops);
 
 -- =====================================================================
 -- 3. ユーザー              docs/10-legal-risk.md §5.2

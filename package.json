@@ -23,6 +23,7 @@
     "db:check-remote": "tsx scripts/db/check-remote.ts",
     "db:dev-seed": "tsx scripts/db/dev-seed.ts",
     "db:diagnostic-coverage": "tsx scripts/db/diagnostic-coverage.ts",
+    "db:embed-index": "tsx scripts/db/embed-index.ts",
     "seed:validate": "node seed/validate.mjs"
   },
   "dependencies": {

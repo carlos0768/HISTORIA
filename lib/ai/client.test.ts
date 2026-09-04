@@ -204,6 +204,28 @@ dbSuite('クライアント（実DB）', () => {
   })
 
   /**
+   * ★ 埋め込みは Gemini にしか無い。既定の向き（生成 Claude / 検証 Gemini）で
+   *   「生成側で埋め込む」と、既定の構成で埋め込みが必ず失敗する
+   *   （教材の中の「調べる」が最初の利用者で、そこで見つかった）。
+   *   向きに関係なく Gemini の側で埋め込み、支出もその名前で記録する。
+   */
+  it('生成が Claude でも埋め込みは Gemini の側に流れ、元帳もそう記録する', async () => {
+    const flipped = cfg({
+      genProvider: 'anthropic', genModel: 'claude-opus-5',
+      verifyProvider: 'gemini', verifyModel: 'gemini-3.6-flash',
+    })
+    const c = createClient(flipped)
+    expect(c.embedProviderName).toBe('fake:gemini')
+    const { vectors } = await c.embed({ db, texts: ['ウマイヤ朝'], now: NOW })
+    expect(vectors[0]).toHaveLength(768)
+    const rows = await db<{ provider: string; purpose: string }[]>`
+      SELECT provider, purpose FROM ai_spend WHERE period = ${P}`
+    expect(rows).toEqual([{ provider: 'gemini', purpose: 'embed' }])
+    // 本物の Gemini の鍵があれば、生成が Claude のままでも本物の Gemini が埋め込む
+    expect(createClient({ ...flipped, geminiApiKey: 'K' }).embedProviderName).toBe('gemini')
+  })
+
+  /**
    * 以前は「無料枠のモデルは 0 円で確定する」を固定していた。
    * だが 0 円だと遮断器から生成が見えなくなる。無料枠の存在は
    * 2026-09-02 の実測で確認できていない（docs/14 M28）ので、

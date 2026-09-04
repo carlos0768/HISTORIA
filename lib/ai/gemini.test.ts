@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createGeminiProvider, GeminiBlockedError, SchemaViolationError } from './gemini'
+import { createGeminiProvider, GeminiBlockedError, SchemaViolationError, EMBED_DIMENSIONS } from './gemini'
 import { materialJsonSchema, toGeminiSchema, verdictJsonSchema, MaterialOutput, bodyCharCount, isCharCountOutOfRange } from './schema'
 import type { Claim } from './types'
 import { fetchWithRetry, RateLimitedError, ProviderHttpError, BACKOFF_MS } from './http'
@@ -202,6 +202,19 @@ describe('§9 拒否と打ち切り', () => {
 })
 
 describe('埋め込み', () => {
+  it('次元を 768 に指定して送る（既定の 3072 は vector(768) に入らない）', async () => {
+    let body: Record<string, unknown> = {}
+    const f = vi.fn(async (_u: string, init: RequestInit) => {
+      body = JSON.parse(init.body as string)
+      return new Response(JSON.stringify({ embeddings: [{ values: [1] }, { values: [2] }] }), { status: 200 })
+    })
+    const p = createGeminiProvider({ apiKey: 'K', model: 'm', embedModel: 'e', fetchImpl: f as unknown as typeof fetch })
+    await p.embed(['a', 'b'])
+    const reqs = body.requests as Array<Record<string, unknown>>
+    expect(reqs).toHaveLength(2)
+    for (const r of reqs) expect(r.outputDimensionality).toBe(EMBED_DIMENSIONS)
+  })
+
   it('件数が合わなければ落とす（黙って詰めない）', async () => {
     const f = vi.fn(async () => new Response(JSON.stringify({ embeddings: [{ values: [1, 2] }] }), { status: 200 }))
     const p = createGeminiProvider({ apiKey: 'K', model: 'm', embedModel: 'e', fetchImpl: f as unknown as typeof fetch })
