@@ -37,6 +37,20 @@ describe('出力トークンの上限', () => {
     expect(MATERIAL_MAX_OUTPUT_TOKENS).toBeGreaterThan(12_168)
   })
 
+  /**
+   * ★ 中身の最大構成に**思考のぶんを足した**余地があること。
+   *   2026-09-04、16,000 では `gh.1.1.1` が stop_reason: max_tokens で落ちた。
+   *   claude-api の資料でも 16,384 は Opus 5 の試行の 15% を打ち切るとされる。
+   *   上げてもコストは増えない（settle は実測の usage で確定する）。
+   */
+  it('中身の最大構成の2倍以上ある（思考トークンもこの予算から出る）', () => {
+    const contentMax = 15_100   // 本文4,500字＋FC14枚＋四択10問＋claims40件
+    expect(MATERIAL_MAX_OUTPUT_TOKENS).toBeGreaterThan(16_000)
+    expect(MATERIAL_MAX_OUTPUT_TOKENS).toBeGreaterThanOrEqual(contentMax * 2)
+    // Opus 5 の天井は 128K。超えると 400 になる
+    expect(MATERIAL_MAX_OUTPUT_TOKENS).toBeLessThanOrEqual(128_000)
+  })
+
   it('受け入れ範囲の最大構成でも収まる', () => {
     // docs/08 §3.3 の 12,168 は 本文3,500字 / FC12枚 / 四択8問 / claims20件 の構成
     const base = 12_168
