@@ -92,7 +92,14 @@ export type GenerateOutcome =
  *   ここ1箇所に持ち、道具の側で数え直さない。
  *
  * ★ KC を持たない単元は対象外（教材の材料が無いため）。
- *   docs/08 §3.4 の分母 75 はこの条件で数えたものである。
+ *   docs/08 §3.4 の分母はこの条件で数えたものである。
+ *
+ * ★ **retired の KC は数えない。** 範囲外にした KC しか無い単元へ教材を作ると、
+ *   誰も読まない教材に1本あたり約50円を払うことになる。
+ *   `kcsForUnits` / `unitTree` / `redact.ts` / 診断はいずれも `NOT retired` を
+ *   見ているのに、ここだけ見ていなかった。2026-09-04 に歴史総合の日本史分野を
+ *   範囲外にしたとき、**この関数だけが 75 単元のまま**で、外したはずの9単元へ
+ *   課金するところだった（docs/02 §6.1）。
  */
 export async function pendingUnits(
   db: Sql,
@@ -102,6 +109,7 @@ export async function pendingUnits(
     SELECT s.id, s.label, count(*) AS kcs
       FROM syllabus_unit s
       JOIN kc_syllabus_unit ku ON ku.unit_id = s.id
+      JOIN kc k ON k.id = ku.kc_id AND NOT k.retired
      WHERE NOT EXISTS (
        SELECT 1 FROM material m
         WHERE m.unit_id = s.id AND m.user_id IS NULL

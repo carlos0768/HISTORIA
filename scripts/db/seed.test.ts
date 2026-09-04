@@ -303,6 +303,46 @@ dbSuite('seed 投入（実DB）', () => {
     expect(dangling).toHaveLength(0)
   })
 
+  /**
+   * ★ 範囲外（retired）の運び方を実 DB で見る（docs/02 §6.1）。
+   *
+   *   CSV から行を消すのではなく `retired` を立てる方式にしたので、
+   *   **列を1つ運び忘れるだけで「外したつもりが外れていない」**が起きる。
+   *   そのとき画面には何も出ず、教材の生成だけが静かに9本ぶん課金される。
+   */
+  it('範囲外にした KC が retired で入る（行は消さない）', async () => {
+    await seedKc(db, SEED_DIR, { requireApproval: false })
+    const csv = readCsv(`${SEED_DIR}/kc.csv`)
+    const want = csv.filter(r => (r.retired ?? '') !== '').map(r => r.id).sort()
+    expect(want.length).toBeGreaterThan(0)
+
+    const got = await db<{ id: string }[]>`SELECT id FROM kc WHERE retired ORDER BY id`
+    expect(got.map(r => r.id)).toEqual(want)
+    // ★ 行そのものは残っていること。消すと item_kc / response が道連れになる
+    const [all] = await db<{ n: string }[]>`SELECT count(*) AS n FROM kc`
+    expect(Number(all!.n)).toBe(csv.length)
+  })
+
+  it('範囲外にしたのは歴史総合だけで、世界史探究の KC は1件も外れていない', async () => {
+    await seedKc(db, SEED_DIR, { requireApproval: false })
+    const wrong = await db<{ id: string }[]>`
+      SELECT k.id FROM kc k
+       JOIN kc_syllabus_unit ku ON ku.kc_id = k.id
+       JOIN syllabus_unit u ON u.id = ku.unit_id
+       WHERE k.retired AND u.subject <> 'general_history'`
+    expect(wrong).toHaveLength(0)
+  })
+
+  it('範囲内の KC が、範囲外にした KC を前提にしていない', async () => {
+    await seedKc(db, SEED_DIR, { requireApproval: false })
+    // ★ 前提が永久に出題されないと、その KC は永久に「前提未習」で止まる
+    const dangling = await db<{ id: string; p: string }[]>`
+      SELECT k.id, p FROM kc k, unnest(k.prereq_ids) p
+       WHERE NOT k.retired
+         AND EXISTS (SELECT 1 FROM kc r WHERE r.id = p AND r.retired)`
+    expect(dangling).toHaveLength(0)
+  })
+
   it('KC を1件も持たない節が、第1バッチの範囲（wh.2.*）には無い', async () => {
     await seedKc(db, SEED_DIR, { requireApproval: false })
     const uncovered = await db<{ id: string }[]>`

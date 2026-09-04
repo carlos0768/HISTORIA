@@ -253,6 +253,33 @@ dbSuite('生成パイプライン（実DB）', () => {
       expect(after.some(u => u.id === UNIT)).toBe(false)
     })
 
+    /**
+     * ★ **範囲外にした KC しか無い単元へ課金しない。**
+     *
+     *   2026-09-04 に歴史総合の日本史分野を範囲外にした（docs/02 §6.1）。
+     *   `kcsForUnits` / `unitTree` / `redact.ts` / 診断はどれも `NOT retired` を
+     *   見ていたのに、**この一覧だけが見ていなかった**。そのまま流せば、
+     *   誰も読まない教材9本に約 ¥470 を払うところだった。
+     */
+    it('範囲外にした KC しか無い単元は挙げない', async () => {
+      expect((await pendingUnits(db)).some(u => u.id === UNIT)).toBe(true)
+      await db`UPDATE kc SET retired = true
+                WHERE id IN (SELECT kc_id FROM kc_syllabus_unit WHERE unit_id = ${UNIT})`
+      expect((await pendingUnits(db)).some(u => u.id === UNIT)).toBe(false)
+      await db`UPDATE kc SET retired = false`
+      expect((await pendingUnits(db)).some(u => u.id === UNIT)).toBe(true)
+    })
+
+    it('KC の数は範囲内のものだけを数える（見込み額がずれる）', async () => {
+      const [first] = await db<{ kc_id: string }[]>`
+        SELECT kc_id FROM kc_syllabus_unit WHERE unit_id = ${UNIT} ORDER BY kc_id LIMIT 1`
+      const before = (await pendingUnits(db)).find(u => u.id === UNIT)!.kcs
+      await db`UPDATE kc SET retired = true WHERE id = ${first!.kc_id}`
+      const after = (await pendingUnits(db)).find(u => u.id === UNIT)!.kcs
+      expect(after).toBe(before - 1)
+      await db`UPDATE kc SET retired = false`
+    })
+
     it('プロンプトの版が違えば、また対象になる（作り直しが要るため）', async () => {
       await generateMaterial(db, createClient(cfg), { userId, unitId: UNIT, now: NOW })
       expect((await pendingUnits(db)).some(u => u.id === UNIT)).toBe(false)

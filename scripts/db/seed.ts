@@ -166,11 +166,18 @@ export async function seedKc(
       year_from: num(k.year_from), year_to: num(k.year_to),
       year_precision: orNull(k.year_precision), prereq_ids: list(k.prereq_ids),
       exam_weight: num(k.exam_weight) ?? 1,
+      // ★ retired 列は「範囲外にした理由」を書く。空なら範囲内（docs/02 §6.1）。
+      //   行は消さない。消すと item_kc / response / kc_region の外部キーが道連れになり、
+      //   **一度でも解いた記録が消える**。retired なら出題・教材・診断から外れるだけで、
+      //   気が変わったときに列を空にすれば戻る
+      retired: (k.retired ?? '') !== '',
     })), r => r.id),
-    ['id', 'label', 'kind', 'era_id', 'year_from', 'year_to', 'year_precision', 'prereq_ids', 'exam_weight'],
+    ['id', 'label', 'kind', 'era_id', 'year_from', 'year_to', 'year_precision', 'prereq_ids',
+     'exam_weight', 'retired'],
     d => d`ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
              year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-             prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight`)
+             prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight,
+             retired = EXCLUDED.retired`)
 
   await insertMany(db, 'kc_syllabus_unit',
     dedupe(approved.map(k => ({ kc_id: k.id!, unit_id: k.unit_id! })), r => `${r.kc_id}|${r.unit_id}`),
