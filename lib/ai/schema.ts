@@ -128,6 +128,46 @@ export function toGeminiSchema(schema: unknown): unknown {
   return out
 }
 
+/**
+ * Anthropic の構造化出力（`output_config.format.schema`）が受け付ける形に直す。
+ *
+ * ★ **実測で分かった制約**（2026-09-04・request_id `req_011CeiPWeKkAjSeaPDzHB2z9`）:
+ *
+ *     400 invalid_request_error
+ *     output_config.format.schema: For 'array' type, 'minItems' values other than
+ *     0 or 1 are not supported (got: [6, ∞])
+ *
+ *   配列の `minItems` は **0 か 1 しか通らない**。教材スキーマは
+ *   sections(7) / flashcards(10) / mcqs(6) / claims(6) / choices(4) と
+ *   全部これに当たるので、そのまま送ると1文字も生成されずに落ちる。
+ *
+ * ★ **落としても正しさは失われない。** 件数の契約は応答を `MaterialOutput`（zod）で
+ *   検証するときに効く。スキーマは「守らせるための助言」であって保証ではない、
+ *   という `toGeminiSchema` と同じ立場である（両プロバイダとも、モデルが
+ *   スキーマを守る保証は無い）。
+ *
+ * ★ **0 ではなく 1 に丸める。**「空配列は認めない」という意味は通る範囲で残す。
+ *   ここを 0 にすると、空の教材が API 側の検査を素通りしてしまう。
+ *
+ * ★ `maxItems` は落とさない。上の 400 は `minItems` だけを名指ししており、
+ *   上限は通っている。**確かめていないものを推測で削らない** — 削ると
+ *   「なぜか件数が増える」の原因が分からなくなる。
+ */
+export function toAnthropicSchema(schema: unknown): unknown {
+  if (Array.isArray(schema)) return schema.map(toAnthropicSchema)
+  if (schema === null || typeof schema !== 'object') return schema
+
+  const out: Record<string, unknown> = {}
+  for (const [k, v] of Object.entries(schema as Record<string, unknown>)) {
+    if (k === 'minItems' && typeof v === 'number' && v > 1) {
+      out[k] = 1
+      continue
+    }
+    out[k] = toAnthropicSchema(v)
+  }
+  return out
+}
+
 /** 教材本文の文字数。docs/07 §2 の目標 3,500字に対する実測用 */
 export function bodyCharCount(m: MaterialOutput): number {
   return m.sections.reduce((n, s) => n + s.body_md.length, 0)

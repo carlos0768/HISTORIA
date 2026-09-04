@@ -562,6 +562,15 @@ VERIFY_MODEL    = モデルID                     -- 既定 gemini-3.6-flash（M
 `assertConfig` が起動時に強制する。**組み合わせの規則は設定の層にあり、
 能力の有無はプロバイダの層にある** — これを混ぜない。
 
+★ **構造化出力のスキーマは、プロバイダごとに削る。** Gemini は OpenAPI 3.0 の
+部分集合しか受けず（`toGeminiSchema`）、Anthropic は**配列の `minItems` に 0 か 1 しか
+許さない**（`toAnthropicSchema`。2026-09-04 に実鍵で観測、request_id
+`req_011CeiPWeKkAjSeaPDzHB2z9`）。教材スキーマは sections(7) / flashcards(10) /
+mcqs(6) / claims(6) / choices(4) と**全ての配列が後者に当たる**ため、変換しないと
+400 で1文字も生成されない。**件数の契約は応答を zod で検査するときに効く**ので、
+送るスキーマから落としても正しさは失われない — スキーマは「守らせるための助言」
+であって保証ではない。
+
 ★ **`assertConfig` にも守れない層がある。** 同じ 2026-09-04、`resolveProvider` が
 モデルを**役割ではなくベンダーから**選んでいた（`gemini → genModel` /
 `anthropic → verifyModel`）。設定どうしは揃っているのに、**実物へ配る途中で
