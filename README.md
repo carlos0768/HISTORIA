@@ -16,9 +16,10 @@
 | 閉ループ | 出題→採点→弱点更新→翌日出し直しが実 DB で動く |
 | **認証** | 招待コード＋Google／メールリンク。未認証は全経路 404 |
 | 画面 | ホーム・出題・教材・範囲選択・特訓一覧・確認テスト・その結果・記録・認証4画面。三分割シェルと3タブ。Litverse デザインシステム |
+| 教材の中の「調べる」 | 語の一致＋pgvector の近傍検索で KC と正典を引き、**年表（行＝地域）と地図**に置く（[`11`](./docs/11-ux.md) §4.1）。埋め込みが無くても語の一致で動く |
 | AI 生成 | プロバイダ抽象層のみ。**鍵が無い間はフェイクで通る** |
 | PWA | オフラインは**読むだけ**。出題は端末に降ろさない（[`12`](./docs/12-nonfunctional.md) §10） |
-| テスト | 486件（`npm test`） |
+| テスト | 976件（`npm test`） |
 
 ## 動かす
 
@@ -209,6 +210,18 @@ npx tsx scripts/db/review-sheet.ts                    # 408問を1枚もので�
 npx tsx scripts/db/approve-kc.ts --file item --all    # 承認する
 npm run db:dump-sql                                   # 件数を焼き直す
 ```
+
+### 埋め込み索引（教材の中の「調べる」）
+
+```bash
+DATABASE_URL='...' GEMINI_API_KEY='...' npm run db:embed-index            # 充足率を見るだけ
+DATABASE_URL='...' GEMINI_API_KEY='...' npm run db:embed-index -- --apply # 空の行を埋める
+```
+
+`kc.embedding` と `canon_event.embedding` のうち **空の行だけ**を `EMBED_MODEL` で埋める。
+何度流しても同じ。鍵が無いと拒む（フェイクの埋め込みは意味の無い乱数で、入れると
+「意味の近さ」がでたらめになる）。空のままでも「調べる」は語の一致だけで動き、画面にそう出る。
+既存の DB に `canon_event.embedding` が無ければ、先に `seed/sql/04_phase3.sql` を流す。
 
 ### 教材を作る／止まったものを配信可能にする
 

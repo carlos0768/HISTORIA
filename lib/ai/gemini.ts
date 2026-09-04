@@ -21,6 +21,9 @@ import { parseMaterialOutput, VerdictOutput, toGeminiSchema, verdictJsonSchema }
 
 const BASE = 'https://generativelanguage.googleapis.com/v1beta'
 
+/** 埋め込みの次元。docs/schema.sql の vector(768) と一致させる */
+export const EMBED_DIMENSIONS = 768
+
 export type GeminiOptions = {
   apiKey: string
   model: string
@@ -208,6 +211,9 @@ export function createGeminiProvider(o: GeminiOptions): Provider {
         requests: texts.map(t => ({
           model: `models/${o.embedModel}`,
           content: { parts: [{ text: t }] },
+          // ★ 次元を必ず指定する。gemini-embedding-001 の既定は 3072 次元で、
+          //   docs/schema.sql の vector(768) に入らない（INSERT の時点で落ちる）。
+          outputDimensionality: EMBED_DIMENSIONS,
         })),
       })
       const json = (await res.json()) as { embeddings?: Array<{ values?: number[] }> }

@@ -8,9 +8,11 @@ import dynamic from 'next/dynamic'
 // 基図は約80KBある。geo の KC があるセクションを開いたときだけ読む。
 // 全教材ページに載せると、地図を一度も見ない読者にも毎回送ることになる
 const WorldMap = dynamic(() => import('@/components/world-map').then(m => m.WorldMap))
-import { markRead, report, watchVideo, videoRetrieval, answerRetrieval } from './actions'
+import { markRead, report, watchVideo, videoRetrieval, answerRetrieval, researchTextbook } from './actions'
 import { ReportButton } from '@/components/report-button'
 import { VideoEmbed } from '@/components/video-embed'
+import { ResearchPanel, useResearch } from '@/components/research-panel'
+import { QUERY_MAX_CHARS } from '@/lib/loop/research'
 import type { VideoCard } from '@/lib/loop/video'
 
 export type SectionProps = {
@@ -67,6 +69,12 @@ function SectionPane({
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
 
+  // 教材の中の「調べる」（docs/11-ux.md §4.1）。開くまで何も引かない
+  const [researchOpen, setResearchOpen] = useState(false)
+  const research = useResearch(researchTextbook)
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const [selection, setSelection] = useState<string | null>(null)
+
   const stop = useCallback(() => {
     if (since.current !== null) {
       activeMs.current += Date.now() - since.current
@@ -101,6 +109,26 @@ function SectionPane({
       stop()
     }
   }, [start, stop])
+
+  /**
+   * 本文で選んだ文字列を「調べる」の候補にする。
+   * ★ 本文の中の選択だけを拾う。入力欄や他の節の文字は対象にしない。
+   * ★ 選んだだけでは引かない。押して初めて送る（送る前に、送ると書いてある）。
+   */
+  useEffect(() => {
+    const onSelect = () => {
+      const sel = document.getSelection()
+      const body = bodyRef.current
+      if (!sel || sel.isCollapsed || !body || !sel.anchorNode || !body.contains(sel.anchorNode)) {
+        setSelection(null)
+        return
+      }
+      const text = sel.toString().replace(/\s+/g, ' ').trim()
+      setSelection(text.length > 0 && text.length <= QUERY_MAX_CHARS ? text : null)
+    }
+    document.addEventListener('selectionchange', onSelect)
+    return () => document.removeEventListener('selectionchange', onSelect)
+  }, [])
 
   const finish = () => {
     if (pending) return
@@ -143,7 +171,9 @@ function SectionPane({
               </p>
             </div>
           ) : (
-            <Markdown source={section.bodyMd} />
+            <div ref={bodyRef}>
+              <Markdown source={section.bodyMd} />
+            </div>
           )}
 
           {/* 位置・版図の KC があるセクションだけ地図を出す */}
@@ -151,13 +181,42 @@ function SectionPane({
             <WorldMap highlight={section.geoRegionIds} />
           )}
 
+          {/* KC のチップは押すとその語で「調べる」が開く。飾りの札にしない */}
           {section.kcLabels.length > 0 && (
             <div className="lv-chips">
-              {section.kcLabels.map(l => <span key={l} className="lv-chip">{l}</span>)}
+              {section.kcLabels.map(l => (
+                <button key={l} type="button" className="lv-chip"
+                        onClick={() => { setResearchOpen(true); research.run(l) }}>
+                  {l}
+                </button>
+              ))}
             </div>
           )}
         </div>
       </div>
+
+      {/* ★ 教材の中の「調べる」（docs/11-ux.md §4.1）。伏せた節には出さない（引く語が無い） */}
+      {!section.hidden && (
+        <div className="lv-card">
+          <div className="lv-card__pad hs-stack">
+            <div className="hs-titlerow">
+              <span className="lv-label">この節について調べる</span>
+              <button type="button" className="lv-chip" aria-expanded={researchOpen}
+                      onClick={() => setResearchOpen(o => !o)}>
+                {researchOpen ? '閉じる' : '開く'}
+              </button>
+            </div>
+            {researchOpen ? (
+              <ResearchPanel research={research} suggestions={section.kcLabels} selection={selection} />
+            ) : (
+              <p className="lv-caption">
+                語を入れると、関係する出来事と知識項目を年表と地図に置いて示します。
+                本文の語を選んでからでも引けます。
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="hs-stack">
         <p className="lv-caption">

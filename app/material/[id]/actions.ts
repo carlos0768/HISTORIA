@@ -7,6 +7,10 @@ import { recordRead, type ReadResult } from '@/lib/loop/material'
 import { reportContent, type ReportTarget } from '@/lib/loop/report'
 import { recordView, retrievalAfterVideo, type RetrievalItem } from '@/lib/loop/video'
 import { submitAnswer } from '@/lib/loop/answer'
+import { createClient } from '@/lib/ai/client'
+import { BudgetExceededError } from '@/lib/ai/budget'
+import { assertNoIdentifiers } from '@/lib/ai/redact'
+import { parseQuery, research, embedCoverage, type ResearchResponse } from '@/lib/loop/research'
 
 /**
  * セクションの読了を記録する。
@@ -120,4 +124,66 @@ export async function answerRetrieval(input: {
     chosen: input.chosen, latencyMs: input.latencyMs, now: new Date(),
   })
   return { correct: r.correct, explanation: r.explanation }
+}
+
+/**
+ * 教材の中の「調べる」（docs/11-ux.md §4.1）
+ *
+ * ★ 検索語は**利用者が入れた語そのもの**を埋め込みの API へ送る。
+ *   docs/08 §4.1 が自由入力を送らないとしているのは学習データの話で、
+ *   ここは「範囲指定の自然文」と同じ例外である（同 §4.1 の但し書き）。
+ *   それでも上限（QUERY_MAX_CHARS）と UUID の検査は通し、画面には送る旨を先に書く。
+ *
+ * ★ 意味で引けないときは語の一致だけで引き、**そう言う**。
+ *   鍵が無い（フェイクの埋め込みは意味を持たない）／PGVECTOR=off／
+ *   支出上限／埋め込みがまだ空、のどれでも検索そのものは止めない。
+ *
+ * ★ 個人の情報は返さない。kc と canon_event は全員が同じものを読む正典である。
+ */
+export async function researchTextbook(rawQuery: string): Promise<ResearchResponse> {
+  const userId = await currentUserId()
+  if (!userId) throw new Error('ユーザーが特定できません')
+
+  const parsed = parseQuery(typeof rawQuery === 'string' ? rawQuery : '')
+  if ('error' in parsed) return { ok: false, error: parsed.error }
+  const { query } = parsed
+
+  const db = sql()
+  const now = new Date()
+  const client = createClient()
+  let vector: number[] | null = null
+  let note: string | null = null
+
+  if (client.embedProviderName.startsWith('fake')) {
+    note = 'AI の鍵が無いため、語の一致だけで引いています。'
+  } else if (process.env.PGVECTOR === 'off') {
+    note = 'このデータベースには pgvector が無いため、語の一致だけで引いています。'
+  } else {
+    try {
+      assertNoIdentifiers(query)
+    } catch {
+      return { ok: false, error: '検索語に識別子（UUID）が含まれています。語だけを入れてください。' }
+    }
+    try {
+      const out = await client.embed({ db, texts: [query], now })
+      vector = out.vectors[0] ?? null
+    } catch (e) {
+      note = e instanceof BudgetExceededError
+        ? '今月の AI 支出が上限に達しているため、語の一致だけで引いています。'
+        : '意味の近さでは引けなかったため、語の一致だけで引いています。'
+    }
+  }
+
+  const hits = await research(db, { query, vector })
+  const mode = vector === null ? 'text' : 'hybrid'
+
+  // ベクトルは作れたのに近傍が1件も無い＝索引がまだ空。黙って「語の一致だけ」の顔をしない
+  if (mode === 'hybrid' && hits.every(h => h.similarity === null)) {
+    const c = await embedCoverage(db)
+    if (c.kc.embedded === 0 && c.canonEvent.embedded === 0) {
+      note = '埋め込みの索引がまだ作られていないため、語の一致だけで引けています（npm run db:embed-index）。'
+    }
+  }
+
+  return { ok: true, query, mode, note, hits }
 }

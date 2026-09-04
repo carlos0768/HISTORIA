@@ -211,7 +211,7 @@ export function createAnthropicProvider(o: AnthropicOptions): Provider {
 
     async embed(): Promise<{ vectors: number[][]; usage: Usage; model: string }> {
       // Anthropic に埋め込み API は無い（docs/09 §6）
-      throw new Error('anthropic に埋め込み API はありません。生成側（Gemini）を使ってください')
+      throw new Error('anthropic に埋め込み API はありません。Gemini の側を使ってください（client.ts の emb）')
     },
   }
 }

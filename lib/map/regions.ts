@@ -79,6 +79,15 @@ export const REGION_SHAPES: readonly RegionShape[] = build()
 const BY_ID = new Map(REGION_SHAPES.map(r => [r.id, r]))
 export const regionShape = (id: number): RegionShape | undefined => BY_ID.get(id)
 
+/** 子 → 親。親自身と、親を持たない地域（南アジア等）は自分自身を返す */
+const PARENT_OF: ReadonlyMap<number, number> = new Map(
+  Object.entries(CHILDREN).flatMap(([p, kids]) => kids.map(k => [k, Number(p)] as const)),
+)
+export const regionGroupId = (id: number): number => PARENT_OF.get(id) ?? id
+
+/** 地域の表示名。id が知らないものなら「地域 <id>」（黙って落とさない） */
+export const regionLabel = (id: number): string => BY_ID.get(id)?.label ?? `地域 ${id}`
+
 /**
  * 地図に出せない国コードを指していないか。試験と開発時の確認に使う。
  * 国土（COUNTRY_PATHS）でも点（MICRO_PINS）でも出せないものが該当する。
