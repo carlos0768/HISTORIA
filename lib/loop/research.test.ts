@@ -195,8 +195,10 @@ vectorSuite('近傍検索（pgvector）', () => {
   })
 
   it('空の行だけを埋め、埋まっている行には触れない（何度流しても同じ）', async () => {
-    const client = createClient(readConfig({ GEN_PROVIDER: 'gemini', VERIFY_PROVIDER: 'anthropic' } as unknown as NodeJS.ProcessEnv))
+    // 既定の向き（生成 Claude / 検証 Gemini）。鍵が無いのでフェイクの Gemini が埋め込む
+    const client = createClient(readConfig({} as unknown as NodeJS.ProcessEnv))
     expect(client.usingFake).toBe(true)
+    expect(client.embedProviderName).toBe('fake:gemini')
     const before = await db<{ e: string }[]>`SELECT embedding::text AS e FROM canon_event WHERE id = 'ce.a'`
 
     const r1 = await embedMissing(db, client, { now: new Date('2026-09-04T00:00:00Z'), batch: 1 })

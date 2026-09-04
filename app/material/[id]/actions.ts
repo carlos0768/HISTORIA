@@ -154,7 +154,7 @@ export async function researchTextbook(rawQuery: string): Promise<ResearchRespon
   let vector: number[] | null = null
   let note: string | null = null
 
-  if (client.genProviderName.startsWith('fake')) {
+  if (client.embedProviderName.startsWith('fake')) {
     note = 'AI の鍵が無いため、語の一致だけで引いています。'
   } else if (process.env.PGVECTOR === 'off') {
     note = 'このデータベースには pgvector が無いため、語の一致だけで引いています。'

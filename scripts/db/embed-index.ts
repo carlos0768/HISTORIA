@@ -43,8 +43,8 @@ try {
   }
 
   const client = createClient()
-  if (client.genProviderName.startsWith('fake')) {
-    console.error(`\nGEMINI_API_KEY が無いため埋め込みを作れません（いまは ${client.genProviderName}）。`)
+  if (client.embedProviderName.startsWith('fake')) {
+    console.error(`\nGEMINI_API_KEY が無いため埋め込みを作れません（いまは ${client.embedProviderName}）。`)
     console.error('フェイクの埋め込みは意味を持たない乱数なので、本番の列には入れません。')
     process.exit(1)
   }
