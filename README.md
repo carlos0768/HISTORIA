@@ -249,7 +249,7 @@ npm run build
 - **未認証はリダイレクトではなく404**。ログイン画面の存在すら見せない（[`10`](./docs/10-legal-risk.md) §3.2 G2）
 - **ブラウザに Supabase を触らせない**。OAuth をサーバー側に閉じて CSP を広げない（[`03`](./docs/03-data-model.md) §7.3）
 - **月1万円で AI 呼び出しを機械的に停止する**。上限を1円も超えない（[`08`](./docs/08-ai-architecture.md) §7.1）
-- **生成は無料枠、検証は課金**。同一モデルの自己検証に退化させない（[`08`](./docs/08-ai-architecture.md) §2）
+- **生成 Claude Opus 5 / 検証 Gemini 3 Pro**（どちらも課金）。同一モデルの自己検証に退化させない（[`08`](./docs/08-ai-architecture.md) §2）
 
 読む順は [`docs/README.md`](./docs/README.md) にある。
 

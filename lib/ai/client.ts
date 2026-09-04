@@ -26,12 +26,27 @@ export type AiConfig = {
   anthropicApiKey?: string
 }
 
+/**
+ * ★ 既定は「生成 Claude / 検証 Gemini」。2026-09-04 に作者が費用試算を見て決めた
+ *   （全75節で約 ¥4,300、月上限 1万円の 43%。docs/08 §3.4）。v0.3 までの
+ *   「生成は Gemini の無料枠、検証は Anthropic」から**向きが逆になっている**。
+ *
+ * ★ 既定をそのままにしなかった理由。鍵だけ入れて GEN_PROVIDER を設定し忘れると、
+ *   教材が黙って Gemini Flash で作られる。フェイクではないので警告も出ず、
+ *   安いので遮断器も鳴らない——**一番気づきにくい間違い方**をする。
+ *
+ * ★ VERIFY_MODEL の既定を Gemini 3 Pro にしていない。この環境から
+ *   ai.google.dev に到達できず、正しいモデル id を確認できなかったため。
+ *   gemini.ts は id を URL のパスにそのまま入れるので、推測を書くと 404 になる
+ *   （docs/14 M28 で実際に観測した症状）。作者が AI Studio で確認したものを
+ *   Vercel の VERIFY_MODEL に入れる。既定はリポジトリで既に使っている id を置く。
+ */
 export function readConfig(env: NodeJS.ProcessEnv = process.env): AiConfig {
   return {
-    genProvider: env.GEN_PROVIDER ?? 'gemini',
-    genModel: env.GEN_MODEL ?? 'gemini-3.6-flash',
-    verifyProvider: env.VERIFY_PROVIDER ?? 'anthropic',
-    verifyModel: env.VERIFY_MODEL ?? 'claude-sonnet-5',
+    genProvider: env.GEN_PROVIDER ?? 'anthropic',
+    genModel: env.GEN_MODEL ?? 'claude-opus-5',
+    verifyProvider: env.VERIFY_PROVIDER ?? 'gemini',
+    verifyModel: env.VERIFY_MODEL ?? 'gemini-3.6-flash',
     embedModel: env.EMBED_MODEL ?? 'gemini-embedding-001',
     geminiApiKey: env.GEMINI_API_KEY || undefined,
     anthropicApiKey: env.ANTHROPIC_API_KEY || undefined,
@@ -50,10 +65,39 @@ export function assertConfig(cfg: AiConfig): void {
         '同一系統のモデルによる自己検証に退化するため許可しません（docs/08 §6）。',
     )
   }
+
+  /**
+   * ★ プロバイダとモデル id の食い違いを起動時に落とす。
+   *   gemini.ts は id を `/models/${model}:generateContent` と **URL のパスに
+   *   そのまま入れる**ので、'claude-sonnet-5' を渡すと 404 になる。
+   *   これは docs/14 M28 で実際に観測した症状で、鍵の問題と見分けがつかない。
+   *   向きを入れ替えるときに片方だけ直し忘れるのが典型なので、ここで止める。
+   */
+  for (const [provider, model, gen] of [
+    [cfg.genProvider, cfg.genModel, 'GEN'],
+    [cfg.verifyProvider, cfg.verifyModel, 'VERIFY'],
+  ] as const) {
+    const looksAnthropic = model.startsWith('claude-')
+    const looksGemini = model.startsWith('gemini-')
+    const mismatch =
+      (provider === 'gemini' && looksAnthropic) || (provider === 'anthropic' && looksGemini)
+    if (mismatch) {
+      throw new Error(
+        `${gen}_PROVIDER=${provider} に ${gen}_MODEL=${model} が組み合わされています。` +
+          'モデル id はそのままリクエストに乗るため、この組み合わせは 404 になります。',
+      )
+    }
+  }
 }
 
 /** USD / MTok。docs/08 §3.4 */
 export const PRICES: Record<string, Price> = {
+  // ★ 生成に使うモデルは必ずここに書く。下の未知モデルの既定は**天井ではない**。
+  //   Opus 5 は $5/$25 で、既定の $3/$15 を出力側で上回る。書き忘れると
+  //   estimateJpy が実額の約6割しか返さず、settle も同じ式を使うので
+  //   **元帳が実支出より4割少なく積まれる**。cap_jpy 10,000 は実額 16,700 円
+  //   あたりまで素通りし、遮断器の不変条件（settled + reserved <= cap）が崩れる。
+  'claude-opus-5': { inputPerMTok: 5, outputPerMTok: 25 },
   'claude-sonnet-5': { inputPerMTok: 2, outputPerMTok: 10 },
   // ★ Gemini の単価をここに書かない。
   //   docs/08 は「無料枠だから0円」を前提にしていたが、2026-09-02 の実測では
@@ -62,11 +106,21 @@ export const PRICES: Record<string, Price> = {
   //   **この鍵からは無料枠の存在を確認できていない**（docs/14 M28）。
   //   0 と書くと estimateJpy が 0 を返し、遮断器が生成を1円も数えなくなる。
   //   実際に課金されていた場合、元帳が空のまま支出だけが進む。
-  //   単価を実測できるまでは、下の未知モデルの見積り（高め）に落ちるままにする。
+  //   単価を実測できるまでは、下の未知モデルの見積りに落ちるままにする。
+  //   Gemini 3 Pro は $2/$12 と伝えられており、既定の $3/$15 はそれを上回るので
+  //   Gemini については安全側に落ちる（Opus 5 と違って過小にならない）。
 }
 
+/**
+ * ★ 既定値は「安全側」ではなく「Sonnet 5 より高め」でしかない。
+ *   2026-09-04 まで「未知のモデルは高めに見積もる」と書いてあったが、
+ *   それは Sonnet 5（$2/$10）だけが表に載っていた頃の話である。
+ *   Opus 5（$5/$25）は既定を上回るので、**上に書かなければ過小評価になる**。
+ *   実際に使うモデルは PRICES に載せること。ここは「載せ忘れても
+ *   0 円にはしない」という最後の網であって、天井ではない。
+ */
 const priceOf = (model: string): Price =>
-  PRICES[model] ?? { inputPerMTok: 3, outputPerMTok: 15 } // 未知のモデルは高めに見積もる
+  PRICES[model] ?? { inputPerMTok: 3, outputPerMTok: 15 }
 
 /**
  * 鍵があれば実物、無ければフェイクにする。
