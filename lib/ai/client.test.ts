@@ -5,7 +5,7 @@ import { seedMasters, SEED_DIR } from '@/scripts/db/seed'
 import { createClient, assertConfig, readConfig, PRICES, type AiConfig } from './client'
 import { createFakeProvider } from './fake'
 import { toBand, assertAnonymized, assertNoIdentifiers, buildGenerationContext } from './redact'
-import { budgetStatus, BudgetExceededError, ensureBudgetRow } from './budget'
+import { budgetStatus, BudgetExceededError, ensureBudgetRow, estimateJpy } from './budget'
 import { createUser, createKcs } from '@/lib/loop/fixture'
 import type { AnonymizedContext } from './types'
 
@@ -22,13 +22,75 @@ describe('§6 プロバイダ設定', () => {
   it('別プロバイダなら通る', () => {
     expect(() => assertConfig(cfg())).not.toThrow()
   })
-  it('退避時（生成を anthropic に）でも検証を gemini に入れ替えれば通る', () => {
-    expect(() => assertConfig(cfg({ genProvider: 'anthropic', verifyProvider: 'gemini' }))).not.toThrow()
+  it('向きを入れ替えても、モデルごと入れ替えれば通る（生成 Claude / 検証 Gemini）', () => {
+    // ★ 2026-09-04 に既定になった向き。以前ここは**プロバイダだけ**入れ替えて
+    //   通ることを確かめており、モデル id が付いてこないことを見逃していた。
+    expect(() => assertConfig(cfg({
+      genProvider: 'anthropic', genModel: 'claude-opus-5',
+      verifyProvider: 'gemini', verifyModel: 'gemini-3.6-flash',
+    }))).not.toThrow()
   })
+
+  /**
+   * ★ プロバイダだけ入れ替えてモデルを置き忘れる、を起動時に落とす。
+   *   gemini.ts はモデル id を URL のパスにそのまま入れるので、
+   *   食い違うと 404 になる。鍵の不具合と見分けがつかず、docs/14 M28 で
+   *   実際に「404 が出るが原因が分からない」に化けた症状である。
+   */
+  it('プロバイダとモデル id が食い違っていたら落とす', () => {
+    expect(() => assertConfig(cfg({ genProvider: 'anthropic', verifyProvider: 'gemini' })))
+      .toThrow(/404/)
+    expect(() => assertConfig(cfg({ verifyProvider: 'gemini', verifyModel: 'claude-sonnet-5', genProvider: 'anthropic', genModel: 'claude-opus-5' })))
+      .toThrow(/VERIFY_MODEL=claude-sonnet-5/)
+  })
+
   it('環境変数から読める', () => {
     const c = readConfig({ GEN_PROVIDER: 'gemini', VERIFY_PROVIDER: 'anthropic' } as unknown as NodeJS.ProcessEnv)
     expect(c.genProvider).toBe('gemini')
     expect(c.verifyProvider).toBe('anthropic')
+  })
+
+  /**
+   * ★ 既定だけで起動できること。環境変数を1つも置いていない相手（新しい開発環境、
+   *   設定を忘れた本番）で assertConfig が落ちると、鍵の話に辿り着く前に死ぬ。
+   *   既定を入れ替えるときに、プロバイダとモデルの片方だけ直す事故を止める。
+   */
+  it('既定値だけで assertConfig を通る', () => {
+    const c = readConfig({} as unknown as NodeJS.ProcessEnv)
+    expect(() => assertConfig(c)).not.toThrow()
+    expect(c.genProvider).toBe('anthropic')
+    expect(c.genModel).toBe('claude-opus-5')
+    expect(c.verifyProvider).toBe('gemini')
+  })
+})
+
+/**
+ * ★ 遮断器は単価表が正しいことに全面的に依存している。
+ *   PRICES に無いモデルは { 3, 15 } に落ちるが、**それは天井ではない**。
+ *   Opus 5 は $5/$25 なので、書き忘れると出力側で 4 割の過小評価になり、
+ *   settle も同じ式を使うので元帳ごとずれる（cap_jpy が効かなくなる）。
+ */
+describe('§3.4 単価表', () => {
+  it('生成に使うモデルが PRICES に載っている', () => {
+    const c = readConfig({} as unknown as NodeJS.ProcessEnv)
+    expect(PRICES[c.genModel], `${c.genModel} が PRICES に無い`).toBeDefined()
+  })
+
+  it('Opus 5 の単価が未知モデルの既定を上回る（＝既定では過小になる）', () => {
+    const opus = PRICES['claude-opus-5']!
+    expect(opus.inputPerMTok).toBe(5)
+    expect(opus.outputPerMTok).toBe(25)
+    // 既定 { 3, 15 } では足りない、という事実そのものを固定する
+    expect(opus.outputPerMTok).toBeGreaterThan(15)
+  })
+
+  it('教材1本の予約が、既定値で数えた額より大きくなる', () => {
+    // 予約は maxIn 3,600 / maxOut 16,000（client.ts の maxIn の式と MATERIAL_MAX_OUTPUT_TOKENS）
+    const real = estimateJpy(3_600, 16_000, PRICES['claude-opus-5']!)
+    const fallback = estimateJpy(3_600, 16_000, { inputPerMTok: 3, outputPerMTok: 15 })
+    expect(real).toBeGreaterThan(fallback)
+    expect(Math.round(real)).toBe(70)
+    expect(Math.round(fallback)).toBe(42)
   })
 })
 

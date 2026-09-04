@@ -124,6 +124,70 @@ dbSuite('生成パイプライン（実DB）', () => {
     expect(r.itemCount).toBe(16)
   })
 
+  /**
+   * ★ **本物で作って偽物で検証した教材を配信しない。**
+   *
+   *   2026-09-04 に見つけた穴。鍵が片方だけのとき resolveProvider は
+   *   もう片方を黙ってフェイクにする。フェイクの verify は全 claim を `ok` にするので、
+   *   「検証を通った」が偽になる。しかも `material.provider` に入るのは生成側だけで、
+   *   検証側を記録する列が無い——**記録にも画面にも痕跡が残らない**。
+   *
+   *   作者が選んだ構成（生成 Opus 5 / 検証 Gemini 3 Pro）は、まさにこの向きである。
+   *   Gemini 鍵だけ失敗すると、本物の Claude が本物らしい教材を作り、
+   *   フェイクが「問題なし」と言い、警告なしで配信される。
+   *
+   *   ★ 鍵は使われない。安全弁は AI を呼ぶ前に落ちるので、実際の通信は起きない。
+   */
+  it('検証がフェイクに落ちているとき、本物の生成を始めない', async () => {
+    const ai = createClient({
+      ...cfg,
+      genProvider: 'anthropic', genModel: 'claude-opus-5',
+      verifyProvider: 'gemini', verifyModel: 'gemini-3.6-flash',
+      anthropicApiKey: 'test-key-not-used',   // 生成側だけ本物になる
+    })
+    expect(ai.genProviderName).toBe('anthropic')
+    expect(ai.verifyProviderName).toBe('fake:gemini')
+
+    const r = await generateMaterial(db, ai, { userId, unitId: UNIT, now: NOW })
+    expect(r.status).toBe('failed')
+    if (r.status !== 'failed') return
+    expect(r.reason).toContain('検証')
+
+    // 教材を1行も作らない。「検証済み」に見える行を残さないため
+    const m = await db<{ n: string }[]>`SELECT count(*) AS n FROM material`
+    expect(Number(m[0]!.n)).toBe(0)
+
+    // 失敗の理由が job に残る（作者が原因を追えるようにする）
+    const j = await db<{ status: string; error: string | null }[]>`
+      SELECT status, error FROM generation_job WHERE user_id = ${userId}`
+    expect(j[0]!.status).toBe('failed')
+    expect(j[0]!.error).toContain('鍵')
+
+    // 1円も使っていない（AI を呼ぶ前に止めている）
+    const sp = await db<{ n: string }[]>`SELECT count(*) AS n FROM ai_spend`
+    expect(Number(sp[0]!.n)).toBe(0)
+  })
+
+  /**
+   * ★ 逆対照。上と1つだけ違う（鍵を外す）。両方フェイクなら今までどおり通る。
+   *   鍵なしで閉ループを通す動作確認を壊していないことを見る。
+   *   そのとき provider は 'fake:anthropic' になり、既存の FakeWarning が働く。
+   */
+  it('両方フェイクなら今までどおり通る（鍵なしの動作確認を壊さない）', async () => {
+    const ai = createClient({
+      ...cfg,
+      genProvider: 'anthropic', genModel: 'claude-opus-5',
+      verifyProvider: 'gemini', verifyModel: 'gemini-3.6-flash',
+    })
+    expect(ai.genProviderName).toBe('fake:anthropic')
+    expect(ai.verifyProviderName).toBe('fake:gemini')
+
+    const r = await generateMaterial(db, ai, { userId, unitId: UNIT, now: NOW })
+    expect(r.status).toBe('ready')
+    const p = await db<{ provider: string }[]>`SELECT provider FROM material`
+    expect(p[0]!.provider).toBe('fake:anthropic')   // 画面に警告が出る側
+  })
+
   it('ready なら item が factcheck 承認で出題可能になる', async () => {
     const ai = createClient(cfg)
     const r = await generateMaterial(db, ai, { userId, unitId: UNIT, now: NOW })
