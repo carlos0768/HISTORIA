@@ -166,7 +166,14 @@ export function createGeminiProvider(o: GeminiOptions): Provider {
       }
       const finish = json.candidates?.[0]?.finishReason
       if (finish && finish !== 'STOP') {
-        throw new GeminiVerifyFailedError(`finishReason=${finish}`)
+        // ★ MAX_TOKENS のとき、原因は「判定が長すぎた」とは限らない。
+        //   3.x Pro は思考トークンをこの予算から使うので、判定を書き始める前に
+        //   使い切ることがある（2026-09-04 に実際に踏んだ）。次に読む人が
+        //   claims の件数を疑って時間を溶かさないよう、ここに書いておく
+        const hint = finish === 'MAX_TOKENS'
+          ? '（maxOutputTokens が足りません。思考トークンもこの予算から使われます）'
+          : ''
+        throw new GeminiVerifyFailedError(`finishReason=${finish}${hint}`)
       }
 
       const text = json.candidates?.[0]?.content?.parts?.map(p => p.text ?? '').join('') ?? ''

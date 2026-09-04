@@ -48,9 +48,23 @@ describe('出力トークンの上限', () => {
     expect(MATERIAL_MAX_OUTPUT_TOKENS).toBeGreaterThanOrEqual(base + extra)
   })
 
-  it('検証の上限が claims 最大40件の判定を収められる', () => {
-    // 1件あたり index + status + 理由およそ60字
-    expect(VERIFY_MAX_OUTPUT_TOKENS).toBeGreaterThanOrEqual(40 * 90)
+  /**
+   * ★ **「答えの長さ」で決めてはいけない。**
+   *
+   *   2026-09-04、実鍵で `finishReason=MAX_TOKENS` を踏んだ。判定そのものは
+   *   claims 40件でも 3,600 トークン程度で、実際に投げたのは 20件前後。
+   *   それでも 4,000 で足りなかった。`gemini-3.1-pro-preview` は
+   *   **思考トークンをこの予算から使う**ため、判定を書き始める前に尽きる。
+   *
+   *   上げてもコストはほぼ増えない（settle は実測の usage で確定する）。
+   */
+  it('検証の上限が、判定の長さだけでなく思考のぶんも見込んである', () => {
+    // 判定そのもの: 1件あたり index + status + 理由およそ60字 × 40件
+    const answerOnly = 40 * 90
+    expect(VERIFY_MAX_OUTPUT_TOKENS).toBeGreaterThanOrEqual(answerOnly)
+    // ★ 実測で 4,000 では足りなかった。答えの長さの数倍を確保する
+    expect(VERIFY_MAX_OUTPUT_TOKENS).toBeGreaterThan(4_000)
+    expect(VERIFY_MAX_OUTPUT_TOKENS).toBeGreaterThanOrEqual(answerOnly * 4)
   })
 })
 

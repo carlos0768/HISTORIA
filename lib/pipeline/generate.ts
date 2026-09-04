@@ -42,10 +42,26 @@ export const MATERIAL_MAX_OUTPUT_TOKENS = 16_000
 
 /**
  * 検証の出力トークン上限。
- * claims 最大40件 × (index + status + 理由およそ60字) ≈ 3,600。余裕を足して 4,000。
- * 1,500 では24件を超えたあたりで打ち切られ、検証が失敗する。
+ *
+ * ★ **思考（thinking）トークンがここに含まれる。** 2026-09-04 に実鍵で回して
+ *   `finishReason=MAX_TOKENS` で落ちた。判定そのものは
+ *   claims 最大40件 × (index + status + 理由およそ60字) ≈ 3,600 に収まるはずで、
+ *   実際に投げたのは 20件前後だった。**それでも 4,000 で足りなかった。**
+ *
+ *   `gemini-3.1-pro-preview` は思考する。判定の JSON を書き始める前に
+ *   予算を使い切ると、1文字も出ないまま打ち切られる。
+ *   **「答えの長さ」で上限を決めてはいけない。**
+ *
+ * ★ 上げてもコストはほぼ増えない。settle は実測の usage で確定する
+ *   （reserve が大きくなるぶん同時実行の余裕が減るだけ）。生成側の
+ *   MATERIAL_MAX_OUTPUT_TOKENS と同じ 16,000 まで引き上げ、
+ *   思考の余地を十分に取る。
+ *
+ * ★ 実測が出たら見直す。思考が毎回1万トークン使うなら、検証の原価は
+ *   docs/08 §3.4 の見積り（全75節で約300円）を大きく超える。
+ *   そのときは検証を Flash 系に落とすか、思考を抑える設定を探す（M36）。
  */
-export const VERIFY_MAX_OUTPUT_TOKENS = 4_000
+export const VERIFY_MAX_OUTPUT_TOKENS = 16_000
 /** 文字数が範囲外だったときの作り直し回数。無料枠を無限に食わせない */
 export const MAX_LENGTH_RETRIES = 1
 
