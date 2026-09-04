@@ -28,9 +28,25 @@ import { SCHEMA_PATH } from './schema'
  * 「どれが後から足された分か」はここに書くしかない。
  */
 export const NEW_TABLES = ['push_subscription', 'ops_log'] as const
-export const NEW_COLUMNS = [
+export type NewColumn = {
+  table: string
+  column: string
+  type: string
+  check?: string
+  /**
+   * 列と一緒に足す索引の本体（`ON <表>` の後ろ）。
+   * `indexStatements` は `CREATE INDEX ON <表> (列)` の形しか拾わないので、
+   * `USING hnsw (…)` のような索引はここに書く。名前は PostgreSQL の自動命名
+   * （<表>_<列>_idx）に合わせる。ずれると IF NOT EXISTS が効かず2本できる。
+   */
+  index?: string
+}
+export const NEW_COLUMNS: readonly NewColumn[] = [
   { table: 'app_user', column: 'remind_hour', type: 'smallint', check: 'remind_hour BETWEEN 0 AND 23' },
-] as const
+  // 教材の中の「調べる」の近傍検索（docs/11-ux.md §4.1）。kc.embedding と同じ次元・同じモデル
+  { table: 'canon_event', column: 'embedding', type: 'vector(768)',
+    index: 'USING hnsw (embedding vector_cosine_ops)' },
+]
 
 /**
  * 導出テーブルの作り直し。
@@ -122,6 +138,9 @@ export function buildMigrationSql(schema = readFileSync(SCHEMA_PATH, 'utf8')): s
     say(`-- ---- ${c.table}.${c.column} ----`)
     say(`ALTER TABLE ${c.table} ADD COLUMN IF NOT EXISTS ${c.column} ${c.type}` +
         (c.check ? ` CHECK (${c.check})` : '') + ';')
+    if (c.index) {
+      say(`CREATE INDEX IF NOT EXISTS ${c.table}_${c.column}_idx ON ${c.table} ${c.index};`)
+    }
     say('')
   }
 
