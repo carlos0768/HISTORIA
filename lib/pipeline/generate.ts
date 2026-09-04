@@ -231,6 +231,39 @@ export async function generateMaterial(
     return { status: 'failed', reason }
   }
 
+  /**
+   * ★ **本物で作って偽物で検証した教材を配信しない。**
+   *
+   *   `lib/ai/client.ts` の resolveProvider は鍵が無いと黙ってフェイクに落ちる。
+   *   そしてフェイクの verify は既定で全 claim を `ok` にする（`lib/ai/fake.ts` の
+   *   `wrongRate ?? 0`）。つまり「検証を通った」という事実が偽になる。
+   *
+   *   質が悪いのは、それが**どこにも残らない**ことである。`material.provider` に
+   *   入るのは生成側の名前だけで（下の INSERT）、検証側を記録する列が
+   *   `docs/schema.sql` の material に無い。`components/fake-warning.tsx` の
+   *   `isFake` もその1列しか見ない。だから:
+   *
+   *     生成がフェイク → provider = 'fake:...' → 画面に警告が出る
+   *     検証がフェイク → 記録も警告も無い ← ここが素通りしていた
+   *
+   *   fake-warning.tsx 自身が警戒している「**嘘を覚えて、気づかない**」が、
+   *   パイプラインの後半半分では効いていなかった。作者判断 Q4
+   *   「エラー出して生成しない」に従い、**AI を呼ぶ前に**止める。
+   *
+   * ★ 両方フェイクは止めない。鍵なしで閉ループを通す動作確認はこの経路を使っており、
+   *   そのとき provider が 'fake:...' になるので既存の FakeWarning が働く。
+   *   塞ぐのは「片側だけ本物」という、警告の網から漏れる組み合わせだけである。
+   */
+  const genIsFake = ai.genProviderName.startsWith('fake:')
+  const verifyIsFake = ai.verifyProviderName.startsWith('fake:')
+  if (!genIsFake && verifyIsFake) {
+    return fail(
+      `検証プロバイダ（${ai.config.verifyProvider}）の鍵が無く、フェイクに落ちています。` +
+        'フェイクの検証は全ての主張を「問題なし」と返すため、未検証の教材が' +
+        '検証済みとして配信されます。生成を中止しました。',
+    )
+  }
+
   // ---- 生成。文字数が範囲外なら作り直す（docs/07 §2） ----
   let out: MaterialOutput | null = null
   let chars = 0
