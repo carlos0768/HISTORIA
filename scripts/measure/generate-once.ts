@@ -26,9 +26,32 @@ const admin = process.env.TEST_DATABASE_URL ?? process.env.DATABASE_URL
 if (!admin) throw new Error('TEST_DATABASE_URL か DATABASE_URL が要ります')
 
 const cfg = readConfig()
-if (!cfg.geminiApiKey) throw new Error('GEMINI_API_KEY が要ります')
-console.log(`生成: ${cfg.genProvider}/${cfg.genModel}`)
-console.log(`検証: ${cfg.verifyProvider}/${cfg.verifyModel}${cfg.anthropicApiKey ? '' : '（鍵が無いのでフェイク）'}`)
+
+/**
+ * ★ 鍵の有無を env で直接見ない。**どちらのプロバイダが生成側かは設定で変わる**。
+ *   2026-09-04 に向きが「生成 Claude / 検証 Gemini」へ入れ替わったとき、
+ *   ここは `GEMINI_API_KEY` だけを見ていたので、**生成側の鍵が無いまま通っていた**。
+ *   その場合フェイクが本文を書き、本物の検証がそれを検証して、
+ *   この道具は「でたらめな教材の実測値」を出す。
+ *
+ *   createClient が返す名前は resolveProvider が実際に選んだものなので
+ *   （鍵が無ければ 'fake:...'）、ここを唯一の判断材料にすれば設定と食い違わない。
+ */
+const ai = createClient(cfg)
+const genFake = ai.genProviderName.startsWith('fake:')
+const verifyFake = ai.verifyProviderName.startsWith('fake:')
+if (genFake || verifyFake) {
+  const need = [
+    genFake ? `生成 ${cfg.genProvider}` : null,
+    verifyFake ? `検証 ${cfg.verifyProvider}` : null,
+  ].filter(Boolean).join(' と ')
+  console.error(`${need} の鍵がありません。実測にならないので止めます。`)
+  console.error('  GEMINI_API_KEY と ANTHROPIC_API_KEY の両方が要ります。')
+  console.error('  （生成と検証は必ず別プロバイダなので、片方だけでは足りません）')
+  process.exit(1)
+}
+console.log(`生成: ${ai.genProviderName}/${cfg.genModel}`)
+console.log(`検証: ${ai.verifyProviderName}/${cfg.verifyModel}`)
 console.log(`単元: ${unitId}\n`)
 
 const name = `historia_measure_${Date.now()}`
@@ -49,7 +72,7 @@ try {
   const userId = await createUser(db, now)
 
   const t0 = Date.now()
-  const r = await generateMaterial(db, createClient(cfg), { userId, unitId, now })
+  const r = await generateMaterial(db, ai, { userId, unitId, now })
   const ms = Date.now() - t0
 
   console.log(`結果: ${r.status}`)

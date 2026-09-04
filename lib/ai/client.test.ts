@@ -85,9 +85,12 @@ describe('§3.4 単価表', () => {
   })
 
   it('教材1本の予約が、既定値で数えた額より大きくなる', () => {
-    // 予約は maxIn 3,600 / maxOut 16,000（client.ts の maxIn の式と MATERIAL_MAX_OUTPUT_TOKENS）
-    const real = estimateJpy(3_600, 16_000, PRICES['claude-opus-5']!)
-    const fallback = estimateJpy(3_600, 16_000, { inputPerMTok: 3, outputPerMTok: 15 })
+    // 予約は maxIn 約3,000 / maxOut 16,000。
+    // maxIn は client.ts の式（(system+user)/1.5 + 1000）で単元ごとに変わる。
+    // wh.4.1.3 の実測が 2,996 だったので、丸めた 3,000 を代表値にする。
+    // ★ 出力が支配的なので、入力側が数百ずれても結論（実額 > 既定）は動かない
+    const real = estimateJpy(3_000, 16_000, PRICES['claude-opus-5']!)
+    const fallback = estimateJpy(3_000, 16_000, { inputPerMTok: 3, outputPerMTok: 15 })
     expect(real).toBeGreaterThan(fallback)
     expect(Math.round(real)).toBe(70)
     expect(Math.round(fallback)).toBe(42)
