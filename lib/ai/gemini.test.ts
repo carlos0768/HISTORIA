@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { createGeminiProvider, GeminiBlockedError, SchemaViolationError, EMBED_DIMENSIONS } from './gemini'
-import { materialJsonSchema, toGeminiSchema, MaterialOutput, bodyCharCount, isCharCountOutOfRange } from './schema'
+import { materialJsonSchema, toGeminiSchema, verdictJsonSchema, MaterialOutput, bodyCharCount, isCharCountOutOfRange } from './schema'
+import type { Claim } from './types'
 import { fetchWithRetry, RateLimitedError, ProviderHttpError, BACKOFF_MS } from './http'
 
 /** docs/07 §5.3 を満たす最小の教材 */
@@ -221,10 +222,77 @@ describe('埋め込み', () => {
   })
 })
 
-describe('§2.1 役割の分離', () => {
-  it('Gemini に検証はさせない（自己検証への退化を防ぐ）', async () => {
-    const p = createGeminiProvider({ apiKey: 'K', model: 'm', embedModel: 'e' })
-    await expect(p.verify([], 100)).rejects.toThrow(/検証に使わない/)
+/**
+ * ★ **役割の分離は、このファイルの仕事ではない。**
+ *
+ *   2026-09-04 まで、ここには「Gemini に検証はさせない」という試験があり、
+ *   `verify()` が必ず例外を投げることを固定していた。向きが
+ *   「生成 Claude / 検証 Gemini」へ入れ替わった瞬間、**製品が動かなくなった**
+ *   （作者が実際に踏んだ: 「anthropic は生成に使わない設定です」）。
+ *
+ *   自己検証への退化を防ぐのは `client.ts` の `assertConfig` である。
+ *   そちらに「生成と検証が同じプロバイダなら起動時に落とす」試験がある。
+ *   **片方のプロバイダの口を塞いで防ぐのは、不変条件を間違った層に置いていた。**
+ */
+describe('§5 層3 検証', () => {
+  const verdictOk = (verdicts: unknown, usage = { promptTokenCount: 1200, candidatesTokenCount: 400 }) =>
+    new Response(JSON.stringify({
+      candidates: [{ content: { parts: [{ text: JSON.stringify({ verdicts }) }] }, finishReason: 'STOP' }],
+      usageMetadata: usage,
+    }), { status: 200 })
+
+  const claims: Claim[] = [
+    { type: 'year', text: 'ウェストファリア条約は1648年' },
+    { type: 'person', text: 'ハンムラビ法典を制定したのはハンムラビ王' },
+  ]
+
+  const provider = (fetchImpl: typeof fetch) =>
+    createGeminiProvider({ apiKey: 'K', model: 'm', embedModel: 'e', fetchImpl })
+
+  it('判定用のスキーマと maxOutputTokens を送る', async () => {
+    let body: Record<string, unknown> = {}
+    const f = vi.fn(async (_u: string, init?: RequestInit) => {
+      body = JSON.parse(String(init!.body))
+      return verdictOk([{ index: 0, status: 'ok' }, { index: 1, status: 'ok' }])
+    }) as unknown as typeof fetch
+
+    await provider(f).verify(claims, 4000)
+    const gc = body.generationConfig as Record<string, unknown>
+    expect(gc.maxOutputTokens).toBe(4000)
+    expect(gc.responseSchema).toEqual(toGeminiSchema(verdictJsonSchema()))
+    // ★ 事実の判定は揺らさない。生成（0.4）より低くする
+    expect(gc.temperature).toBe(0)
+  })
+
+  it('判定が返らなかった主張を ok にしない（unverifiable にする）', async () => {
+    // ★ 検証されていないものは「正しいと分かった」ではない。
+    //   ここを ok に倒すと、未検証の記述が配信される
+    const f = vi.fn(async () => verdictOk([{ index: 0, status: 'ok' }])) as unknown as typeof fetch
+    const r = await provider(f).verify(claims, 4000)
+    expect(r.verdicts.map(v => v.status)).toEqual(['ok', 'unverifiable'])
+    expect(r.verdicts[1]!.reason).toMatch(/判定を返しませんでした/)
+    expect(r.usage).toEqual({ inputTokens: 1200, outputTokens: 400 })
+  })
+
+  it('安全側の判定で止められたら落とす（黙って通さない）', async () => {
+    const f = vi.fn(async () => new Response(
+      JSON.stringify({ promptFeedback: { blockReason: 'SAFETY' } }), { status: 200 },
+    )) as unknown as typeof fetch
+    await expect(provider(f).verify(claims, 4000)).rejects.toThrow(/拒否/)
+  })
+
+  it('出力が上限で切れたら落とす', async () => {
+    const f = vi.fn(async () => new Response(JSON.stringify({
+      candidates: [{ content: { parts: [{ text: '{"verd' }] }, finishReason: 'MAX_TOKENS' }],
+    }), { status: 200 })) as unknown as typeof fetch
+    await expect(provider(f).verify(claims, 10)).rejects.toThrow(/MAX_TOKENS/)
+  })
+
+  it('主張が0件なら API を呼ばない', async () => {
+    const f = vi.fn(async () => verdictOk([])) as unknown as typeof fetch
+    const r = await provider(f).verify([], 4000)
+    expect(r.verdicts).toEqual([])
+    expect(f).not.toHaveBeenCalled()
   })
 })
 

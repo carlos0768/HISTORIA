@@ -1,14 +1,23 @@
 /**
- * Gemini プロバイダ（生成）
+ * Gemini プロバイダ（生成・検証）
  *
  * 仕様: docs/08-ai-architecture.md §1.1・§7
  *
  * ★ generativelanguage.googleapis.com を直接叩く。**Vertex AI は経由しない。**
- *   無料枠があるのは AI Studio 系のこの経路だけである（§1.1）。
+ *   もともとは無料枠が AI Studio 系のこの経路にしか無かったためだが（§1.1）、
+ *   2026-09-04 に課金枠へ移った後もこの経路のままにしている。
+ *
+ * ★ 生成と検証の**両方**を実装する。どちらに使うかは設定で決まる。
+ *   2026-09-04 に向きが「生成 Claude / 検証 Gemini」へ入れ替わった。
+ *   それまでここは生成専用で、verify() は必ず例外を投げていた。
+ *
+ * ★ 「自己検証への退化」を防ぐのはこのファイルの仕事ではない。
+ *   `client.ts` の `assertConfig` が生成と検証を別プロバイダに強制する。
+ *   **片方の口を塞いで防ぐと、向きを変えた瞬間に製品が動かなくなる**（実際になった）。
  */
-import type { Provider, GenerateArgs, GenerateResult, VerifyResult, Usage } from './types'
+import type { Provider, GenerateArgs, GenerateResult, VerifyResult, Claim, Verdict, Usage } from './types'
 import { fetchWithRetry, type Sleep } from './http'
-import { MaterialOutput, toGeminiSchema } from './schema'
+import { MaterialOutput, VerdictOutput, toGeminiSchema, verdictJsonSchema } from './schema'
 
 const BASE = 'https://generativelanguage.googleapis.com/v1beta'
 
@@ -45,6 +54,28 @@ export class SchemaViolationError extends Error {
     this.name = 'SchemaViolationError'
   }
 }
+
+export class GeminiVerifyFailedError extends Error {
+  constructor(readonly detail: string) {
+    super(`検証に失敗しました: ${detail}`)
+    this.name = 'GeminiVerifyFailedError'
+  }
+}
+
+/** 検証の指示。anthropic.ts の SYSTEM と同じ規準にする（判定がぶれないため） */
+const VERIFY_SYSTEM = `あなたは日本の大学受験世界史の事実確認を行う校閲者です。
+与えられた主張のひとつひとつについて、史実として正しいかを判定してください。
+
+# 判定
+- ok           … 史実として正しい
+- wrong        … 史実と食い違う。年号のずれ・主体の取り違え・因果の逆転を含む
+- unverifiable … 判定に必要な情報が主張の中に無い、または学説が分かれている
+
+# 守ること
+1. 確信が持てないものを ok にしない。迷ったら unverifiable にする
+2. wrong と判定したら、何がどう違うのかを reason に1文で書く
+3. 教材の文体や表現の good/bad は判定しない。事実の正誤だけを見る
+4. 入力の主張に含まれない前提を補って正しさを作らない`
 
 export function createGeminiProvider(o: GeminiOptions): Provider {
   const call = async (path: string, body: unknown): Promise<Response> =>
@@ -111,10 +142,60 @@ export function createGeminiProvider(o: GeminiOptions): Provider {
       return { value: check.data as unknown as T, usage, model: o.model }
     },
 
-    async verify(): Promise<VerifyResult> {
-      // 生成と検証は必ず別プロバイダにする（docs/08 §6）。
-      // 生成側で検証させると同一モデルの自己検証に退化する
-      throw new Error('gemini は検証に使わない設定です（docs/08 §2.1）')
+    async verify(claims: Claim[], maxOutputTokens: number): Promise<VerifyResult> {
+      if (claims.length === 0) {
+        return { verdicts: [], usage: { inputTokens: 0, outputTokens: 0 }, model: o.model }
+      }
+
+      const list = claims.map((c, i) => `${i}. [${c.type}] ${c.text}`).join('\n')
+
+      const res = await call(`/models/${o.model}:generateContent`, {
+        systemInstruction: { parts: [{ text: VERIFY_SYSTEM }] },
+        contents: [{ role: 'user', parts: [{ text: `次の主張を1件ずつ判定してください。\n\n${list}` }] }],
+        generationConfig: {
+          responseMimeType: 'application/json',
+          responseSchema: toGeminiSchema(verdictJsonSchema()),
+          maxOutputTokens,
+          // ★ 事実の判定なので揺らさない。生成（0.4）より低くする
+          temperature: 0,
+        },
+      })
+
+      const json = (await res.json()) as GeminiResponse
+      // ★ 安全側の判定で止められたものを「問題なし」として通さない。
+      //   検証できなかったのであって、正しいと分かったのではない
+      if (json.promptFeedback?.blockReason) {
+        throw new GeminiVerifyFailedError(`検証モデルが応答を拒否しました: ${json.promptFeedback.blockReason}`)
+      }
+      const finish = json.candidates?.[0]?.finishReason
+      if (finish && finish !== 'STOP') {
+        throw new GeminiVerifyFailedError(`finishReason=${finish}`)
+      }
+
+      const text = json.candidates?.[0]?.content?.parts?.map(p => p.text ?? '').join('') ?? ''
+      let parsed: unknown
+      try {
+        parsed = JSON.parse(text)
+      } catch {
+        throw new GeminiVerifyFailedError('判定を JSON として読めません')
+      }
+      const check = VerdictOutput.safeParse(parsed)
+      if (!check.success) throw new GeminiVerifyFailedError('判定がスキーマに適合しません')
+
+      // ★ 判定が返ってこなかった claim を「問題なし」として扱わない。
+      //   検証されていないものは unverifiable であって ok ではない
+      const byIndex = new Map(check.data.verdicts.map(v => [v.index, v]))
+      const verdicts: Verdict[] = claims.map((claim, i) => {
+        const v = byIndex.get(i)
+        if (!v) return { claim, status: 'unverifiable', reason: '検証モデルが判定を返しませんでした' }
+        return { claim, status: v.status, ...(v.reason ? { reason: v.reason } : {}) }
+      })
+
+      const usage: Usage = {
+        inputTokens: json.usageMetadata?.promptTokenCount ?? 0,
+        outputTokens: json.usageMetadata?.candidatesTokenCount ?? 0,
+      }
+      return { verdicts, usage, model: o.model }
     },
 
     async embed(texts: string[]) {
