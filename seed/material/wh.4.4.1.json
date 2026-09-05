@@ -485,10 +485,9 @@
       "section_ord": 3
     },
     {
-      "kind": "year",
-      "text": "ビスマルクが辞職したのは1890年です。",
+      "kind": "person",
+      "text": "ビスマルクは、ヴィルヘルム2世が新航路政策を掲げたのにともなって辞職しました。",
       "subject": "ビスマルク",
-      "year_from": 1890,
       "section_ord": 3
     },
     {
