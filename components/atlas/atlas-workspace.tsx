@@ -6,7 +6,7 @@ import {
   type KeyboardEvent, type PointerEvent as ReactPointerEvent, type WheelEvent,
 } from 'react'
 import type { Feature, GeoJsonProperties, Geometry } from 'geojson'
-import { geoGraticule10, geoOrthographic, geoPath } from 'd3-geo'
+import { geoGraticule10, geoInterpolate, geoOrthographic, geoPath } from 'd3-geo'
 import {
   formatHistoricalDate,
   type AtlasEvent, type AtlasPosition, type AtlasStory,
@@ -34,6 +34,11 @@ function primaryPosition(event: AtlasEvent): AtlasPosition | null {
     if (item.kind === 'route') return item.coordinates[item.coordinates.length - 1] ?? null
   }
   return null
+}
+
+/** 固有記事が無い出来事もあるため、完全一致なら記事へ、無ければ検索結果へ送る。 */
+export function wikipediaHref(event: Pick<AtlasEvent, 'label'>): string {
+  return `https://ja.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(event.label)}&go=Go`
 }
 
 function countryId(feature: Feature<Geometry, GeoJsonProperties>): string {
@@ -68,9 +73,11 @@ export function AtlasWorkspace({
   const [learningHref, setLearningHref] = useState(initialLearningHref)
   const [yearEvents, setYearEvents] = useState<AtlasEvent[]>([])
   const [yearTotal, setYearTotal] = useState(0)
+  const [yearSelectedId, setYearSelectedId] = useState<string | null>(null)
   const [year, setYear] = useState(initialYear ?? initialStory.heroYear)
   const [stepIndex, setStepIndex] = useState(Math.min(3, initialStory.steps.length - 1))
   const [playing, setPlaying] = useState(false)
+  const [focusRequest, setFocusRequest] = useState(0)
   const [query, setQuery] = useState('')
   const deferredQuery = useDeferredValue(query)
   const [flags, setFlags] = useState<FeatureFlags>({ route: true, point: true, area: true })
@@ -82,22 +89,19 @@ export function AtlasWorkspace({
   const eventById = useMemo(() => new Map(storyEvents.map(event => [event.id, event])), [storyEvents])
   const currentStep = story.steps[Math.min(stepIndex, story.steps.length - 1)]!
   const currentEvent = eventById.get(currentStep.eventId) ?? storyEvents[0]!
+  const nextStep = story.steps[stepIndex + 1]
+  const nextEvent = nextStep ? eventById.get(nextStep.eventId) ?? null : null
+  const trailPositions = useMemo(() => story.steps.slice(0, stepIndex + 1).flatMap(step => {
+    const event = eventById.get(step.eventId)
+    const position = event ? primaryPosition(event) : null
+    return position ? [position] : []
+  }), [eventById, stepIndex, story.steps])
   const visibleEvents = mode === 'story'
     ? story.steps.slice(0, stepIndex + 1).flatMap(step => {
       const event = eventById.get(step.eventId)
       return event ? [event] : []
     })
     : yearEvents.slice(0, 100)
-
-  useEffect(() => {
-    if (!playing || mode !== 'story') return
-    const step = story.steps[stepIndex]
-    const timer = window.setTimeout(() => {
-      if (stepIndex >= story.steps.length - 1) setPlaying(false)
-      else setStepIndex(index => index + 1)
-    }, step?.durationMs ?? 3600)
-    return () => window.clearTimeout(timer)
-  }, [mode, playing, stepIndex, story.steps])
 
   useEffect(() => {
     if (mode !== 'year') return
@@ -109,7 +113,11 @@ export function AtlasWorkspace({
         if (!response.ok) throw new Error(String(response.status))
         return response.json() as Promise<{ total: number; items: AtlasEvent[] }>
       })
-      .then(result => { setYearEvents(result.items); setYearTotal(result.total) })
+      .then(result => {
+        setYearEvents(result.items)
+        setYearTotal(result.total)
+        setYearSelectedId(result.items[0]?.id ?? null)
+      })
       .catch(error => { if (error instanceof Error && error.name !== 'AbortError') setYearEvents([]) })
     return () => controller.abort()
   }, [deferredQuery, mode, year])
@@ -138,6 +146,37 @@ export function AtlasWorkspace({
     if (filteredStories.some(item => item.id === story.id)) return
     void chooseStory(filteredStories[0]!.id)
   }, [chooseStory, filteredStories, mode, story.id])
+
+  const selectStoryStep = useCallback((index: number) => {
+    setStepIndex(index)
+    setPlaying(false)
+    setFocusRequest(value => value + 1)
+  }, [])
+
+  const advanceStory = useCallback(() => {
+    if (stepIndex >= story.steps.length - 2) {
+      setStepIndex(story.steps.length - 1)
+      setPlaying(false)
+    } else {
+      setStepIndex(stepIndex + 1)
+    }
+  }, [stepIndex, story.steps.length])
+
+  const togglePlaying = () => {
+    if (playing) {
+      setPlaying(false)
+      return
+    }
+    if (stepIndex >= story.steps.length - 1) setStepIndex(0)
+    setFocusRequest(0)
+    setPlaying(true)
+  }
+
+  const selectYearEvent = (id: string) => {
+    setYearSelectedId(id)
+    setFocusRequest(value => value + 1)
+  }
+  const activeYearEvent = yearEvents.find(event => event.id === yearSelectedId) ?? yearEvents[0]
 
   return (
     <div className="hs-atlas">
@@ -175,28 +214,34 @@ export function AtlasWorkspace({
       <main className="hs-atlas__stage">
         <AtlasGlobe
           countries={countries} events={visibleEvents} flags={flags}
-          activeEventId={mode === 'story' ? currentEvent.id : yearEvents[0]?.id}
-          mode={mode} playing={playing} onManual={() => setPlaying(false)}
+          activeEventId={mode === 'story' ? currentEvent.id : activeYearEvent?.id}
+          mode={mode} playing={playing} focusRequest={focusRequest}
+          trailPositions={mode === 'story' ? trailPositions : []}
+          nextPosition={mode === 'story' && nextEvent ? primaryPosition(nextEvent) : null}
+          travelDurationMs={nextStep?.durationMs ?? 3600}
+          onTravelEnd={advanceStory} onManual={() => setPlaying(false)}
         />
         {mode === 'story' ? (
           <Playback story={story} currentEvent={currentEvent} stepIndex={stepIndex} playing={playing}
-            onPlaying={setPlaying} onStep={index => { setStepIndex(index); setPlaying(false) }} />
+            onToggle={togglePlaying} onStep={selectStoryStep} />
         ) : <YearRail year={year} setYear={setYear} count={yearTotal} />}
       </main>
 
       <aside className="hs-atlas__detail" aria-live="polite">
         {mode === 'story' ? (
           <StoryDetail story={story} events={storyEvents} currentEvent={currentEvent} stepIndex={stepIndex}
-            flags={flags} setFlags={setFlags} onStep={index => { setStepIndex(index); setPlaying(false) }}
+            flags={flags} setFlags={setFlags} onStep={selectStoryStep}
             learningHref={learningHref} />
-        ) : <YearDetail events={yearEvents} flags={flags} setFlags={setFlags} />}
+        ) : <YearDetail events={yearEvents} selectedId={activeYearEvent?.id}
+          flags={flags} setFlags={setFlags} onSelect={selectYearEvent} />}
       </aside>
     </div>
   )
 }
 
 function AtlasGlobe({
-  countries, events, flags, activeEventId, mode, playing, onManual,
+  countries, events, flags, activeEventId, mode, playing, focusRequest,
+  trailPositions, nextPosition, travelDurationMs, onTravelEnd, onManual,
 }: {
   countries: AtlasCountries
   events: AtlasEvent[]
@@ -204,11 +249,17 @@ function AtlasGlobe({
   activeEventId?: string
   mode: Mode
   playing: boolean
+  focusRequest: number
+  trailPositions: AtlasPosition[]
+  nextPosition: AtlasPosition | null
+  travelDurationMs: number
+  onTravelEnd: () => void
   onManual: () => void
 }) {
   const [rotation, setRotation] = useState<[number, number, number]>(ATLANTIC_ROTATION)
   const [zoom, setZoom] = useState(1)
   const drag = useRef<{ x: number; y: number; rotation: [number, number, number] } | null>(null)
+  const [journeyPosition, setJourneyPosition] = useState<AtlasPosition | null>(null)
   const reducedMotion = useReducedMotion()
   const projection = useMemo(() => geoOrthographic().translate([WIDTH / 2, HEIGHT / 2])
     .scale(GLOBE_SCALE * zoom).clipAngle(90).precision(0.45).rotate(rotation), [rotation, zoom])
@@ -216,20 +267,51 @@ function AtlasGlobe({
   const activeEvent = events.find(event => event.id === activeEventId)
 
   useEffect(() => {
-    if (mode !== 'story' || !activeEvent) return
+    if (!activeEvent || (mode === 'year' && focusRequest === 0)) return
     const position = primaryPosition(activeEvent)
     if (!position) return
     const frame = window.requestAnimationFrame(() => {
       setRotation(targetRotation(position))
+      if (focusRequest > 0 && !playing) setZoom(1.38)
     })
     return () => window.cancelAnimationFrame(frame)
-  }, [activeEvent, mode])
+  }, [activeEvent, focusRequest, mode, playing])
+
+  // 再生中は現在地から次の出来事までを大円上で補間する。親の stepIndex は
+  // 区間の終端でだけ進め、線の先端と地球の中心は requestAnimationFrame で連続移動させる。
+  useEffect(() => {
+    if (!playing || mode !== 'story' || !activeEvent || !nextPosition) return
+    const from = primaryPosition(activeEvent)
+    if (!from) return
+    if (reducedMotion) {
+      const timer = window.setTimeout(onTravelEnd, travelDurationMs)
+      return () => window.clearTimeout(timer)
+    }
+    const interpolate = geoInterpolate(from, nextPosition)
+    let frame = 0
+    let zoomed = false
+    const startedAt = performance.now()
+    const tick = (now: number) => {
+      if (!zoomed) {
+        zoomed = true
+        setZoom(value => Math.max(value, 1.12))
+      }
+      const progress = Math.min(1, (now - startedAt) / travelDurationMs)
+      const position = interpolate(progress) as AtlasPosition
+      setJourneyPosition(position)
+      setRotation(targetRotation(position))
+      if (progress < 1) frame = window.requestAnimationFrame(tick)
+      else onTravelEnd()
+    }
+    frame = window.requestAnimationFrame(tick)
+    return () => window.cancelAnimationFrame(frame)
+  }, [activeEvent, mode, nextPosition, onTravelEnd, playing, reducedMotion, travelDurationMs])
 
   useEffect(() => {
-    if (mode !== 'year' || playing || reducedMotion) return
+    if (mode !== 'year' || playing || reducedMotion || focusRequest > 0) return
     const timer = window.setInterval(() => setRotation(([lambda, phi]) => [lambda + 0.18, phi, 0]), 60)
     return () => window.clearInterval(timer)
-  }, [mode, playing, reducedMotion])
+  }, [focusRequest, mode, playing, reducedMotion])
 
   const areas = useMemo(() => new Set(events.flatMap(event => event.features.flatMap(item =>
     item.kind === 'area' ? item.countryCodes : []))), [events])
@@ -237,6 +319,12 @@ function AtlasGlobe({
     item.kind === 'point' ? [{ event, feature: item, eventIndex, featureIndex }] : [])), [events])
   const routes = useMemo(() => events.flatMap(event => event.features.flatMap((item, featureIndex) =>
     item.kind === 'route' ? [{ event, feature: item, featureIndex }] : [])), [events])
+  const liveJourneyPosition = playing ? journeyPosition : null
+  const progressCoordinates = liveJourneyPosition ? [...trailPositions, liveJourneyPosition] : trailPositions
+  const progressPath = progressCoordinates.length < 2 ? null
+    : path({ type: 'LineString', coordinates: progressCoordinates })
+  const journeyProjected = liveJourneyPosition && isFrontFacing(liveJourneyPosition, rotation)
+    ? projection(liveJourneyPosition) : null
 
   const pointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
     onManual(); event.currentTarget.setPointerCapture(event.pointerId)
@@ -289,6 +377,10 @@ function AtlasGlobe({
             className={`hs-atlas-route${active ? ' is-active' : ''}${event.evidence.confidence === 'low' ? ' is-low' : ''}`}
             style={{ ['--route-index' as string]: index }} /> : null
         })}
+        {flags.route && progressPath && <path className="hs-atlas-progress" d={progressPath} />}
+        {journeyProjected && <circle className="hs-atlas-progress__head"
+          cx={journeyProjected[0]} cy={journeyProjected[1]} r="7"
+          data-longitude={liveJourneyPosition?.[0]} data-latitude={liveJourneyPosition?.[1]} />}
         {flags.point && points.map(({ event, feature, eventIndex, featureIndex }) => {
           if (!isFrontFacing(feature.coordinates, rotation)) return null
           const projected = projection(feature.coordinates)
@@ -308,14 +400,14 @@ function AtlasGlobe({
   )
 }
 
-function Playback({ story, currentEvent, stepIndex, playing, onPlaying, onStep }: {
+function Playback({ story, currentEvent, stepIndex, playing, onToggle, onStep }: {
   story: AtlasStory; currentEvent: AtlasEvent; stepIndex: number; playing: boolean
-  onPlaying: (value: boolean) => void; onStep: (value: number) => void
+  onToggle: () => void; onStep: (value: number) => void
 }) {
   return <section className="hs-atlas-playback" aria-label="物語の再生">
     <div className="hs-atlas-playback__buttons">
       <button type="button" disabled={stepIndex === 0} onClick={() => onStep(stepIndex - 1)}>◀　前へ</button>
-      <button type="button" className="is-primary" onClick={() => onPlaying(!playing)}>{playing ? '■　停止' : '▶　再生'}</button>
+      <button type="button" className="is-primary" onClick={onToggle}>{playing ? '■　停止' : '▶　再生'}</button>
       <button type="button" disabled={stepIndex === story.steps.length - 1} onClick={() => onStep(stepIndex + 1)}>次へ　▶</button>
     </div>
     <label className="hs-atlas-scrub"><span className="sr-only">物語の位置</span>
@@ -344,7 +436,10 @@ function StoryDetail({ story, events, currentEvent, stepIndex, flags, setFlags, 
   return <>
     <section className="hs-atlas-evidence">
       <div><span>信頼度</span><strong className={`is-${currentEvent.evidence.confidence}`}>{CONFIDENCE_LABEL[currentEvent.evidence.confidence]}</strong></div>
-      <a href={source.url} target="_blank" rel="noreferrer">出典 ↗</a>
+      <div className="hs-atlas-evidence__links">
+        <a href={wikipediaHref(currentEvent)} target="_blank" rel="noreferrer">Wikipedia ↗</a>
+        <a href={source.url} target="_blank" rel="noreferrer">出典 ↗</a>
+      </div>
       <p>{CONFIDENCE_DETAIL[currentEvent.evidence.confidence]}</p>
     </section>
     <FeatureSwitches flags={flags} setFlags={setFlags} />
@@ -376,16 +471,25 @@ function YearRail({ year, setYear, count }: { year: number; setYear: (year: numb
   </section>
 }
 
-function YearDetail({ events, flags, setFlags }: { events: AtlasEvent[]; flags: FeatureFlags; setFlags: (next: FeatureFlags) => void }) {
-  return <><FeatureSwitches flags={flags} setFlags={setFlags} />
+function YearDetail({ events, selectedId, flags, setFlags, onSelect }: {
+  events: AtlasEvent[]; selectedId?: string; flags: FeatureFlags
+  setFlags: (next: FeatureFlags) => void; onSelect: (id: string) => void
+}) {
+  const selected = events.find(event => event.id === selectedId) ?? events[0]
+  return <>{selected && <div className="hs-atlas-year-heading">
+      <strong>{selected.label}</strong>
+      <a href={wikipediaHref(selected)} target="_blank" rel="noreferrer">Wikipedia ↗</a>
+    </div>}
+    <FeatureSwitches flags={flags} setFlags={setFlags} />
     <p className="hs-atlas-note">一度に描くのは最大100件です。低信頼度も「要検証」として表示します。</p>
     <section className="hs-atlas-steps hs-atlas-steps--year"><h2>この年代の出来事 <small>（{events.length}件）</small></h2>
       {events.length === 0 ? <p className="hs-atlas-empty">この年に表示できる出来事はありません。</p> : <ol>
         {events.slice(0, 100).map((event, index) => <li key={event.id}>
-          <div className={`hs-atlas-event-row is-${event.evidence.confidence}`}>
+          <button type="button" onClick={() => onSelect(event.id)}
+            className={`hs-atlas-event-row is-${event.evidence.confidence}${event.id === selected?.id ? ' is-active' : ''}`}>
             <span>{index + 1}</span><strong>{event.label}</strong><time>{formatHistoricalDate(event.start)}</time>
             <small>{CONFIDENCE_LABEL[event.evidence.confidence]} ・ {event.summary}</small>
-          </div>
+          </button>
         </li>)}
       </ol>}
     </section>

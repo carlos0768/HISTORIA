@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import type { AtlasEvent, AtlasStory } from '@/lib/atlas/schema'
-import { AtlasWorkspace } from './atlas-workspace'
+import { AtlasWorkspace, wikipediaHref } from './atlas-workspace'
 
 const story = (name: string): AtlasStory =>
   JSON.parse(readFileSync(`seed/atlas/stories/${name}.json`, 'utf8')) as AtlasStory
@@ -82,5 +82,59 @@ describe('歴史地球儀の物語検索', () => {
     expect(container.querySelector<HTMLSelectElement>('.hs-atlas-select select')?.value)
       .toBe('story.industrial-revolution-spread')
     expect(container.querySelector('.hs-atlas-steps li strong')?.textContent).toBe('紡績を機械化')
+  })
+
+  it('出来事を押すと地点へズームし、右上に Wikipedia 導線を出す', async () => {
+    await act(async () => {
+      root.render(<AtlasWorkspace
+        stories={[columbus, industrial]}
+        initialStory={columbus}
+        initialEvents={eventsOf(columbus)}
+        initialLearningHref="/drills/new?unit=wh.3.5.1"
+        countries={[]}
+      />)
+    })
+    const ocean = container.querySelector<SVGCircleElement>('.hs-atlas-globe__ocean')!
+    expect(ocean.getAttribute('r')).toBe('300')
+
+    await act(async () => {
+      container.querySelector<HTMLButtonElement>('.hs-atlas-steps li button')!.click()
+      await new Promise(resolve => setTimeout(resolve, 30))
+    })
+
+    expect(Number(ocean.getAttribute('r'))).toBeCloseTo(414)
+    const link = container.querySelector<HTMLAnchorElement>('.hs-atlas-evidence__links a')!
+    expect(link.textContent).toContain('Wikipedia')
+    expect(link.href).toBe(wikipediaHref(eventsOf(columbus)[0]!))
+  })
+
+  it('再生中はステップの途中でも進行点を連続して動かす', async () => {
+    vi.mocked(window.matchMedia).mockReturnValue({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    } as unknown as MediaQueryList)
+    await act(async () => {
+      root.render(<AtlasWorkspace
+        stories={[columbus, industrial]}
+        initialStory={columbus}
+        initialEvents={eventsOf(columbus)}
+        initialLearningHref="/drills/new?unit=wh.3.5.1"
+        countries={[]}
+      />)
+    })
+
+    act(() => container.querySelector<HTMLButtonElement>('.hs-atlas-playback .is-primary')!.click())
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 80)) })
+    const first = container.querySelector<SVGCircleElement>('.hs-atlas-progress__head')
+      ?.getAttribute('data-longitude')
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 100)) })
+    const second = container.querySelector<SVGCircleElement>('.hs-atlas-progress__head')
+      ?.getAttribute('data-longitude')
+
+    expect(first).toBeTruthy()
+    expect(second).toBeTruthy()
+    expect(second).not.toBe(first)
+    expect(container.querySelector('.hs-atlas-scrub span:last-child')?.textContent).toBe('4 / 7')
   })
 })

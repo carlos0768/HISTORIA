@@ -7,8 +7,6 @@ import { recordRead, type ReadResult } from '@/lib/loop/material'
 import { reportContent, type ReportTarget } from '@/lib/loop/report'
 import { recordView, retrievalAfterVideo, type RetrievalItem } from '@/lib/loop/video'
 import { submitAnswer } from '@/lib/loop/answer'
-import { runResearch } from '@/lib/loop/research-service'
-import type { ResearchResponse } from '@/lib/loop/research'
 
 /**
  * セクションの読了を記録する。
@@ -122,16 +120,4 @@ export async function answerRetrieval(input: {
     chosen: input.chosen, latencyMs: input.latencyMs, now: new Date(),
   })
   return { correct: r.correct, explanation: r.explanation }
-}
-
-/**
- * 教材の中の「調べる」（docs/11-ux.md §4.1）
- *
- * ★ 中身は lib/loop/research-service.ts の runResearch にある。
- *   専用ページ（/research）と同じ入口を通し、文言も上限もここでは決めない。
- */
-export async function researchTextbook(rawQuery: string): Promise<ResearchResponse> {
-  const userId = await currentUserId()
-  if (!userId) throw new Error('ユーザーが特定できません')
-  return runResearch(sql(), typeof rawQuery === 'string' ? rawQuery : '', { userId })
 }
