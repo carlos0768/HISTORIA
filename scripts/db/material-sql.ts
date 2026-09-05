@@ -79,13 +79,25 @@ for (const unitId of files) {
   say('')
   say(`-- ${unitId}  ${m.title}  ${chars}字`)
   // 同じ単元の共有教材で配信中のものを退ける（一意索引に触れないため）
+  //
+  // ★ **2文に分ける。1文にまとめてはいけない。** 同じ文の中の CTE は同じ
+  //   スナップショットを見るので、UPDATE で退けたことが INSERT からは見えず、
+  //   material_one_shared_ready_per_unit に当たって落ちる（実測）。
   say(`UPDATE material SET status = 'superseded'`)
   say(`  WHERE unit_id = ${lit(unitId)} AND status = 'ready' AND user_id IS NULL;`)
+  // ★ いま退けた版を supersedes_id に控える。どの版がどれを置き換えたかが
+  //   残らないと、誤りの報告が来たときに「いつ入れ替わったか」を追えない。
+  //   lib/loop/approve.ts は承認の経路で同じことをしている。ここだけ空だと
+  //   来歴が経路によって欠ける。初回投入では該当が無いので NULL になる。
+  const supersedes =
+    `(SELECT id FROM material WHERE unit_id = ${lit(unitId)} AND user_id IS NULL` +
+    ` AND status = 'superseded' ORDER BY generated_at DESC, id DESC LIMIT 1)`
   say(`INSERT INTO material (id, user_id, unit_id, title, provider, model, prompt_version,`)
-  say(`                      status, input_tokens, output_tokens, generated_at, human_edit_log)`)
+  say(`                      status, input_tokens, output_tokens, generated_at, human_edit_log,`)
+  say(`                      supersedes_id)`)
   say(`  VALUES (${lit(materialId)}, NULL, ${lit(unitId)}, ${lit(m.title)}, ${lit(PROVIDER)},`)
   say(`          ${lit(MODEL)}, ${lit(MATERIAL_PROMPT_VERSION)}, 'ready', 0, 0, now(),`)
-  say(`          ${editLog});`)
+  say(`          ${editLog}, ${supersedes});`)
   materials++
 
   for (const s of m.sections) {
