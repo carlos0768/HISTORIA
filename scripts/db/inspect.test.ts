@@ -154,7 +154,9 @@ dbSuite('実DBを読む', () => {
     expect(r.missingTables).toEqual([])
     expect(r.missingColumns).toEqual([])
     expect(r.verdict).toBe('complete')
-    expect(r.expectedTables).toBe(44)
+    // ★ docs/schema.sql の表の数。歴史地球儀の atlas_* 7表が入って 44 → 51。
+    //   固定値にしてあるのは、表が増えたことに誰も気づかないまま進むのを防ぐためである。
+    expect(r.expectedTables).toBe(51)
   })
 
   it('seed を入れていなければ行数は全部0', async () => {
@@ -235,6 +237,6 @@ dbSuite('実DBを読む', () => {
     await inspect(db)
     expect(await snapshot()).toEqual(before)
     // 表そのものも増減していない
-    expect(Object.keys(before)).toHaveLength(44)
+    expect(Object.keys(before)).toHaveLength(51)
   })
 })
