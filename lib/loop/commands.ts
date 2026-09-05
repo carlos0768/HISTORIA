@@ -28,7 +28,7 @@ export const SCREEN_COMMANDS: readonly Command[] = [
   { id: 's.study', label: '今日の出題', kind: '移動', href: '/study', keywords: 'とく 問題' },
   { id: 's.drills', label: '集中特訓の一覧', kind: '移動', href: '/drills' },
   { id: 's.new', label: '範囲と締切を決める', kind: '移動', href: '/drills/new', keywords: 'あたらしい' },
-  { id: 's.records', label: '記録', kind: '移動', href: '/records', keywords: '弱点 連続' },
+  { id: 's.textbook', label: '教科書', kind: '移動', href: '/textbook', keywords: '本文 文章 読む 章' },
   { id: 's.library', label: '教材の一覧', kind: '移動', href: '/library' },
   { id: 's.timeline', label: '年表と地図', kind: '移動', href: '/timeline' },
   { id: 's.map', label: '地図', kind: '移動', href: '/map' },

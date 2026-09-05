@@ -7,6 +7,7 @@ import { createUser, createMaterial } from './fixture'
 import { materialLibrary, MATERIAL_STATUSES, LIBRARY_LIMIT } from './library'
 import { timeline, formatYear, formatSpan, TIMELINE_LIMIT } from './timeline'
 import { commandsFor, SCREEN_COMMANDS, MAX_COMMANDS } from './commands'
+import { textbookChapters } from './textbook'
 
 /**
  * デスクトップの画面が読むもの（docs/06-desktop.md）
@@ -32,7 +33,7 @@ describe('年の見せ方', () => {
 describe('画面への移動', () => {
   it('主要な画面が全部さがせる', () => {
     const hrefs = SCREEN_COMMANDS.map(c => c.href)
-    for (const h of ['/', '/study', '/drills', '/records', '/library', '/timeline', '/map', '/research', '/settings']) {
+    for (const h of ['/', '/study', '/drills', '/textbook', '/library', '/timeline', '/map', '/research', '/settings']) {
       expect(hrefs, `${h} がさがせない`).toContain(h)
     }
   })
@@ -176,6 +177,38 @@ dbSuite('デスクトップの画面（実DB）', () => {
 
     it('上限を守る', async () => {
       expect(LIBRARY_LIMIT).toBeLessThanOrEqual(500)
+    })
+  })
+
+  describe('教科書', () => {
+    it('読める文章を章ごと・節順にまとめる', async () => {
+      const first = await createMaterial(db, { userId, unitId: UNIT })
+      const second = await createMaterial(db, { userId, unitId: 'wh.2.1.2' })
+      await db`UPDATE material SET title = '最初の文章' WHERE id = ${first}`
+      await db`UPDATE material SET title = '次の文章' WHERE id = ${second}`
+
+      const chapters = await textbookChapters(db, userId)
+      expect(chapters).toHaveLength(1)
+      expect(chapters[0]!.label).toBeTruthy()
+      expect(chapters[0]!.articles.map(a => a.materialId)).toEqual([first, second])
+    })
+
+    it('同じ節では共有版より個人版を優先し、他人の個別版は出さない', async () => {
+      const shared = await createMaterial(db, { userId: null, unitId: UNIT })
+      const personal = await createMaterial(db, { userId, unitId: UNIT })
+      const other = await createUser(db, NOW)
+      await createMaterial(db, { userId: other, unitId: 'wh.2.1.2' })
+
+      const articles = (await textbookChapters(db, userId)).flatMap(c => c.articles)
+      expect(articles.map(a => a.materialId)).toContain(personal)
+      expect(articles.map(a => a.materialId)).not.toContain(shared)
+      expect(articles).toHaveLength(1)
+    })
+
+    it('ready 以外の文章は教科書に出さない', async () => {
+      await createMaterial(db, { userId, unitId: UNIT, status: 'generating' })
+      await createMaterial(db, { userId, unitId: 'wh.2.1.2', status: 'blocked' })
+      expect(await textbookChapters(db, userId)).toEqual([])
     })
   })
 

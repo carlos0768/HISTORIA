@@ -40,6 +40,23 @@ body { margin: 0; background: var(--lv-canvas); }
    押し下げる余地が無く、タブが画面の途中で止まる（375×812 で実測）。 */
 .hs-shell__main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 
+/* モバイルの主要ナビは常に画面下へ固定する。
+   fixed は通常フローから外れるので、本体末尾に同じ高さの余白を確保し、
+   最後のボタンや文章がタブバーの裏へ潜らないようにする。 */
+@media (max-width: 1439px) {
+  .hs-shell__main {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+  .hs-shell .lv-tabbar {
+    position: fixed; z-index: 40;
+    left: 50%; bottom: 0; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    box-sizing: border-box;
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--lv-paper);
+  }
+}
+
 @media (min-width: 1440px) {
   .hs-shell {
     flex-direction: row;
@@ -163,6 +180,34 @@ body { margin: 0; background: var(--lv-canvas); }
   display: flex; flex-direction: column; gap: var(--lv-space-2);
   padding: 10px 0; border-top: var(--lv-hairline);
 }
+
+/* ---- 特訓の学習方法とカード学習 ---- */
+.hs-study-modes,
+.hs-study-session,
+.hs-flashcard { display: flex; flex-direction: column; gap: var(--lv-space-3); }
+.hs-flashcard__answer {
+  padding: var(--lv-space-3) 0;
+  border-top: var(--lv-hairline); border-bottom: var(--lv-hairline);
+}
+.hs-flashcard__answer > * { margin: 0; }
+.hs-rating-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--lv-space-2); }
+
+/* ---- 教科書。章と文章だけを静かに並べ、集計用のカードにはしない ---- */
+.hs-textbook { display: flex; flex-direction: column; gap: var(--lv-space-6); }
+.hs-textbook__chapter { display: flex; flex-direction: column; gap: var(--lv-space-2); }
+.hs-textbook__chapter .lv-heading { margin: 0; }
+.lv-root .hs-textbook__article { text-decoration: none; }
+.hs-textbook__article > :first-child {
+  display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 2px;
+}
+
+/* ---- ページ遷移中 ---- */
+.hs-route-loading { display: flex; flex-direction: column; gap: var(--lv-space-3); }
+.hs-route-loading__line {
+  display: block; width: 100%; height: 12px;
+  border: var(--lv-hairline); background: var(--lv-canvas);
+}
+.hs-route-loading__line--short { width: 62%; }
 
 /* ---- 教材の本文（app/material/[id]） ---- */
 .hs-prose { display: flex; flex-direction: column; gap: var(--lv-space-3); }

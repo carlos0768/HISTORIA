@@ -13,7 +13,7 @@
  * 何をオフラインで動かすか（ここが設計の中心）
  *
  *   教材を読む        … できる。電車で読むのが本来の使い方
- *   記録・弱点を見る  … できる（最後に見た状態）
+ *   教科書を見る      … できる（最後に見た状態）
  *   問題を解く        … **させない**
  *
  * 出題をオフラインで動かすには answer_key を端末に置くことになる。
@@ -29,7 +29,8 @@
  * ────────────────────────────────────────────────
  */
 
-const VERSION = 'v1'
+// キャッシュ対象やシェルのCSSを変えたら上げる。古い固定フッターを残さない。
+const VERSION = 'v2'
 const SHELL = `historia-shell-${VERSION}`   // /offline とアイコン
 const PAGES = `historia-pages-${VERSION}`   // 個人の内容を含む頁。ログアウトで消す
 const STATIC = `historia-static-${VERSION}` // _next/static。内容ハッシュ付きで不変
@@ -51,7 +52,7 @@ const NEVER_CACHE = ['/study', '/checktest']
  * オフラインで開ける頁。**列挙する**。既定はキャッシュしないである。
  * 「他は全部入れる」にすると、新しい画面を足したときに黙って混ざる。
  */
-const CACHEABLE = ['/material', '/records']
+const CACHEABLE = ['/material', '/textbook']
 
 const startsWithAny = (path, list) =>
   list.some(p => path === p || path.startsWith(`${p}/`))
@@ -88,7 +89,7 @@ self.addEventListener('activate', event => {
 /**
  * 個人の内容を消す。
  *
- * ★ 共用端末に他人の教材と記録を残さない。
+ * ★ 共用端末に他人の教材と教科書一覧を残さない。
  *   引き金は「ログアウト」だけではない。session が切れた場合も同じ危険がある。
  *   保護された経路は未認証だと **404 になる**（docs/10 G2）ので、
  *   404 を消去の合図として使う。これでログアウト・session 切れ・

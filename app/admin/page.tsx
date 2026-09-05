@@ -23,8 +23,7 @@ export const dynamic = 'force-dynamic'
  *   /login へ飛ばすと「管理画面が在る」ことを教えてしまう。
  *   `ADMIN_USER_ID` が未設定なら誰も入れない（lib/auth/admin.ts。既定は閉）。
  *
- * ★ タブには足さない。components/nav.test.ts が3タブを固定しており、
- *   あれは「増やすな」という意図の防壁である。入口は設定画面からの条件付きリンク。
+ * ★ 管理者以外にも見える主要タブには足さない。入口は設定画面からの条件付きリンク。
  */
 const yen = (n: number) => `${Math.round(n).toLocaleString('ja-JP')} 円`
 const pct = (n: number) => `${(n * 100).toFixed(1)}%`

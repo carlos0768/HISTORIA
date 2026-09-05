@@ -203,7 +203,7 @@ export type UnitMaterial = {
 
 /**
  * 特訓の範囲に対する教材の状態を一覧する。
- * 「生成中」「配信不可」を隠さずホームに出すために使う（docs/08 §5 層5）。
+ * drill の所有者も同時に検査し、他人の特訓IDから単元名を引けないようにする。
  */
 export async function drillMaterials(db: Sql, userId: string, drillId: string): Promise<UnitMaterial[]> {
   const rows = await db<{
@@ -221,6 +221,7 @@ export async function drillMaterials(db: Sql, userId: string, drillId: string): 
                     ), 0) AS read_count,
            COALESCE((SELECT count(*) FROM material_section s WHERE s.material_id = m.id), 0) AS section_count
       FROM drill_unit du
+      JOIN drill d ON d.id = du.drill_id AND d.user_id = ${userId}
       JOIN syllabus_unit u ON u.id = du.unit_id
       LEFT JOIN LATERAL (
         SELECT x.* FROM material x
