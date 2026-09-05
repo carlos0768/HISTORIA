@@ -305,7 +305,7 @@ psql -d historia -v ON_ERROR_STOP=1 -f docs/schema.sql
 | `item (user_id) WHERE user_id IS NOT NULL` / `item_diagnostic_pool` | 個人の設問プールと診断プールの引き当て |
 | `generation_job (status, created_at) WHERE status IN ('queued','running')` | 同時実行数のカウント（`08-ai-architecture.md` §7） |
 | `item_kc (kc_id)` / `material_section_kc (kc_id)` / `video_kc (kc_id, relevance DESC)` | KC からの逆引き。すべての「関連◯◯を出す」導線 |
-| `kc USING hnsw (embedding)` / `canon_event USING hnsw (embedding)` / `video USING hnsw (embedding)` | 近傍検索（KC 分類・動画の対応付け・教材の中の「調べる」） |
+| `kc USING hnsw (embedding)` / `canon_event USING hnsw (embedding)` / `material_section USING hnsw (embedding)` / `video USING hnsw (embedding)` | 近傍検索（KC 分類・動画の対応付け・「調べる」） |
 | `content_report (status) WHERE status = 'open'` | 未処理の誤り報告 |
 
 ## 10. 命名規則

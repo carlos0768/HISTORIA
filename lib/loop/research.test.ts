@@ -3,10 +3,14 @@ import type { Sql } from 'postgres'
 import { createTestDb, TEST_DB_URL } from '@/lib/db/test-helper'
 import { seedMasters, SEED_DIR } from '@/scripts/db/seed'
 import { createClient, readConfig } from '@/lib/ai/client'
+import { runResearch } from './research-service'
 import {
   parseQuery, likePattern, toVectorLiteral, rankHits, research, embedMissing, embedCoverage,
-  embedTextOfEvent, QUERY_MAX_CHARS, EMBED_DIMENSIONS, type ResearchHit,
+  embedTextOfEvent, embedTextOfSection, plainText, snippetOf,
+  QUERY_MAX_CHARS, EMBED_DIMENSIONS, SECTION_EMBED_CHARS, type ResearchHit,
 } from './research'
+import { createUser, createMaterial } from './fixture'
+import { randomUUID } from 'node:crypto'
 
 describe('検索語の扱い', () => {
   it('前後と連続する空白を整える', () => {
@@ -62,6 +66,27 @@ describe('埋め込みにかける文', () => {
     expect(embedTextOfEvent({ label: 'フビライの即位', aliases: ['クビライ'] })).toBe('フビライの即位（クビライ）')
     expect(embedTextOfEvent({ label: 'ハンムラビ法典', aliases: [] })).toBe('ハンムラビ法典')
   })
+  it('節は見出し＋本文。記法を落とし、入力上限に収める', () => {
+    const t = embedTextOfSection({ heading: '統一', bodyMd: '## 小見出し\n\n**アッシリア**が統一した。\n\n- 鉄器' })
+    expect(t).toBe('統一\n小見出し アッシリアが統一した。 鉄器')
+    expect(embedTextOfSection({ heading: 'h', bodyMd: 'あ'.repeat(5000) }).length).toBe(SECTION_EMBED_CHARS)
+  })
+})
+
+describe('本文の抜き書き', () => {
+  it('記法を落とす', () => {
+    expect(plainText('### 見出し\n\n**強調**と\n- 箇条書き')).toBe('見出し 強調と 箇条書き')
+  })
+  it('一致した箇所の前後を切り出し、無ければ先頭を出す', () => {
+    const body = 'あ'.repeat(100) + 'ハンムラビ法典' + 'い'.repeat(200)
+    const s = snippetOf(body, 'ハンムラビ')
+    expect(s).toContain('ハンムラビ法典')
+    expect(s.startsWith('…')).toBe(true)
+    expect(s.endsWith('…')).toBe(true)
+    expect(s.length).toBeLessThan(160)
+    expect(snippetOf('短い本文', '無い語')).toBe('短い本文')
+    expect(snippetOf('あ'.repeat(300), '無い語').endsWith('…')).toBe(true)
+  })
 })
 
 const dbSuite = TEST_DB_URL ? describe : describe.skip
@@ -103,45 +128,128 @@ dbSuite('教材の中の「調べる」（実DB）', () => {
   afterAll(async () => { await drop() })
 
   it('語の一致だけで引ける（ベクトルが無くても止まらない）', async () => {
-    const hits = await research(db, { query: 'ウマイヤ', vector: null })
+    const { hits } = await research(db, { query: 'ウマイヤ', vector: null })
     expect(hits.map(h => h.id)).toEqual(['kc.islam.umayyad_vs_abbasid', 'ce.umayyad'])
     expect(hits.every(h => h.textMatch && h.similarity === null)).toBe(true)
   })
 
   it('別名でも当たる', async () => {
-    const hits = await research(db, { query: '始皇帝', vector: null })
+    const { hits } = await research(db, { query: '始皇帝', vector: null })
     expect(hits.map(h => h.id)).toEqual(['ce.qin'])
   })
 
   it('退役した KC は出さない', async () => {
-    const hits = await research(db, { query: '退役', vector: null })
+    const { hits } = await research(db, { query: '退役', vector: null })
     expect(hits).toEqual([])
   })
 
   it('年代・地域・教科書の節を持ち帰る（画面が年表と地図に置くため）', async () => {
-    const [kc] = await research(db, { query: 'ウマイヤ朝とアッバース朝', vector: null })
+    const [kc] = (await research(db, { query: 'ウマイヤ朝とアッバース朝', vector: null })).hits
     expect(kc).toMatchObject({
       kind: 'kc', kcKind: 'distinction', yearFrom: 661, yearTo: 1258, precision: 'century',
       unitLabels: [expect.any(String)],
     })
     // 主地域が先頭
     expect(kc!.regionIds).toEqual([11, 10])
-    const [ev] = await research(db, { query: 'ハンムラビ', vector: null })
+    const [ev] = (await research(db, { query: 'ハンムラビ', vector: null })).hits
     expect(ev).toMatchObject({ kind: 'event', yearFrom: -1750, yearTo: null, regionIds: [10] })
   })
 
   it('% を打っても全件にならない', async () => {
-    expect(await research(db, { query: '%', vector: null })).toEqual([])
+    expect(await research(db, { query: '%', vector: null })).toEqual({ sections: [], hits: [] })
   })
 
   it('空の語は空を返す', async () => {
-    expect(await research(db, { query: '  ', vector: null })).toEqual([])
+    expect(await research(db, { query: '  ', vector: null })).toEqual({ sections: [], hits: [] })
   })
 
   it('埋め込みの充足率を数える', async () => {
     const c = await embedCoverage(db)
     expect(c.kc).toEqual({ total: 1, embedded: 0 })
     expect(c.canonEvent).toEqual({ total: 4, embedded: 0 })
+  })
+
+  /**
+   * ★ 参照元の主役は教科書（教材の節）。見出しと本文を語で引き、
+   *   年代と地域は節に付いた KC から取る。他人の個別教材と伏せた節は出さない。
+   */
+  describe('教材の節', () => {
+    let me: string, other: string
+    let shared: string, mine: string, theirs: string
+    const addSection = async (materialId: string, ord: number, heading: string, body: string, kc = true, hidden = false) => {
+      const id = randomUUID()
+      await db`INSERT INTO material_section (id, material_id, ord, heading, body_md, char_count, hidden)
+               VALUES (${id}, ${materialId}, ${ord}, ${heading}, ${body}, ${body.length}, ${hidden})`
+      if (kc) await db`INSERT INTO material_section_kc (section_id, kc_id) VALUES (${id}, 'kc.islam.umayyad_vs_abbasid')`
+      return id
+    }
+    beforeAll(async () => {
+      const now = new Date()
+      me = await createUser(db, now); other = await createUser(db, now)
+      shared = await createMaterial(db, { userId: null, unitId: 'wh.2.4.1' })
+      mine = await createMaterial(db, { userId: me, unitId: 'wh.2.4.1' })
+      theirs = await createMaterial(db, { userId: other, unitId: 'wh.2.4.1' })
+      await addSection(shared, 1, 'イスラーム世界の成立', '## 成立\n\n**ウマイヤ朝**はダマスクスを都とした。')
+      await addSection(shared, 2, '伏せた節', 'ウマイヤ朝の秘密', true, true)
+      await addSection(mine, 1, '私の節', 'ウマイヤ朝について私向けに書いた。', false)
+      await addSection(theirs, 1, '他人の節', 'ウマイヤ朝について他人向けに書いた。')
+    }, 60_000)
+
+    it('本文の語で当たり、年代と地域は KC から取り、抜き書きを付ける', async () => {
+      const { sections } = await research(db, { query: 'ダマスクス', vector: null, userId: me })
+      expect(sections).toHaveLength(1)
+      const s = sections[0]!
+      expect(s).toMatchObject({
+        kind: 'section', label: 'イスラーム世界の成立', textMatch: true,
+        yearFrom: 661, yearTo: 1258, regionIds: [11, 10], unitLabels: [expect.any(String)],
+      })
+      expect(s.section).toMatchObject({ materialId: shared, ord: 1, materialTitle: '教材' })
+      expect(s.section!.snippet).toContain('ダマスクス')
+      expect(s.section!.snippet).not.toContain('**')
+    })
+
+    it('共有と自分の教材は出るが、他人の個別教材と伏せた節は出ない', async () => {
+      const { sections } = await research(db, { query: 'ウマイヤ朝', vector: null, userId: me })
+      const ids = sections.map(s => s.section!.materialId)
+      expect(ids).toContain(shared)
+      expect(ids).toContain(mine)
+      expect(ids).not.toContain(theirs)
+      expect(sections.map(s => s.label)).not.toContain('伏せた節')
+      // userId 無し（未指定）なら共有だけ
+      const anon = await research(db, { query: 'ウマイヤ朝', vector: null })
+      expect(anon.sections.map(s => s.section!.materialId)).toEqual([shared])
+    })
+
+    it('KC の付いていない節は年代なし・地域なしで出る', async () => {
+      const { sections } = await research(db, { query: '私向け', vector: null, userId: me })
+      expect(sections[0]).toMatchObject({ label: '私の節', yearFrom: null, yearTo: null, regionIds: [] })
+    })
+
+    it('充足率に節も数える（配信中で伏せていないものだけ）', async () => {
+      const c = await embedCoverage(db)
+      expect(c.section).toEqual({ total: 3, embedded: 0 })
+    })
+  })
+
+  /**
+   * 入口（教材のパネルと /research が共有する）。
+   * ★ 鍵が無ければ語の一致だけで引き、**理由を文にして返す**。黙って減らさない。
+   */
+  it('入口: 鍵が無ければ語の一致だけで引き、そう言う', async () => {
+    const client = createClient(readConfig({} as unknown as NodeJS.ProcessEnv))
+    const r = await runResearch(db, ' ウマイヤ ', { client })
+    expect(r.ok).toBe(true)
+    if (!r.ok) return
+    expect(r.query).toBe('ウマイヤ')
+    expect(r.mode).toBe('text')
+    expect(r.note).toMatch(/鍵が無い/)
+    expect(r.hits.map(h => h.id)).toEqual(['kc.islam.umayyad_vs_abbasid', 'ce.umayyad'])
+  })
+
+  it('入口: 空や長すぎる語は理由つきで断る', async () => {
+    const client = createClient(readConfig({} as unknown as NodeJS.ProcessEnv))
+    expect(await runResearch(db, '', { client })).toMatchObject({ ok: false })
+    expect(await runResearch(db, 'あ'.repeat(QUERY_MAX_CHARS + 1), { client })).toMatchObject({ ok: false })
   })
 })
 
@@ -161,11 +269,23 @@ vectorSuite('近傍検索（pgvector）', () => {
     await db`
       INSERT INTO kc (id, label, kind, exam_weight, embedding) VALUES
         ('kc.a', '知識A', 'fact', 1.0, ${toVectorLiteral(unit(1))}::vector)`
+    // 教材の節も近傍で引ける。埋め込みが unit(0) なので ce.a と同じ近さ
+    const m = await createMaterial(db, { userId: null, unitId: 'wh.2.1.1' })
+    await db`INSERT INTO material_section (id, material_id, ord, heading, body_md, char_count, embedding)
+             VALUES (${randomUUID()}, ${m}, 1, '節A', '本文', 2, ${toVectorLiteral(unit(0))}::vector)`
+    await db`INSERT INTO material_section (id, material_id, ord, heading, body_md, char_count)
+             VALUES (${randomUUID()}, ${m}, 2, '節B（埋め込み無し）', '本文', 2)`
   }, 120_000)
   afterAll(async () => { await drop() })
 
+  it('教材の節も近傍で引ける', async () => {
+    const { sections } = await research(db, { query: 'なにか', vector: unit(0) })
+    expect(sections.map(s => s.label)).toEqual(['節A'])
+    expect(sections[0]!.similarity).toBeCloseTo(1, 5)
+  })
+
   it('類似度の高い順に返し、類似度を隠さない', async () => {
-    const hits = await research(db, { query: 'なにか', vector: unit(0) })
+    const { hits } = await research(db, { query: 'なにか', vector: unit(0) })
     // 類似度 0 の2件（ce.c と kc.a）は年代のある方が先
     expect(hits.map(h => h.id)).toEqual(['ce.a', 'ce.b', 'ce.c', 'kc.a'])
     expect(hits[0]!.similarity).toBeCloseTo(1, 5)
@@ -176,21 +296,21 @@ vectorSuite('近傍検索（pgvector）', () => {
   })
 
   it('埋め込みが無い行は近傍では出ないが、語が一致すれば出る', async () => {
-    const byVec = await research(db, { query: 'なにか', vector: unit(0) })
+    const { hits: byVec } = await research(db, { query: 'なにか', vector: unit(0) })
     expect(byVec.map(h => h.id)).not.toContain('ce.none')
-    const byText = await research(db, { query: '埋め込み無し', vector: unit(0) })
+    const { hits: byText } = await research(db, { query: '埋め込み無し', vector: unit(0) })
     expect(byText[0]).toMatchObject({ id: 'ce.none', textMatch: true, similarity: null })
   })
 
   it('語の一致は類似度が低くても先頭に来る', async () => {
     // 出来事C は unit(2) で、検索ベクトル unit(0) との類似度は 0
-    const hits = await research(db, { query: '出来事C', vector: unit(0) })
+    const { hits } = await research(db, { query: '出来事C', vector: unit(0) })
     expect(hits[0]).toMatchObject({ id: 'ce.c', textMatch: true })
     expect(hits[0]!.similarity).toBeCloseTo(0, 5)
   })
 
   it('件数の上限を守る', async () => {
-    const hits = await research(db, { query: 'なにか', vector: unit(0), limit: 2 })
+    const { hits } = await research(db, { query: 'なにか', vector: unit(0), limit: 2 })
     expect(hits).toHaveLength(2)
   })
 
@@ -202,10 +322,10 @@ vectorSuite('近傍検索（pgvector）', () => {
     const before = await db<{ e: string }[]>`SELECT embedding::text AS e FROM canon_event WHERE id = 'ce.a'`
 
     const r1 = await embedMissing(db, client, { now: new Date('2026-09-04T00:00:00Z'), batch: 1 })
-    expect(r1).toMatchObject({ kc: 0, canonEvent: 1 })
+    expect(r1).toMatchObject({ kc: 0, canonEvent: 1, section: 1 })
     expect(r1.model).toContain('fake')
     expect(await embedCoverage(db)).toEqual({
-      kc: { total: 1, embedded: 1 }, canonEvent: { total: 4, embedded: 4 },
+      kc: { total: 1, embedded: 1 }, canonEvent: { total: 4, embedded: 4 }, section: { total: 2, embedded: 2 },
     })
     // 既に入っていたものはそのまま
     const after = await db<{ e: string }[]>`SELECT embedding::text AS e FROM canon_event WHERE id = 'ce.a'`
@@ -215,6 +335,6 @@ vectorSuite('近傍検索（pgvector）', () => {
     expect(dim!.n).toBe(EMBED_DIMENSIONS)
 
     const r2 = await embedMissing(db, client, { now: new Date('2026-09-04T00:00:00Z') })
-    expect(r2).toMatchObject({ kc: 0, canonEvent: 0, model: null })
+    expect(r2).toMatchObject({ kc: 0, canonEvent: 0, section: 0, model: null })
   })
 })

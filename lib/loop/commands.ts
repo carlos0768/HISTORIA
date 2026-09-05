@@ -32,6 +32,7 @@ export const SCREEN_COMMANDS: readonly Command[] = [
   { id: 's.library', label: '教材の一覧', kind: '移動', href: '/library' },
   { id: 's.timeline', label: '年表と地図', kind: '移動', href: '/timeline' },
   { id: 's.map', label: '地図', kind: '移動', href: '/map' },
+  { id: 's.research', label: '調べる', kind: '移動', href: '/research', keywords: '検索 リサーチ 出来事 年表' },
   { id: 's.diagnostic', label: '診断テスト', kind: '移動', href: '/diagnostic' },
   { id: 's.settings', label: '設定', kind: '移動', href: '/settings' },
 ]

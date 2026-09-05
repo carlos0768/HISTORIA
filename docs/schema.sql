@@ -252,8 +252,12 @@ CREATE TABLE material_section (
   char_count  int  NOT NULL,
   hidden        boolean NOT NULL DEFAULT false,  -- 誤り報告 or ファクトチェックで非表示
   hidden_reason text CHECK (hidden_reason IN ('user_report','factcheck_flag','moderation')),
+  -- 「調べる」（docs/11-ux.md §4.1）が教材の本文を近傍検索するための埋め込み。
+  -- 見出し＋本文の先頭を kc.embedding と同じモデル・次元で作る。scripts/db/embed-index.ts が埋める
+  embedding   vector(768),
   UNIQUE (material_id, ord)
 );
+CREATE INDEX ON material_section USING hnsw (embedding vector_cosine_ops);
 
 CREATE TABLE material_section_kc (
   section_id uuid NOT NULL REFERENCES material_section(id) ON DELETE CASCADE,
