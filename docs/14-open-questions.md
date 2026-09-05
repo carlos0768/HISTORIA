@@ -131,7 +131,7 @@ KC は**追加しても既存データを壊さない**（`kc` への INSERT で
 | M22 | ~~**RLS ポリシーが意図どおり効くこと**~~ **決着（2026-09-02）**。本番の Supabase に修正を適用し、**本物の `auth.uid()` で確認済み**（§1.-2）。`npx tsx scripts/db/verify-rls.ts` で 52 項目を自動化してあり、手元では 52/52 | — |
 | M19 | **judge の distractor 軸と因果軸のスコア** | 機械照合では守れない領域。Flash が落ちるとしたらここ | 0 |
 | M20 | **Supabase Free の一時停止条件**（何日で停止・復帰は手動か） | Free で始める判断の前提（`03` §6.1） | 1 |
-| M21 | **Try IT の再生リストが `playlistItems.list` で取得でき、`embeddable` であること** | 動画連携の前提（`09b` §4.1.1） | 3 |
+| M21 | **Try IT の再生リストが `playlistItems.list` で取得でき、`embeddable` であること** | 動画連携の前提（`09b` §4.1.1）。**2026-09-05 に一部だけ埋まった**: チャンネル id `UCcj-cHmS0uD91MLjtdiN89Q` は検索結果の URL 経路から裏づけが取れ、動画 39 本を id と題名つきで seed に入れた（`09b` §4.1.0 で許可制を撤廃したため取り込み器を通していない）。**まだ確かめていないのは再生できるかどうかである。** 実行環境から youtube.com へ出られず（egress 403）、oEmbed も watch ページも引けないので、`embeddable` と生存は未確認。鍵が手に入ったら `videos.list` で 39 本の `status.embeddable` を確かめること | 3 |
 | M6 | **Supabase 上で pgvector と HNSW インデックスが動くこと** | `schema.sql` はローカル検証で `real[]` に置換して通した（`03` §0） | 1 |
 | M7 | Supabase の PGroonga 有効化と日本語全文検索の実性能 | Phase2 の用語検索・過去問検索 | 5 |
 | M8 | Vercel Hobby の非商用利用条項が本アプリに適合するか | インフラ選定（`12` §3） | 1 |

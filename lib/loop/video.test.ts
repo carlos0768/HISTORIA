@@ -259,7 +259,17 @@ dbSuite('動画（実DB）', () => {
     const dir = 'seed'
 
     it('承認欄が空なら1件も入らない', async () => {
-      const r = await seedVideo(db, dir)
+      // ★ 実際の seed をそのまま流さない。実データが承認済みかどうかで
+      //   結果が変わってしまい、**関門そのものを試したことにならない**。
+      //   写しを作って承認欄を全部外し、それでも1件も入らないことを見る。
+      const empty = mkdtempSync(join(tmpdir(), 'historia-video-'))
+      for (const f of ['channel_allowlist.csv', 'video.csv', 'video_kc.csv']) {
+        const lines = readFileSync(join(SEED_DIR, f), 'utf8').split('\n')
+        writeFileSync(join(empty, f),
+          lines.map((l, i) => (i === 0 ? l : l.replace(/^○,/, ','))).join('\n'))
+      }
+      const r = await seedVideo(db, empty)
+      rmSync(empty, { recursive: true, force: true })
       expect(r.channel).toBe(0)
       expect(r.video).toBe(0)
       expect(r.skipped).toBeGreaterThan(0)

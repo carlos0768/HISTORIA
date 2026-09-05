@@ -13905,11 +13905,536 @@ INSERT INTO item (id, user_id, format, stem, choices, answer_key, explanation,
 INSERT INTO item_kc (item_id, kc_id, weight) VALUES ('cd8c3401-7215-3ffc-be5b-beddd4018a26', 'kc.jptoday.regional_geo', 1.0)
   ON CONFLICT DO NOTHING;
 
--- 動画のチャンネル 0 件（承認されず除外 1）
+-- 動画のチャンネル 1 件（承認されず除外 0）
+INSERT INTO channel_allowlist (channel_id, channel_title, subject_scope, note) VALUES ('UCcj-cHmS0uD91MLjtdiN89Q', '映像授業 Try IT（トライイット）', 'both', '家庭教師のトライ。事前の許可制は撤廃したので、この表は「動画から自動で埋まる登録簿」である（docs/09b §4.1）')
+  ON CONFLICT (channel_id) DO UPDATE SET channel_title = EXCLUDED.channel_title,
+    subject_scope = EXCLUDED.subject_scope, note = EXCLUDED.note;
 
--- 動画 0 件（承認・埋め込み可のみ。除外 0）
+-- 動画 39 件（承認・埋め込み可のみ。除外 0）
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('DZaSr9KVCR8', '【世界史】 古代オリエント１ メソポタミア （18分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1080, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('mKsMgbGtToQ', '【世界史】 古代オリエント２ エジプト （18分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1080, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('-W_jXJ5T8hE', '【世界史】 古代オリエント３ 文化 （17分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1020, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('eJswYizWw8U', '【世界史】 古代オリエント５ オリエントの統一 （18分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1080, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('7tK4vuo9avM', '【世界史】 ギリシア世界０ ガイダンス （7分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   420, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('8Vks-mjABOw', '【世界史】 ギリシア世界１ エーゲ文明 （18分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1080, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('Dn7eRxf0Mr0', '【世界史】 ギリシア世界２ アテネとスパルタ （17分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1020, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('XGEyLWHoHV4', '【世界史】 ギリシア世界６ ギリシア文化② （16分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   960, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('q-P5HeHb7fI', '【世界史】 ローマ世界１ 共和政の確立 （20分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1200, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('90oS782rUTc', '【世界史】 ローマ世界３ ローマ帝国 （18分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1080, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('WtgixU5o3WI', '【世界史】 古代中国（秦・漢）１ 古代文明 （17分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1020, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('lSYfNHMtwL0', '【世界史】 古代中国（秦・漢）２ 春秋戦国時代 （17分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1020, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('TWWDdydovSk', '【世界史】 古代中国（秦・漢）３ 秦の統一 （17分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1020, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('KYas8kZOv3Y', '【世界史】 古代中国（秦・漢）４ 前漢の時代 （19分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1140, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('thcGz6o0egQ', '【世界史】 古代中国（秦・漢）５ 後漢の時代 （20分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1200, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('_2Yx0ZG9xfU', '【世界史】 イスラーム世界１ ムハンマド時代 （18分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1080, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('ojd2bp42Xmo', '【世界史】 イスラーム世界２ イスラーム帝国 （20分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1200, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('IGiWjrV5qOA', '【世界史】 中世西欧の成立４ 封建社会の成立 （19分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1140, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('__8fyVDRwiA', '【世界史】 中世西欧の展開５ 封建社会の崩壊 （19分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1140, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('nn5tW4zhfe0', '【世界史】 大航海時代１ ルネサンスの始まり （14分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   840, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('slK8dkezyYc', '【世界史】 大航海時代２ イタリア＝ルネサンス （13分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   780, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('Gc3oMuvu8ZQ', '【世界史】 大航海時代３ 北方ルネサンス （17分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1020, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('y-0SBaEzpU4', '【世界史】 大航海時代４ 大航海時代の幕開け （16分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   960, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('GuvHg9j0JhQ', '【世界史】 宗教改革１ ドイツ宗教改革の始まり （19分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1140, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('qe3WU6ptW1Y', '【世界史】 宗教改革６ 確認テスト① （10分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   600, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('NYqYDndUmF0', '【世界史】 イギリス市民革命４ 産業革命 （11分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   660, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('gQjoAQK1hpc', '【世界史】 イギリス市民革命５ 産業革命の影響 （17分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1020, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('eiacQ80QmGU', '【世界史】 フランス革命０ ガイダンス （10分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   600, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('XFCFAE4Zra4', '【世界史】 フランス革命１ 革命の勃発 （19分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1140, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('lgB7c7L1p3g', '【世界史】 フランス革命４ ナポレオン時代の開始 （14分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   840, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('2sSvXI3cvg4', '【世界史】 フランス革命５ ナポレオン時代の終焉 （14分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   840, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('V0IrRYbjYGE', '【世界史】 帝国主義の時代０ ガイダンス （11分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   660, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('WYfOwFm36eE', '【世界史】 第一次世界大戦０ ガイダンス （7分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   420, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('Pe2sMV9YfJs', '【世界史】 第一次世界大戦１ ２０世紀初頭の情勢 （22分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1320, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('fhcuGhsbVw0', '【世界史】 第一次世界大戦２ 大戦の勃発 （15分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   900, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('VqOnt0EEjUA', '【世界史】 第一次世界大戦３ 大戦の戦局 （20分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1200, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('8CD01Xrs4l8', '【世界史】 第二次世界大戦４ 日本支配への抵抗 （19分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   1140, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('Ri-NJkIi2w0', '【世界史】 冷戦の時代１ 第二次世界大戦後の欧州 （15分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   900, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
+INSERT INTO video (id, title, description, channel_id, duration_sec, published_at,
+                   embeddable, yt_rating, status, approved_at) VALUES
+  ('Vut73bew4Nk', '【世界史】 冷戦の時代２ 冷戦の始まり （14分）', NULL, 'UCcj-cHmS0uD91MLjtdiN89Q',
+   840, NULL,
+   true, NULL, 'approved', now())
+  ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title,
+    description = EXCLUDED.description, duration_sec = EXCLUDED.duration_sec,
+    embeddable = EXCLUDED.embeddable, yt_rating = EXCLUDED.yt_rating,
+    status = EXCLUDED.status, approved_at = EXCLUDED.approved_at;
 
--- 動画と KC の対応 0 件
+-- 動画と KC の対応 57 件
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('DZaSr9KVCR8', 'kc.orient.mesopotamia_dynasty_order', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('DZaSr9KVCR8', 'kc.orient.hammurabi_code_principle', 0, NULL, 0.8, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('mKsMgbGtToQ', 'kc.orient.egypt_kingdom_periods', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('-W_jXJ5T8hE', 'kc.orient.east_med_three_peoples', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('eJswYizWw8U', 'kc.orient.assyria_vs_achaemenid_rule', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('eJswYizWw8U', 'kc.orient.unification_extent_geo', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('7tK4vuo9avM', 'kc.greece.polis_formation_causes', 0, NULL, 0.7, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('8Vks-mjABOw', 'kc.greece.polis_formation_causes', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('Dn7eRxf0Mr0', 'kc.greece.athens_vs_sparta', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('Dn7eRxf0Mr0', 'kc.greece.athens_democracy_steps', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('XGEyLWHoHV4', 'kc.greece.hellenistic_kingdoms_geo', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('q-P5HeHb7fI', 'kc.rome.plebeian_rights_causes', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('90oS782rUTc', 'kc.rome.gracchus_to_principate', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('90oS782rUTc', 'kc.rome.principate_vs_dominate', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('WtgixU5o3WI', 'kc.china.fengjian_vs_junxian', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('lSYfNHMtwL0', 'kc.china.hundred_schools_positions', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('lSYfNHMtwL0', 'kc.china.warring_states_geo', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('TWWDdydovSk', 'kc.china.qin_unification_causes', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('TWWDdydovSk', 'kc.china.qin_fall_causes', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('KYas8kZOv3Y', 'kc.china.han_junguo_to_junxian', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('KYas8kZOv3Y', 'kc.china.wudi_policies', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('thcGz6o0egQ', 'kc.china.wudi_policies', 0, NULL, 0.8, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('_2Yx0ZG9xfU', 'kc.islam.hijra_and_umma', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('_2Yx0ZG9xfU', 'kc.islam.arab_conquest_causes', 0, NULL, 0.8, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('ojd2bp42Xmo', 'kc.islam.rashidun_vs_umayyad_succession', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('ojd2bp42Xmo', 'kc.islam.umayyad_vs_abbasid', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('IGiWjrV5qOA', 'kc.euro.feudal_two_layers', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('__8fyVDRwiA', 'kc.medcult.black_death_effects', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('nn5tW4zhfe0', 'kc.renaissance.why_italy', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('slK8dkezyYc', 'kc.renaissance.humanism', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('Gc3oMuvu8ZQ', 'kc.renaissance.northern', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('Gc3oMuvu8ZQ', 'kc.renaissance.printing_effects', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('y-0SBaEzpU4', 'kc.voyage.motives', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('y-0SBaEzpU4', 'kc.voyage.two_routes_geo', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('GuvHg9j0JhQ', 'kc.reformation.luther_causes', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('qe3WU6ptW1Y', 'kc.reformation.settlement_order', 0, NULL, 0.7, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('NYqYDndUmF0', 'kc.industrial.why_britain', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('NYqYDndUmF0', 'kc.industrial.textile_inventions', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('gQjoAQK1hpc', 'kc.industrial.social_change', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('gQjoAQK1hpc', 'kc.industrial.labour_to_socialism', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('eiacQ80QmGU', 'kc.frrev.causes', 0, NULL, 0.7, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('XFCFAE4Zra4', 'kc.frrev.causes', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('XFCFAE4Zra4', 'kc.frrev.stages_order', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('lgB7c7L1p3g', 'kc.frrev.declaration_vs_code', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('lgB7c7L1p3g', 'kc.frrev.napoleonic_europe_geo', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('2sSvXI3cvg4', 'kc.frrev.napoleon_fall', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('V0IrRYbjYGE', 'kc.imperialism.causes', 0, NULL, 0.8, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('WYfOwFm36eE', 'kc.ww1.causes', 0, NULL, 0.7, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('Pe2sMV9YfJs', 'kc.ww1.causes', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('fhcuGhsbVw0', 'kc.ww1.causes', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('fhcuGhsbVw0', 'kc.ww1.fronts_geo', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('VqOnt0EEjUA', 'kc.ww1.turning_points', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('VqOnt0EEjUA', 'kc.ww1.total_war', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('8CD01Xrs4l8', 'kc.ww2.axis_extent_geo', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('Ri-NJkIi2w0', 'kc.coldwar.origin', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('Vut73bew4Nk', 'kc.coldwar.origin', 0, NULL, 0.9, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
+INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ('Vut73bew4Nk', 'kc.coldwar.marshall_vs_comecon', 0, NULL, 1, 'manual')
+  ON CONFLICT (video_id, kc_id, start_sec) DO UPDATE SET
+    end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source;
 
 COMMIT;
 

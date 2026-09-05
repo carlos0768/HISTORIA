@@ -346,9 +346,16 @@ export async function seedItem(
  *   ユーザーへは video テーブルから返すだけである。鍵が要るのは取り込み
  *   （scripts/db/ingest-video.ts）と週次の生存確認だけ。
  *
- * ★ 承認は作者が手で行う（V4）。channel_allowlist と video の approve を見る。
+ * ★ 承認は作者が手で行う（V4）。video の approve を見る。
  *   video_kc には approve を置かない。**承認された動画に紐づくものだけを入れる**ので、
  *   対応付けを別に承認する意味が無い（承認の対象が2つあると片方だけ通る事故が起きる）。
+ *
+ * ★ **チャンネルの事前許可制は撤廃した**（2026-09-05・作者判断）。
+ *   `channel_allowlist` は残すが、役割は「事前に通すチャンネルの一覧」ではなく
+ *   **動画から自動で埋まる登録簿**である。表を消さないのは、画面が局名を出すのに
+ *   `video.channel_id` の参照先を要るためで、消すと外部キーと JOIN を
+ *   同時に作り替えることになる（`lib/loop/video.ts` の videosForKcs）。
+ *   撤廃したのは関門だけで、局名の記録はむしろ残す。
  *
  * ★ embeddable = false と ytAgeRestricted は入れない（V5）。
  *   DB 側にも CHECK があるが、そこに当てて落とすのではなく、ここで落として
@@ -377,13 +384,24 @@ export async function seedVideo(
   const chIds = new Set(channels.map(c => c.id!))
   const vRows = readCsv(join(dir, 'video.csv'))
   const approvedV = vRows.filter(ok)
-  // ★ 許可リストに無いチャンネルの動画は入れない（V2）。CSV に直接書かれても通さない
-  const known = approvedV.filter(v => {
-    if (!chIds.has(v.channel_id!)) {
-      throw new Error(`video.csv: channel_id "${v.channel_id}" が承認済みの channel_allowlist にありません（${v.id}）`)
-    }
-    return true
-  })
+  // ★ 事前の許可制は撤廃した。知らないチャンネルは**弾かずに登録簿へ足す**。
+  //   ただし局名の無い行は通さない。画面は局名を出すので、空だと
+  //   「どこの誰が作った動画か分からないものを再生させる」ことになる。
+  const unknown = dedupe(
+    approvedV.filter(v => !chIds.has(v.channel_id!)).map(v => {
+      if (!v.channel_id || !v.channel_title) {
+        throw new Error(`video.csv: channel_id と channel_title の両方が要る（${v.id}）`)
+      }
+      return { channel_id: v.channel_id, channel_title: v.channel_title,
+               subject_scope: 'both', note: '動画から自動で登録した' }
+    }), r => r.channel_id)
+  if (unknown.length > 0) {
+    await insertMany(db, 'channel_allowlist', unknown,
+      ['channel_id', 'channel_title', 'subject_scope', 'note'],
+      d => d`ON CONFLICT (channel_id) DO NOTHING`)
+    unknown.forEach(c => chIds.add(c.channel_id))
+  }
+  const known = approvedV
   // 埋め込めない動画・年齢制限つきの動画は入れない（docs/09b V5）
   const embeddable = known.filter(v => v.embeddable === 'true' && v.yt_rating !== 'ytAgeRestricted')
 
@@ -410,7 +428,13 @@ export async function seedVideo(
              status = EXCLUDED.status, approved_at = EXCLUDED.approved_at`)
 
   const vIds = new Set(embeddable.map(v => v.id!))
-  const kcRows = readCsv(join(dir, 'video_kc.csv')).filter(r => vIds.has(r.video_id!))
+  // ★ **入っている KC だけに結ぶ。** 承認から外れた KC を指す行が混じると
+  //   外部キーで seed 全体が止まる。動画の対応付けごときで KC の投入を
+  //   巻き添えにしない。落とした数は skipped に数える（黙って減らさない）。
+  const liveKc = new Set(
+    (await db<{ id: string }[]>`SELECT id FROM kc`).map(r => r.id))
+  const kcAll = readCsv(join(dir, 'video_kc.csv')).filter(r => vIds.has(r.video_id!))
+  const kcRows = kcAll.filter(r => liveKc.has(r.kc_id!))
   await insertMany(db, 'video_kc',
     dedupe(kcRows.map(r => ({
       video_id: r.video_id!, kc_id: r.kc_id!, start_sec: num(r.start_sec) ?? 0,
@@ -422,10 +446,11 @@ export async function seedVideo(
              end_sec = EXCLUDED.end_sec, relevance = EXCLUDED.relevance, source = EXCLUDED.source`)
 
   return {
-    channel: channels.length,
+    channel: channels.length + unknown.length,
     video: embeddable.length,
     videoKc: kcRows.length,
-    skipped: (chRows.length - channels.length) + (vRows.length - approvedV.length),
+    skipped: (chRows.length - channels.length) + (vRows.length - approvedV.length)
+             + (kcAll.length - kcRows.length),
     unsafe: known.length - embeddable.length,
   }
 }
