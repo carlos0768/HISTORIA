@@ -19,6 +19,7 @@ import type { Sql } from 'postgres'
 import { createClient, type Client } from '@/lib/ai/client'
 import { BudgetExceededError } from '@/lib/ai/budget'
 import { assertNoIdentifiers } from '@/lib/ai/redact'
+import { dbFailure } from '@/lib/db/error'
 import { parseQuery, research, embedCoverage, type ResearchResponse } from './research'
 import { polityVectors, rankPolities, pickPolities } from './territory-search'
 
@@ -69,7 +70,27 @@ export async function runResearch(
     }
   }
 
-  const { sections, hits } = await research(db, { query, vector, userId: opts.userId ?? null })
+  let found: Awaited<ReturnType<typeof research>>
+  try {
+    found = await research(db, { query, vector, userId: opts.userId ?? null })
+  } catch (e) {
+    // ベクトル列・演算子・索引の移行が遅れていても、完全一致の検索は続ける。
+    // 2026-09-05 に本番だけ material_section.embedding が無く、ここから
+    // Next のエラー画面（「もう一度ためす」）へ落ちたための再発防止。
+    if (vector !== null) {
+      dbFailure('research-hybrid', e)
+      try {
+        found = await research(db, { query, vector: null, userId: opts.userId ?? null })
+        vector = null
+        note = '意味の近さでは引けなかったため、語の一致だけで引いています。'
+      } catch (fallbackError) {
+        return { ok: false, error: dbFailure('research-text', fallbackError) }
+      }
+    } else {
+      return { ok: false, error: dbFailure('research-text', e) }
+    }
+  }
+  const { sections, hits } = found
   const mode = vector === null ? 'text' : 'hybrid'
 
   // ★ 版図（国家）も同じベクトルで引く。国家の埋め込みはプロセス内に一度だけ作る。
@@ -82,9 +103,14 @@ export async function runResearch(
 
   // ベクトルは作れたのに近傍が1件も無い＝索引がまだ空。黙って「語の一致だけ」の顔をしない
   if (mode === 'hybrid' && [...sections, ...hits].every(h => h.similarity === null)) {
-    const c = await embedCoverage(db)
-    if (c.kc.embedded === 0 && c.canonEvent.embedded === 0 && c.section.embedded === 0) {
-      note = '埋め込みの索引がまだ作られていないため、語の一致だけで引けています（npm run db:embed-index）。'
+    try {
+      const c = await embedCoverage(db)
+      if (c.kc.embedded === 0 && c.canonEvent.embedded === 0 && c.section.embedded === 0) {
+        note = '埋め込みの索引がまだ作られていないため、語の一致だけで引けています（npm run db:embed-index）。'
+      }
+    } catch (e) {
+      dbFailure('research-coverage', e)
+      note = '語の一致は取得できましたが、意味検索の索引状態を確認できませんでした。'
     }
   }
 

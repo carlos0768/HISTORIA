@@ -10,7 +10,7 @@
 | | 状態 |
 |---|---|
 | 仕様書 | [`docs/`](./docs) 19文書。作者判断の未決は0件 |
-| スキーマ | [`docs/schema.sql`](./docs/schema.sql) 44テーブル・RLS 44本＋ポリシー35本。本番 Supabase で 55項目の検査を通過 |
+| スキーマ | [`docs/schema.sql`](./docs/schema.sql) 51テーブル・RLS 51本＋ポリシー42本。本番 Supabase で検査済み |
 | マスタ | [`seed/`](./seed) 章立て117件・KC 408件・`canon_event` 1,180件・`person` 446件（すべて承認済み・本番 Supabase 投入済み） |
 | 学習ロジック | SM-2 / 弱点推定 / スケジューラ / 確認テスト / 支出遮断器 |
 | 閉ループ | 出題→採点→弱点更新→翌日出し直しが実 DB で動く |
@@ -19,7 +19,7 @@
 | 「調べる」 | 語の一致＋pgvector の近傍検索で教材の節・KC・正典を引き、**年表（行＝地域）と地図**に置く（[`11`](./docs/11-ux.md) §4.1）。教材の各節と専用ページ `/research` の両方から。埋め込みが無くても語の一致で動く。国名を入れると**版図の移り変わりを再生**できる（20国家・暫定マスタ。オスマン帝国の 3 段階は historical-basemaps の実境界、[`10`](./docs/10-legal-risk.md) §7b） |
 | AI 生成 | プロバイダ抽象層のみ。**鍵が無い間はフェイクで通る** |
 | PWA | オフラインは**読むだけ**。出題は端末に降ろさない（[`12`](./docs/12-nonfunctional.md) §10） |
-| テスト | 1066件（`npm test`） |
+| テスト | 1083件（`npm test`） |
 
 ## 動かす
 
@@ -183,7 +183,7 @@ DATABASE_URL='...' npx tsx scripts/db/check-remote.ts
 | **空のDB** | `docs/schema.sql` → `seed/sql/03_rls.sql` |
 | **既に `schema.sql` を流したDB** | `seed/sql/04_phase3.sql`（3KB）→ `seed/sql/03_rls.sql`（12KB） |
 
-> ★ **既存のDBに `docs/schema.sql` を貼らないこと。** `CREATE TABLE` 44本すべてが
+> ★ **既存のDBに `docs/schema.sql` を貼らないこと。** `CREATE TABLE` 51本すべてが
 > `IF NOT EXISTS` を持たないので、**`relation "era" already exists` で必ず止まる**。
 > これは不具合ではなく、そう作ってある。`IF NOT EXISTS` を足すと、列が違う表を
 > 黙って飛ばして**ずれを隠す**ため、あえて落ちるようにしている。

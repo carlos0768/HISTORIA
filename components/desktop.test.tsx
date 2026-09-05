@@ -47,6 +47,17 @@ const key = (k: string, o: Partial<KeyboardEventInit> = {}, target?: EventTarget
   return e
 }
 
+describe('共通シェルの画面幅', () => {
+  const css = readFileSync('app/globals.css', 'utf8')
+
+  it('一般的なPC幅では全画面をデスクトップ表示にする', () => {
+    expect(css).toContain('@media (min-width: 1024px)')
+    expect(css).toContain('@media (max-width: 1023px)')
+    expect(css).not.toContain('@media (min-width: 1440px)')
+    expect(css).not.toContain('@media (max-width: 1439px)')
+  })
+})
+
 describe('絞り込み', () => {
   it('空なら全部返す', () => {
     expect(filterCommands(COMMANDS, '')).toHaveLength(3)
@@ -327,7 +338,7 @@ describe('地図の表示範囲', () => {
  *   最初は `<Screen commands={...}>` として画面ごとに渡す形にしていたが、
  *   実際に渡したのは /library・/timeline・/map の3つだけで、
  *   人が出発する画面（ホーム・特訓・記録・出題）に載っていなかった。
- *   サイドバーは 1440px 以上でしか出ないので、モバイルでは
+ *   サイドバーは 1024px 以上でしか出ないので、モバイルでは
  *   「机の上」3画面が互いからしか開けない孤島になっていた。
  *
  * ★ 直し方は「16画面に渡し忘れないよう気をつける」ではなく、

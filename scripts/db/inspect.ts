@@ -25,7 +25,9 @@ export const SEEDED_TABLES = [
  *   期待する表の一覧そのものは docs/schema.sql から読む（二重管理しない）。
  */
 export const PHASE3_TABLES = ['push_subscription', 'ops_log'] as const
-export const PHASE3_COLUMNS = ['app_user.remind_hour'] as const
+export const PHASE3_COLUMNS = [
+  'app_user.remind_hour', 'canon_event.embedding', 'material_section.embedding',
+] as const
 
 export type Verdict = 'complete' | 'empty' | 'phase3' | 'unknown_drift'
 
