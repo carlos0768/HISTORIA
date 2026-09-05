@@ -32,7 +32,7 @@ describe('年の見せ方', () => {
 describe('画面への移動', () => {
   it('主要な画面が全部さがせる', () => {
     const hrefs = SCREEN_COMMANDS.map(c => c.href)
-    for (const h of ['/', '/study', '/drills', '/records', '/library', '/timeline', '/map', '/settings']) {
+    for (const h of ['/', '/study', '/drills', '/records', '/library', '/timeline', '/map', '/research', '/settings']) {
       expect(hrefs, `${h} がさがせない`).toContain(h)
     }
   })

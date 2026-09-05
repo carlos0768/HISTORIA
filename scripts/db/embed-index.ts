@@ -4,8 +4,8 @@
  *   npx tsx scripts/db/embed-index.ts            # 充足率を見るだけ（何もしない）
  *   npx tsx scripts/db/embed-index.ts --apply    # 空の行を埋める
  *
- * kc.embedding と canon_event.embedding のうち NULL の行だけを埋める。
- * 何度流しても同じ（埋まっている行には触れない）。
+ * kc / canon_event / material_section の embedding のうち NULL の行だけを埋める。
+ * 何度流しても同じ（埋まっている行には触れない）。教材を新しく作ったら、また流す。
  *
  * ★ 鍵が無ければ拒む。フェイクの埋め込みは決定的だが意味を持たない乱数で、
  *   それを本番の列に入れると「意味の近さ」がでたらめになる。空のままなら
@@ -34,8 +34,9 @@ try {
   const before = await embedCoverage(db)
   const say = (name: string, c: { total: number; embedded: number }) =>
     console.log(`${name}: ${c.embedded} / ${c.total} 件に埋め込みあり（空 ${c.total - c.embedded}）`)
-  say('kc         ', before.kc)
-  say('canon_event', before.canonEvent)
+  say('kc              ', before.kc)
+  say('canon_event     ', before.canonEvent)
+  say('material_section', before.section)
 
   if (process.env.PGVECTOR === 'off') {
     console.error('\nPGVECTOR=off です。この DB には vector 型が無いので索引は作れません。')
@@ -50,6 +51,7 @@ try {
   }
 
   const missing = before.kc.total - before.kc.embedded + before.canonEvent.total - before.canonEvent.embedded
+    + before.section.total - before.section.embedded
   if (missing === 0) {
     console.log('\n空の行はありません。何もしません。')
     process.exit(0)
@@ -64,10 +66,11 @@ try {
     now: new Date(),
     onProgress: (done, table) => console.log(`  ${table}: ${done} 件`),
   })
-  console.log(`\nkc ${r.kc} 件 / canon_event ${r.canonEvent} 件を埋めました（${r.model}）。`)
+  console.log(`\nkc ${r.kc} 件 / canon_event ${r.canonEvent} 件 / material_section ${r.section} 件を埋めました（${r.model}）。`)
   const after = await embedCoverage(db)
-  say('kc         ', after.kc)
-  say('canon_event', after.canonEvent)
+  say('kc              ', after.kc)
+  say('canon_event     ', after.canonEvent)
+  say('material_section', after.section)
 } finally {
   await db.end({ timeout: 5 })
 }

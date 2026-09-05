@@ -11,8 +11,16 @@ import { videosForKcs, MAX_PER_SECTION } from '@/lib/loop/video'
 
 export const dynamic = 'force-dynamic'
 
-export default async function MaterialPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function MaterialPage({
+  params, searchParams,
+}: {
+  params: Promise<{ id: string }>
+  /** `?s=<ord>` で節を直接開く。「調べる」の結果から飛んでくるため */
+  searchParams: Promise<{ s?: string }>
+}) {
   const { id } = await params
+  const { s } = await searchParams
+  const initialOrd = Number.isInteger(Number(s)) && s !== undefined && s !== '' ? Number(s) : null
   const db = tryDb()
   const userId = await currentUserId()
 
@@ -79,6 +87,7 @@ export default async function MaterialPage({ params }: { params: Promise<{ id: s
         title={m.title}
         totalChars={m.totalChars}
         sections={sections}
+        initialOrd={initialOrd}
       />
     </Screen>
   )

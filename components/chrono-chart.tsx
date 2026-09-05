@@ -9,15 +9,16 @@
  *
  * ★ 実行時に d3 も外部の描画ライブラリも持ちこまない（CSP を広げない）。
  *   位置の計算は lib/domain/periods.ts の純関数で、ここは SVG に写すだけである。
- * ★ 横軸は既定で全範囲（前3000〜2000）。近代の出来事ばかりだと右端に固まるので、
- *   「結果に合わせる」で範囲を寄せられる。既定を寄せた範囲にしないのは、
- *   「全史の中のどこか」がまず見えるべきだからである（年表の意味）。
+ * ★ 横軸は既定で**結果のある時代に合わせる**（lib/domain/periods.ts の adaptiveDomain）。
+ *   近代の出来事ばかりなのに前3000年から描くと右端に固まって読めない。
+ *   「全史の中のどこか」を見たいときは「全範囲を表示」で前3000〜2000に戻せる。
+ *   上の時代区分の帯は、寄せた範囲でもその時代の名前が読めるように残す。
  * ★ 年代の無い項目はここには置かない。置けないものを 0 年に置くのは嘘になる。
  *   一覧の側で「年代なし」と出す。
  */
 import { useMemo } from 'react'
 import {
-  PERIODS, CHART_MIN_YEAR, CHART_MAX_YEAR, fitDomain, yearToX, centuryTicks, assignLanes,
+  PERIODS, CHART_MIN_YEAR, CHART_MAX_YEAR, adaptiveDomain, yearToX, centuryTicks, assignLanes,
   type Span,
 } from '@/lib/domain/periods'
 import { formatYear } from '@/lib/loop/timeline'
@@ -26,7 +27,7 @@ import { regionGroupId, regionLabel } from '@/lib/map/regions'
 export type ChronoItem = {
   id: string
   label: string
-  kind: 'kc' | 'event'
+  kind: 'kc' | 'event' | 'section'
   yearFrom: number
   yearTo: number | null
   /** century なら概数として点線で描く */
@@ -35,15 +36,15 @@ export type ChronoItem = {
   regionIds: readonly number[]
 }
 
-/** 描画の寸法（viewBox 単位）。文字は 11 で固定し、狭い画面では横に流す */
+/** 描画の寸法（viewBox 単位）。文字は 11 で固定し、狭い画面では横に流す。箱は文字が入る高さ */
 export const CHART_WIDTH = 720
 export const LABEL_COL = 96          // 左の地域名の列
 const RIGHT_PAD = 8
 const PERIOD_H = 20
 const TICK_H = 18
-const LANE_H = 20
+const LANE_H = 22
 const ROW_PAD = 6
-const BAR_H = 10
+const BAR_H = 16
 const MIN_BAR_W = 5
 const FONT = 11
 /** 1文字の幅の見積り。日本語は全角（≒ FONT）、数字と記号はその半分 */
@@ -53,11 +54,12 @@ const textWidth = (s: string) =>
 const NO_REGION = -1
 
 export type Placed = ChronoItem & {
+  /** 箱の左右。年の幅より文字が長ければ文字の分だけ広げる */
   x0: number; x1: number; lane: number
-  /** 実際に描く文字。入り切らなければ末尾を「…」で詰める */
+  /** 実際に描く文字。箱に入り切らなければ末尾を「…」で詰める */
   text: string
-  labelX: number
-  anchor: 'start' | 'end'
+  /** 本当の年の位置。右端で箱をずらしたときだけ、ここに印を打つ */
+  yearX: number | null
 }
 export type Row = { groupId: number; label: string; items: Placed[]; lanes: number; y: number; h: number }
 
@@ -72,28 +74,30 @@ export function fitText(label: string, maxWidth: number): string {
   return ''
 }
 
+const PAD_X = 4
+
 /**
- * ラベルの置き場所。右 → 棒の中 → 左の順に、入り切る場所を選ぶ。
- * どこにも入り切らなければ一番広い場所に「…」で詰めて置く。
+ * 出来事の名前を**箱の中**に入れる（添付の年表と同じ見せ方）。
+ *
+ * 箱は年の幅（yearX0〜yearX1）を最低とし、文字が長ければ文字の分だけ右へ広げる。
+ * 右端から出るなら箱ごと左へずらし、**本当の年の位置には印を残す**（ずらした分だけ
+ * 棒の始点が年からずれるので、印が無いと年を読み違える）。
  * ★ 左の地域名の列（LABEL_COL より左）には決して入れない。
- *   入れると地域名と重なって、どちらも読めなくなる（実際に一度そうなった）。
  */
-export function placeLabel(
-  label: string, x0: number, x1: number, width: number,
-): { text: string; labelX: number; anchor: 'start' | 'end'; ext: { x0: number; x1: number } } {
-  const w = textWidth(label)
-  const right = width - RIGHT_PAD - (x1 + 3)
-  const inside = x1 - x0 - 6
-  const left = x0 - 3 - LABEL_COL
-  if (w <= right) return { text: label, labelX: x1 + 3, anchor: 'start', ext: { x0, x1: x1 + 3 + w } }
-  if (w <= inside) return { text: label, labelX: x0 + 3, anchor: 'start', ext: { x0, x1 } }
-  if (w <= left) return { text: label, labelX: x0 - 3, anchor: 'end', ext: { x0: x0 - 3 - w, x1 } }
-  const best = Math.max(right, inside, left)
-  const text = fitText(label, best)
-  const tw = textWidth(text)
-  if (best === right) return { text, labelX: x1 + 3, anchor: 'start', ext: { x0, x1: x1 + 3 + tw } }
-  if (best === inside) return { text, labelX: x0 + 3, anchor: 'start', ext: { x0, x1 } }
-  return { text, labelX: x0 - 3, anchor: 'end', ext: { x0: x0 - 3 - tw, x1 } }
+export function placeBox(
+  label: string, yearX0: number, yearX1: number, width: number,
+): { x0: number; x1: number; text: string; yearX: number | null } {
+  const right = width - RIGHT_PAD
+  const need = textWidth(label) + PAD_X * 2
+  let x0 = yearX0
+  let x1 = Math.max(yearX1, yearX0 + need)
+  if (x1 > right) {
+    const shift = x1 - right
+    x0 = Math.max(LABEL_COL, x0 - shift)
+    x1 = right
+  }
+  const text = fitText(label, x1 - x0 - PAD_X * 2)
+  return { x0, x1, text, yearX: x0 === yearX0 ? null : yearX0 }
 }
 
 export function chartRows(items: readonly ChronoItem[], domain: Span, width: number): Row[] {
@@ -110,19 +114,18 @@ export function chartRows(items: readonly ChronoItem[], domain: Span, width: num
   let y = PERIOD_H + TICK_H
   return groups.map(g => {
     const raw = byGroup.get(g)!.map(it => {
-      const x0 = LABEL_COL + yearToX(it.yearFrom, domain, plot)
-      const x1 = Math.min(width - RIGHT_PAD,
-        Math.max(x0 + MIN_BAR_W, LABEL_COL + yearToX(it.yearTo ?? it.yearFrom, domain, plot)))
-      return { it, x0, x1, ...placeLabel(it.label, x0, x1, width) }
+      const yearX0 = LABEL_COL + yearToX(it.yearFrom, domain, plot)
+      const yearX1 = Math.min(width - RIGHT_PAD,
+        Math.max(yearX0 + MIN_BAR_W, LABEL_COL + yearToX(it.yearTo ?? it.yearFrom, domain, plot)))
+      return { it, ...placeBox(it.label, yearX0, yearX1, width) }
     })
-    const lanes = assignLanes(raw.map(r => r.ext))
+    // ★ 箱そのものが重なるかで段を分ける。文字は箱の中なので、箱が離れていれば重ならない
+    const lanes = assignLanes(raw.map(r => ({ x0: r.x0, x1: r.x1 + 2 })))
     const laneCount = Math.max(1, ...lanes.map(l => l + 1))
     const h = laneCount * LANE_H + ROW_PAD * 2
     const row: Row = {
       groupId: g, label: g === NO_REGION ? '地域なし' : regionLabel(g),
-      items: raw.map((r, i) => ({
-        ...r.it, x0: r.x0, x1: r.x1, lane: lanes[i]!, text: r.text, labelX: r.labelX, anchor: r.anchor,
-      })),
+      items: raw.map((r, i) => ({ ...r.it, x0: r.x0, x1: r.x1, lane: lanes[i]!, text: r.text, yearX: r.yearX })),
       lanes: laneCount, y, h,
     }
     y += h
@@ -131,18 +134,18 @@ export function chartRows(items: readonly ChronoItem[], domain: Span, width: num
 }
 
 export function ChronoChart({
-  items, selectedId, onSelect, fit,
+  items, selectedId, onSelect, full = false,
 }: {
   items: readonly ChronoItem[]
   selectedId: string | null
   onSelect: (id: string) => void
-  /** 横軸を結果に合わせて寄せる */
-  fit: boolean
+  /** true なら全範囲（前3000〜2000）。既定は結果のある時代に合わせる（adaptiveDomain） */
+  full?: boolean
 }) {
   const width = CHART_WIDTH
-  const domain = useMemo<Span>(() => fit
-    ? fitDomain(items.map(it => ({ from: it.yearFrom, to: it.yearTo ?? it.yearFrom })))
-    : { from: CHART_MIN_YEAR, to: CHART_MAX_YEAR }, [items, fit])
+  const domain = useMemo<Span>(() => full
+    ? { from: CHART_MIN_YEAR, to: CHART_MAX_YEAR }
+    : adaptiveDomain(items.map(it => ({ from: it.yearFrom, to: it.yearTo ?? it.yearFrom }))), [items, full])
   const rows = useMemo(() => chartRows(items, domain, width), [items, domain, width])
   if (items.length === 0) return null
 
@@ -199,7 +202,7 @@ export function ChronoChart({
               const selected = it.id === selectedId
               const cls = [
                 'hs-chrono__bar',
-                it.kind === 'kc' ? 'hs-chrono__bar--kc' : 'hs-chrono__bar--event',
+                it.kind === 'kc' ? 'hs-chrono__bar--kc' : it.kind === 'section' ? 'hs-chrono__bar--section' : 'hs-chrono__bar--event',
                 it.precision === 'century' ? 'hs-chrono__bar--approx' : '',
                 selected ? 'hs-chrono__bar--selected' : '',
               ].filter(Boolean).join(' ')
@@ -209,7 +212,12 @@ export function ChronoChart({
                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(it.id) } }}>
                   <title>{`${it.label}（${formatYear(it.yearFrom)}${it.yearTo !== null && it.yearTo !== it.yearFrom ? `–${formatYear(it.yearTo)}` : ''}）`}</title>
                   <rect x={it.x0} y={cy - BAR_H / 2} width={it.x1 - it.x0} height={BAR_H} className={cls} />
-                  <text x={it.labelX} y={cy + FONT / 3} textAnchor={it.anchor}
+                  {/* 右端で箱をずらしたときは、本当の年の位置に印を打つ */}
+                  {it.yearX !== null && (
+                    <line x1={it.yearX} x2={it.yearX} y1={cy - BAR_H / 2 - 3} y2={cy + BAR_H / 2 + 3}
+                          className="hs-chrono__year-mark" />
+                  )}
+                  <text x={it.x0 + PAD_X} y={cy + FONT / 3} textAnchor="start"
                         className={`hs-chrono__label${selected ? ' hs-chrono__label--selected' : ''}`}>
                     {it.text}
                   </text>
@@ -222,6 +230,7 @@ export function ChronoChart({
         <line x1={LABEL_COL} x2={LABEL_COL} y1={0} y2={height} className="hs-chrono__rule" />
       </svg>
       <div className="hs-chrono__legend">
+        <span className="hs-chrono__key"><span className="hs-chrono__swatch hs-chrono__swatch--section" />教材の節</span>
         <span className="hs-chrono__key"><span className="hs-chrono__swatch hs-chrono__swatch--event" />出来事</span>
         <span className="hs-chrono__key"><span className="hs-chrono__swatch hs-chrono__swatch--kc" />知識項目（KC）</span>
         <span className="hs-chrono__key"><span className="hs-chrono__swatch hs-chrono__swatch--approx" />世紀の概数</span>

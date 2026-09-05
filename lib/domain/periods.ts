@@ -65,6 +65,33 @@ export function fitDomain(spans: readonly Span[], opts: { minSpan?: number } = {
   return { from: Math.max(CHART_MIN_YEAR, from), to: Math.min(CHART_MAX_YEAR, to) }
 }
 
+/**
+ * 結果のある時代に合わせた横軸の範囲（既定の見せ方）。
+ *
+ * 近代にしか結果が無いのに前3000年から描くと、棒が右端に固まって読めない。
+ * 結果が重なる時代区分（PERIODS）の外側を上限にし、その中で結果の世紀の境界に寄せる。
+ * 例: 1810〜1890 の結果 → 近代（1800〜1900）。前700〜前300 → 古代の中で前800〜前200。
+ *
+ * ★ 時代の境界を越えて広げない。近代の結果に古代の帯を添えても情報が無い。
+ * ★ 最小の幅は「時代の幅」と 500 年の小さい方。近代は 100 年しか無いので 100 年でよい。
+ */
+export function adaptiveDomain(spans: readonly Span[]): Span {
+  if (spans.length === 0) return { from: CHART_MIN_YEAR, to: CHART_MAX_YEAR }
+  const hit = PERIODS.filter(p => spans.some(s => Math.min(s.from, s.to) < p.to && Math.max(s.from, s.to) >= p.from))
+  const lo = Math.max(CHART_MIN_YEAR, hit.length ? Math.min(...hit.map(p => p.from)) : CHART_MIN_YEAR)
+  const hi = Math.min(CHART_MAX_YEAR, hit.length ? Math.max(...hit.map(p => p.to)) : CHART_MAX_YEAR)
+  let { from, to } = toCenturyBounds({
+    from: Math.min(...spans.map(s => s.from)),
+    to: Math.max(...spans.map(s => s.to)),
+  })
+  const minSpan = Math.min(500, hi - lo)
+  if (to - from < minSpan) {
+    const pad = Math.ceil((minSpan - (to - from)) / 2 / 100) * 100
+    from -= pad; to += pad
+  }
+  return { from: Math.max(lo, from), to: Math.min(hi, to) }
+}
+
 /** 年 → 横位置（0..width）。範囲の外は端に留める */
 export function yearToX(year: number, domain: Span, width: number): number {
   const span = domain.to - domain.from
@@ -79,12 +106,21 @@ export function yearToX(year: number, domain: Span, width: number): number {
  * （世紀より細かい目盛りは、precision が century の出来事に対して嘘になる）。
  */
 export function centuryTicks(domain: Span, maxTicks = 12): number[] {
-  const steps = [100, 200, 500, 1000, 2000]
   const span = domain.to - domain.from
+  const ticks = (step: number) => {
+    const out: number[] = []
+    for (let y = Math.ceil(domain.from / step) * step; y <= domain.to; y += step) out.push(y)
+    return out
+  }
+  // ★ 範囲が狭い（300年未満。近代・現代だけを見るとき）ときだけ世紀より細かく刻む。
+  //   100年刻みでは目盛りが2本しか立たず、棒の位置が読めない
+  if (span < 300) {
+    for (const step of [50, 25, 10]) if (span / step >= 3) return ticks(step)
+    return ticks(10)
+  }
+  const steps = [100, 200, 500, 1000, 2000]
   const step = steps.find(s => span / s <= maxTicks) ?? steps[steps.length - 1]!
-  const out: number[] = []
-  for (let y = Math.ceil(domain.from / step) * step; y <= domain.to; y += step) out.push(y)
-  return out
+  return ticks(step)
 }
 
 /**
