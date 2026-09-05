@@ -181,16 +181,20 @@ dbSuite('デスクトップの画面（実DB）', () => {
   })
 
   describe('教科書', () => {
-    it('読める文章を章ごと・節順にまとめる', async () => {
+    // ★ 章ではなく**国・地域**でまとめる（lib/loop/textbook.ts の COUNTRY_UNITS）。
+    //   wh.2.1.1 は「古代オリエント」、wh.2.1.2 は「ギリシア」に分かれる。
+    //   同じ親章（wh.2.1）だからといって1つにはならない。
+    it('読める文章を国・地域ごと・年代順にまとめる', async () => {
       const first = await createMaterial(db, { userId, unitId: UNIT })
       const second = await createMaterial(db, { userId, unitId: 'wh.2.1.2' })
       await db`UPDATE material SET title = '最初の文章' WHERE id = ${first}`
       await db`UPDATE material SET title = '次の文章' WHERE id = ${second}`
 
       const chapters = await textbookChapters(db, userId)
-      expect(chapters).toHaveLength(1)
-      expect(chapters[0]!.label).toBeTruthy()
-      expect(chapters[0]!.articles.map(a => a.materialId)).toEqual([first, second])
+      expect(chapters.map(c => c.id)).toEqual(['orient', 'greece'])
+      expect(chapters.map(c => c.label)).toEqual(['古代オリエント', 'ギリシア'])
+      expect(chapters.map(c => c.articles.map(a => a.materialId)))
+        .toEqual([[first], [second]])
     })
 
     it('同じ節では共有版より個人版を優先し、他人の個別版は出さない', async () => {

@@ -303,7 +303,11 @@ for (const v of videos) {
 say('')
 
 const vSet = new Set(videos.map(v => v.id))
-const links = readCsv(join(SEED_DIR, 'video_kc.csv')).filter(r => vSet.has(r.video_id))
+// ★ **承認された KC だけに結ぶ。** 未承認の KC を指す行を書き出すと、
+//   貼った先で外部キーに当たり、seed 全体が途中で止まる。
+//   設問（245行目）と同じ規則を動画にも当てる。scripts/db/seed.ts も同じ。
+const allLinks = readCsv(join(SEED_DIR, 'video_kc.csv')).filter(r => vSet.has(r.video_id))
+const links = allLinks.filter(r => approvedKcIds.has(r.kc_id!))
 say(`-- 動画と KC の対応 ${links.length} 件`)
 for (const l of links) {
   say(`INSERT INTO video_kc (video_id, kc_id, start_sec, end_sec, relevance, source) VALUES ` +
