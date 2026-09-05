@@ -12,7 +12,7 @@ import Link from 'next/link'
 import type { MasteryStatus } from '@/lib/domain/weakness'
 
 /**
- * フッタの3タブ（docs/11-ux.md §9）。
+ * モバイルフッタのタブ。
  *
  * ★ ここに載せる行き先は**必ず実在させる**。行き止まりのタブを出すと、
  *   利用者は「壊れている」と判断してアプリごと使うのをやめる。
@@ -20,31 +20,28 @@ import type { MasteryStatus } from '@/lib/domain/weakness'
 export const TABS = [
   { key: 'home', href: '/', label: 'ホーム', icon: '⌂' },
   { key: 'drills', href: '/drills', label: '特訓', icon: '◆' },
-  { key: 'records', href: '/records', label: '記録', icon: '▤' },
+  { key: 'textbook', href: '/textbook', label: '教科書', icon: '▤' },
+  { key: 'research', href: '/research', label: '検索', icon: '⌕' },
 ] as const
 
 /**
  * 画面がシェルのどこに属するか。
  *
- * ★ 'settings' はタブではない（docs/11 §9 は3タブと定めている）。
+ * ★ 'settings' はタブではない。
  *   デスクトップのサイドバーで別の見出しに置くための印である。
- *   TABS に足すと、モバイルのフッタが4つになって仕様から外れる。
  */
 export type TabKey = typeof TABS[number]['key'] | 'settings' | typeof DESK[number]['key']
 
 /**
  * デスクトップにだけ出す画面（docs/06-desktop.md）。
  *
- * ★ **TABS には足さない。** components/nav.test.ts が3タブを固定しており、
- *   あれは「モバイルのフッタを増やすな」という意図の防壁である。
- *   ここはサイドバー（1440px 以上でしか現れない）専用の一覧で、
- *   モバイルからは ⌘K か直接の URL でしか行けない。
+ * ここはサイドバー（1440px 以上でしか現れない）専用の一覧。
+ * 検索はモバイルフッタにも置くため TABS 側で管理する。
  */
 export const DESK = [
   { key: 'library', href: '/library', label: '教材の一覧' },
   { key: 'timeline', href: '/timeline', label: '年表と地図' },
-  { key: 'map', href: '/map', label: '地図' },
-  { key: 'research', href: '/research', label: '調べる' },
+  { key: 'map', href: '/map', label: '歴史地球儀' },
 ] as const
 
 /**
@@ -57,7 +54,7 @@ export const DESK = [
  *   モバイルでは**そもそも並べない**ので、中身の描画費用もかからない。
  */
 export function Screen({
-  title, children, tab, aside, trailing,
+  title, children, tab, aside, trailing, layout = 'reading',
 }: {
   title: string
   children: ReactNode
@@ -65,6 +62,8 @@ export function Screen({
   aside?: ReactNode
   /** 見出しの右端に置くもの（連続日数など）。docs/11-ux.md §7 */
   trailing?: ReactNode
+  /** 読書幅を外して道具面を広く使う画面。現在は歴史地球儀だけ。 */
+  layout?: 'reading' | 'workspace'
 }) {
   if (!tab) {
     return (
@@ -75,7 +74,7 @@ export function Screen({
     )
   }
   return (
-    <div className="lv-root hs-screen hs-shell">
+    <div className={`lv-root hs-screen hs-shell${layout === 'workspace' ? ' hs-shell--workspace' : ''}`}>
       <nav className="hs-shell__side" aria-label="メニュー">
         <span className="hs-side__label">学習</span>
         {TABS.map(t => (
@@ -85,7 +84,7 @@ export function Screen({
             {t.label}
           </Link>
         ))}
-        {/* ★ 広い画面でだけ出す。モバイルのフッタは3つのまま（docs/11 §9） */}
+        {/* ★ 広い画面でだけ出す。モバイルでは下のフッタを使う */}
         <span className="hs-side__label">机の上</span>
         {DESK.map(d => (
           <Link key={d.key} href={d.href}
@@ -95,9 +94,8 @@ export function Screen({
           </Link>
         ))}
 
-        {/* ★ 設定はタブに入れない。docs/11 §9 が3タブと定めている。
-             デスクトップは横に余裕があるので、別の見出しで下に置く。
-             モバイルからは記録タブの末尾から入る。 */}
+        {/* ★ 設定は主要タブに入れない。デスクトップは横に余裕があるので、
+             別の見出しで下に置く。モバイルでも直接 URL から開ける。 */}
         <span className="hs-side__label">アカウント</span>
         <Link href="/settings"
               className={`hs-side__item${tab === 'settings' ? ' hs-side__item--active' : ''}`}

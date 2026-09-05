@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { authEnabled } from '@/lib/auth/supabase'
@@ -9,14 +10,14 @@ import { PushToggle } from '@/components/push-toggle'
 import { publicVapidKey } from '@/lib/push/vapid'
 import { subscribePush, unsubscribePush } from './actions'
 import { isAdmin } from '@/lib/auth/admin'
+import { hasDiagnostic } from '@/lib/loop/diagnostic'
 
 export const dynamic = 'force-dynamic'
 
 /**
  * 設定（docs/11-ux.md §10 の画面12）
  *
- * ★ タブには入れない。docs/11 §9 が3タブと定めているので、
- *   デスクトップはサイドバーの「アカウント」から、モバイルは記録タブの末尾から入る。
+ * ★ 主要タブには入れない。デスクトップはサイドバーの「アカウント」から入る。
  */
 export default async function Settings() {
   const db = tryDb()
@@ -30,10 +31,13 @@ export default async function Settings() {
     )
   }
 
-  const [u] = await db<{
-    max_daily_items: number; display_name: string | null; remind_hour: number | null
-  }[]>`
-    SELECT max_daily_items, display_name, remind_hour FROM app_user WHERE id = ${userId}`
+  const [[u], tookDiagnostic] = await Promise.all([
+    db<{
+      max_daily_items: number; display_name: string | null; remind_hour: number | null
+    }[]>`
+      SELECT max_daily_items, display_name, remind_hour FROM app_user WHERE id = ${userId}`,
+    hasDiagnostic(db, userId),
+  ])
 
   // ★ 鍵が無ければ通知の枠ごと出さない（lib/push/vapid.ts の作法）。
   //   「押しても何も起きないボタン」を置かない
@@ -55,8 +59,23 @@ export default async function Settings() {
         />
       )}
 
-      {/* ★ 管理画面への入口。タブには足さない（components/nav.test.ts が3タブを固定しており、
-           あれは「増やすな」という意図の防壁である）。作者以外にはこの行ごと出ない */}
+      <Card>
+        <span className="lv-label">診断テスト</span>
+        {tookDiagnostic ? (
+          <>
+            <p className="lv-caption">診断結果の確認と、必要なときの受け直しができます。</p>
+            <Link className="lv-btn lv-btn--block" href="/diagnostic/result">結果を見る</Link>
+            <Link className="lv-btn lv-btn--block" href="/diagnostic">受け直す</Link>
+          </>
+        ) : (
+          <>
+            <p className="lv-caption">最大24問・10分ほど。点数は付きません。</p>
+            <Link className="lv-btn lv-btn--block" href="/diagnostic">診断テストを受ける</Link>
+          </>
+        )}
+      </Card>
+
+      {/* ★ 管理画面への入口。主要タブには足さず、作者以外にはこの行ごと出さない */}
       {isAdmin(userId) && (
         <Card>
           <span className="lv-label">管理</span>
@@ -68,7 +87,7 @@ export default async function Settings() {
       <Card>
         <span className="lv-label">この端末に残っているもの</span>
         <p className="lv-caption">
-          オフラインで読めるように、読んだ教材と最後に見た記録をこの端末に保存しています。
+          オフラインで読めるように、読んだ教材と最後に見た教科書をこの端末に保存しています。
           出題と確認テストは保存していません（正解を端末に置かないため）。
           ログアウトすると保存したものは消えます。
         </p>

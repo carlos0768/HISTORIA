@@ -12,9 +12,16 @@ import { createDrillAction, type CreateResult } from '../actions'
  * ★ KC が0件の節も隠さずに出す。隠すと「教科書にあるのに出てこない」と映り、
  *   何が足りないのかが分からなくなる。選べないことと理由を書く。
  */
-export function RangePicker({ tree, defaultDeadline }: { tree: UnitTreeNode[]; defaultDeadline: string }) {
+export function RangePicker({
+  tree, defaultDeadline, initialUnitId,
+}: { tree: UnitTreeNode[]; defaultDeadline: string; initialUnitId?: string }) {
   const router = useRouter()
-  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [selected, setSelected] = useState<Set<string>>(() => {
+    if (!initialUnitId) return new Set()
+    const selectable = tree.some(part => part.children.some(chapter =>
+      chapter.children.some(section => section.id === initialUnitId && section.kcCount > 0)))
+    return selectable ? new Set([initialUnitId]) : new Set()
+  })
   const [open, setOpen] = useState<Set<string>>(() => new Set(tree.filter(n => n.kcCount > 0).map(n => n.id)))
   const [title, setTitle] = useState('')
   const [deadline, setDeadline] = useState(defaultDeadline)

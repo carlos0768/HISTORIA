@@ -23,6 +23,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { feature, mesh } from 'topojson-client'
 import { geoNaturalEarth1, geoPath, geoGraticule, geoArea, geoCentroid } from 'd3-geo'
+import { simplify } from './simplify.mjs'
 
 /**
  * ★ 解像度を引数で選べるようにした（2026-09-02）。
@@ -51,34 +52,6 @@ const path = geoPath(proj)
 // 間引きの強さ。50m は拡大して見るので、110m ほど落とせない
 const STEP = HI ? 0.25 : 0.35
 const RING = HI ? 0.4 : 0.5
-
-/**
- * 投影後の座標で間引く。660×340 で見えない差は落とす。
- * minStep: 直前の点からこれ未満しか動かない点を落とす（px）
- * minRing: これより小さい輪を落とす（px）。0 なら落とさない
- */
-function simplify(d, minStep, minRing) {
-  const out = []
-  for (const sub of d.split('M').filter(Boolean)) {
-    const closed = sub.endsWith('Z')
-    const pts = sub.replace(/Z$/, '').split('L').map(s => s.split(',').map(Number))
-    if (pts.some(p => !isFinite(p[0]) || !isFinite(p[1]))) continue
-    if (minRing > 0) {
-      const xs = pts.map(p => p[0]), ys = pts.map(p => p[1])
-      if (Math.max(...xs) - Math.min(...xs) < minRing && Math.max(...ys) - Math.min(...ys) < minRing) continue
-    }
-    const kept = [pts[0]]
-    for (const p of pts.slice(1)) {
-      const q = kept[kept.length - 1]
-      if (Math.hypot(p[0] - q[0], p[1] - q[1]) >= minStep) kept.push(p)
-    }
-    if (kept.length < 3) continue
-    const s = kept.map(([a, b]) => `${Math.round(a * 10) / 10},${Math.round(b * 10) / 10}`)
-      .filter((v, i, a) => v !== a[i - 1]).join('L')
-    out.push('M' + s + (closed ? 'Z' : ''))
-  }
-  return out.join('')
-}
 
 // ---- 国土 ----
 const paths = {}, names = {}

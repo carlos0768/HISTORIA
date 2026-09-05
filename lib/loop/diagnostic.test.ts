@@ -82,14 +82,14 @@ describe('画面の文言（§5.5）', () => {
   /**
    * ★ 導線が1本しか無いと、受けたあと辿り着けなくなる。
    *   ホームの案内は `!hasDiagnostic` の分岐の中にあるので、
-   *   一度受けると消える。記録タブに常設の入口を置いてある。
+   *   一度受けると消える。設定画面に常設の入口を置いてある。
    */
-  it('記録タブから受け直しと結果の見返しができる', () => {
-    const records = rendered('app/records/page.tsx')
-    expect(records).toContain('href="/diagnostic/result"')
-    expect(records).toContain('href="/diagnostic"')
+  it('設定画面から受け直しと結果の見返しができる', () => {
+    const settings = rendered('app/settings/page.tsx')
+    expect(settings).toContain('href="/diagnostic/result"')
+    expect(settings).toContain('href="/diagnostic"')
     // 受けたかどうかで文言を出し分けている（受けていない人に「結果を見る」を出さない）
-    expect(records).toContain('tookDiagnostic')
+    expect(settings).toContain('tookDiagnostic')
   })
 
   it('進捗を出す（終わりが見えない測定は投げ出される）', () => {

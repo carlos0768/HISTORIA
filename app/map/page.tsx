@@ -1,62 +1,39 @@
-import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
-import { Screen, Card } from '@/components/ui'
+import { tryDb } from '@/lib/db/optional'
+import { loadAtlasBundle } from '@/lib/atlas/catalog'
+import { atlasLearningHref } from '@/lib/atlas/learning'
+import { Screen } from '@/components/ui'
 import { NotReady } from '@/components/not-ready'
-import { REGION_SHAPES } from '@/lib/map/regions'
-import { MapLoader } from './loader'
+import { AtlasLoader } from './loader'
 
 export const dynamic = 'force-dynamic'
 
-/**
- * 地図ワークスペース（docs/06-desktop.md 04）
- *
- * ★ 教材に埋まっている地図（components/world-map.tsx）とは別物である。
- *   あちらは「いま読んでいる節の地域を示す小さな図」で、こちらは
- *   「地図そのものを見る場所」。基図の解像度も操作もパン・ズームも違う。
- *
- * ★ 地域は URL で選ぶ（`?region=1&region=7`）。
- *   状態を URL に置けば、見ている範囲をそのまま人に渡せる。
- */
 export default async function MapPage({
   searchParams,
 }: {
-  searchParams: Promise<{ region?: string | string[] }>
+  searchParams: Promise<{ story?: string; year?: string }>
 }) {
-  const db = tryDb()
   const userId = await currentUserId()
-  const { region } = await searchParams
+  if (!userId) return <Screen title="歴史地球儀" tab="map"><NotReady /></Screen>
 
-  if (!db || !userId) {
-    return <Screen title="地図" tab="map"><NotReady /></Screen>
-  }
-
-  const asked = (Array.isArray(region) ? region : region ? [region] : [])
-    .map(Number)
-    .filter(n => Number.isInteger(n))
-  // ★ 知らない id は落とす。塗れない id を渡しても静かに何も起きないので、
-  //   ここで弾いておくと「選んだのに塗られない」の原因が分かる
-  const known = new Set(REGION_SHAPES.map(s => s.id))
-  const regionIds = asked.filter(n => known.has(n))
+  const bundle = await loadAtlasBundle()
+  const db = tryDb()
+  const query = await searchParams
+  const initialStory = bundle.stories.find(story => story.id === query.story) ?? bundle.stories[0]!
+  const eventIds = new Set(initialStory.eventIds)
+  const initialEvents = bundle.events.filter(event => eventIds.has(event.id))
+  const initialLearningHref = await atlasLearningHref(db, userId, initialStory.unitId)
+  const parsedYear = Number(query.year)
 
   return (
-    <Screen title="地図" tab="map">
-      <Card>
-        <span className="lv-label">地域を塗る</span>
-        <form className="hs-report__row" method="get">
-          <select className="lv-input" name="region" aria-label="塗る地域">
-            <option value="">選ばない</option>
-            {REGION_SHAPES.map(s => (
-              <option key={s.id} value={s.id}>{s.label}</option>
-            ))}
-          </select>
-          <button type="submit" className="lv-btn">塗る</button>
-        </form>
-        <p className="lv-caption">
-          ドラッグで移動、ホイールで拡大縮小。PNG で保存できます。
-        </p>
-      </Card>
-
-      <MapLoader regionIds={regionIds} title="世界地図" />
+    <Screen title="歴史地球儀" tab="map" layout="workspace">
+      <AtlasLoader
+        stories={bundle.stories}
+        initialStory={initialStory}
+        initialEvents={initialEvents}
+        initialLearningHref={initialLearningHref}
+        initialYear={Number.isInteger(parsedYear) && parsedYear !== 0 ? parsedYear : undefined}
+      />
     </Screen>
   )
 }

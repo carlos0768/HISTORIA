@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { globSync } from 'node:fs'
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
@@ -12,8 +12,7 @@ import { clampView, zoomAt, MIN_ZOOM, MAX_ZOOM } from './map-workspace'
  * デスクトップの部品（docs/06-desktop.md）
  *
  * ★ 守りたい一線は2つある。
- *   1. **モバイルの見た目を変えないこと。** フッタは3タブのままで、
- *      デスクトップ専用の画面はそこに混ざらない。
+ *   1. モバイルのフッタにデスクトップ専用の画面を混ぜないこと。
  *   2. **⌘K が入力欄の中で発火しないこと。** 書きかけを消してパレットが開くのは事故である。
  */
 
@@ -365,16 +364,15 @@ describe('⌘K の置き場所', () => {
   })
 })
 
-describe('モバイルを変えていないこと', () => {
-  /** ★ components/nav.test.ts と対になる防壁。デスクトップの画面をタブに混ぜない */
-  it('タブは3つのまま', () => {
-    expect(TABS).toHaveLength(3)
-    expect(TABS.map(t => t.href)).toEqual(['/', '/drills', '/records'])
+describe('モバイルナビゲーション', () => {
+  it('検索を含む4つのタブがある', () => {
+    expect(TABS).toHaveLength(4)
+    expect(TABS.map(t => t.href)).toEqual(['/', '/drills', '/textbook', '/research'])
   })
 
   /**
    * ★ ここは型でも守られている。`TABS.map(t => t.href)` の型は
-   *   `'/' | '/drills' | '/records'` に固定されるので、DESK の href を
+   *   `'/' | '/drills' | '/textbook' | '/research'` に固定されるので、DESK の href を
    *   `Set.has()` に渡すと **tsc が落ちる**（重なりが無いことの証明になる）。
    *   実行時にも見ておくのは、どちらかを `string[]` に緩めたときのためである。
    */
@@ -391,6 +389,31 @@ describe('モバイルを変えていないこと', () => {
    *   **どの経路の manifest にも載っていない**（＝初回の読み込みには入らない）。
    *   本文の地図が使う 110m は lib/map/basemap.ts（166KB）のまま据え置き。
    */
+  /**
+   * ★ 版図の境界データ（lib/map/territory-geo/<国家>.ts）も同じ。国家ごとに別 chunk で、
+   *   開いた国家の分だけ読む。1か所でも静的に import すると全国家分が初回に乗る。
+   */
+  it('版図の境界データは動的 import からしか読まれない', () => {
+    const ids = readdirSync('lib/map/territory-geo')
+      .filter(f => f.endsWith('.ts') && !['index.ts', 'types.ts', 'attribution.ts'].includes(f))
+      .map(f => f.replace(/\.ts$/, ''))
+    expect(ids.length).toBeGreaterThan(0)
+    const index = readFileSync('lib/map/territory-geo/index.ts', 'utf8')
+    for (const id of ids) {
+      expect(index, `index.ts が ${id} を動的に読む`).toContain(`import('./${id}')`)
+      expect(index, `index.ts が ${id} を静的に読んでいる`).not.toMatch(new RegExp(`^import .* from '\\./${id}'`, 'm'))
+    }
+    const files = [...globSync('app/**/*.{ts,tsx}'), ...globSync('components/**/*.{ts,tsx}'), ...globSync('lib/**/*.{ts,tsx}')]
+      .filter(f => !f.startsWith('lib/map/territory-geo/'))
+    for (const f of files) {
+      const src = readFileSync(f, 'utf8')
+      for (const id of ids) {
+        expect(src, `${f} が territory-geo/${id} を静的に読んでいる`).not.toContain(`/territory-geo/${id}'`)
+      }
+    }
+    expect(readFileSync('components/territory-player.tsx', 'utf8')).toContain('TERRITORY_GEO[')
+  })
+
   it('50m の基図は動的 import からしか読まれない', () => {
     const loader = readFileSync('app/map/loader.tsx', 'utf8')
     expect(loader).toContain("import('@/lib/map/basemap-50m')")

@@ -18,7 +18,7 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: 'ja',
     start_url: '/',
     scope: '/',
-    // ブラウザの chrome を消す。フッタの3タブが下端に来るので、
+    // ブラウザの chrome を消す。フッタのタブが下端に来るので、
     // アドレスバーの分だけ縦が稼げる（docs/11 §9）
     display: 'standalone',
     orientation: 'portrait',

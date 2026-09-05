@@ -1,0 +1,29 @@
+{
+  "id": "story.industrial-revolution-spread",
+  "title": "産業革命の波及",
+  "summary": "イギリスの綿工業・蒸気機関から、大陸ヨーロッパと日本への工業化の波を追う。",
+  "unitId": "wh.4.1.1",
+  "kind": "diffusion",
+  "heroYear": 1764,
+  "examWeight": 3,
+  "eventIds": [
+    "ae.industry.spinning_jenny",
+    "ae.industry.water_frame",
+    "ae.industry.watt_engine",
+    "ae.industry.power_loom",
+    "ae.industry.belgium",
+    "ae.industry.stockton_darlington",
+    "ae.industry.ruhr",
+    "ae.industry.japan_railway"
+  ],
+  "steps": [
+    {"id":"as.industry.1","eventId":"ae.industry.spinning_jenny","ord":1,"title":"紡績を機械化","narration":"多軸紡績機が綿糸生産を大きく増やした。","durationMs":3000},
+    {"id":"as.industry.2","eventId":"ae.industry.water_frame","ord":2,"title":"工場制が成立","narration":"水力機械を集めた大規模工場がクロムフォードに生まれた。","durationMs":3400},
+    {"id":"as.industry.3","eventId":"ae.industry.watt_engine","ord":3,"title":"蒸気力を実用化","narration":"改良蒸気機関が動力源と工場立地を変えていった。","durationMs":3400},
+    {"id":"as.industry.4","eventId":"ae.industry.power_loom","ord":4,"title":"織布も機械化","narration":"力織機が織布工程にも機械化を広げた。","durationMs":3000},
+    {"id":"as.industry.5","eventId":"ae.industry.belgium","ord":5,"title":"ベルギーへ波及","narration":"石炭と鉄、技術移転を背景に大陸で早く工業化した。","durationMs":3600},
+    {"id":"as.industry.6","eventId":"ae.industry.stockton_darlington","ord":6,"title":"鉄道が交通を変える","narration":"蒸気鉄道が石炭輸送と人の移動を加速した。","durationMs":3400},
+    {"id":"as.industry.7","eventId":"ae.industry.ruhr","ord":7,"title":"ルール工業地帯が成長","narration":"ドイツでは石炭・鉄鋼・鉄道が結びついて工業化が進んだ。","durationMs":3600},
+    {"id":"as.industry.8","eventId":"ae.industry.japan_railway","ord":8,"title":"日本の交通基盤へ","narration":"明治政府も鉄道を導入し、国家主導の工業化を進めた。","durationMs":3800}
+  ]
+}
