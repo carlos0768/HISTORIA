@@ -312,6 +312,15 @@ body { margin: 0; background: var(--lv-canvas); }
   padding: 1px 5px; font: 600 10px/1.4 var(--lv-font-ja); white-space: nowrap;
 }
 .hs-research__meta { color: var(--lv-sub); }
+.hs-research__section { display: grid; grid-template-columns: 1fr auto; gap: var(--lv-space-2); align-items: start;
+  border-top: var(--lv-hairline); padding: 8px 0; }
+.hs-research__section--active { background: var(--lv-marker); }
+.hs-research__pick { background: none; border: 0; padding: 0; text-align: left; color: var(--lv-ink);
+  cursor: pointer; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.hs-research__crumb { font: var(--lv-text-caption); color: var(--lv-muted); }
+.hs-research__heading { font: 600 14px/1.5 var(--lv-font-ja); }
+.hs-research__snippet { font: var(--lv-text-caption); color: var(--lv-sub); }
+.hs-research__open { align-self: center; white-space: nowrap; }
 .hs-timeline__row--active .hs-research__meta,
 .hs-timeline__row--active .lv-caption { color: var(--lv-ink); }
 
@@ -335,15 +344,18 @@ body { margin: 0; background: var(--lv-canvas); }
 .hs-chrono__bar { stroke: var(--lv-ink); stroke-width: 0.8; }
 .hs-chrono__bar--event { fill: var(--lv-marker); }
 .hs-chrono__bar--kc { fill: var(--lv-canvas); }
+.hs-chrono__bar--section { fill: var(--lv-paper); stroke: var(--lv-accent); stroke-width: 1.6; }
 .hs-chrono__bar--approx { stroke-dasharray: 2 1.5; }
 .hs-chrono__bar--selected { fill: var(--lv-accent); }
-.hs-chrono__label { font: 400 11px var(--lv-font-ja); fill: var(--lv-ink); }
+.hs-chrono__label { font: 400 11px var(--lv-font-ja); fill: var(--lv-ink); pointer-events: none; }
+.hs-chrono__year-mark { stroke: var(--lv-ink); stroke-width: 1.2; }
 .hs-chrono__label--selected { font-weight: 600; }
 .hs-chrono__legend { display: flex; gap: var(--lv-space-3); flex-wrap: wrap; font: var(--lv-text-caption); color: var(--lv-sub); }
 .hs-chrono__key { display: inline-flex; align-items: center; gap: 4px; }
 .hs-chrono__swatch { width: 14px; height: 8px; border: 1px solid var(--lv-ink); display: inline-block; }
 .hs-chrono__swatch--event { background: var(--lv-marker); }
 .hs-chrono__swatch--kc { background: var(--lv-canvas); }
+.hs-chrono__swatch--section { background: var(--lv-paper); border-color: var(--lv-accent); border-width: 2px; }
 .hs-chrono__swatch--approx { background: var(--lv-paper); border-style: dashed; }
 .hs-chrono__swatch--selected { background: var(--lv-accent); }
 

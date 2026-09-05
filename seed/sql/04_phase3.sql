@@ -39,6 +39,10 @@ ALTER TABLE app_user ADD COLUMN IF NOT EXISTS remind_hour smallint CHECK (remind
 ALTER TABLE canon_event ADD COLUMN IF NOT EXISTS embedding vector(768);
 CREATE INDEX IF NOT EXISTS canon_event_embedding_idx ON canon_event USING hnsw (embedding vector_cosine_ops);
 
+-- ---- material_section.embedding ----
+ALTER TABLE material_section ADD COLUMN IF NOT EXISTS embedding vector(768);
+CREATE INDEX IF NOT EXISTS material_section_embedding_idx ON material_section USING hnsw (embedding vector_cosine_ops);
+
 -- ---- user_activity を response と material_read から作り直す ----
 -- ★ 日付は Asia/Tokyo。UTC で入れると日本時間の深夜0〜9時が前日に落ちる。
 --   アプリ側（lib/domain/streak.ts の jstDate）と同じ基準にそろえる。
@@ -59,9 +63,9 @@ ON CONFLICT (user_id, activity_date) DO UPDATE
 COMMIT;
 
 -- ---- 確認 ----
--- 表 が 2、列 が 2 になっていれば当たっている。
+-- 表 が 2、列 が 3 になっていれば当たっている。
 SELECT
   (SELECT count(*) FROM pg_tables WHERE schemaname = 'public'
      AND tablename IN ('push_subscription', 'ops_log')) AS 表,
   (SELECT count(*) FROM information_schema.columns WHERE table_schema = 'public'
-     AND (table_name, column_name) IN (('app_user', 'remind_hour'), ('canon_event', 'embedding'))) AS 列;
+     AND (table_name, column_name) IN (('app_user', 'remind_hour'), ('canon_event', 'embedding'), ('material_section', 'embedding'))) AS 列;

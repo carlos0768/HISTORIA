@@ -266,9 +266,15 @@ function SectionPane({
 
 /** 教材を1セクションずつ読む */
 export function Reader({
-  title, totalChars, sections,
-}: { title: string; totalChars: number; sections: SectionProps[] }) {
+  title, totalChars, sections, initialOrd = null,
+}: {
+  title: string; totalChars: number; sections: SectionProps[]
+  /** 開く節の ord。「調べる」の結果から飛んできたときに指定される。無ければ未読の最初の節 */
+  initialOrd?: number | null
+}) {
   const [i, setI] = useState(() => {
+    const asked = initialOrd === null ? -1 : sections.findIndex(s => s.ord === initialOrd)
+    if (asked !== -1) return asked
     const first = sections.findIndex(s => !s.read && !s.hidden)
     return first === -1 ? 0 : first
   })

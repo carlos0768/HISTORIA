@@ -46,6 +46,9 @@ export const NEW_COLUMNS: readonly NewColumn[] = [
   // 教材の中の「調べる」の近傍検索（docs/11-ux.md §4.1）。kc.embedding と同じ次元・同じモデル
   { table: 'canon_event', column: 'embedding', type: 'vector(768)',
     index: 'USING hnsw (embedding vector_cosine_ops)' },
+  // 同じ「調べる」が教材の本文（節）も引く。見出し＋本文の先頭を埋め込む
+  { table: 'material_section', column: 'embedding', type: 'vector(768)',
+    index: 'USING hnsw (embedding vector_cosine_ops)' },
 ]
 
 /**
