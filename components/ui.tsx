@@ -35,7 +35,7 @@ export type TabKey = typeof TABS[number]['key'] | 'settings' | typeof DESK[numbe
 /**
  * デスクトップにだけ出す画面（docs/06-desktop.md）。
  *
- * ここはサイドバー（1440px 以上でしか現れない）専用の一覧。
+ * ここはサイドバー（1024px 以上で現れる）専用の一覧。
  * 検索はモバイルフッタにも置くため TABS 側で管理する。
  */
 export const DESK = [
@@ -50,7 +50,7 @@ export const DESK = [
  * ★ `tab` を渡した画面だけに導線が付く。認証まわり（招待コード・ログイン・生年月日）は
  *   ログイン前なので渡さない。渡すと未登録の人にアプリの構造が見える。
  *
- * ★ `aside` は 1440px 以上でだけ現れる資料面（設計系の三分割の右 320px）。
+ * ★ `aside` はデスクトップで現れる資料面（設計系の三分割の右 320px）。
  *   モバイルでは**そもそも並べない**ので、中身の描画費用もかからない。
  */
 export function Screen({

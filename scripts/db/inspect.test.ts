@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import type { Sql } from 'postgres'
 import { createTestDb, TEST_DB_URL } from '@/lib/db/test-helper'
 import { parseSchema, schemaShape } from './schema-shape'
-import { inspect, verdictFor, SEEDED_TABLES, PHASE3_TABLES } from './inspect'
+import { inspect, verdictFor, SEEDED_TABLES, PHASE3_TABLES, PHASE3_COLUMNS } from './inspect'
 import { PASTE_LIMIT_KB, deployGuidance } from './dump-sql'
 
 /**
@@ -79,15 +79,17 @@ describe('何を流すべきかの判定', () => {
   })
 
   it('04_phase3 の範囲なら phase3', () => {
-    expect(verdictFor(44, ['push_subscription', 'ops_log'], [])).toBe('phase3')
-    expect(verdictFor(44, [], ['app_user.remind_hour'])).toBe('phase3')
-    expect(verdictFor(44, ['ops_log'], ['app_user.remind_hour'])).toBe('phase3')
+    expect(PHASE3_COLUMNS).toContain('material_section.embedding')
+    expect(verdictFor(51, ['push_subscription', 'ops_log'], [])).toBe('phase3')
+    expect(verdictFor(51, [], ['app_user.remind_hour'])).toBe('phase3')
+    expect(verdictFor(51, [], ['material_section.embedding'])).toBe('phase3')
+    expect(verdictFor(51, ['ops_log'], ['app_user.remind_hour'])).toBe('phase3')
   })
 
   /** ★ 04_phase3 で埋まらない差分を phase3 と言ってはいけない（流しても直らない） */
   it('範囲外が混ざれば unknown_drift', () => {
-    expect(verdictFor(44, ['ops_log', 'response'], [])).toBe('unknown_drift')
-    expect(verdictFor(44, [], ['item.elo_b'])).toBe('unknown_drift')
+    expect(verdictFor(51, ['ops_log', 'response'], [])).toBe('unknown_drift')
+    expect(verdictFor(51, [], ['item.elo_b'])).toBe('unknown_drift')
   })
 })
 

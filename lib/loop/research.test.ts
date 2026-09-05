@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from 'vitest
 import type { Sql } from 'postgres'
 import { createTestDb, TEST_DB_URL } from '@/lib/db/test-helper'
 import { seedMasters, SEED_DIR } from '@/scripts/db/seed'
-import { createClient, readConfig } from '@/lib/ai/client'
+import { createClient, readConfig, type Client } from '@/lib/ai/client'
 import { runResearch } from './research-service'
 import {
   parseQuery, likePattern, toVectorLiteral, rankHits, research, embedMissing, embedCoverage,
@@ -42,6 +42,46 @@ describe('ベクトルの書式', () => {
     const v = new Array(EMBED_DIMENSIONS).fill(0)
     v[3] = Number.NaN
     expect(() => toVectorLiteral(v)).toThrow()
+  })
+})
+
+describe('検索入口の障害時フォールバック', () => {
+  /** SQL 断片は印を返し、実問い合わせだけを制御する最小の postgres.js 代役。 */
+  const fakeDb = (failure: 'hybrid' | 'all'): Sql => {
+    const tag = ((strings: TemplateStringsArray, ...values: unknown[]) => {
+      const text = strings.join(' ')
+      const isQuery = /SELECT k\.id|SELECT e\.id|SELECT s\.id/.test(text)
+      if (!isQuery) return { hybrid: text.includes('<=>') }
+      const hybrid = values.some(v => typeof v === 'object' && v !== null && 'hybrid' in v
+        && (v as { hybrid: boolean }).hybrid)
+      if (failure === 'all' || hybrid) {
+        return Promise.reject(Object.assign(new Error('test database failure'), { code: '42P01' }))
+      }
+      return Promise.resolve([])
+    }) as unknown as Sql
+    return tag
+  }
+
+  const semanticClient = {
+    embedProviderName: 'gemini',
+    embed: vi.fn(async () => ({ vectors: [new Array(EMBED_DIMENSIONS).fill(0)], model: 'test' })),
+  } as unknown as Client
+
+  it('意味検索が失敗しても語の一致へ落として結果画面を返す', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const r = await runResearch(fakeDb('hybrid'), 'コロンブス', { client: semanticClient })
+    expect(r).toMatchObject({ ok: true, mode: 'text', note: expect.stringMatching(/語の一致だけ/) })
+    expect(error).toHaveBeenCalled()
+    error.mockRestore()
+  })
+
+  it('語の一致も失敗したときは Next の例外画面ではなく固定文を返す', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const client = createClient(readConfig({} as unknown as NodeJS.ProcessEnv))
+    const r = await runResearch(fakeDb('all'), 'コロンブス', { client })
+    expect(r).toEqual({ ok: false, error: 'データベースの準備がまだ終わっていません。作者に連絡してください。' })
+    expect(error).toHaveBeenCalled()
+    error.mockRestore()
   })
 })
 

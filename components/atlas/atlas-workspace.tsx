@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import {
-  useDeferredValue, useEffect, useMemo, useRef, useState,
+  useCallback, useDeferredValue, useEffect, useMemo, useRef, useState,
   type KeyboardEvent, type PointerEvent as ReactPointerEvent, type WheelEvent,
 } from 'react'
 import type { Feature, GeoJsonProperties, Geometry } from 'geojson'
@@ -74,6 +74,11 @@ export function AtlasWorkspace({
   const [query, setQuery] = useState('')
   const deferredQuery = useDeferredValue(query)
   const [flags, setFlags] = useState<FeatureFlags>({ route: true, point: true, area: true })
+  const storyRequest = useRef(0)
+  const filteredStories = useMemo(
+    () => stories.filter(item => !deferredQuery || `${item.title} ${item.summary}`.includes(deferredQuery)),
+    [deferredQuery, stories],
+  )
   const eventById = useMemo(() => new Map(storyEvents.map(event => [event.id, event])), [storyEvents])
   const currentStep = story.steps[Math.min(stepIndex, story.steps.length - 1)]!
   const currentEvent = eventById.get(currentStep.eventId) ?? storyEvents[0]!
@@ -109,19 +114,30 @@ export function AtlasWorkspace({
     return () => controller.abort()
   }, [deferredQuery, mode, year])
 
-  const chooseStory = async (id: string) => {
+  const chooseStory = useCallback(async (id: string) => {
     const next = stories.find(candidate => candidate.id === id)
     if (!next) return
+    const request = ++storyRequest.current
     const response = await fetch(`/api/atlas/stories/${encodeURIComponent(id)}`)
     if (!response.ok) return
     const detail = await response.json() as { story: AtlasStory; events: AtlasEvent[]; learningHref: string }
+    // 入力中に候補が続けて変わった場合、遅れて返った古い応答で巻き戻さない。
+    if (request !== storyRequest.current) return
     setStory(detail.story)
     setStoryEvents(detail.events)
     setLearningHref(detail.learningHref)
     setStepIndex(0)
     setYear(next.heroYear)
     setPlaying(false)
-  }
+  }, [stories])
+
+  // 検索で現在の物語が候補から外れたら、先頭候補を実際の表示にも反映する。
+  // select の option だけを絞ると、欄は新候補なのに地球と説明は旧物語のままになる。
+  useEffect(() => {
+    if (mode !== 'story' || filteredStories.length === 0) return
+    if (filteredStories.some(item => item.id === story.id)) return
+    void chooseStory(filteredStories[0]!.id)
+  }, [chooseStory, filteredStories, mode, story.id])
 
   return (
     <div className="hs-atlas">
@@ -139,7 +155,7 @@ export function AtlasWorkspace({
           <label className="hs-atlas-select hs-atlas-select--story">
             <span className="sr-only">選択中の物語</span>
             <select value={story.id} onChange={event => { void chooseStory(event.target.value) }}>
-              {stories.filter(item => !query || `${item.title} ${item.summary}`.includes(query)).map(item => (
+              {filteredStories.map(item => (
                 <option key={item.id} value={item.id}>{item.title}</option>
               ))}
             </select>
