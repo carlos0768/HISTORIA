@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  PERIODS, periodsOf, formatCentury, toCenturyBounds, fitDomain, yearToX, centuryTicks, assignLanes,
+  PERIODS, periodsOf, formatCentury, toCenturyBounds, fitDomain, adaptiveDomain, yearToX, centuryTicks, assignLanes,
   CHART_MIN_YEAR, CHART_MAX_YEAR,
 } from './periods'
 
@@ -53,6 +53,22 @@ describe('年表の横軸', () => {
     expect(fitDomain([{ from: -3000, to: -2950 }]).from).toBe(CHART_MIN_YEAR)
   })
 
+  it('結果のある時代に合わせる（近代だけなら近代の範囲、時代の境界は越えない）', () => {
+    expect(adaptiveDomain([])).toEqual({ from: CHART_MIN_YEAR, to: CHART_MAX_YEAR })
+    // 近代（1800〜1900）にしか無い → 近代の幅だけ
+    expect(adaptiveDomain([{ from: 1810, to: 1815 }, { from: 1871, to: 1890 }])).toEqual({ from: 1800, to: 1900 })
+    // 現代は 2000 で切る
+    expect(adaptiveDomain([{ from: 1945, to: 1991 }])).toEqual({ from: 1900, to: 2000 })
+    // 古代の中では世紀に寄せ、最小 500 年に広げる
+    expect(adaptiveDomain([{ from: -670, to: -330 }])).toEqual({ from: -800, to: -200 })
+    // 中世と近世に跨る → 両方の中で世紀に寄せる
+    const d = adaptiveDomain([{ from: 1450, to: 1450 }, { from: 1550, to: 1550 }])
+    expect(d.from).toBeGreaterThanOrEqual(500)
+    expect(d.to).toBeLessThanOrEqual(1800)
+    expect(d.from).toBeLessThanOrEqual(1400)
+    expect(d.to).toBeGreaterThanOrEqual(1600)
+  })
+
   it('年を横位置にする。範囲の外は端に留める', () => {
     const d = { from: -1000, to: 1000 }
     expect(yearToX(-1000, d, 200)).toBe(0)
@@ -70,6 +86,10 @@ describe('年表の横軸', () => {
     expect(full[full.length - 1]).toBe(2000)
     // 100 で割り切れない端は内側の刻みから始める
     expect(centuryTicks({ from: -1750, to: -1200 })).toEqual([-1700, -1600, -1500, -1400, -1300, -1200])
+    // 300年未満（近代だけ等）は世紀より細かく刻む
+    expect(centuryTicks({ from: 1800, to: 1900 })).toEqual([1800, 1825, 1850, 1875, 1900])
+    expect(centuryTicks({ from: 1900, to: 2000 })).toEqual([1900, 1925, 1950, 1975, 2000])
+    expect(centuryTicks({ from: 1500, to: 1800 })).toEqual([1500, 1600, 1700, 1800])
   })
 
   it('重なるものは別の段に、重ならないものは同じ段に置く', () => {

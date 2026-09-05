@@ -7,10 +7,8 @@ import { recordRead, type ReadResult } from '@/lib/loop/material'
 import { reportContent, type ReportTarget } from '@/lib/loop/report'
 import { recordView, retrievalAfterVideo, type RetrievalItem } from '@/lib/loop/video'
 import { submitAnswer } from '@/lib/loop/answer'
-import { createClient, type Client } from '@/lib/ai/client'
-import { BudgetExceededError } from '@/lib/ai/budget'
-import { assertNoIdentifiers } from '@/lib/ai/redact'
-import { parseQuery, research, embedCoverage, type ResearchResponse } from '@/lib/loop/research'
+import { runResearch } from '@/lib/loop/research-service'
+import type { ResearchResponse } from '@/lib/loop/research'
 
 /**
  * セクションの読了を記録する。
@@ -129,82 +127,11 @@ export async function answerRetrieval(input: {
 /**
  * 教材の中の「調べる」（docs/11-ux.md §4.1）
  *
- * ★ 検索語は**利用者が入れた語そのもの**を埋め込みの API へ送る。
- *   docs/08 §4.1 が自由入力を送らないとしているのは学習データの話で、
- *   ここは「範囲指定の自然文」と同じ例外である（同 §4.1 の但し書き）。
- *   それでも上限（QUERY_MAX_CHARS）と UUID の検査は通し、画面には送る旨を先に書く。
- *
- * ★ 意味で引けないときは語の一致だけで引き、**そう言う**。
- *   鍵が無い（フェイクの埋め込みは意味を持たない）／PGVECTOR=off／
- *   支出上限／埋め込みがまだ空、のどれでも検索そのものは止めない。
- *
- * ★ 個人の情報は返さない。kc と canon_event は全員が同じものを読む正典である。
+ * ★ 中身は lib/loop/research-service.ts の runResearch にある。
+ *   専用ページ（/research）と同じ入口を通し、文言も上限もここでは決めない。
  */
 export async function researchTextbook(rawQuery: string): Promise<ResearchResponse> {
   const userId = await currentUserId()
   if (!userId) throw new Error('ユーザーが特定できません')
-
-  const parsed = parseQuery(typeof rawQuery === 'string' ? rawQuery : '')
-  if ('error' in parsed) return { ok: false, error: parsed.error }
-  const { query } = parsed
-
-  const db = sql()
-  const now = new Date()
-  let vector: number[] | null = null
-  let note: string | null = null
-
-  /**
-   * ★ **設定の誤りで画面を落とさない。**
-   *   `createClient` は `assertConfig` を呼び、環境変数の組み合わせが
-   *   おかしいと例外を投げる（生成と検証が同じプロバイダ／モデル id と
-   *   プロバイダの食い違い）。ここはそれを受けていなかったので、
-   *   **Vercel の環境変数を1つ間違えるだけで「うまくいきませんでした」**になり、
-   *   しかも理由がどこにも出なかった。
-   *
-   *   この関数の他の失敗（鍵が無い・pgvector が無い・予算上限・埋め込みの失敗）は
-   *   すべて「語の一致だけで引く」に落として note で理由を出している。
-   *   設定の誤りだけが致命的である理由は無い。同じ扱いにする。
-   */
-  let client: Client | null = null
-  try {
-    client = createClient()
-  } catch (e) {
-    note = `AI の設定が正しくないため、語の一致だけで引いています（${
-      e instanceof Error ? e.message : String(e)}）`
-  }
-
-  if (client === null) {
-    // note は設定済み。埋め込みは作らない
-  } else if (client.embedProviderName.startsWith('fake')) {
-    note = 'AI の鍵が無いため、語の一致だけで引いています。'
-  } else if (process.env.PGVECTOR === 'off') {
-    note = 'このデータベースには pgvector が無いため、語の一致だけで引いています。'
-  } else {
-    try {
-      assertNoIdentifiers(query)
-    } catch {
-      return { ok: false, error: '検索語に識別子（UUID）が含まれています。語だけを入れてください。' }
-    }
-    try {
-      const out = await client.embed({ db, texts: [query], now })
-      vector = out.vectors[0] ?? null
-    } catch (e) {
-      note = e instanceof BudgetExceededError
-        ? '今月の AI 支出が上限に達しているため、語の一致だけで引いています。'
-        : '意味の近さでは引けなかったため、語の一致だけで引いています。'
-    }
-  }
-
-  const hits = await research(db, { query, vector })
-  const mode = vector === null ? 'text' : 'hybrid'
-
-  // ベクトルは作れたのに近傍が1件も無い＝索引がまだ空。黙って「語の一致だけ」の顔をしない
-  if (mode === 'hybrid' && hits.every(h => h.similarity === null)) {
-    const c = await embedCoverage(db)
-    if (c.kc.embedded === 0 && c.canonEvent.embedded === 0) {
-      note = '埋め込みの索引がまだ作られていないため、語の一致だけで引けています（npm run db:embed-index）。'
-    }
-  }
-
-  return { ok: true, query, mode, note, hits }
+  return runResearch(sql(), typeof rawQuery === 'string' ? rawQuery : '', { userId })
 }

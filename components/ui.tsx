@@ -44,6 +44,7 @@ export const DESK = [
   { key: 'library', href: '/library', label: '教材の一覧' },
   { key: 'timeline', href: '/timeline', label: '年表と地図' },
   { key: 'map', href: '/map', label: '地図' },
+  { key: 'research', href: '/research', label: '調べる' },
 ] as const
 
 /**
