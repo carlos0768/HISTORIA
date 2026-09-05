@@ -194,10 +194,24 @@ export type Client = {
   embed(a: EmbedCall): Promise<{ vectors: number[][]; model: string }>
 }
 
-export function createClient(cfg: AiConfig = readConfig(), fake: FakeOptions = {}): Client {
+export type ClientOverrides = {
+  /**
+   * 生成プロバイダを差し替える。手で書いた教材を流し込むときに使う
+   * （`lib/ai/authored.ts`）。
+   *
+   * ★ **検証側は差し替えられない。** 生成と検証を別系統に分けることが
+   *   docs/08 §5 の5層の土台であり、両方を差し替えられる口を開ければ
+   *   自己検証への退化を型で止められなくなる。
+   */
+  gen?: Provider
+}
+
+export function createClient(
+  cfg: AiConfig = readConfig(), fake: FakeOptions = {}, overrides: ClientOverrides = {},
+): Client {
   assertConfig(cfg)
   // 役割とモデルを対にして渡す。ここがずれると 404 / 400 になる（resolveProvider の注記）
-  const gen = resolveProvider(cfg.genProvider, cfg.genModel, cfg, fake)
+  const gen = overrides.gen ?? resolveProvider(cfg.genProvider, cfg.genModel, cfg, fake)
   const ver = resolveProvider(cfg.verifyProvider, cfg.verifyModel, cfg, fake)
   const usingFake = !cfg.geminiApiKey || !cfg.anthropicApiKey
 
@@ -209,9 +223,16 @@ export function createClient(cfg: AiConfig = readConfig(), fake: FakeOptions = {
    *   生成と検証のどちらであれ Gemini の側を使い、支出もその名前で記録する。
    *   どちらも Gemini でなければ生成側に落とす（フェイクなら通り、本物なら投げる）。
    */
+  // ★ 差し替えた生成プロバイダを埋め込みの候補にしない。あれは実物のベンダー
+  //   クライアントではなく、埋め込みを持たない（`lib/ai/authored.ts`）。
+  //   ここを見落とすと **GEN_PROVIDER=gemini のときだけ実行時に落ちる**という、
+  //   設定次第で壊れるいちばん見つけにくい壊れ方をする。
   const [emb, embedProvider] =
-    cfg.genProvider === 'gemini' ? [gen, cfg.genProvider]
+    overrides.gen === undefined && cfg.genProvider === 'gemini' ? [gen, cfg.genProvider]
     : cfg.verifyProvider === 'gemini' ? [ver, cfg.verifyProvider]
+    // ★ 最後の受け皿でも差し替えた生成側は選ばない。どちらも Gemini でないなら
+    //   埋め込みは作れないので、実物（検証側）に落として本物の理由で落とす
+    : overrides.gen !== undefined ? [ver, cfg.verifyProvider]
     : [gen, cfg.genProvider]
 
   /** 予約 → 呼び出し → 確定。失敗したら解放する */
