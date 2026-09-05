@@ -16,10 +16,10 @@
 | 閉ループ | 出題→採点→弱点更新→翌日出し直しが実 DB で動く |
 | **認証** | 招待コード＋Google／メールリンク。未認証は全経路 404 |
 | 画面 | ホーム・出題・教材・範囲選択・特訓一覧・確認テスト・その結果・記録・認証4画面。三分割シェルと3タブ。Litverse デザインシステム |
-| 「調べる」 | 語の一致＋pgvector の近傍検索で教材の節・KC・正典を引き、**年表（行＝地域）と地図**に置く（[`11`](./docs/11-ux.md) §4.1）。教材の各節と専用ページ `/research` の両方から。埋め込みが無くても語の一致で動く。国名を入れると**版図の移り変わりを再生**できる（20国家・暫定マスタ） |
+| 「調べる」 | 語の一致＋pgvector の近傍検索で教材の節・KC・正典を引き、**年表（行＝地域）と地図**に置く（[`11`](./docs/11-ux.md) §4.1）。教材の各節と専用ページ `/research` の両方から。埋め込みが無くても語の一致で動く。国名を入れると**版図の移り変わりを再生**できる（20国家・暫定マスタ。オスマン帝国の 3 段階は historical-basemaps の実境界、[`10`](./docs/10-legal-risk.md) §7b） |
 | AI 生成 | プロバイダ抽象層のみ。**鍵が無い間はフェイクで通る** |
 | PWA | オフラインは**読むだけ**。出題は端末に降ろさない（[`12`](./docs/12-nonfunctional.md) §10） |
-| テスト | 1001件（`npm test`） |
+| テスト | 1066件（`npm test`） |
 
 ## 動かす
 
@@ -255,6 +255,17 @@ DATABASE_URL='...' npx tsx scripts/db/approve-material.ts wh.4.1.3 \
 > 退けたのか**」が、[`10`](./docs/10-legal-risk.md) §8 の求める監修の痕跡そのものである。
 > 設問の `approved_by` は `'author'` になる（`'factcheck'` とは書かない。事実確認は
 > 通っていない）。同じことは管理画面（`/admin`）からもできる。
+
+### 版図の境界データ（historical-basemaps）
+
+```bash
+npm run map:fetch -- 1700 1880 1914   # 元データを取る（gitignore。scripts/map/data/）
+npm run map:territories               # lib/map/territory-geo/ に焼く（版に入れる）
+npm run map:basemap                   # 基図を作り直す（Natural Earth）
+```
+
+`lib/map/territories.ts` の段階に `geo: { year, names }` を付けたものだけが焼かれる。出典は GPL-3.0 なので
+`lib/map/territory-geo/LICENSE` と画面の出典表示を消さない（[`10`](./docs/10-legal-risk.md) §7b）。
 
 ### RLS が効いているか
 
