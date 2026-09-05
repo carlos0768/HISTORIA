@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from 'vitest'
 import type { Sql } from 'postgres'
 import { createTestDb, TEST_DB_URL } from '@/lib/db/test-helper'
 import { seedMasters, SEED_DIR } from '@/scripts/db/seed'
@@ -11,6 +11,8 @@ import {
 } from './research'
 import { createUser, createMaterial } from './fixture'
 import { randomUUID } from 'node:crypto'
+
+afterEach(() => vi.unstubAllEnvs())
 
 describe('検索語の扱い', () => {
   it('前後と連続する空白を整える', () => {
@@ -252,6 +254,17 @@ dbSuite('教材の中の「調べる」（実DB）', () => {
     const client = createClient(readConfig({} as unknown as NodeJS.ProcessEnv))
     expect(await runResearch(db, '', { client })).toMatchObject({ ok: false })
     expect(await runResearch(db, 'あ'.repeat(QUERY_MAX_CHARS + 1), { client })).toMatchObject({ ok: false })
+  })
+
+  it('入口: AI の設定が不正でも語の一致へフォールバックする', async () => {
+    vi.stubEnv('GEN_PROVIDER', 'anthropic')
+    vi.stubEnv('VERIFY_PROVIDER', 'anthropic')
+    const r = await runResearch(db, 'ウマイヤ')
+    expect(r.ok).toBe(true)
+    if (!r.ok) return
+    expect(r.mode).toBe('text')
+    expect(r.note).toMatch(/AI の設定が正しくない.*GEN_PROVIDER と VERIFY_PROVIDER が同じ/)
+    expect(r.hits.map(h => h.id)).toEqual(['kc.islam.umayyad_vs_abbasid', 'ce.umayyad'])
   })
 })
 

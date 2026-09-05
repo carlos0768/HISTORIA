@@ -32,12 +32,24 @@ export async function runResearch(
   const { query } = parsed
 
   const now = opts.now ?? new Date()
-  const client = opts.client ?? createClient()
   const pgvector = opts.pgvector ?? process.env.PGVECTOR !== 'off'
+  let client: Client | null = opts.client ?? null
   let vector: number[] | null = null
   let note: string | null = null
 
-  if (client.embedProviderName.startsWith('fake')) {
+  // 設定ミスで createClient が失敗しても、検索自体は語の一致へフォールバックする。
+  if (client === null) {
+    try {
+      client = createClient()
+    } catch (e) {
+      note = `AI の設定が正しくないため、語の一致だけで引いています（${
+        e instanceof Error ? e.message : String(e)}）`
+    }
+  }
+
+  if (client === null) {
+    // note は設定済み。埋め込みは作らない
+  } else if (client.embedProviderName.startsWith('fake')) {
     note = 'AI の鍵が無いため、語の一致だけで引いています。'
   } else if (!pgvector) {
     note = 'このデータベースには pgvector が無いため、語の一致だけで引いています。'
@@ -63,7 +75,7 @@ export async function runResearch(
   // ★ 版図（国家）も同じベクトルで引く。国家の埋め込みはプロセス内に一度だけ作る。
   //   作れなければ語の一致だけに落とし、検索そのものは止めない
   let vectors: number[][] | null = null
-  if (vector !== null) {
+  if (vector !== null && client !== null) {
     try { vectors = await polityVectors(db, client, now) } catch { vectors = null }
   }
   const polities = pickPolities(rankPolities(query, vectors === null ? null : vector, vectors))

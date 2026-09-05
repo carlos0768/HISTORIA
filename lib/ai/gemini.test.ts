@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { createGeminiProvider, GeminiBlockedError, SchemaViolationError, EMBED_DIMENSIONS } from './gemini'
-import { materialJsonSchema, toGeminiSchema, verdictJsonSchema, MaterialOutput, bodyCharCount, isCharCountOutOfRange } from './schema'
+import { materialJsonSchema, toGeminiSchema, verdictJsonSchema, MaterialOutput, parseMaterialOutput, bodyCharCount, isCharCountOutOfRange } from './schema'
 import type { Claim } from './types'
 import { fetchWithRetry, RateLimitedError, ProviderHttpError, BACKOFF_MS } from './http'
 
@@ -293,6 +293,67 @@ describe('§5 層3 検証', () => {
     const r = await provider(f).verify([], 4000)
     expect(r.verdicts).toEqual([])
     expect(f).not.toHaveBeenCalled()
+  })
+})
+
+/**
+ * ★ **n=1 から一般化しない。**
+ *
+ *   Anthropic の構造化出力は maxItems を受け付けないので送っていない。
+ *   wh.4.1.3 の1本では件数がすべて指示どおりに収まったので「プロンプトの
+ *   指示だけで守られる」と結論したが、gh.2.1.1 はフラッシュカードを15枚出し、
+ *   `flashcards: Too big` で教材が丸ごと落ちた（2026-09-04・実費が消えた）。
+ */
+describe('上限を超えた配列の切り詰め', () => {
+  const over = (key: 'flashcards' | 'mcqs' | 'claims', n: number) => {
+    const m = validMaterial() as Record<string, unknown>
+    const arr = m[key] as unknown[]
+    // 既存の要素を繰り返して n 件にする
+    m[key] = Array.from({ length: n }, (_, i) => arr[i % arr.length])
+    return m
+  }
+
+  it('フラッシュカードが15枚でも通り、14枚に切り詰まる', () => {
+    const r = parseMaterialOutput(over('flashcards', 15))
+    expect(r.success, r.success ? '' : JSON.stringify(r.error.issues.slice(0, 3))).toBe(true)
+    if (r.success) expect(r.data.flashcards).toHaveLength(14)
+  })
+
+  it('四択が12問でも通り、10問に切り詰まる', () => {
+    const r = parseMaterialOutput(over('mcqs', 12))
+    expect(r.success).toBe(true)
+    if (r.success) expect(r.data.mcqs).toHaveLength(10)
+  })
+
+  it('claims が45件でも通り、40件に切り詰まる', () => {
+    const r = parseMaterialOutput(over('claims', 45))
+    expect(r.success).toBe(true)
+    if (r.success) expect(r.data.claims).toHaveLength(40)
+  })
+
+  /**
+   * ★ 下限は救えない。10枚と頼んで8枚しか返らなければ作り直すしかない。
+   *   ここで水増しすると、検証していない中身が混ざる。
+   */
+  it('足りない側は救わない（水増ししない）', () => {
+    expect(parseMaterialOutput(over('flashcards', 8)).success).toBe(false)
+  })
+
+  /**
+   * ★ choices を切り詰めない。削ると answer_key が消えた選択肢を指しうる
+   *   —— **正解の無い設問**ができる。数が合わないなら落とす。
+   */
+  it('選択肢が5つある設問は切り詰めずに落とす（正解が消える恐れ）', () => {
+    const m = validMaterial() as Record<string, unknown>
+    const mcqs = m.mcqs as Array<Record<string, unknown>>
+    mcqs[0]!.choices = [...(mcqs[0]!.choices as unknown[]), { key: 'a', text: 'x', why_wrong: 'y' }]
+    expect(parseMaterialOutput(m).success).toBe(false)
+  })
+
+  it('セクションが8つあるときも落とす（ちょうど7が構造の要件）', () => {
+    const m = validMaterial() as Record<string, unknown>
+    m.sections = [...(m.sections as unknown[]), (m.sections as unknown[])[0]]
+    expect(parseMaterialOutput(m).success).toBe(false)
   })
 })
 

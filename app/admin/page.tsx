@@ -10,6 +10,7 @@ import {
   RPD_LIMIT, CRON_SILENCE_HOURS,
 } from '@/lib/loop/admin'
 import { AdminControls } from './controls'
+import { BlockedMaterials } from './blocked'
 
 export const dynamic = 'force-dynamic'
 
@@ -147,21 +148,13 @@ export default async function Admin() {
         }))}
       />
 
-      <Card>
-        <span className="lv-label">配信できなかった教材</span>
-        {blocked.length === 0 ? (
-          <p className="lv-caption">ありません。</p>
-        ) : (
-          <div className="hs-stack">
-            {blocked.map(b => (
-              <div className="hs-unit" key={b.id}>
-                <span className="lv-list__key">{b.unitId}</span>
-                <span className="lv-caption">{b.reason ?? '理由の記録がありません'}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </Card>
+      {/* ★ 一覧だけでなく「配信できるようにする」まで置く。層3の指摘は
+           誤りとは限らず、作り直せば同じ本文はもう手に入らない（docs/02 §5） */}
+      <BlockedMaterials
+        rows={blocked.map(b => ({
+          id: b.id, unitId: b.unitId, reason: b.reason, createdAt: b.createdAt.toISOString(),
+        }))}
+      />
 
       <Card>
         <span className="lv-label">定時実行</span>

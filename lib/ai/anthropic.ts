@@ -14,7 +14,7 @@
  */
 import Anthropic from '@anthropic-ai/sdk'
 import type { Provider, GenerateArgs, GenerateResult, VerifyResult, Claim, Verdict, Usage } from './types'
-import { MaterialOutput, VerdictOutput, verdictJsonSchema } from './schema'
+import { parseMaterialOutput, VerdictOutput, verdictJsonSchema, toAnthropicSchema } from './schema'
 
 export type AnthropicOptions = {
   apiKey: string
@@ -77,7 +77,12 @@ export function createAnthropicProvider(o: AnthropicOptions): Provider {
             max_tokens: args.maxOutputTokens,
             system: args.prompt.system,
             output_config: {
-              format: { type: 'json_schema', schema: args.schema as Record<string, unknown> },
+              // ★ そのまま送らない。配列の minItems は 0/1 しか通らない（schema.ts の注記）。
+              //   教材スキーマは全ての配列が引っかかるので、変換しないと 400 で必ず落ちる
+              format: {
+                type: 'json_schema',
+                schema: toAnthropicSchema(args.schema) as Record<string, unknown>,
+              },
             },
             // budget_tokens は Opus 5 では 400 になる。adaptive のみ
             thinking: { type: 'adaptive' },
@@ -116,7 +121,8 @@ export function createAnthropicProvider(o: AnthropicOptions): Provider {
       }
 
       // ★ モデルがスキーマを守る保証はどのプロバイダにも無い。必ずこちらで検証する
-      const check = MaterialOutput.safeParse(parsed)
+      // ★ 上限を超えた配列は切り詰めてから検査する（schema.ts の注記）
+      const check = parseMaterialOutput(parsed)
       if (!check.success) {
         throw new GenerateFailedError(
           check.error.issues.slice(0, 5).map(i => `${i.path.join('.')}: ${i.message}`).join(' / '),
@@ -143,8 +149,15 @@ export function createAnthropicProvider(o: AnthropicOptions): Provider {
           model: o.model,
           max_tokens: maxOutputTokens,
           system: SYSTEM,
-          // 判定は構造化出力で受ける。プレフィルは Sonnet 5 では使えない
-          output_config: { format: { type: 'json_schema', schema: verdictJsonSchema() as Record<string, unknown> } },
+          // 判定は構造化出力で受ける。プレフィルは Sonnet 5 では使えない。
+          // 生成側と同じ変換を通す（いまの VerdictOutput に minItems は無いが、
+          // 増やしたときに片方だけ落ちる、を防ぐ）
+          output_config: {
+            format: {
+              type: 'json_schema',
+              schema: toAnthropicSchema(verdictJsonSchema()) as Record<string, unknown>,
+            },
+          },
           // budget_tokens は Sonnet 5 では 400 になる。adaptive のみ
           thinking: { type: 'adaptive' },
           messages: [{ role: 'user', content: `次の主張を1件ずつ判定してください。\n\n${list}` }],
@@ -198,7 +211,7 @@ export function createAnthropicProvider(o: AnthropicOptions): Provider {
 
     async embed(): Promise<{ vectors: number[][]; usage: Usage; model: string }> {
       // Anthropic に埋め込み API は無い（docs/09 §6）
-      throw new Error('anthropic に埋め込み API はありません。生成側（Gemini）を使ってください')
+      throw new Error('anthropic に埋め込み API はありません。Gemini の側を使ってください（client.ts の emb）')
     },
   }
 }
