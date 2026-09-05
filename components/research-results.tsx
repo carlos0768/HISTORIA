@@ -13,15 +13,17 @@
  */
 import { useState } from 'react'
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
 import { ChronoChart, type ChronoItem } from './chrono-chart'
+import { WorldMap } from './world-map'
 import { periodsOf, formatCentury } from '@/lib/domain/periods'
 import { formatSpan } from '@/lib/loop/timeline'
 import { regionLabel } from '@/lib/map/regions'
 import type { ResearchHit, ResearchResponse } from '@/lib/loop/research'
 
-// 基図は約80KBある。結果に地域が付いたときだけ読む（reader.tsx と同じ理由）
-const WorldMap = dynamic(() => import('@/components/world-map').then(m => m.WorldMap))
+// 基図は約80KBだが、検索結果の描画中に別チャンクとしては読まない。
+// モバイルのPWAをデプロイをまたいで開いたままにすると、古いクライアントが
+// 既に消えた遅延チャンクを要求し、検索した瞬間にReactのエラー境界まで落ちる。
+// 検索結果そのものが主要機能なので、ここは初回のクライアントチャンクに含める。
 
 const KC_KIND: Record<string, string> = {
   fact: '事実', distinction: '区別', causal: '因果', chronology: '年代順', geo: '地理',

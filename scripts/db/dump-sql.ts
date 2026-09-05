@@ -153,15 +153,18 @@ const approved = kcRows.filter(k => k.approve === '○')
 const skipped = kcRows.length - approved.length
 const regionId = new Map(regions.map(r => [r.label!, Number(r.id)]))
 
+const retiredCount = approved.filter(k => (k.retired ?? '') !== '').length
 say(`-- KC ${approved.length} 件（承認済みのみ。未承認 ${skipped} 件は含めない）`)
+say(`-- うち ${retiredCount} 件は retired = true（世界史の範囲外。docs/02 §6.1）。`)
+say(`-- 行は残す。消すと item_kc / response の外部キーが道連れになるためである`)
 say(`-- 作者承認制については docs/02 §5 を参照`)
 for (const k of approved) {
-  say(`INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES`)
+  say(`INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES`)
   say(`  (${lit(k.id!)}, ${lit(k.label!)}, ${lit(k.kind!)}, ${lit(num(k.era_id))}, ${lit(num(k.year_from))},`)
-  say(`   ${lit(num(k.year_to))}, ${lit(orNull(k.year_precision))}, ${arr(list(k.prereq_ids))}, ${lit(num(k.exam_weight) ?? 1)})`)
+  say(`   ${lit(num(k.year_to))}, ${lit(orNull(k.year_precision))}, ${arr(list(k.prereq_ids))}, ${lit(num(k.exam_weight) ?? 1)}, ${(k.retired ?? '') !== ''})`)
   say(`  ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,`)
   say(`    year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,`)
-  say(`    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;`)
+  say(`    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;`)
 }
 say('')
 

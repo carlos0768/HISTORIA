@@ -19,7 +19,7 @@
 | 「調べる」 | 語の一致＋pgvector の近傍検索で教材の節・KC・正典を引き、**年表（行＝地域）と地図**に置く（[`11`](./docs/11-ux.md) §4.1）。教材の各節と専用ページ `/research` の両方から。埋め込みが無くても語の一致で動く。国名を入れると**版図の移り変わりを再生**できる（20国家・暫定マスタ。オスマン帝国の 3 段階は historical-basemaps の実境界、[`10`](./docs/10-legal-risk.md) §7b） |
 | AI 生成 | プロバイダ抽象層のみ。**鍵が無い間はフェイクで通る** |
 | PWA | オフラインは**読むだけ**。出題は端末に降ろさない（[`12`](./docs/12-nonfunctional.md) §10） |
-| テスト | 1010件（`npm test`） |
+| テスト | 1066件（`npm test`） |
 
 ## 動かす
 
@@ -222,6 +222,39 @@ DATABASE_URL='...' GEMINI_API_KEY='...' npm run db:embed-index -- --apply # 空�
 何度流しても同じ。教材を新しく作ったら（節が増えたら）また流す。鍵が無いと拒む（フェイクの埋め込みは意味の無い乱数で、入れると
 「意味の近さ」がでたらめになる）。空のままでも「調べる」は語の一致だけで動き、画面にそう出る。
 既存の DB に `canon_event.embedding` / `material_section.embedding` が無ければ、先に `seed/sql/04_phase3.sql` を流す。
+
+### 教材を作る／止まったものを配信可能にする
+
+```bash
+DATABASE_URL='...' GEMINI_API_KEY=... ANTHROPIC_API_KEY=... \
+  npx tsx scripts/db/generate-remote.ts                  # 下見（API を1回も呼ばない）
+  npx tsx scripts/db/generate-remote.ts --limit 10 --apply
+```
+
+> ★ 1本あたり実費が約50円かかる（実測・[`08`](./docs/08-ai-architecture.md) §3.4）。
+> **止めてよい。再開できる。** 済んだ単元は下見の対象から外れるので、
+> `Ctrl-C` で止めて直してから続きを流せる。
+>
+> ★ **先に `seed-remote.ts --apply` を流すこと。** 範囲外にした KC（`kc.retired`）は
+> そこで初めて DB に反映される。流さないまま生成すると、範囲外にした歴史総合の
+> 日本史分野9節へ約 ¥470 を払うことになる（[`02`](./docs/02-domain-model.md) §6.1）。
+> 対象は **66節・約 ¥3,400**。下見に出る数がこれと違ったら、seed がまだである。
+
+事実確認で止まった（`blocked`）教材は、本文を読んだうえで作者の判断で配信できる
+（[`08`](./docs/08-ai-architecture.md) §5.2）。**層3の指摘は誤りとは限らない。**
+
+```bash
+DATABASE_URL='...' npx tsx scripts/db/approve-material.ts             # 止まっている一覧
+DATABASE_URL='...' npx tsx scripts/db/approve-material.ts wh.4.1.3    # 中身を読む
+DATABASE_URL='...' npx tsx scripts/db/approve-material.ts wh.4.1.3 --full
+DATABASE_URL='...' npx tsx scripts/db/approve-material.ts wh.4.1.3 \
+  --apply --note "三部会は1614年10月招集・1615年2月閉会。本文の記述は誤りではない"
+```
+
+> ★ `--note` は省略できない。`material.human_edit_log` に残る「**なぜ機械の指摘を
+> 退けたのか**」が、[`10`](./docs/10-legal-risk.md) §8 の求める監修の痕跡そのものである。
+> 設問の `approved_by` は `'author'` になる（`'factcheck'` とは書かない。事実確認は
+> 通っていない）。同じことは管理画面（`/admin`）からもできる。
 
 ### 版図の境界データ（historical-basemaps）
 

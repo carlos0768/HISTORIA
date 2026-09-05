@@ -1,7 +1,10 @@
 /**
  * 実 API で教材を1本作り、仕様の実測項目を確かめる
  *
- *   GEMINI_API_KEY=... npx tsx scripts/measure/generate-once.ts [unit_id]
+ *   npx tsx scripts/measure/generate-once.ts [unit_id] [--keep]
+ *
+ *   --keep を付けると使い捨て DB を消さない。1回に実費（約50円）がかかるので、
+ *   読み損ねたときに払い直さずに済むようにするため。
  *
  * 測るもの（docs/14）:
  *   M5  responseSchema が docs/07 §5.3 のまま通るか
@@ -14,7 +17,7 @@
  */
 import postgres from 'postgres'
 import { applySchema } from '../db/schema'
-import { seedMasters, seedKc, SEED_DIR } from '../db/seed'
+import { seedMasters, seedKc, seedCanonEvent, seedPerson, SEED_DIR } from '../db/seed'
 import { createClient, readConfig } from '@/lib/ai/client'
 import { ensureBudgetRow, periodOf, budgetStatus } from '@/lib/ai/budget'
 import { generateMaterial } from '@/lib/pipeline/generate'
@@ -66,6 +69,20 @@ try {
   await applySchema(db, { pgvector: process.env.PGVECTOR !== 'off' })
   await seedMasters(db, SEED_DIR)
   await seedKc(db, SEED_DIR)
+  /**
+   * ★ **正典を入れる。層2は正典との照合そのものだから。**
+   *
+   *   2026-09-04、これを入れ忘れたまま M2b（機械照合率、目標80%）を測り、
+   *   **0.0% という無意味な数字を出した**。分母の 9 件は全て
+   *   「canon_event に一致する事象がありません」で、モデルの出力ではなく
+   *   こちらの DB が空だっただけである。
+   *
+   *   道具が自分で気づけるよう照合率の下に正典の件数を出してはいたが、
+   *   **そもそも入れておけば済む**。1回 ¥50 かかる実測を無駄にしない。
+   */
+  const ce = await seedCanonEvent(db, SEED_DIR)
+  const pe = await seedPerson(db, SEED_DIR)
+  console.log(`正典: canon_event ${ce.canonEvent} / person ${pe.person}\n`)
 
   const now = new Date()
   await ensureBudgetRow(db, periodOf(now))
@@ -89,9 +106,27 @@ try {
     if (job.error) console.log(`ジョブの誤り: ${job.error}`)
   }
 
-  const [m] = await db<{ id: string; title: string; status: string; blocked_reason: string | null }[]>`
-    SELECT id, title, status, blocked_reason FROM material WHERE user_id = ${userId} ORDER BY generated_at DESC LIMIT 1`
+  /**
+   * ★ **user_id で絞らない。** 個別化の必要が無い文脈から作った教材は
+   *   `user_id IS NULL`（共有教材）で保存される（generate.ts の owner）。
+   *   初回はほぼ必ずこちらになるので、`user_id = ${userId}` で引くと**空振りする**。
+   *
+   *   2026-09-04、これで報告が丸ごと飛んだ。生成は成功していたのに
+   *   文字数も claims も照合率も1つも出ず、**¥52 かけた実測が読めなかった**。
+   *   generate.ts は同じ罠を踏んで既に直してある（冪等の短絡のところ）。
+   *   道具の側が追随していなかった。
+   */
+  const [m] = await db<{ id: string; title: string; status: string; blocked_reason: string | null; user_id: string | null }[]>`
+    SELECT id, title, status, blocked_reason, user_id FROM material
+     WHERE user_id = ${userId} OR user_id IS NULL
+     ORDER BY generated_at DESC LIMIT 1`
+  if (!m) {
+    // ★ 黙って終わらせない。ここに来たら道具の側の欠陥である
+    console.log('\n⚠ 教材の行が見つかりません。生成は成功しているのに読めていません。')
+    console.log('  scripts/measure/generate-once.ts の material の問い合わせを疑ってください。')
+  }
   if (m) {
+    console.log(`（${m.user_id === null ? '共有教材 user_id IS NULL' : '個別教材'}）`)
     console.log(`\n教材: 「${m.title}」 (${m.status})`)
     if (m.blocked_reason) console.log(`配信不可の理由: ${m.blocked_reason}`)
 
@@ -170,7 +205,18 @@ try {
   console.log(`予算: 使用 ${b.usedJpy.toFixed(3)}円 / 上限 ${b.capJpy}円 / 残り ${b.remainingJpy.toFixed(3)}円 / 停止 ${b.halted}`)
 } finally {
   await db.end({ timeout: 5 })
-  const c = postgres(admin, { prepare: false, max: 1, onnotice: () => {} })
-  await c.unsafe(`DROP DATABASE IF EXISTS "${name}"`)
-  await c.end({ timeout: 5 })
+  /**
+   * ★ **--keep を付けたら消さない。** 1回の実行に実費がかかる（Opus 5 の生成で
+   *   約50円）。報告の側に欠陥があると、**払った実測がそのまま消える**。
+   *   2026-09-04 に実際に起きた。読み損ねたときに DB を残せる逃げ道を作る。
+   */
+  if (process.argv.includes('--keep')) {
+    console.log(`\n使い捨て DB を残しました: ${name}`)
+    console.log(`  psql "${admin.replace(/\/[^/]*$/, '')}/${name}" で覗けます`)
+    console.log(`  消すとき: DROP DATABASE "${name}"`)
+  } else {
+    const c = postgres(admin, { prepare: false, max: 1, onnotice: () => {} })
+    await c.unsafe(`DROP DATABASE IF EXISTS "${name}"`)
+    await c.end({ timeout: 5 })
+  }
 }

@@ -6,6 +6,9 @@ import { currentUserId } from '@/lib/auth/dal'
 import { isAdmin } from '@/lib/auth/admin'
 import { resolveReport, type ReportStatus, REPORT_STATUSES } from '@/lib/loop/report'
 import { resumeBudget } from '@/lib/loop/admin'
+import {
+  approveMaterial, approvalTarget, type ApprovalResult, type ApprovalTarget,
+} from '@/lib/loop/approve'
 import { setCap, periodOf } from '@/lib/ai/budget'
 
 /**
@@ -54,4 +57,32 @@ export async function setCapAction(capJpy: number): Promise<{ ok: boolean; messa
   await setCap(sql(), periodOf(new Date()), capJpy)
   revalidatePath('/admin')
   return { ok: true, message: `当月の上限を ${capJpy.toLocaleString('ja-JP')} 円にしました` }
+}
+
+/**
+ * 止まった教材の中身を読む（承認する前に確かめるため）
+ *
+ * ★ 一覧と一緒に本文まで送らない。blocked が30本あれば7万字を毎回
+ *   画面へ運ぶことになり、作者が実際に読む1本のために残り29本を運ぶ。
+ *   押したときに1本だけ取りに行く。
+ */
+export async function blockedDetailAction(materialId: string): Promise<ApprovalTarget | null> {
+  await requireAdmin()
+  return approvalTarget(sql(), materialId)
+}
+
+/**
+ * 事実確認で止まった教材を、作者の判断で配信可能にする（docs/02 §5 / docs/10 §8）
+ *
+ * ★ 判断そのものはここに書かない。理由の検査も状態の検査も
+ *   lib/loop/approve.ts が持つ。画面と道具（scripts/db/approve-material.ts）で
+ *   規則が二重になると、片方だけ緩い抜け道ができる。
+ */
+export async function approveMaterialAction(
+  materialId: string, note: string,
+): Promise<ApprovalResult> {
+  await requireAdmin()
+  const r = await approveMaterial(sql(), { materialId, note, now: new Date() })
+  if (r.approved) revalidatePath('/admin')
+  return r
 }

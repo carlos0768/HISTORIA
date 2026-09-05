@@ -452,2455 +452,2457 @@ INSERT INTO syllabus_unit (id, subject, parent_id, level, label, ord) VALUES ('g
     level = EXCLUDED.level, label = EXCLUDED.label, ord = EXCLUDED.ord;
 
 -- KC 408 件（承認済みのみ。未承認 0 件は含めない）
+-- うち 52 件は retired = true（世界史の範囲外。docs/02 §6.1）。
+-- 行は残す。消すと item_kc / response の外部キーが道連れになるためである
 -- 作者承認制については docs/02 §5 を参照
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.orient.mesopotamia_dynasty_order', 'メソポタミアの支配者交替の順序', 'chronology', 1, -3000,
-   -330, 'century', '{}'::text[], 1.2)
+   -330, 'century', '{}'::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.orient.egypt_kingdom_periods', 'エジプト古王国・中王国・新王国の区別', 'distinction', 1, -2700,
-   -1100, 'century', '{}'::text[], 1.3)
+   -1100, 'century', '{}'::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.orient.assyria_vs_achaemenid_rule', 'アッシリアとアケメネス朝の統治方法の違い', 'distinction', 1, -670,
-   -330, 'century', '{}'::text[], 1.5)
+   -330, 'century', '{}'::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.orient.east_med_three_peoples', 'フェニキア人・アラム人・ヘブライ人の役割分担', 'distinction', 1, -1200,
-   -600, 'century', '{}'::text[], 1.4)
+   -600, 'century', '{}'::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.orient.hammurabi_code_principle', 'ハンムラビ法典の同害復讐と身分差', 'fact', 1, -1792,
-   -1750, 'exact', '{}'::text[], 1.1)
+   -1750, 'exact', '{}'::text[], 1.1, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.rome.christianity_official_steps', 'キリスト教公認から公会議までの順序', 'chronology', 1, 313,
-   451, 'exact', '{}'::text[], 1.5)
+   451, 'exact', '{}'::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.greece.polis_formation_causes', 'ポリスが成立し統一国家にならなかった要因', 'causal', 1, -800,
-   -500, 'century', '{}'::text[], 1.2)
+   -500, 'century', '{}'::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.greece.athens_democracy_steps', 'アテネ民主政の改革者と改革内容の順序', 'chronology', 1, -621,
-   -429, 'exact', '{}'::text[], 1.6)
+   -429, 'exact', '{}'::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.greece.athens_vs_sparta', 'アテネとスパルタの政体・軍制・社会構造の違い', 'distinction', 1, -700,
-   -400, 'century', ARRAY['kc.greece.athens_democracy_steps']::text[], 1.4)
+   -400, 'century', ARRAY['kc.greece.athens_democracy_steps']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.greece.persian_war_to_peloponnesian', 'ペルシア戦争の勝利がペロポネソス戦争を招いた因果', 'causal', 1, -500,
-   -404, 'exact', ARRAY['kc.greece.athens_vs_sparta']::text[], 1.5)
+   -404, 'exact', ARRAY['kc.greece.athens_vs_sparta']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.greece.hellenistic_kingdoms_geo', 'ヘレニズム3王国の版図', 'geo', 1, -323,
-   -30, 'exact', '{}'::text[], 1.2)
+   -30, 'exact', '{}'::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.rome.plebeian_rights_causes', '重装歩兵としての従軍が平民の地位を高めた因果', 'causal', 1, -494,
-   -287, 'exact', '{}'::text[], 1.3)
+   -287, 'exact', '{}'::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.rome.gracchus_to_principate', '共和政の崩壊から元首政の成立までの因果', 'causal', 1, -133,
-   -27, 'exact', ARRAY['kc.rome.plebeian_rights_causes']::text[], 1.6)
+   -27, 'exact', ARRAY['kc.rome.plebeian_rights_causes']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.rome.principate_vs_dominate', '元首政と専制君主政の違い', 'distinction', 1, -27,
-   284, 'exact', ARRAY['kc.rome.gracchus_to_principate']::text[], 1.4)
+   284, 'exact', ARRAY['kc.rome.gracchus_to_principate']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.india.indus_vs_aryan', 'インダス文明とアーリヤ人社会の断絶', 'distinction', 1, -2600,
-   -600, 'century', '{}'::text[], 1.3)
+   -600, 'century', '{}'::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.india.varna_jati_structure', 'ヴァルナとジャーティの関係', 'fact', 1, -1000,
-   0, 'century', ARRAY['kc.india.indus_vs_aryan']::text[], 1.3)
+   0, 'century', ARRAY['kc.india.indus_vs_aryan']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.india.new_religions_vs_brahmanism', '仏教・ジャイナ教とバラモン教の対立点', 'distinction', 1, -500,
-   -400, 'century', ARRAY['kc.india.varna_jati_structure']::text[], 1.4)
+   -400, 'century', ARRAY['kc.india.varna_jati_structure']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.india.maurya_kushana_gupta', 'マウリヤ朝・クシャーナ朝・グプタ朝の宗教政策', 'distinction', 1, -317,
-   550, 'century', '{}'::text[], 1.5)
+   550, 'century', '{}'::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.india.mahayana_vs_theravada', '大乗仏教と上座部仏教の教義と伝播経路', 'distinction', 1, 0,
-   500, 'century', ARRAY['kc.india.new_religions_vs_brahmanism']::text[], 1.5)
+   500, 'century', ARRAY['kc.india.new_religions_vs_brahmanism']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.sea.indianization_causes', '季節風交易がインド文化の流入を生んだ因果', 'causal', 1, 100,
-   800, 'century', '{}'::text[], 1.1)
+   800, 'century', '{}'::text[], 1.1, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.sea.port_polities_geo', '扶南・チャンパー・シュリーヴィジャヤ・アンコールの位置', 'geo', 1, 100,
-   1400, 'century', ARRAY['kc.sea.indianization_causes']::text[], 1.2)
+   1400, 'century', ARRAY['kc.sea.indianization_causes']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.sea.angkor_and_pagan', 'アンコール朝とパガン朝の信仰した宗教', 'fact', 1, 849,
-   1431, 'century', ARRAY['kc.sea.port_polities_geo']::text[], 1)
+   1431, 'century', ARRAY['kc.sea.port_polities_geo']::text[], 1, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.china.fengjian_vs_junxian', '周の封建制と秦の郡県制の違い', 'distinction', 1, -1046,
-   -206, 'century', '{}'::text[], 1.6)
+   -206, 'century', '{}'::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.china.hundred_schools_positions', '諸子百家の学派と主張の対応', 'distinction', 1, -550,
-   -230, 'century', '{}'::text[], 1.4)
+   -230, 'century', '{}'::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.china.qin_unification_causes', '秦が中国を統一できた要因', 'causal', 1, -356,
-   -221, 'exact', ARRAY['kc.china.fengjian_vs_junxian']::text[], 1.3)
+   -221, 'exact', ARRAY['kc.china.fengjian_vs_junxian']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.china.qin_fall_causes', '秦が短期間で崩壊した要因', 'causal', 1, -221,
-   -206, 'exact', ARRAY['kc.china.qin_unification_causes']::text[], 1.3)
+   -206, 'exact', ARRAY['kc.china.qin_unification_causes']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.china.han_junguo_to_junxian', '郡国制から実質的な郡県制への移行', 'causal', 1, -202,
-   -141, 'exact', ARRAY['kc.china.qin_fall_causes']::text[], 1.4)
+   -141, 'exact', ARRAY['kc.china.qin_fall_causes']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.china.wudi_policies', '武帝の内政・外交政策', 'fact', 1, -141,
-   -87, 'exact', ARRAY['kc.china.han_junguo_to_junxian']::text[], 1.5)
+   -87, 'exact', ARRAY['kc.china.han_junguo_to_junxian']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.china.division_period_order', '黄巾の乱から南北朝までの分裂期の順序', 'chronology', 1, 184,
-   589, 'exact', '{}'::text[], 1.5)
+   589, 'exact', '{}'::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.china.northern_wei_sinicization', '孝文帝の漢化政策と均田制の導入', 'causal', 1, 485,
-   494, 'exact', ARRAY['kc.china.division_period_order']::text[], 1.4)
+   494, 'exact', ARRAY['kc.china.division_period_order']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.china.tang_system_collapse', '均田制・租調庸・府兵制の崩壊が両税法・募兵制を生んだ因果', 'causal', 1, 624,
-   780, 'exact', ARRAY['kc.china.northern_wei_sinicization']::text[], 1.6)
+   780, 'exact', ARRAY['kc.china.northern_wei_sinicization']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.china.sui_vs_tang_institutions', '隋と唐の制度の連続と相違', 'distinction', 1, 581,
-   907, 'exact', '{}'::text[], 1.4)
+   907, 'exact', '{}'::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.eastasia.tang_cultural_sphere', '東アジア文化圏を成り立たせた4要素', 'fact', 1, 600,
-   900, 'century', ARRAY['kc.china.sui_vs_tang_institutions']::text[], 1.3)
+   900, 'century', ARRAY['kc.china.sui_vs_tang_institutions']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.eastasia.korea_dynasty_order', '朝鮮の王朝交替の順序', 'chronology', 1, -100,
-   1392, 'century', ARRAY['kc.eastasia.tang_cultural_sphere']::text[], 1.2)
+   1392, 'century', ARRAY['kc.eastasia.tang_cultural_sphere']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.innerasia.nomad_vs_oasis', '遊牧国家とオアシス都市国家の関係', 'distinction', 1, -200,
-   1200, 'century', '{}'::text[], 1.2)
+   1200, 'century', '{}'::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.innerasia.xiongnu_and_han', '匈奴の圧力が漢の対外政策を規定した因果', 'causal', 1, -209,
-   -87, 'exact', ARRAY['kc.innerasia.nomad_vs_oasis']::text[], 1.4)
+   -87, 'exact', ARRAY['kc.innerasia.nomad_vs_oasis']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.innerasia.turk_and_uighur', '突厥・ウイグルと唐の関係', 'fact', 1, 552,
-   840, 'exact', ARRAY['kc.innerasia.xiongnu_and_han']::text[], 1.1)
+   840, 'exact', ARRAY['kc.innerasia.xiongnu_and_han']::text[], 1.1, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.trade.three_routes_geo', 'オアシスの道・草原の道・海の道の経路', 'geo', 1, -100,
-   1500, 'century', '{}'::text[], 1.3)
+   1500, 'century', '{}'::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.trade.sogdian_role', 'ソグド人の交易と文化仲介', 'fact', 1, 400,
-   800, 'century', ARRAY['kc.trade.three_routes_geo']::text[], 1.1)
+   800, 'century', ARRAY['kc.trade.three_routes_geo']::text[], 1.1, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.trade.buddhism_transmission_order', '仏教がインドから日本へ伝わった順序', 'chronology', 1, -100,
-   538, 'century', ARRAY['kc.india.mahayana_vs_theravada']::text[], 1.2)
+   538, 'century', ARRAY['kc.india.mahayana_vs_theravada']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islam.hijra_and_umma', 'ヒジュラとウンマの成立', 'fact', 1, 622,
-   622, 'exact', '{}'::text[], 1.3)
+   622, 'exact', '{}'::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islam.rashidun_vs_umayyad_succession', '正統カリフ時代とウマイヤ朝のカリフ選出方法の違い', 'distinction', 1, 632,
-   750, 'exact', ARRAY['kc.islam.hijra_and_umma']::text[], 1.4)
+   750, 'exact', ARRAY['kc.islam.hijra_and_umma']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islam.sunni_vs_shia_origin', 'スンナ派とシーア派が分かれた原因', 'causal', 1, 656,
-   680, 'exact', ARRAY['kc.islam.rashidun_vs_umayyad_succession']::text[], 1.6)
+   680, 'exact', ARRAY['kc.islam.rashidun_vs_umayyad_succession']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islam.arab_conquest_causes', '大征服が短期間で成功した要因', 'causal', 1, 634,
-   750, 'exact', ARRAY['kc.islam.hijra_and_umma']::text[], 1.4)
+   750, 'exact', ARRAY['kc.islam.hijra_and_umma']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islam.umayyad_vs_abbasid', 'ウマイヤ朝とアッバース朝の支配原理の違い', 'distinction', 1, 661,
-   1258, 'exact', ARRAY['kc.islam.rashidun_vs_umayyad_succession']::text[], 1.8)
+   1258, 'exact', ARRAY['kc.islam.rashidun_vs_umayyad_succession']::text[], 1.8, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islam.abbasid_decline_order', 'アッバース朝の実権喪失からスルタンの出現までの順序', 'chronology', 1, 945,
-   1055, 'exact', ARRAY['kc.islam.umayyad_vs_abbasid']::text[], 1.4)
+   1055, 'exact', ARRAY['kc.islam.umayyad_vs_abbasid']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islam.three_caliphates_geo', '10世紀に3人のカリフが並立した位置', 'geo', 1, 909,
-   1031, 'exact', ARRAY['kc.islam.umayyad_vs_abbasid']::text[], 1.3)
+   1031, 'exact', ARRAY['kc.islam.umayyad_vs_abbasid']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islam.fatimid_vs_ayyubid', 'ファーティマ朝とアイユーブ朝の宗派の違い', 'distinction', 1, 909,
-   1250, 'exact', ARRAY['kc.islam.three_caliphates_geo']::text[], 1.3)
+   1250, 'exact', ARRAY['kc.islam.three_caliphates_geo']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islam.iqta_system', 'イクター制の内容と開始時期', 'fact', 1, 946,
-   1200, 'century', ARRAY['kc.islam.abbasid_decline_order']::text[], 1.3)
+   1200, 'century', ARRAY['kc.islam.abbasid_decline_order']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islam.transmission_to_europe', 'イスラーム経由でギリシア古典がヨーロッパへ再流入した因果', 'causal', 1, 1085,
-   1200, 'century', '{}'::text[], 1.3)
+   1200, 'century', '{}'::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.germanic_migration_causes', 'ゲルマン人の大移動を引き起こした要因', 'causal', 1, 375,
-   476, 'exact', '{}'::text[], 1.4)
+   476, 'exact', '{}'::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.frank_conversion_significance', 'クローヴィスの改宗が持った意味', 'causal', 1, 496,
-   496, 'exact', ARRAY['kc.euro.germanic_migration_causes']::text[], 1.5)
+   496, 'exact', ARRAY['kc.euro.germanic_migration_causes']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.carolingian_coronation_meaning', 'カールの戴冠が意味したもの', 'causal', 1, 800,
-   800, 'exact', ARRAY['kc.euro.frank_conversion_significance']::text[], 1.6)
+   800, 'exact', ARRAY['kc.euro.frank_conversion_significance']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.verdun_and_mersen', 'ヴェルダン条約とメルセン条約の結果', 'chronology', 1, 843,
-   870, 'exact', ARRAY['kc.euro.carolingian_coronation_meaning']::text[], 1.4)
+   870, 'exact', ARRAY['kc.euro.carolingian_coronation_meaning']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.orthodox_vs_catholic', 'ギリシア正教とローマ=カトリックの違い', 'distinction', 1, 726,
-   1054, 'exact', '{}'::text[], 1.5)
+   1054, 'exact', '{}'::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.byzantine_institutions', 'ビザンツ帝国の軍管区制と屯田兵制', 'fact', 1, 610,
-   1071, 'century', ARRAY['kc.euro.orthodox_vs_catholic']::text[], 1.2)
+   1071, 'century', ARRAY['kc.euro.orthodox_vs_catholic']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.slav_division_geo', '東・西・南スラヴの分布と受容した宗派', 'geo', 1, 800,
-   1200, 'century', ARRAY['kc.euro.orthodox_vs_catholic']::text[], 1.3)
+   1200, 'century', ARRAY['kc.euro.orthodox_vs_catholic']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.feudal_two_layers', '封建的主従関係と荘園制の違い', 'distinction', 1, 800,
-   1300, 'century', '{}'::text[], 1.5)
+   1300, 'century', '{}'::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.investiture_controversy', '聖職叙任権闘争の経緯と決着', 'causal', 1, 1075,
-   1122, 'exact', ARRAY['kc.euro.feudal_two_layers']::text[], 1.5)
+   1122, 'exact', ARRAY['kc.euro.feudal_two_layers']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.agricultural_growth_effects', '農業技術の普及が中世の拡大を支えた因果', 'causal', 1, 1000,
-   1300, 'century', ARRAY['kc.euro.feudal_two_layers']::text[], 1.3)
+   1300, 'century', ARRAY['kc.euro.feudal_two_layers']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.prehist.hominid_stages', '猿人・原人・旧人・新人の区別', 'distinction', 1, NULL,
-   NULL, 'unknown', '{}'::text[], 0.9)
+   NULL, 'unknown', '{}'::text[], 0.9, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.prehist.human_dispersal_geo', '新人がアフリカから拡散した経路', 'geo', 1, NULL,
-   NULL, 'unknown', ARRAY['kc.prehist.hominid_stages']::text[], 0.8)
+   NULL, 'unknown', ARRAY['kc.prehist.hominid_stages']::text[], 0.8, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.prehist.bipedalism_effects', '直立二足歩行が人類にもたらした変化', 'causal', 1, NULL,
-   NULL, 'unknown', '{}'::text[], 0.8)
+   NULL, 'unknown', '{}'::text[], 0.8, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.prehist.fire_burial_art', '火の使用・埋葬・洞穴絵画の担い手', 'fact', 1, NULL,
-   NULL, 'unknown', ARRAY['kc.prehist.hominid_stages']::text[], 0.8)
+   NULL, 'unknown', ARRAY['kc.prehist.hominid_stages']::text[], 0.8, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.prehist.stone_age_division', '旧石器・中石器・新石器の区分基準', 'distinction', 1, NULL,
-   NULL, 'unknown', '{}'::text[], 0.8)
+   NULL, 'unknown', '{}'::text[], 0.8, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.neolithic.food_production_causes', '獲得経済から生産経済へ転換した要因', 'causal', 1, -9000,
-   -8000, 'century', '{}'::text[], 1)
+   -8000, 'century', '{}'::text[], 1, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.neolithic.neolithic_toolkit', '新石器時代を特徴づける道具', 'fact', 1, -9000,
-   -3000, 'century', ARRAY['kc.prehist.stone_age_division']::text[], 0.9)
+   -3000, 'century', ARRAY['kc.prehist.stone_age_division']::text[], 0.9, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.neolithic.fertile_crescent_geo', '農耕の起源地とその伝播', 'geo', 1, -9000,
-   -4000, 'century', ARRAY['kc.neolithic.food_production_causes']::text[], 1)
+   -4000, 'century', ARRAY['kc.neolithic.food_production_causes']::text[], 1, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.neolithic.irrigation_to_state', '灌漑農業が階級と国家を生んだ因果', 'causal', 1, -4000,
-   -3000, 'century', ARRAY['kc.neolithic.food_production_causes']::text[], 1.2)
+   -3000, 'century', ARRAY['kc.neolithic.food_production_causes']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.neolithic.metal_age_order', '石器から青銅器・鉄器へ移る順序', 'chronology', 1, -3000,
-   -1200, 'century', ARRAY['kc.neolithic.neolithic_toolkit']::text[], 1)
+   -1200, 'century', ARRAY['kc.neolithic.neolithic_toolkit']::text[], 1, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.source.primary_vs_secondary', '一次史料と二次史料の区別', 'distinction', 1, NULL,
-   NULL, 'unknown', '{}'::text[], 0.8)
+   NULL, 'unknown', '{}'::text[], 0.8, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.source.material_vs_written', '文字史料と考古資料でわかることの違い', 'distinction', 1, NULL,
-   NULL, 'unknown', ARRAY['kc.source.primary_vs_secondary']::text[], 0.7)
+   NULL, 'unknown', ARRAY['kc.source.primary_vs_secondary']::text[], 0.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.source.bias_in_records', '記録が残る側に偏る理由', 'causal', 1, NULL,
-   NULL, 'unknown', ARRAY['kc.source.primary_vs_secondary']::text[], 0.8)
+   NULL, 'unknown', ARRAY['kc.source.primary_vs_secondary']::text[], 0.8, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.source.periodization_problem', '時代区分が地域ごとに一致しないこと', 'distinction', 1, NULL,
-   NULL, 'unknown', '{}'::text[], 0.9)
+   NULL, 'unknown', '{}'::text[], 0.9, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.turkiran.samanid_to_ghaznavid', 'イラン系・トルコ系王朝の交替順序', 'chronology', 1, 875,
-   1187, 'exact', ARRAY['kc.islam.abbasid_decline_order']::text[], 1.3)
+   1187, 'exact', ARRAY['kc.islam.abbasid_decline_order']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.turkiran.turkification_causes', '中央アジアがトルコ化・イスラーム化した要因', 'causal', 1, 840,
-   1000, 'century', '{}'::text[], 1.4)
+   1000, 'century', '{}'::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.turkiran.seljuk_sultanate', 'セルジューク朝がスルタン位を得た経緯', 'fact', 1, 1038,
-   1157, 'exact', ARRAY['kc.islam.abbasid_decline_order']::text[], 1.5)
+   1157, 'exact', ARRAY['kc.islam.abbasid_decline_order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.turkiran.mamluk_and_iqta', 'マムルークとイクター制の結びつき', 'distinction', 1, 946,
-   1250, 'century', ARRAY['kc.islam.iqta_system']::text[], 1.3)
+   1250, 'century', ARRAY['kc.islam.iqta_system']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.turkiran.anatolia_turkification_geo', 'トルコ系勢力がアナトリアへ進出した範囲', 'geo', 1, 1071,
-   1300, 'exact', ARRAY['kc.turkiran.seljuk_sultanate']::text[], 1.4)
+   1300, 'exact', ARRAY['kc.turkiran.seljuk_sultanate']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.turkiran.ghaznavid_india_causes', 'ガズナ朝の侵入が北インドに与えた影響', 'causal', 1, 998,
-   1206, 'exact', ARRAY['kc.turkiran.samanid_to_ghaznavid']::text[], 1.3)
+   1206, 'exact', ARRAY['kc.turkiran.samanid_to_ghaznavid']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islamize.delhi_sultanate_order', 'デリー=スルタン朝5王朝の順序', 'chronology', 1, 1206,
-   1526, 'exact', ARRAY['kc.turkiran.ghaznavid_india_causes']::text[], 1.3)
+   1526, 'exact', ARRAY['kc.turkiran.ghaznavid_india_causes']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islamize.bhakti_and_sufism', 'インドでイスラームが民衆に定着した経路', 'causal', 1, 1200,
-   1600, 'century', ARRAY['kc.islamize.delhi_sultanate_order']::text[], 1.4)
+   1600, 'century', ARRAY['kc.islamize.delhi_sultanate_order']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islamize.sea_route_islam_geo', '東南アジアがイスラーム化した順序と範囲', 'geo', 1, 1290,
-   1600, 'century', ARRAY['kc.sea.port_polities_geo']::text[], 1.4)
+   1600, 'century', ARRAY['kc.sea.port_polities_geo']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islamize.west_africa_states', 'ガーナ・マリ・ソンガイ王国の違い', 'distinction', 1, 700,
-   1591, 'century', '{}'::text[], 1.3)
+   1591, 'century', '{}'::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islamize.swahili_coast_geo', '東アフリカ海岸の海港都市の位置', 'geo', 1, 1000,
-   1500, 'century', '{}'::text[], 1.1)
+   1500, 'century', '{}'::text[], 1.1, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.islamize.sufi_role', 'スーフィーが布教で果たした役割', 'fact', 1, 1100,
-   1600, 'century', ARRAY['kc.islamize.bhakti_and_sufism']::text[], 1.2)
+   1600, 'century', ARRAY['kc.islamize.bhakti_and_sufism']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.song.civil_supremacy_causes', '文治主義が軍事的弱体を招いた因果', 'causal', 1, 960,
-   1127, 'exact', ARRAY['kc.china.tang_system_collapse']::text[], 1.6)
+   1127, 'exact', ARRAY['kc.china.tang_system_collapse']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.song.northern_peoples', '遼・西夏・金の民族と文字', 'distinction', 1, 916,
-   1234, 'exact', '{}'::text[], 1.5)
+   1234, 'exact', '{}'::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.song.wang_anshi_reform', '王安石の新法の内容と挫折', 'fact', 1, 1069,
-   1085, 'exact', ARRAY['kc.song.civil_supremacy_causes']::text[], 1.4)
+   1085, 'exact', ARRAY['kc.song.civil_supremacy_causes']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.song.north_to_south_geo', '北宋と南宋の領域の違い', 'geo', 1, 960,
-   1279, 'exact', ARRAY['kc.song.northern_peoples']::text[], 1.4)
+   1279, 'exact', ARRAY['kc.song.northern_peoples']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.song.economic_revolution', '江南の開発と商業の発展が生んだ変化', 'causal', 1, 960,
-   1279, 'century', '{}'::text[], 1.5)
+   1279, 'century', '{}'::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.song.scholar_officials', '士大夫と門閥貴族の違い', 'distinction', 1, 960,
-   1279, 'century', ARRAY['kc.song.civil_supremacy_causes']::text[], 1.3)
+   1279, 'century', ARRAY['kc.song.civil_supremacy_causes']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mongol.expansion_order', 'モンゴルの征服とウルス成立の順序', 'chronology', 1, 1206,
-   1279, 'exact', '{}'::text[], 1.6)
+   1279, 'exact', '{}'::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mongol.four_khanates_geo', '4ハン国の位置', 'geo', 1, 1240,
-   1502, 'exact', ARRAY['kc.mongol.expansion_order']::text[], 1.5)
+   1502, 'exact', ARRAY['kc.mongol.expansion_order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mongol.yuan_hierarchy', '元の身分序列', 'fact', 1, 1271,
-   1368, 'exact', ARRAY['kc.mongol.expansion_order']::text[], 1.4)
+   1368, 'exact', ARRAY['kc.mongol.expansion_order']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mongol.pax_mongolica', 'ユーラシアの東西交流が活発化した要因', 'causal', 1, 1240,
-   1350, 'century', ARRAY['kc.mongol.four_khanates_geo']::text[], 1.5)
+   1350, 'century', ARRAY['kc.mongol.four_khanates_geo']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mongol.yuan_fall_causes', '元が短期間で中国から退いた要因', 'causal', 1, 1351,
-   1368, 'exact', ARRAY['kc.mongol.yuan_hierarchy']::text[], 1.3)
+   1368, 'exact', ARRAY['kc.mongol.yuan_hierarchy']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mongol.khanate_religion', 'イル=ハン国とキプチャク=ハン国の宗教的帰結', 'distinction', 1, 1258,
-   1502, 'century', ARRAY['kc.mongol.four_khanates_geo']::text[], 1.2)
+   1502, 'century', ARRAY['kc.mongol.four_khanates_geo']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.crusade.first_crusade_causes', '十字軍が起こされた要因', 'causal', 1, 1071,
-   1099, 'exact', ARRAY['kc.euro.agricultural_growth_effects']::text[], 1.5)
+   1099, 'exact', ARRAY['kc.euro.agricultural_growth_effects']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.crusade.expedition_order', '主要な十字軍の回次と結果', 'chronology', 1, 1096,
-   1291, 'exact', ARRAY['kc.crusade.first_crusade_causes']::text[], 1.4)
+   1291, 'exact', ARRAY['kc.crusade.first_crusade_causes']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.crusade.consequences', '十字軍が結果として変えたもの', 'causal', 1, 1096,
-   1300, 'century', ARRAY['kc.crusade.expedition_order']::text[], 1.6)
+   1300, 'century', ARRAY['kc.crusade.expedition_order']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.crusade.two_trade_zones', '地中海商業圏と北ヨーロッパ商業圏の違い', 'distinction', 1, 1100,
-   1400, 'century', '{}'::text[], 1.4)
+   1400, 'century', '{}'::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.crusade.trade_routes_geo', '東方貿易と内陸交易路の結節点', 'geo', 1, 1100,
-   1400, 'century', ARRAY['kc.crusade.two_trade_zones']::text[], 1.3)
+   1400, 'century', ARRAY['kc.crusade.two_trade_zones']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.crusade.manor_decline', '貨幣経済の浸透が荘園制を崩した因果', 'causal', 1, 1200,
-   1400, 'century', ARRAY['kc.euro.feudal_two_layers']::text[], 1.5)
+   1400, 'century', ARRAY['kc.euro.feudal_two_layers']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.medstate.papal_decline_order', '教皇権の絶頂から衰退までの順序', 'chronology', 1, 1198,
-   1417, 'exact', ARRAY['kc.euro.investiture_controversy']::text[], 1.5)
+   1417, 'exact', ARRAY['kc.euro.investiture_controversy']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.medstate.parliament_vs_etats', 'イギリス議会とフランス三部会の違い', 'distinction', 1, 1265,
-   1302, 'exact', '{}'::text[], 1.5)
+   1302, 'exact', '{}'::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.medstate.hundred_years_war', '百年戦争が両国の王権を強めた因果', 'causal', 1, 1339,
-   1453, 'exact', ARRAY['kc.medstate.parliament_vs_etats']::text[], 1.5)
+   1453, 'exact', ARRAY['kc.medstate.parliament_vs_etats']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.medstate.hre_vs_france', '神聖ローマ帝国とフランス王権の集権度の違い', 'distinction', 1, 1250,
-   1500, 'century', ARRAY['kc.medstate.hundred_years_war']::text[], 1.4)
+   1500, 'century', ARRAY['kc.medstate.hundred_years_war']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.medstate.europe_1500_geo', '15世紀末のヨーロッパ主要国の版図', 'geo', 1, 1450,
-   1500, 'century', ARRAY['kc.medstate.hre_vs_france']::text[], 1.3)
+   1500, 'century', ARRAY['kc.medstate.hre_vs_france']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.medstate.reconquista', 'レコンキスタがスペイン王国を生んだ因果', 'causal', 1, 1085,
-   1492, 'exact', '{}'::text[], 1.4)
+   1492, 'exact', '{}'::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.medcult.black_death_effects', '黒死病が社会構造を変えた因果', 'causal', 1, 1347,
-   1400, 'exact', ARRAY['kc.crusade.manor_decline']::text[], 1.6)
+   1400, 'exact', ARRAY['kc.crusade.manor_decline']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.medcult.realism_vs_nominalism', 'スコラ学の実在論と唯名論', 'distinction', 1, 1100,
-   1350, 'century', '{}'::text[], 1.3)
+   1350, 'century', '{}'::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.medcult.medieval_universities', '中世大学の成立と得意分野', 'fact', 1, 1088,
-   1300, 'century', ARRAY['kc.medcult.realism_vs_nominalism']::text[], 1.2)
+   1300, 'century', ARRAY['kc.medcult.realism_vs_nominalism']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.medcult.romanesque_vs_gothic', 'ロマネスクとゴシックの違い', 'distinction', 1, 1000,
-   1400, 'century', '{}'::text[], 1.2)
+   1400, 'century', '{}'::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.medcult.wyclif_and_hus', '教会批判が宗教改革の先駆となった経緯', 'causal', 1, 1376,
-   1415, 'exact', ARRAY['kc.medstate.papal_decline_order']::text[], 1.4)
+   1415, 'exact', ARRAY['kc.medstate.papal_decline_order']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mingqing.ming_vs_qing_rule', '明と清の中国支配の方法の違い', 'distinction', 2, 1368,
-   1912, 'exact', '{}'::text[], 1.6)
+   1912, 'exact', '{}'::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mingqing.haijin_and_tribute', '明の海禁と朝貢体制', 'fact', 2, 1368,
-   1567, 'exact', ARRAY['kc.mingqing.ming_vs_qing_rule']::text[], 1.5)
+   1567, 'exact', ARRAY['kc.mingqing.ming_vs_qing_rule']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mingqing.tax_silver_reform', '一条鞭法と地丁銀が生まれた因果', 'causal', 2, 1581,
-   1717, 'exact', ARRAY['kc.mingqing.haijin_and_tribute']::text[], 1.5)
+   1717, 'exact', ARRAY['kc.mingqing.haijin_and_tribute']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mingqing.ming_fall_order', '明の滅亡から清の支配確立までの順序', 'chronology', 2, 1616,
-   1683, 'exact', ARRAY['kc.mingqing.ming_vs_qing_rule']::text[], 1.4)
+   1683, 'exact', ARRAY['kc.mingqing.ming_vs_qing_rule']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mingqing.qing_territory_geo', '清の最大版図と藩部', 'geo', 2, 1683,
-   1759, 'exact', ARRAY['kc.mingqing.ming_fall_order']::text[], 1.5)
+   1759, 'exact', ARRAY['kc.mingqing.ming_fall_order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mingqing.new_crops_population', '明清期の人口増加を支えた要因', 'causal', 2, 1550,
-   1800, 'century', ARRAY['kc.mingqing.tax_silver_reform']::text[], 1.3)
+   1800, 'century', ARRAY['kc.mingqing.tax_silver_reform']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ottoman.expansion_order', 'オスマン帝国が拡大した順序', 'chronology', 2, 1299,
-   1683, 'exact', '{}'::text[], 1.6)
+   1683, 'exact', '{}'::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ottoman.devshirme_and_timar', 'オスマン帝国の支配制度', 'fact', 2, 1400,
-   1600, 'century', ARRAY['kc.ottoman.expansion_order']::text[], 1.5)
+   1600, 'century', ARRAY['kc.ottoman.expansion_order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ottoman.millet_system', 'ミッレト制とジズヤの関係', 'distinction', 2, 1450,
-   1800, 'century', ARRAY['kc.ottoman.devshirme_and_timar']::text[], 1.4)
+   1800, 'century', ARRAY['kc.ottoman.devshirme_and_timar']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ottoman.sunni_vs_shia_states', 'オスマン朝とサファヴィー朝の宗派の対立', 'distinction', 2, 1501,
-   1736, 'exact', ARRAY['kc.islam.sunni_vs_shia_origin']::text[], 1.6)
+   1736, 'exact', ARRAY['kc.islam.sunni_vs_shia_origin']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ottoman.three_empires_geo', '3イスラーム帝国の版図', 'geo', 2, 1500,
-   1700, 'century', ARRAY['kc.ottoman.sunni_vs_shia_states']::text[], 1.5)
+   1700, 'century', ARRAY['kc.ottoman.sunni_vs_shia_states']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ottoman.mediterranean_decline', '地中海商業圏の地位が下がった要因', 'causal', 2, 1500,
-   1600, 'century', ARRAY['kc.ottoman.expansion_order']::text[], 1.3)
+   1600, 'century', ARRAY['kc.ottoman.expansion_order']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mughal.emperor_order', 'ムガル帝国の皇帝と政策の順序', 'chronology', 2, 1526,
-   1707, 'exact', ARRAY['kc.islamize.delhi_sultanate_order']::text[], 1.6)
+   1707, 'exact', ARRAY['kc.islamize.delhi_sultanate_order']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mughal.akbar_vs_aurangzeb', 'アクバルとアウラングゼーブの宗教政策の違い', 'distinction', 2, 1556,
-   1707, 'exact', ARRAY['kc.mughal.emperor_order']::text[], 1.7)
+   1707, 'exact', ARRAY['kc.mughal.emperor_order']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mughal.mansabdar', 'マンサブダール制の内容', 'fact', 2, 1571,
-   1707, 'century', ARRAY['kc.mughal.emperor_order']::text[], 1.3)
+   1707, 'century', ARRAY['kc.mughal.emperor_order']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mughal.decline_causes', 'ムガル帝国が解体した要因', 'causal', 2, 1707,
-   1764, 'exact', ARRAY['kc.mughal.akbar_vs_aurangzeb']::text[], 1.5)
+   1764, 'exact', ARRAY['kc.mughal.akbar_vs_aurangzeb']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.mughal.indo_islamic_culture', 'インド=イスラーム文化の融合の表れ', 'distinction', 2, 1526,
-   1707, 'century', ARRAY['kc.mughal.emperor_order']::text[], 1.2)
+   1707, 'century', ARRAY['kc.mughal.emperor_order']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.voyage.motives', 'ヨーロッパが海へ出た要因', 'causal', 2, 1415,
-   1498, 'exact', ARRAY['kc.ottoman.mediterranean_decline']::text[], 1.5)
+   1498, 'exact', ARRAY['kc.ottoman.mediterranean_decline']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.voyage.two_routes_geo', 'ポルトガルとスペインの航路の違い', 'geo', 2, 1488,
-   1522, 'exact', ARRAY['kc.voyage.motives']::text[], 1.6)
+   1522, 'exact', ARRAY['kc.voyage.motives']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.voyage.tordesillas', 'トルデシリャス条約の内容', 'fact', 2, 1494,
-   1529, 'exact', ARRAY['kc.voyage.two_routes_geo']::text[], 1.3)
+   1529, 'exact', ARRAY['kc.voyage.two_routes_geo']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.voyage.commercial_revolution', '商業革命と価格革命が起きた因果', 'causal', 2, 1500,
-   1600, 'century', ARRAY['kc.voyage.two_routes_geo']::text[], 1.6)
+   1600, 'century', ARRAY['kc.voyage.two_routes_geo']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.voyage.east_india_companies', '各国の東インド会社の違い', 'distinction', 2, 1600,
-   1799, 'exact', ARRAY['kc.voyage.commercial_revolution']::text[], 1.4)
+   1799, 'exact', ARRAY['kc.voyage.commercial_revolution']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.voyage.gutsherrschaft', '東欧で農場領主制が強まった因果', 'causal', 2, 1500,
-   1700, 'century', ARRAY['kc.voyage.commercial_revolution']::text[], 1.4)
+   1700, 'century', ARRAY['kc.voyage.commercial_revolution']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.atlantic.three_civilizations', 'アステカ・インカ・マヤの違い', 'distinction', 2, 300,
-   1533, 'century', '{}'::text[], 1.4)
+   1533, 'century', '{}'::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.atlantic.conquest_order', 'アメリカ大陸征服の順序', 'chronology', 2, 1492,
-   1533, 'exact', ARRAY['kc.atlantic.three_civilizations']::text[], 1.3)
+   1533, 'exact', ARRAY['kc.atlantic.three_civilizations']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.atlantic.conquest_causes', '少数の征服者が大帝国を倒せた要因', 'causal', 2, 1519,
-   1533, 'exact', ARRAY['kc.atlantic.conquest_order']::text[], 1.5)
+   1533, 'exact', ARRAY['kc.atlantic.conquest_order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.atlantic.encomienda', 'エンコミエンダ制とアシエンダ制', 'fact', 2, 1503,
-   1700, 'century', ARRAY['kc.atlantic.conquest_causes']::text[], 1.4)
+   1700, 'century', ARRAY['kc.atlantic.conquest_causes']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.atlantic.triangular_trade_geo', '大西洋三角貿易の三辺', 'geo', 2, 1600,
-   1800, 'century', ARRAY['kc.atlantic.encomienda']::text[], 1.6)
+   1800, 'century', ARRAY['kc.atlantic.encomienda']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.atlantic.columbian_exchange', '新旧大陸の作物と病原体の交換が生んだ影響', 'causal', 2, 1500,
-   1800, 'century', ARRAY['kc.atlantic.triangular_trade_geo']::text[], 1.5)
+   1800, 'century', ARRAY['kc.atlantic.triangular_trade_geo']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.renaissance.why_italy', 'ルネサンスがイタリアで始まった要因', 'causal', 2, 1300,
-   1450, 'century', ARRAY['kc.crusade.two_trade_zones']::text[], 1.4)
+   1450, 'century', ARRAY['kc.crusade.two_trade_zones']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.renaissance.humanism', '人文主義とスコラ学の違い', 'distinction', 2, 1350,
-   1550, 'century', ARRAY['kc.medcult.realism_vs_nominalism']::text[], 1.4)
+   1550, 'century', ARRAY['kc.medcult.realism_vs_nominalism']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.renaissance.three_inventions', '三大発明の改良と影響', 'fact', 2, 1450,
-   1500, 'century', '{}'::text[], 1.4)
+   1500, 'century', '{}'::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.renaissance.northern', '各国のルネサンスの担い手', 'distinction', 2, 1450,
-   1600, 'century', ARRAY['kc.renaissance.humanism']::text[], 1.3)
+   1600, 'century', ARRAY['kc.renaissance.humanism']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.renaissance.printing_effects', '活版印刷が社会を変えた因果', 'causal', 2, 1450,
-   1550, 'century', ARRAY['kc.renaissance.three_inventions']::text[], 1.5)
+   1550, 'century', ARRAY['kc.renaissance.three_inventions']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.reformation.luther_causes', 'ルターが教会を批判した理由', 'causal', 2, 1517,
-   1521, 'exact', ARRAY['kc.medcult.wyclif_and_hus']::text[], 1.6)
+   1521, 'exact', ARRAY['kc.medcult.wyclif_and_hus']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.reformation.luther_vs_calvin', 'ルター派とカルヴァン派の違い', 'distinction', 2, 1517,
-   1560, 'exact', ARRAY['kc.reformation.luther_causes']::text[], 1.7)
+   1560, 'exact', ARRAY['kc.reformation.luther_causes']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.reformation.settlement_order', '宗教改革が政治的に決着する順序', 'chronology', 2, 1521,
-   1648, 'exact', ARRAY['kc.reformation.luther_vs_calvin']::text[], 1.5)
+   1648, 'exact', ARRAY['kc.reformation.luther_vs_calvin']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.reformation.anglican', 'イギリス国教会の成立の特殊性', 'distinction', 2, 1534,
-   1559, 'exact', ARRAY['kc.reformation.luther_vs_calvin']::text[], 1.5)
+   1559, 'exact', ARRAY['kc.reformation.luther_vs_calvin']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.reformation.counter_reformation', '対抗宗教改革が生んだもの', 'causal', 2, 1534,
-   1563, 'exact', ARRAY['kc.reformation.luther_causes']::text[], 1.4)
+   1563, 'exact', ARRAY['kc.reformation.luther_causes']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.reformation.wars_to_state', '宗教戦争が主権国家を用意した因果', 'causal', 2, 1562,
-   1648, 'exact', ARRAY['kc.reformation.settlement_order']::text[], 1.5)
+   1648, 'exact', ARRAY['kc.reformation.settlement_order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.absolutism.sovereign_state', '主権国家体制と中世の秩序の違い', 'distinction', 2, 1648,
-   1700, 'exact', ARRAY['kc.reformation.wars_to_state']::text[], 1.5)
+   1700, 'exact', ARRAY['kc.reformation.wars_to_state']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.absolutism.machinery', '絶対王政を支えた仕組み', 'fact', 2, 1600,
-   1750, 'century', ARRAY['kc.absolutism.sovereign_state']::text[], 1.5)
+   1750, 'century', ARRAY['kc.absolutism.sovereign_state']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.absolutism.mercantilism_types', '重商主義の2つの型', 'distinction', 2, 1500,
-   1700, 'century', ARRAY['kc.absolutism.machinery']::text[], 1.4)
+   1700, 'century', ARRAY['kc.absolutism.machinery']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.absolutism.hegemony_order', 'ヨーロッパの覇権が移った順序', 'chronology', 2, 1580,
-   1763, 'exact', ARRAY['kc.absolutism.mercantilism_types']::text[], 1.6)
+   1763, 'exact', ARRAY['kc.absolutism.mercantilism_types']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.absolutism.english_revolution', 'イギリスで議会が王権に勝った因果', 'causal', 2, 1628,
-   1689, 'exact', ARRAY['kc.absolutism.machinery']::text[], 1.7)
+   1689, 'exact', ARRAY['kc.absolutism.machinery']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.absolutism.europe_1700_geo', '18世紀初頭のヨーロッパ列強の版図', 'geo', 2, 1683,
-   1721, 'exact', ARRAY['kc.absolutism.hegemony_order']::text[], 1.4)
+   1721, 'exact', ARRAY['kc.absolutism.hegemony_order']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.industrial.why_britain', '産業革命がイギリスで最初に起きた要因', 'causal', 2, 1700,
-   1760, 'century', '{}'::text[], 1.7)
+   1760, 'century', '{}'::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.industrial.textile_inventions', '綿工業の技術革新の順序', 'chronology', 2, 1733,
-   1785, 'exact', ARRAY['kc.industrial.why_britain']::text[], 1.4)
+   1785, 'exact', ARRAY['kc.industrial.why_britain']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.industrial.steam_to_transport', '蒸気機関が交通革命を生んだ因果', 'causal', 2, 1769,
-   1830, 'exact', ARRAY['kc.industrial.textile_inventions']::text[], 1.4)
+   1830, 'exact', ARRAY['kc.industrial.textile_inventions']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.industrial.social_change', '産業革命前後の社会構造の違い', 'distinction', 2, 1760,
-   1850, 'century', ARRAY['kc.industrial.steam_to_transport']::text[], 1.5)
+   1850, 'century', ARRAY['kc.industrial.steam_to_transport']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.industrial.regions_geo', 'イギリスの工業地帯の位置', 'geo', 2, 1760,
-   1850, 'century', ARRAY['kc.industrial.textile_inventions']::text[], 1.3)
+   1850, 'century', ARRAY['kc.industrial.textile_inventions']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.industrial.labour_to_socialism', '労働問題から社会主義が生まれた因果', 'causal', 2, 1811,
-   1848, 'exact', ARRAY['kc.industrial.social_change']::text[], 1.5)
+   1848, 'exact', ARRAY['kc.industrial.social_change']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.usrev.causes', '本国との対立が深まった要因', 'causal', 2, 1763,
-   1775, 'exact', '{}'::text[], 1.5)
+   1775, 'exact', '{}'::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.usrev.war_order', '独立戦争の経過', 'chronology', 2, 1773,
-   1783, 'exact', ARRAY['kc.usrev.causes']::text[], 1.4)
+   1783, 'exact', ARRAY['kc.usrev.causes']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.usrev.declaration_vs_constitution', '独立宣言と合衆国憲法の性格の違い', 'distinction', 2, 1776,
-   1788, 'exact', ARRAY['kc.usrev.war_order']::text[], 1.5)
+   1788, 'exact', ARRAY['kc.usrev.war_order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.usrev.world_impact', '独立が世界に与えた影響', 'causal', 2, 1776,
-   1810, 'exact', ARRAY['kc.usrev.declaration_vs_constitution']::text[], 1.4)
+   1810, 'exact', ARRAY['kc.usrev.declaration_vs_constitution']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.usrev.foreign_support', '独立を助けた外国の動き', 'fact', 2, 1777,
-   1783, 'exact', ARRAY['kc.usrev.war_order']::text[], 1.1)
+   1783, 'exact', ARRAY['kc.usrev.war_order']::text[], 1.1, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.frrev.causes', 'フランス革命が起きた要因', 'causal', 2, 1774,
-   1789, 'exact', ARRAY['kc.usrev.world_impact']::text[], 1.7)
+   1789, 'exact', ARRAY['kc.usrev.world_impact']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.frrev.stages_order', '革命の段階と主導勢力の順序', 'chronology', 2, 1789,
-   1799, 'exact', ARRAY['kc.frrev.causes']::text[], 1.8)
+   1799, 'exact', ARRAY['kc.frrev.causes']::text[], 1.8, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.frrev.declaration_vs_code', '人権宣言とナポレオン法典の違い', 'distinction', 2, 1789,
-   1804, 'exact', ARRAY['kc.frrev.stages_order']::text[], 1.5)
+   1804, 'exact', ARRAY['kc.frrev.stages_order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.frrev.terror_causes', '恐怖政治が生まれた因果', 'causal', 2, 1792,
-   1794, 'exact', ARRAY['kc.frrev.stages_order']::text[], 1.5)
+   1794, 'exact', ARRAY['kc.frrev.stages_order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.frrev.napoleonic_europe_geo', 'ナポレオン支配下のヨーロッパ', 'geo', 2, 1804,
-   1812, 'exact', ARRAY['kc.frrev.declaration_vs_code']::text[], 1.5)
+   1812, 'exact', ARRAY['kc.frrev.declaration_vs_code']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.frrev.napoleon_fall', 'ナポレオンが没落した要因', 'causal', 2, 1806,
-   1815, 'exact', ARRAY['kc.frrev.napoleonic_europe_geo']::text[], 1.6)
+   1815, 'exact', ARRAY['kc.frrev.napoleonic_europe_geo']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.vienna.principles', '正統主義と勢力均衡の違い', 'distinction', 2, 1814,
-   1815, 'exact', ARRAY['kc.frrev.napoleon_fall']::text[], 1.5)
+   1815, 'exact', ARRAY['kc.frrev.napoleon_fall']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.vienna.map_1815_geo', 'ウィーン議定書後のヨーロッパの版図', 'geo', 2, 1815,
-   1830, 'exact', ARRAY['kc.vienna.principles']::text[], 1.4)
+   1830, 'exact', ARRAY['kc.vienna.principles']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.vienna.liberal_movements_order', '自由主義運動が起きた順序', 'chronology', 2, 1820,
-   1848, 'exact', ARRAY['kc.vienna.principles']::text[], 1.6)
+   1848, 'exact', ARRAY['kc.vienna.principles']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.vienna.1848_spread', '二月革命がヨーロッパへ波及した因果', 'causal', 2, 1848,
-   1849, 'exact', ARRAY['kc.vienna.liberal_movements_order']::text[], 1.6)
+   1849, 'exact', ARRAY['kc.vienna.liberal_movements_order']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.vienna.latin_america', 'ラテンアメリカ諸国が独立できた要因', 'causal', 2, 1804,
-   1826, 'exact', ARRAY['kc.usrev.world_impact']::text[], 1.4)
+   1826, 'exact', ARRAY['kc.usrev.world_impact']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.vienna.british_reforms', 'イギリスの自由主義的改革の内容', 'distinction', 2, 1828,
-   1846, 'exact', ARRAY['kc.vienna.liberal_movements_order']::text[], 1.4)
+   1846, 'exact', ARRAY['kc.vienna.liberal_movements_order']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.unification.italy_vs_germany', 'イタリア統一とドイツ統一の主導勢力の違い', 'distinction', 2, 1859,
-   1871, 'exact', ARRAY['kc.vienna.1848_spread']::text[], 1.6)
+   1871, 'exact', ARRAY['kc.vienna.1848_spread']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.unification.three_wars', 'ドイツ統一の3戦争の順序', 'chronology', 2, 1864,
-   1871, 'exact', ARRAY['kc.unification.italy_vs_germany']::text[], 1.6)
+   1871, 'exact', ARRAY['kc.unification.italy_vs_germany']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.unification.garibaldi', 'ガリバルディの南部併合が統一を早めた因果', 'causal', 2, 1860,
-   1861, 'exact', ARRAY['kc.unification.italy_vs_germany']::text[], 1.4)
+   1861, 'exact', ARRAY['kc.unification.italy_vs_germany']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.unification.irredenta_geo', '統一後に残った未回収の地', 'geo', 2, 1866,
-   1919, 'exact', ARRAY['kc.unification.garibaldi']::text[], 1.3)
+   1919, 'exact', ARRAY['kc.unification.garibaldi']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.unification.bismarck_system', 'ビスマルク外交がフランスを孤立させた因果', 'causal', 2, 1873,
-   1890, 'exact', ARRAY['kc.unification.three_wars']::text[], 1.6)
+   1890, 'exact', ARRAY['kc.unification.three_wars']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.c19soc.us_expansion_order', 'アメリカの領土拡大の順序', 'chronology', 2, 1803,
-   1867, 'exact', '{}'::text[], 1.4)
+   1867, 'exact', '{}'::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.c19soc.civil_war_causes', '南北戦争が起きた要因', 'causal', 2, 1820,
-   1861, 'exact', ARRAY['kc.c19soc.us_expansion_order']::text[], 1.6)
+   1861, 'exact', ARRAY['kc.c19soc.us_expansion_order']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.c19soc.north_vs_south', '北部と南部の経済構造の違い', 'distinction', 2, 1800,
-   1865, 'century', ARRAY['kc.c19soc.civil_war_causes']::text[], 1.5)
+   1865, 'century', ARRAY['kc.c19soc.civil_war_causes']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.c19soc.russian_reform', 'ロシアで農奴解放が行われた因果', 'causal', 2, 1853,
-   1881, 'exact', '{}'::text[], 1.5)
+   1881, 'exact', '{}'::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.c19soc.science_and_thought', '19世紀の科学と思想', 'fact', 2, 1830,
-   1900, 'century', ARRAY['kc.industrial.labour_to_socialism']::text[], 1.2)
+   1900, 'century', ARRAY['kc.industrial.labour_to_socialism']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.c19soc.migration_geo', '19世紀後半の移民の流れ', 'geo', 2, 1840,
-   1900, 'century', ARRAY['kc.c19soc.north_vs_south']::text[], 1.3)
+   1900, 'century', ARRAY['kc.c19soc.north_vs_south']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.westasia19.reform_order', 'オスマン帝国の改革の順序', 'chronology', 2, 1839,
-   1908, 'exact', ARRAY['kc.ottoman.expansion_order']::text[], 1.5)
+   1908, 'exact', ARRAY['kc.ottoman.expansion_order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.westasia19.eastern_question', '東方問題が列強の介入を招いた因果', 'causal', 2, 1821,
-   1878, 'exact', ARRAY['kc.westasia19.reform_order']::text[], 1.6)
+   1878, 'exact', ARRAY['kc.westasia19.reform_order']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.westasia19.balkan_geo', 'バルカン半島の民族と国家の分布', 'geo', 2, 1878,
-   1913, 'exact', ARRAY['kc.westasia19.eastern_question']::text[], 1.5)
+   1913, 'exact', ARRAY['kc.westasia19.eastern_question']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.westasia19.egypt_vs_iran', 'エジプトとイランの半植民地化の違い', 'distinction', 2, 1805,
-   1907, 'exact', ARRAY['kc.westasia19.eastern_question']::text[], 1.4)
+   1907, 'exact', ARRAY['kc.westasia19.eastern_question']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.westasia19.islamic_revival', 'ワッハーブ運動とパン=イスラーム主義の違い', 'causal', 2, 1744,
-   1897, 'exact', ARRAY['kc.westasia19.reform_order']::text[], 1.2)
+   1897, 'exact', ARRAY['kc.westasia19.reform_order']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.indiacol.conquest_order', 'イギリスがインドを支配する過程の順序', 'chronology', 2, 1757,
-   1858, 'exact', ARRAY['kc.mughal.decline_causes']::text[], 1.6)
+   1858, 'exact', ARRAY['kc.mughal.decline_causes']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.indiacol.sepoy_mutiny', 'シパーヒーの反乱が体制を変えた因果', 'causal', 2, 1857,
-   1877, 'exact', ARRAY['kc.indiacol.conquest_order']::text[], 1.6)
+   1877, 'exact', ARRAY['kc.indiacol.conquest_order']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.indiacol.zamindari_vs_ryotwari', '地税制度の2つの型', 'distinction', 2, 1793,
-   1820, 'exact', ARRAY['kc.indiacol.conquest_order']::text[], 1.4)
+   1820, 'exact', ARRAY['kc.indiacol.conquest_order']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.indiacol.deindustrialization', 'インドが原料供給地に変えられた因果', 'causal', 2, 1813,
-   1900, 'century', ARRAY['kc.indiacol.zamindari_vs_ryotwari']::text[], 1.5)
+   1900, 'century', ARRAY['kc.indiacol.zamindari_vs_ryotwari']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.indiacol.congress_shift', 'インド国民会議の性格の変化', 'fact', 2, 1885,
-   1906, 'exact', ARRAY['kc.indiacol.sepoy_mutiny']::text[], 1.4)
+   1906, 'exact', ARRAY['kc.indiacol.sepoy_mutiny']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.qingfall.opium_war_causes', 'アヘン戦争が起きた要因', 'causal', 2, 1793,
-   1842, 'exact', ARRAY['kc.mingqing.qing_territory_geo']::text[], 1.7)
+   1842, 'exact', ARRAY['kc.mingqing.qing_territory_geo']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.qingfall.unequal_treaties', '不平等条約が積み重なる順序', 'chronology', 2, 1842,
-   1860, 'exact', ARRAY['kc.qingfall.opium_war_causes']::text[], 1.6)
+   1860, 'exact', ARRAY['kc.qingfall.opium_war_causes']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.qingfall.taiping', '太平天国の乱が清を変質させた因果', 'causal', 2, 1851,
-   1864, 'exact', ARRAY['kc.qingfall.unequal_treaties']::text[], 1.5)
+   1864, 'exact', ARRAY['kc.qingfall.unequal_treaties']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.qingfall.yangwu_vs_meiji', '洋務運動と明治維新の違い', 'distinction', 2, 1861,
-   1895, 'exact', ARRAY['kc.qingfall.taiping']::text[], 1.7)
+   1895, 'exact', ARRAY['kc.qingfall.taiping']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.qingfall.spheres_geo', '列強の中国分割と勢力範囲', 'geo', 2, 1895,
-   1900, 'exact', ARRAY['kc.qingfall.yangwu_vs_meiji']::text[], 1.6)
+   1900, 'exact', ARRAY['kc.qingfall.yangwu_vs_meiji']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.qingfall.opening_chain', '東アジアの開国が連鎖した因果', 'causal', 2, 1842,
-   1876, 'exact', ARRAY['kc.qingfall.unequal_treaties']::text[], 1.4)
+   1876, 'exact', ARRAY['kc.qingfall.unequal_treaties']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.imperialism.causes', '帝国主義が生まれた要因', 'causal', 2, 1873,
-   1900, 'exact', ARRAY['kc.industrial.labour_to_socialism']::text[], 1.6)
+   1900, 'exact', ARRAY['kc.industrial.labour_to_socialism']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.imperialism.second_industrial', '第1次産業革命と第2次産業革命の違い', 'distinction', 2, 1870,
-   1900, 'century', ARRAY['kc.imperialism.causes']::text[], 1.5)
+   1900, 'century', ARRAY['kc.imperialism.causes']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.imperialism.alliance_order', '三国同盟と三国協商が固まる順序', 'chronology', 2, 1882,
-   1907, 'exact', ARRAY['kc.unification.bismarck_system']::text[], 1.7)
+   1907, 'exact', ARRAY['kc.unification.bismarck_system']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.imperialism.weltpolitik', 'ドイツの世界政策が対立を激化させた因果', 'causal', 2, 1890,
-   1911, 'exact', ARRAY['kc.imperialism.alliance_order']::text[], 1.5)
+   1911, 'exact', ARRAY['kc.imperialism.alliance_order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.imperialism.3b_3c_geo', '3B政策と3C政策の経路', 'geo', 2, 1899,
-   1914, 'exact', ARRAY['kc.imperialism.weltpolitik']::text[], 1.5)
+   1914, 'exact', ARRAY['kc.imperialism.weltpolitik']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.imperialism.us_vs_russia', 'アメリカとロシアの膨張の方向の違い', 'distinction', 2, 1898,
-   1905, 'exact', ARRAY['kc.imperialism.causes']::text[], 1.4)
+   1905, 'exact', ARRAY['kc.imperialism.causes']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.partition.africa_order', 'アフリカ分割が進む順序', 'chronology', 2, 1884,
-   1912, 'exact', '{}'::text[], 1.5)
+   1912, 'exact', '{}'::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.partition.longitudinal_geo', '縦断政策と横断政策の経路', 'geo', 2, 1881,
-   1898, 'exact', ARRAY['kc.partition.africa_order']::text[], 1.7)
+   1898, 'exact', ARRAY['kc.partition.africa_order']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.partition.two_independent', '独立を保った2国', 'fact', 2, 1847,
-   1912, 'exact', ARRAY['kc.partition.africa_order']::text[], 1.4)
+   1912, 'exact', ARRAY['kc.partition.africa_order']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.partition.boer_war', '南アフリカ戦争が起きた要因', 'causal', 2, 1899,
-   1902, 'exact', ARRAY['kc.partition.longitudinal_geo']::text[], 1.4)
+   1902, 'exact', ARRAY['kc.partition.longitudinal_geo']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.partition.pacific_geo', '太平洋地域の分割', 'geo', 2, 1840,
-   1902, 'exact', ARRAY['kc.partition.africa_order']::text[], 1.3)
+   1902, 'exact', ARRAY['kc.partition.africa_order']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.partition.sea_colonies', '東南アジアの植民地化の型の違い', 'distinction', 2, 1830,
-   1900, 'exact', ARRAY['kc.partition.pacific_geo']::text[], 1.5)
+   1900, 'exact', ARRAY['kc.partition.pacific_geo']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.asianation.boxer', '義和団事件が清の運命を決めた因果', 'causal', 2, 1899,
-   1901, 'exact', ARRAY['kc.qingfall.spheres_geo']::text[], 1.5)
+   1901, 'exact', ARRAY['kc.qingfall.spheres_geo']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.asianation.xinhai_order', '辛亥革命に至る順序', 'chronology', 2, 1894,
-   1912, 'exact', ARRAY['kc.asianation.boxer']::text[], 1.6)
+   1912, 'exact', ARRAY['kc.asianation.boxer']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.asianation.leaders', '各国の民族運動の担い手の違い', 'distinction', 2, 1885,
-   1908, 'exact', ARRAY['kc.indiacol.congress_shift']::text[], 1.4)
+   1908, 'exact', ARRAY['kc.indiacol.congress_shift']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.asianation.russo_japanese_impact', '日露戦争がアジアに与えた影響', 'causal', 2, 1905,
-   1911, 'exact', ARRAY['kc.asianation.leaders']::text[], 1.5)
+   1911, 'exact', ARRAY['kc.asianation.leaders']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.asianation.three_principles', '三民主義の内容', 'fact', 2, 1905,
-   1912, 'exact', ARRAY['kc.asianation.xinhai_order']::text[], 1.3)
+   1912, 'exact', ARRAY['kc.asianation.xinhai_order']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ww1.causes', '第一次世界大戦が起きた要因', 'causal', 3, 1908,
-   1914, 'exact', ARRAY['kc.imperialism.alliance_order']::text[], 1.7)
+   1914, 'exact', ARRAY['kc.imperialism.alliance_order']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ww1.total_war', '従来の戦争と総力戦の違い', 'distinction', 3, 1914,
-   1918, 'exact', ARRAY['kc.ww1.causes']::text[], 1.7)
+   1918, 'exact', ARRAY['kc.ww1.causes']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ww1.turning_points', '大戦の転機の順序', 'chronology', 3, 1914,
-   1918, 'exact', ARRAY['kc.ww1.total_war']::text[], 1.5)
+   1918, 'exact', ARRAY['kc.ww1.total_war']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ww1.british_promises', 'イギリスの三枚舌外交', 'fact', 3, 1915,
-   1917, 'exact', ARRAY['kc.ww1.turning_points']::text[], 1.6)
+   1917, 'exact', ARRAY['kc.ww1.turning_points']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ww1.fronts_geo', '大戦の戦線の位置', 'geo', 3, 1914,
-   1918, 'exact', ARRAY['kc.ww1.turning_points']::text[], 1.3)
+   1918, 'exact', ARRAY['kc.ww1.turning_points']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ww1.empires_collapse', '大戦が帝国を解体させた因果', 'causal', 3, 1917,
-   1922, 'exact', ARRAY['kc.ww1.turning_points']::text[], 1.6)
+   1922, 'exact', ARRAY['kc.ww1.turning_points']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.rusrev.two_revolutions', '二月革命から十月革命までの順序', 'chronology', 3, 1917,
-   1918, 'exact', ARRAY['kc.ww1.turning_points']::text[], 1.7)
+   1918, 'exact', ARRAY['kc.ww1.turning_points']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.rusrev.bolshevik_causes', 'ボリシェヴィキが権力を握れた要因', 'causal', 3, 1917,
-   1917, 'exact', ARRAY['kc.rusrev.two_revolutions']::text[], 1.6)
+   1917, 'exact', ARRAY['kc.rusrev.two_revolutions']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.rusrev.war_communism_vs_nep', '戦時共産主義とネップの違い', 'distinction', 3, 1918,
-   1928, 'exact', ARRAY['kc.rusrev.bolshevik_causes']::text[], 1.6)
+   1928, 'exact', ARRAY['kc.rusrev.bolshevik_causes']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.rusrev.intervention', '諸外国の干渉が革命政権を固めた因果', 'causal', 3, 1918,
-   1922, 'exact', ARRAY['kc.rusrev.bolshevik_causes']::text[], 1.4)
+   1922, 'exact', ARRAY['kc.rusrev.bolshevik_causes']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.rusrev.ussr_and_comintern', 'ソ連の成立とコミンテルン', 'fact', 3, 1919,
-   1922, 'exact', ARRAY['kc.rusrev.intervention']::text[], 1.3)
+   1922, 'exact', ARRAY['kc.rusrev.intervention']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.versailles.two_systems', 'ヴェルサイユ体制とワシントン体制の違い', 'distinction', 3, 1919,
-   1922, 'exact', ARRAY['kc.ww1.empires_collapse']::text[], 1.6)
+   1922, 'exact', ARRAY['kc.ww1.empires_collapse']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.versailles.german_terms', 'ヴェルサイユ条約がドイツに課したもの', 'fact', 3, 1919,
-   1921, 'exact', ARRAY['kc.versailles.two_systems']::text[], 1.6)
+   1921, 'exact', ARRAY['kc.versailles.two_systems']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.versailles.league_weakness', '国際連盟が機能しなかった要因', 'causal', 3, 1920,
-   1935, 'exact', ARRAY['kc.versailles.two_systems']::text[], 1.6)
+   1935, 'exact', ARRAY['kc.versailles.two_systems']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.versailles.new_states_geo', '大戦後の東欧に生まれた国', 'geo', 3, 1918,
-   1920, 'exact', ARRAY['kc.versailles.two_systems']::text[], 1.5)
+   1920, 'exact', ARRAY['kc.versailles.two_systems']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.versailles.mandate_system', '委任統治がアラブの不信を生んだ因果', 'causal', 3, 1920,
-   1932, 'exact', ARRAY['kc.ww1.british_promises']::text[], 1.4)
+   1932, 'exact', ARRAY['kc.ww1.british_promises']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.versailles.cooperation_order', '1920年代の国際協調の順序', 'chronology', 3, 1924,
-   1929, 'exact', ARRAY['kc.versailles.league_weakness']::text[], 1.4)
+   1929, 'exact', ARRAY['kc.versailles.league_weakness']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.depression.spread', '世界恐慌が世界へ広がった因果', 'causal', 3, 1929,
-   1933, 'exact', ARRAY['kc.versailles.cooperation_order']::text[], 1.7)
+   1933, 'exact', ARRAY['kc.versailles.cooperation_order']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.depression.responses', '各国の恐慌対策の違い', 'distinction', 3, 1932,
-   1936, 'exact', ARRAY['kc.depression.spread']::text[], 1.7)
+   1936, 'exact', ARRAY['kc.depression.spread']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.depression.fascism_causes', 'ファシズムが支持された要因', 'causal', 3, 1922,
-   1933, 'exact', ARRAY['kc.depression.responses']::text[], 1.7)
+   1933, 'exact', ARRAY['kc.depression.responses']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.depression.italy_vs_germany', 'イタリアとドイツのファシズムの違い', 'distinction', 3, 1922,
-   1939, 'exact', ARRAY['kc.depression.fascism_causes']::text[], 1.4)
+   1939, 'exact', ARRAY['kc.depression.fascism_causes']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.depression.german_revision', 'ドイツが条約を破棄していく順序', 'chronology', 3, 1933,
-   1939, 'exact', ARRAY['kc.depression.italy_vs_germany']::text[], 1.6)
+   1939, 'exact', ARRAY['kc.depression.italy_vs_germany']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.depression.appeasement', '宥和政策がとられた因果', 'causal', 3, 1935,
-   1939, 'exact', ARRAY['kc.depression.german_revision']::text[], 1.5)
+   1939, 'exact', ARRAY['kc.depression.german_revision']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ww2.turning_points', '戦争の拡大と転機の順序', 'chronology', 3, 1939,
-   1945, 'exact', ARRAY['kc.depression.german_revision']::text[], 1.7)
+   1945, 'exact', ARRAY['kc.depression.german_revision']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ww2.axis_vs_allies', '枢軸国と連合国の性格の違い', 'distinction', 3, 1940,
-   1945, 'exact', ARRAY['kc.ww2.turning_points']::text[], 1.4)
+   1945, 'exact', ARRAY['kc.ww2.turning_points']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ww2.axis_extent_geo', '枢軸国の最大勢力圏', 'geo', 3, 1942,
-   1942, 'exact', ARRAY['kc.ww2.turning_points']::text[], 1.5)
+   1942, 'exact', ARRAY['kc.ww2.turning_points']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ww2.eastern_front', '独ソ戦が戦局を決めた因果', 'causal', 3, 1941,
-   1945, 'exact', ARRAY['kc.ww2.axis_extent_geo']::text[], 1.5)
+   1945, 'exact', ARRAY['kc.ww2.axis_extent_geo']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ww2.conferences', '戦後構想を決めた会談', 'fact', 3, 1941,
-   1945, 'exact', ARRAY['kc.ww2.turning_points']::text[], 1.6)
+   1945, 'exact', ARRAY['kc.ww2.turning_points']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ww2.holocaust', 'ホロコーストに至る段階', 'causal', 3, 1935,
-   1945, 'exact', ARRAY['kc.ww2.axis_vs_allies']::text[], 1.5)
+   1945, 'exact', ARRAY['kc.ww2.axis_vs_allies']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.coldwar.origin', '冷戦が始まった要因', 'causal', 3, 1946,
-   1949, 'exact', ARRAY['kc.ww2.conferences']::text[], 1.7)
+   1949, 'exact', ARRAY['kc.ww2.conferences']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.coldwar.marshall_vs_comecon', 'マーシャル=プランとコメコンの対応', 'distinction', 3, 1947,
-   1949, 'exact', ARRAY['kc.coldwar.origin']::text[], 1.6)
+   1949, 'exact', ARRAY['kc.coldwar.origin']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.coldwar.blocs_geo', '東西両陣営の分布', 'geo', 3, 1949,
-   1955, 'exact', ARRAY['kc.coldwar.marshall_vs_comecon']::text[], 1.6)
+   1955, 'exact', ARRAY['kc.coldwar.marshall_vs_comecon']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.coldwar.german_division', 'ドイツと朝鮮の分断が生まれた因果', 'causal', 3, 1948,
-   1953, 'exact', ARRAY['kc.coldwar.blocs_geo']::text[], 1.6)
+   1953, 'exact', ARRAY['kc.coldwar.blocs_geo']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.coldwar.china_prc', '中華人民共和国の成立と冷戦', 'causal', 3, 1945,
-   1950, 'exact', ARRAY['kc.coldwar.german_division']::text[], 1.5)
+   1950, 'exact', ARRAY['kc.coldwar.german_division']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.coldwar.arms_race', '核開発競争が抑止に転じた因果', 'chronology', 3, 1945,
-   1962, 'exact', ARRAY['kc.coldwar.origin']::text[], 1.4)
+   1962, 'exact', ARRAY['kc.coldwar.origin']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.decolonize.india_partition', 'インドが分離独立した因果', 'causal', 3, 1935,
-   1948, 'exact', ARRAY['kc.indiacol.congress_shift']::text[], 1.6)
+   1948, 'exact', ARRAY['kc.indiacol.congress_shift']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.decolonize.sea_independence', '東南アジアの独立の型の違い', 'distinction', 3, 1945,
-   1954, 'exact', ARRAY['kc.partition.sea_colonies']::text[], 1.5)
+   1954, 'exact', ARRAY['kc.partition.sea_colonies']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.decolonize.africa_year_geo', 'アフリカ諸国が独立した順序と範囲', 'geo', 3, 1951,
-   1975, 'exact', ARRAY['kc.partition.africa_order']::text[], 1.6)
+   1975, 'exact', ARRAY['kc.partition.africa_order']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.decolonize.bandung', '第三勢力が形をとった順序', 'chronology', 3, 1954,
-   1961, 'exact', ARRAY['kc.decolonize.sea_independence']::text[], 1.5)
+   1961, 'exact', ARRAY['kc.decolonize.sea_independence']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.decolonize.artificial_borders', '植民地の境界がそのまま国境になった因果', 'causal', 3, 1960,
-   1994, 'exact', ARRAY['kc.decolonize.africa_year_geo']::text[], 1.5)
+   1994, 'exact', ARRAY['kc.decolonize.africa_year_geo']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.decolonize.apartheid', 'アパルトヘイトの成立と廃止', 'fact', 3, 1948,
-   1994, 'exact', ARRAY['kc.partition.boer_war']::text[], 1.4)
+   1994, 'exact', ARRAY['kc.partition.boer_war']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.regionalwar.middle_east_geo', '中東戦争で動いた領域', 'geo', 3, 1948,
-   1979, 'exact', ARRAY['kc.versailles.mandate_system']::text[], 1.6)
+   1979, 'exact', ARRAY['kc.versailles.mandate_system']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.regionalwar.middle_east_order', '中東戦争の順序と争点', 'chronology', 3, 1948,
-   1979, 'exact', ARRAY['kc.regionalwar.middle_east_geo']::text[], 1.6)
+   1979, 'exact', ARRAY['kc.regionalwar.middle_east_geo']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.regionalwar.vietnam_causes', 'ベトナム戦争が長期化した要因', 'causal', 3, 1954,
-   1975, 'exact', ARRAY['kc.decolonize.sea_independence']::text[], 1.6)
+   1975, 'exact', ARRAY['kc.decolonize.sea_independence']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.regionalwar.oil_shock', '石油危機が世界経済を変えた因果', 'causal', 3, 1973,
-   1979, 'exact', ARRAY['kc.regionalwar.middle_east_order']::text[], 1.6)
+   1979, 'exact', ARRAY['kc.regionalwar.middle_east_order']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.regionalwar.sino_soviet', '中ソ対立が冷戦の構図を崩した因果', 'causal', 3, 1956,
-   1972, 'exact', ARRAY['kc.coldwar.china_prc']::text[], 1.5)
+   1972, 'exact', ARRAY['kc.coldwar.china_prc']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.regionalwar.latin_america_coldwar', 'ラテンアメリカが冷戦の場になった経緯', 'fact', 3, 1959,
-   1973, 'exact', ARRAY['kc.coldwar.arms_race']::text[], 1.3)
+   1973, 'exact', ARRAY['kc.coldwar.arms_race']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.detente.detente_causes', '緊張緩和が進んだ要因', 'causal', 3, 1963,
-   1975, 'exact', ARRAY['kc.coldwar.arms_race']::text[], 1.5)
+   1975, 'exact', ARRAY['kc.coldwar.arms_race']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.detente.second_cold_war', '緊張緩和が一度崩れた因果', 'causal', 3, 1979,
-   1985, 'exact', ARRAY['kc.detente.detente_causes']::text[], 1.4)
+   1985, 'exact', ARRAY['kc.detente.detente_causes']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.detente.perestroika', 'ペレストロイカが体制を崩した因果', 'causal', 3, 1985,
-   1991, 'exact', ARRAY['kc.detente.second_cold_war']::text[], 1.7)
+   1991, 'exact', ARRAY['kc.detente.second_cold_war']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.detente.east_europe_1989', '東欧革命が連鎖した順序', 'chronology', 3, 1989,
-   1991, 'exact', ARRAY['kc.detente.perestroika']::text[], 1.6)
+   1991, 'exact', ARRAY['kc.detente.perestroika']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.detente.germany_and_ussr_geo', '冷戦終結で変わった地図', 'geo', 3, 1990,
-   1993, 'exact', ARRAY['kc.detente.east_europe_1989']::text[], 1.5)
+   1993, 'exact', ARRAY['kc.detente.east_europe_1989']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.detente.yugoslavia_causes', 'ユーゴスラヴィアが解体した要因', 'causal', 3, 1991,
-   1999, 'exact', ARRAY['kc.detente.germany_and_ussr_geo']::text[], 1.4)
+   1999, 'exact', ARRAY['kc.detente.germany_and_ussr_geo']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.global.eu_integration_order', 'ヨーロッパ統合の順序', 'chronology', 3, 1952,
-   2002, 'exact', ARRAY['kc.coldwar.marshall_vs_comecon']::text[], 1.5)
+   2002, 'exact', ARRAY['kc.coldwar.marshall_vs_comecon']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.global.multipolar', '冷戦後の秩序が多極化した因果', 'causal', 3, 1991,
-   2020, 'century', ARRAY['kc.detente.germany_and_ussr_geo']::text[], 1.5)
+   2020, 'century', ARRAY['kc.detente.germany_and_ussr_geo']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.global.regional_blocs_geo', '地域経済統合の枠組み', 'geo', 3, 1967,
-   2020, 'century', ARRAY['kc.global.eu_integration_order']::text[], 1.4)
+   2020, 'century', ARRAY['kc.global.eu_integration_order']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.global.terror_and_intervention', '9・11以後の介入が生んだもの', 'causal', 3, 2001,
-   2011, 'exact', ARRAY['kc.global.multipolar']::text[], 1.4)
+   2011, 'exact', ARRAY['kc.global.multipolar']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.global.common_issues', '人類共通の課題の広がり', 'distinction', 3, 1972,
-   2020, 'century', ARRAY['kc.global.multipolar']::text[], 1.3)
+   2020, 'century', ARRAY['kc.global.multipolar']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ghsource.chronology_tools', '年代の表し方の違い', 'distinction', 1, NULL,
-   NULL, 'unknown', ARRAY['kc.source.primary_vs_secondary']::text[], 0.9)
+   NULL, 'unknown', ARRAY['kc.source.primary_vs_secondary']::text[], 0.9, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ghsource.statistics_reading', '統計資料を読むときの落とし穴', 'causal', 1, NULL,
-   NULL, 'unknown', ARRAY['kc.source.bias_in_records']::text[], 1)
+   NULL, 'unknown', ARRAY['kc.source.bias_in_records']::text[], 1, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ghsource.map_as_argument', '地図が主張を含むこと', 'distinction', 1, NULL,
-   NULL, 'unknown', ARRAY['kc.source.periodization_problem']::text[], 0.9)
+   NULL, 'unknown', ARRAY['kc.source.periodization_problem']::text[], 0.9, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.ghsource.multiple_perspectives', '同じ出来事が立場で違って見えること', 'causal', 1, NULL,
-   NULL, 'unknown', ARRAY['kc.source.bias_in_records']::text[], 1)
+   NULL, 'unknown', ARRAY['kc.source.bias_in_records']::text[], 1, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.asia18.three_empires_prosperity', '18世紀のアジア3帝国の状態', 'distinction', 2, 1700,
-   1800, 'century', ARRAY['kc.mingqing.qing_territory_geo']::text[], 1.4)
+   1800, 'century', ARRAY['kc.mingqing.qing_territory_geo']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.asia18.silver_flow_geo', '18世紀の銀と物産の流れ', 'geo', 2, 1700,
-   1800, 'century', ARRAY['kc.mingqing.tax_silver_reform']::text[], 1.5)
+   1800, 'century', ARRAY['kc.mingqing.tax_silver_reform']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.asia18.edo_isolation', '江戸幕府の対外関係の実態', 'distinction', 2, 1639,
-   1854, 'exact', '{}'::text[], 1.5)
+   1854, 'exact', '{}'::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.asia18.asian_trade_causes', 'アジア域内交易が活発だった要因', 'causal', 2, 1700,
-   1800, 'century', ARRAY['kc.asia18.silver_flow_geo']::text[], 1.3)
+   1800, 'century', ARRAY['kc.asia18.silver_flow_geo']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.asia18.prosperity_to_crisis', '繁栄が19世紀の危機に転じた因果', 'causal', 2, 1750,
-   1840, 'century', ARRAY['kc.asia18.three_empires_prosperity']::text[], 1.5)
+   1840, 'century', ARRAY['kc.asia18.three_empires_prosperity']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.triangle.slave_trade_scale', '奴隷貿易の規模と経路', 'geo', 2, 1500,
-   1867, 'exact', ARRAY['kc.atlantic.triangular_trade_geo']::text[], 1.6)
+   1867, 'exact', ARRAY['kc.atlantic.triangular_trade_geo']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.triangle.plantation_system', 'プランテーションの成り立ち', 'causal', 2, 1600,
-   1800, 'century', ARRAY['kc.triangle.slave_trade_scale']::text[], 1.5)
+   1800, 'century', ARRAY['kc.triangle.slave_trade_scale']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.triangle.africa_impact', '奴隷貿易がアフリカに与えた影響', 'causal', 2, 1600,
-   1800, 'century', ARRAY['kc.triangle.slave_trade_scale']::text[], 1.4)
+   1800, 'century', ARRAY['kc.triangle.slave_trade_scale']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.triangle.abolition_order', '奴隷貿易と奴隷制が廃止される順序', 'chronology', 2, 1807,
-   1888, 'exact', ARRAY['kc.triangle.africa_impact']::text[], 1.4)
+   1888, 'exact', ARRAY['kc.triangle.africa_impact']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.triangle.capital_to_industry', '三角貿易の利益が産業革命を支えた因果', 'causal', 2, 1700,
-   1800, 'century', ARRAY['kc.triangle.plantation_system']::text[], 1.5)
+   1800, 'century', ARRAY['kc.triangle.plantation_system']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.indsoc.work_and_time', '工場労働が生活を変えた因果', 'causal', 2, 1780,
-   1850, 'century', ARRAY['kc.industrial.social_change']::text[], 1.5)
+   1850, 'century', ARRAY['kc.industrial.social_change']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.indsoc.urban_problems', '都市化が生んだ問題', 'fact', 2, 1800,
-   1900, 'century', ARRAY['kc.indsoc.work_and_time']::text[], 1.3)
+   1900, 'century', ARRAY['kc.indsoc.work_and_time']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.indsoc.family_and_gender', '性別役割分業が形をとった因果', 'causal', 2, 1800,
-   1900, 'century', ARRAY['kc.indsoc.work_and_time']::text[], 1.4)
+   1900, 'century', ARRAY['kc.indsoc.work_and_time']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.indsoc.spread_geo', '産業革命が各国へ広がった順序と地域', 'geo', 2, 1760,
-   1900, 'century', ARRAY['kc.industrial.regions_geo']::text[], 1.4)
+   1900, 'century', ARRAY['kc.industrial.regions_geo']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.indsoc.labour_movement', '労働運動と社会政策の対応', 'distinction', 2, 1833,
-   1900, 'exact', ARRAY['kc.indsoc.urban_problems']::text[], 1.4)
+   1900, 'exact', ARRAY['kc.indsoc.urban_problems']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.nationstate.what_is_nation', '国民国家という枠組みの新しさ', 'distinction', 2, 1789,
-   1900, 'century', ARRAY['kc.frrev.declaration_vs_code']::text[], 1.6)
+   1900, 'century', ARRAY['kc.frrev.declaration_vs_code']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.nationstate.making_citizens', '国民を作る仕組み', 'causal', 2, 1800,
-   1900, 'century', ARRAY['kc.nationstate.what_is_nation']::text[], 1.5)
+   1900, 'century', ARRAY['kc.nationstate.what_is_nation']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.nationstate.suffrage_order', '参政権が広がる順序', 'chronology', 2, 1832,
-   1928, 'exact', ARRAY['kc.vienna.british_reforms']::text[], 1.5)
+   1928, 'exact', ARRAY['kc.vienna.british_reforms']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.nationstate.nationalism_two_faces', 'ナショナリズムの2つの顔', 'distinction', 2, 1848,
-   1918, 'exact', ARRAY['kc.nationstate.what_is_nation']::text[], 1.5)
+   1918, 'exact', ARRAY['kc.nationstate.what_is_nation']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.nationstate.japan_comparison', '日本の国民国家化の特徴', 'distinction', 2, 1868,
-   1890, 'exact', ARRAY['kc.nationstate.making_citizens']::text[], 1.5)
+   1890, 'exact', ARRAY['kc.nationstate.making_citizens']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.bakumatsu.opening_causes', '日本が開国した要因', 'causal', 2, 1840,
-   1858, 'exact', ARRAY['kc.qingfall.opening_chain']::text[], 1.6)
+   1858, 'exact', ARRAY['kc.qingfall.opening_chain']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.bakumatsu.two_treaties', '和親条約と修好通商条約の違い', 'distinction', 2, 1854,
-   1858, 'exact', ARRAY['kc.bakumatsu.opening_causes']::text[], 1.6)
+   1858, 'exact', ARRAY['kc.bakumatsu.opening_causes']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.bakumatsu.trade_impact', '貿易の開始が経済を混乱させた因果', 'causal', 2, 1859,
-   1867, 'exact', ARRAY['kc.bakumatsu.two_treaties']::text[], 1.5)
+   1867, 'exact', ARRAY['kc.bakumatsu.two_treaties']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.bakumatsu.sonno_joi_shift', '尊王攘夷から倒幕へ転じた因果', 'causal', 2, 1863,
-   1868, 'exact', ARRAY['kc.bakumatsu.trade_impact']::text[], 1.5)
+   1868, 'exact', ARRAY['kc.bakumatsu.trade_impact']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.bakumatsu.treaty_ports_geo', '開港場の位置と役割', 'geo', 2, 1854,
-   1867, 'exact', ARRAY['kc.bakumatsu.two_treaties']::text[], 1.3)
+   1867, 'exact', ARRAY['kc.bakumatsu.two_treaties']::text[], 1.3, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.meiji.centralization', '版籍奉還と廃藩置県の違い', 'distinction', 2, 1869,
-   1871, 'exact', ARRAY['kc.bakumatsu.sonno_joi_shift']::text[], 1.6)
+   1871, 'exact', ARRAY['kc.bakumatsu.sonno_joi_shift']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.meiji.three_reforms', '地租改正・徴兵令・学制の目的', 'causal', 2, 1872,
-   1873, 'exact', ARRAY['kc.meiji.centralization']::text[], 1.7)
+   1873, 'exact', ARRAY['kc.meiji.centralization']::text[], 1.7, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.meiji.westernization_limits', '文明開化が及んだ範囲', 'distinction', 2, 1871,
-   1890, 'exact', ARRAY['kc.meiji.three_reforms']::text[], 1.3)
+   1890, 'exact', ARRAY['kc.meiji.three_reforms']::text[], 1.3, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.meiji.opposition', '士族反乱と自由民権運動の違い', 'distinction', 2, 1874,
-   1884, 'exact', ARRAY['kc.meiji.three_reforms']::text[], 1.5)
+   1884, 'exact', ARRAY['kc.meiji.three_reforms']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.meiji.treaty_revision', '条約改正が長引いた因果', 'causal', 2, 1871,
-   1911, 'exact', ARRAY['kc.bakumatsu.two_treaties']::text[], 1.6)
+   1911, 'exact', ARRAY['kc.bakumatsu.two_treaties']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.constitution.model_choice', 'ドイツ型憲法を選んだ因果', 'causal', 2, 1882,
-   1889, 'exact', ARRAY['kc.meiji.opposition']::text[], 1.6)
+   1889, 'exact', ARRAY['kc.meiji.opposition']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.constitution.emperor_and_diet', '天皇大権と議会の権限の関係', 'distinction', 2, 1889,
-   1890, 'exact', ARRAY['kc.constitution.model_choice']::text[], 1.6)
+   1890, 'exact', ARRAY['kc.constitution.model_choice']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.constitution.early_diet_conflict', '初期議会が対立した争点', 'fact', 2, 1890,
-   1894, 'exact', ARRAY['kc.constitution.emperor_and_diet']::text[], 1.4)
+   1894, 'exact', ARRAY['kc.constitution.emperor_and_diet']::text[], 1.4, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.constitution.education_rescript', '教育勅語が果たした役割', 'causal', 2, 1890,
-   1945, 'exact', ARRAY['kc.nationstate.making_citizens']::text[], 1.4)
+   1945, 'exact', ARRAY['kc.nationstate.making_citizens']::text[], 1.4, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.constitution.compare_asia', 'アジアの立憲運動との比較', 'distinction', 2, 1889,
-   1908, 'exact', ARRAY['kc.asianation.russo_japanese_impact']::text[], 1.3)
+   1908, 'exact', ARRAY['kc.asianation.russo_japanese_impact']::text[], 1.3, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpwars.sino_japanese_causes', '日清戦争が起きた要因', 'causal', 2, 1876,
-   1894, 'exact', ARRAY['kc.qingfall.opening_chain']::text[], 1.6)
+   1894, 'exact', ARRAY['kc.qingfall.opening_chain']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpwars.shimonoseki_and_triple', '下関条約と三国干渉の帰結', 'causal', 2, 1895,
-   1898, 'exact', ARRAY['kc.jpwars.sino_japanese_causes']::text[], 1.6)
+   1898, 'exact', ARRAY['kc.jpwars.sino_japanese_causes']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpwars.russo_japanese_causes', '日露戦争が起きた要因', 'causal', 2, 1900,
-   1904, 'exact', ARRAY['kc.jpwars.shimonoseki_and_triple']::text[], 1.6)
+   1904, 'exact', ARRAY['kc.jpwars.shimonoseki_and_triple']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpwars.portsmouth_limits', 'ポーツマス条約の内容と国内の反発', 'distinction', 2, 1905,
-   1905, 'exact', ARRAY['kc.jpwars.russo_japanese_causes']::text[], 1.5)
+   1905, 'exact', ARRAY['kc.jpwars.russo_japanese_causes']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpwars.korea_annexation', '韓国併合に至る段階', 'chronology', 2, 1904,
-   1910, 'exact', ARRAY['kc.jpwars.portsmouth_limits']::text[], 1.6)
+   1910, 'exact', ARRAY['kc.jpwars.portsmouth_limits']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpwars.northeast_asia_geo', '日清・日露戦争で動いた勢力範囲', 'geo', 2, 1895,
-   1910, 'exact', ARRAY['kc.jpwars.korea_annexation']::text[], 1.4)
+   1910, 'exact', ARRAY['kc.jpwars.korea_annexation']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.totalwar.japan_ww1', '日本の第一次世界大戦への関わり方', 'distinction', 3, 1914,
-   1919, 'exact', ARRAY['kc.ww1.total_war']::text[], 1.5)
+   1919, 'exact', ARRAY['kc.ww1.total_war']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.totalwar.21_demands', '二十一か条の要求とその帰結', 'fact', 3, 1915,
-   1919, 'exact', ARRAY['kc.totalwar.japan_ww1']::text[], 1.6)
+   1919, 'exact', ARRAY['kc.totalwar.japan_ww1']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.totalwar.self_determination_asia', '民族自決がアジアで運動を呼んだ因果', 'causal', 3, 1918,
-   1919, 'exact', ARRAY['kc.totalwar.21_demands']::text[], 1.6)
+   1919, 'exact', ARRAY['kc.totalwar.21_demands']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.totalwar.japan_league', '国際連盟における日本の位置', 'distinction', 3, 1919,
-   1933, 'exact', ARRAY['kc.versailles.league_weakness']::text[], 1.4)
+   1933, 'exact', ARRAY['kc.versailles.league_weakness']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.totalwar.wartime_boom', '大戦景気とその反動', 'causal', 3, 1915,
-   1920, 'exact', ARRAY['kc.totalwar.japan_ww1']::text[], 1.5)
+   1920, 'exact', ARRAY['kc.totalwar.japan_ww1']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.totalwar.japan_mandate_geo', '大戦後に日本が得た地域', 'geo', 3, 1919,
-   1922, 'exact', ARRAY['kc.totalwar.japan_league']::text[], 1.3)
+   1922, 'exact', ARRAY['kc.totalwar.japan_league']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.masssoc.causes', '大衆社会が成立した要因', 'causal', 3, 1918,
-   1930, 'exact', ARRAY['kc.totalwar.self_determination_asia']::text[], 1.5)
+   1930, 'exact', ARRAY['kc.totalwar.self_determination_asia']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.masssoc.us_1920s', 'アメリカの繁栄の光と影', 'distinction', 3, 1920,
-   1929, 'exact', ARRAY['kc.masssoc.causes']::text[], 1.5)
+   1929, 'exact', ARRAY['kc.masssoc.causes']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.masssoc.japan_culture', '日本の大衆文化', 'fact', 3, 1920,
-   1930, 'exact', ARRAY['kc.masssoc.causes']::text[], 1.2)
+   1930, 'exact', ARRAY['kc.masssoc.causes']::text[], 1.2, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.masssoc.womens_suffrage', '女性参政権が広がった因果', 'causal', 3, 1918,
-   1945, 'exact', ARRAY['kc.nationstate.suffrage_order']::text[], 1.4)
+   1945, 'exact', ARRAY['kc.nationstate.suffrage_order']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.masssoc.media_power', 'メディアが世論を作る力', 'distinction', 3, 1920,
-   1940, 'exact', ARRAY['kc.masssoc.japan_culture']::text[], 1.3)
+   1940, 'exact', '{}'::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.taisho.party_politics_order', '政党政治が確立し崩れるまでの順序', 'chronology', 3, 1912,
-   1932, 'exact', ARRAY['kc.constitution.early_diet_conflict']::text[], 1.6)
+   1932, 'exact', ARRAY['kc.constitution.early_diet_conflict']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.taisho.two_laws', '普通選挙法と治安維持法が同時に成立した因果', 'causal', 3, 1925,
-   1925, 'exact', ARRAY['kc.taisho.party_politics_order']::text[], 1.7)
+   1925, 'exact', ARRAY['kc.taisho.party_politics_order']::text[], 1.7, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.taisho.social_movements', '社会運動の担い手の違い', 'distinction', 3, 1920,
-   1925, 'exact', ARRAY['kc.taisho.two_laws']::text[], 1.4)
+   1925, 'exact', ARRAY['kc.taisho.two_laws']::text[], 1.4, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.taisho.minpon', '大正デモクラシーを支えた思想', 'fact', 3, 1916,
-   1925, 'exact', ARRAY['kc.taisho.party_politics_order']::text[], 1.4)
+   1925, 'exact', ARRAY['kc.taisho.party_politics_order']::text[], 1.4, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.taisho.great_quake', '関東大震災が社会に与えた影響', 'causal', 3, 1923,
-   1927, 'exact', ARRAY['kc.taisho.social_movements']::text[], 1.4)
+   1927, 'exact', ARRAY['kc.taisho.social_movements']::text[], 1.4, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.taisho.japan_vs_west', '日本の政党政治と欧米議会政治の違い', 'distinction', 3, 1918,
-   1932, 'exact', ARRAY['kc.taisho.party_politics_order']::text[], 1.4)
+   1932, 'exact', ARRAY['kc.taisho.party_politics_order']::text[], 1.4, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpdep.showa_depression', '日本が昭和恐慌に陥った因果', 'causal', 3, 1927,
-   1931, 'exact', ARRAY['kc.depression.spread']::text[], 1.6)
+   1931, 'exact', ARRAY['kc.depression.spread']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpdep.rural_crisis', '農村の窮乏の実態', 'fact', 3, 1930,
-   1934, 'exact', ARRAY['kc.jpdep.showa_depression']::text[], 1.5)
+   1934, 'exact', ARRAY['kc.jpdep.showa_depression']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpdep.army_rise', '恐慌が軍部の台頭を招いた因果', 'causal', 3, 1930,
-   1936, 'exact', ARRAY['kc.jpdep.rural_crisis']::text[], 1.7)
+   1936, 'exact', ARRAY['kc.jpdep.rural_crisis']::text[], 1.7, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpdep.takahashi', '高橋財政と各国の恐慌対策の比較', 'distinction', 3, 1931,
-   1936, 'exact', ARRAY['kc.jpdep.showa_depression']::text[], 1.4)
+   1936, 'exact', ARRAY['kc.jpdep.showa_depression']::text[], 1.4, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpdep.export_shift_geo', '日本の輸出先の変化', 'geo', 3, 1929,
-   1937, 'exact', ARRAY['kc.jpdep.takahashi']::text[], 1.3)
+   1937, 'exact', ARRAY['kc.jpdep.takahashi']::text[], 1.3, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.manchuria.order', '満洲事変から国際連盟脱退までの順序', 'chronology', 3, 1931,
-   1933, 'exact', ARRAY['kc.jpdep.army_rise']::text[], 1.6)
+   1933, 'exact', '{}'::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.manchuria.domestic_impact', '満洲事変が国内政治を変えた因果', 'causal', 3, 1931,
-   1936, 'exact', ARRAY['kc.manchuria.order']::text[], 1.6)
+   1936, 'exact', ARRAY['kc.manchuria.order']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.manchuria.puppet_state', '満洲国の建前と実態', 'distinction', 3, 1932,
-   1945, 'exact', ARRAY['kc.manchuria.order']::text[], 1.5)
+   1945, 'exact', ARRAY['kc.manchuria.order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.manchuria.geo', '満洲と華北の位置関係', 'geo', 3, 1931,
-   1937, 'exact', ARRAY['kc.manchuria.puppet_state']::text[], 1.4)
+   1937, 'exact', ARRAY['kc.manchuria.puppet_state']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.manchuria.league_failure', '国際連盟の無力が示された因果', 'causal', 3, 1931,
-   1937, 'exact', ARRAY['kc.manchuria.order']::text[], 1.5)
+   1937, 'exact', ARRAY['kc.manchuria.order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.sinojp.prolongation', '日中戦争が長期化した要因', 'causal', 3, 1937,
-   1941, 'exact', ARRAY['kc.manchuria.geo']::text[], 1.7)
+   1941, 'exact', ARRAY['kc.manchuria.geo']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.sinojp.order', '戦争の拡大と和平工作の順序', 'chronology', 3, 1937,
-   1940, 'exact', ARRAY['kc.sinojp.prolongation']::text[], 1.5)
+   1940, 'exact', ARRAY['kc.sinojp.prolongation']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.sinojp.supply_routes_geo', '援蒋ルートと戦線の広がり', 'geo', 3, 1937,
-   1941, 'exact', ARRAY['kc.sinojp.prolongation']::text[], 1.4)
+   1941, 'exact', ARRAY['kc.sinojp.prolongation']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.sinojp.mobilization', '国家総動員体制の中身', 'fact', 3, 1938,
-   1941, 'exact', ARRAY['kc.sinojp.order']::text[], 1.5)
+   1941, 'exact', ARRAY['kc.sinojp.order']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.sinojp.two_regimes', '日本と中国の戦時体制の違い', 'distinction', 3, 1937,
-   1945, 'exact', ARRAY['kc.sinojp.prolongation']::text[], 1.3)
+   1945, 'exact', ARRAY['kc.sinojp.prolongation']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.sinojp.to_us_conflict', '日中戦争が対米関係を悪化させた因果', 'causal', 3, 1939,
-   1941, 'exact', ARRAY['kc.sinojp.supply_routes_geo']::text[], 1.6)
+   1941, 'exact', ARRAY['kc.sinojp.supply_routes_geo']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.pacificwar.causes', '開戦に至った要因', 'causal', 3, 1940,
-   1941, 'exact', ARRAY['kc.sinojp.to_us_conflict']::text[], 1.7)
+   1941, 'exact', ARRAY['kc.sinojp.to_us_conflict']::text[], 1.7, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.pacificwar.co_prosperity', '大東亜共栄圏の建前と占領の実態', 'distinction', 3, 1941,
-   1945, 'exact', ARRAY['kc.pacificwar.causes']::text[], 1.5)
+   1945, 'exact', ARRAY['kc.pacificwar.causes']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.pacificwar.extent_geo', '日本の最大占領範囲と後退線', 'geo', 3, 1942,
-   1945, 'exact', ARRAY['kc.pacificwar.co_prosperity']::text[], 1.4)
+   1945, 'exact', ARRAY['kc.pacificwar.co_prosperity']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.pacificwar.home_front', '戦時下の国民生活と動員', 'fact', 3, 1943,
-   1945, 'exact', ARRAY['kc.pacificwar.co_prosperity']::text[], 1.5)
+   1945, 'exact', ARRAY['kc.pacificwar.co_prosperity']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.pacificwar.end_order', '終戦に至る順序', 'chronology', 3, 1945,
-   1945, 'exact', ARRAY['kc.pacificwar.extent_geo']::text[], 1.6)
+   1945, 'exact', ARRAY['kc.pacificwar.extent_geo']::text[], 1.6, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.pacificwar.postwar_division', '戦後処理が東アジアの分断を生んだ因果', 'causal', 3, 1945,
-   1952, 'exact', ARRAY['kc.pacificwar.end_order']::text[], 1.5)
+   1952, 'exact', ARRAY['kc.pacificwar.end_order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.occupation.policy_shift', '占領初期と後期の政策の違い', 'distinction', 3, 1945,
-   1952, 'exact', ARRAY['kc.coldwar.china_prc']::text[], 1.7)
+   1952, 'exact', ARRAY['kc.coldwar.china_prc']::text[], 1.7, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.occupation.three_reforms', '三大改革の内容', 'fact', 3, 1945,
-   1950, 'exact', ARRAY['kc.occupation.policy_shift']::text[], 1.6)
+   1950, 'exact', ARRAY['kc.occupation.policy_shift']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.occupation.two_constitutions', '大日本帝国憲法と日本国憲法の違い', 'distinction', 3, 1946,
-   1947, 'exact', ARRAY['kc.occupation.three_reforms']::text[], 1.7)
+   1947, 'exact', ARRAY['kc.occupation.three_reforms']::text[], 1.7, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.occupation.independence_order', '独立を回復するまでの順序', 'chronology', 3, 1950,
-   1956, 'exact', ARRAY['kc.occupation.policy_shift']::text[], 1.6)
+   1956, 'exact', ARRAY['kc.occupation.policy_shift']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.occupation.korean_war_boom', '朝鮮戦争が日本の復興を早めた因果', 'causal', 3, 1950,
-   1953, 'exact', ARRAY['kc.occupation.independence_order']::text[], 1.5)
+   1953, 'exact', ARRAY['kc.occupation.independence_order']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.occupation.territory_geo', '平和条約で確定しなかった地域', 'geo', 3, 1951,
-   1972, 'exact', ARRAY['kc.occupation.independence_order']::text[], 1.5)
+   1972, 'exact', ARRAY['kc.occupation.independence_order']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.growth.causes', '高度経済成長が可能になった要因', 'causal', 3, 1955,
-   1973, 'exact', ARRAY['kc.occupation.korean_war_boom']::text[], 1.7)
+   1973, 'exact', ARRAY['kc.occupation.korean_war_boom']::text[], 1.7, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.growth.pollution', '成長の光と影', 'distinction', 3, 1955,
-   1975, 'exact', ARRAY['kc.growth.causes']::text[], 1.6)
+   1975, 'exact', ARRAY['kc.growth.causes']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.growth.diplomacy_order', '国際社会に戻る順序', 'chronology', 3, 1956,
-   1978, 'exact', ARRAY['kc.occupation.independence_order']::text[], 1.5)
+   1978, 'exact', ARRAY['kc.occupation.independence_order']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.growth.end', '高度成長が終わった因果', 'causal', 3, 1971,
-   1975, 'exact', ARRAY['kc.growth.causes']::text[], 1.6)
+   1975, 'exact', ARRAY['kc.growth.causes']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.growth.belt_geo', '太平洋ベルトへの産業と人口の集中', 'geo', 3, 1955,
-   1975, 'exact', ARRAY['kc.growth.pollution']::text[], 1.3)
+   1975, 'exact', ARRAY['kc.growth.pollution']::text[], 1.3, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpcwend.new_role', '冷戦終結が日本の立場を変えた因果', 'causal', 3, 1989,
-   1992, 'exact', ARRAY['kc.detente.east_europe_1989']::text[], 1.5)
+   1992, 'exact', ARRAY['kc.detente.east_europe_1989']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpcwend.bubble', 'バブル経済が生まれ崩壊した因果', 'causal', 3, 1985,
-   1993, 'exact', ARRAY['kc.growth.end']::text[], 1.6)
+   1993, 'exact', ARRAY['kc.growth.end']::text[], 1.6, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpcwend.1955_system', '55年体制とその終わり', 'distinction', 3, 1955,
-   1993, 'exact', ARRAY['kc.jpcwend.new_role']::text[], 1.5)
+   1993, 'exact', ARRAY['kc.jpcwend.new_role']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jpcwend.east_asia_order', '東アジアの緊張と和解の順序', 'chronology', 3, 1989,
-   2002, 'exact', ARRAY['kc.jpcwend.new_role']::text[], 1.3)
+   2002, 'exact', ARRAY['kc.jpcwend.new_role']::text[], 1.3, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jptoday.aging', '少子高齢化が社会保障を圧迫する因果', 'causal', 3, 1990,
-   2020, 'century', ARRAY['kc.jpcwend.bubble']::text[], 1.5)
+   2020, 'century', ARRAY['kc.jpcwend.bubble']::text[], 1.5, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jptoday.globalization', 'グローバル化が生む利益と格差', 'distinction', 3, 1990,
-   2020, 'century', ARRAY['kc.global.multipolar']::text[], 1.4)
+   2020, 'century', ARRAY['kc.global.multipolar']::text[], 1.4, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jptoday.disaster_energy', '災害と原子力政策の転換', 'causal', 3, 1995,
-   2020, 'exact', ARRAY['kc.jptoday.aging']::text[], 1.3)
+   2020, 'exact', ARRAY['kc.jptoday.aging']::text[], 1.3, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.jptoday.regional_geo', '現代日本をめぐる地域の課題', 'geo', 3, 1990,
-   2020, 'century', ARRAY['kc.occupation.territory_geo']::text[], 1.4)
+   2020, 'century', ARRAY['kc.occupation.territory_geo']::text[], 1.4, true)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.orient.unification_extent_geo', 'オリエントを統一した2帝国の版図', 'geo', 1, -670,
-   -330, 'century', ARRAY['kc.orient.assyria_vs_achaemenid_rule']::text[], 1.4)
+   -330, 'century', ARRAY['kc.orient.assyria_vs_achaemenid_rule']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.china.warring_states_geo', '戦国七雄の位置', 'geo', 1, -403,
-   -221, 'century', ARRAY['kc.china.fengjian_vs_junxian']::text[], 1.3)
+   -221, 'century', ARRAY['kc.china.fengjian_vs_junxian']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.frankish_partition_geo', 'フランク王国の分割線', 'geo', 1, 843,
-   870, 'exact', ARRAY['kc.euro.verdun_and_mersen']::text[], 1.3)
+   870, 'exact', ARRAY['kc.euro.verdun_and_mersen']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.medcult.plague_route_geo', '黒死病が広がった経路', 'geo', 1, 1347,
-   1351, 'exact', ARRAY['kc.medcult.black_death_effects']::text[], 1.4)
+   1351, 'exact', ARRAY['kc.medcult.black_death_effects']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.reformation.confession_map_geo', '宗派の分布', 'geo', 2, 1550,
-   1650, 'century', ARRAY['kc.reformation.settlement_order']::text[], 1.5)
+   1650, 'century', ARRAY['kc.reformation.settlement_order']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.usrev.thirteen_colonies_geo', '13植民地の位置と性格', 'geo', 2, 1607,
-   1776, 'exact', ARRAY['kc.usrev.causes']::text[], 1.3)
+   1776, 'exact', ARRAY['kc.usrev.causes']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.sea.mainland_vs_island', '大陸部と諸島部の国家の性格の違い', 'distinction', 1, 100,
-   1500, 'century', ARRAY['kc.sea.port_polities_geo']::text[], 1.3)
+   1500, 'century', ARRAY['kc.sea.port_polities_geo']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.sea.vietnam_independence', 'ベトナムが中国から自立する順序', 'chronology', 1, -111,
-   1428, 'century', ARRAY['kc.eastasia.tang_cultural_sphere']::text[], 1.2)
+   1428, 'century', ARRAY['kc.eastasia.tang_cultural_sphere']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.eastasia.ritsuryo_reception', '律令を受け入れた国と受け入れ方の違い', 'distinction', 1, 600,
-   900, 'century', ARRAY['kc.eastasia.tang_cultural_sphere']::text[], 1.4)
+   900, 'century', ARRAY['kc.eastasia.tang_cultural_sphere']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.eastasia.tributary_logic', '冊封体制が成り立った理由', 'causal', 1, 100,
-   1400, 'century', ARRAY['kc.eastasia.tang_cultural_sphere']::text[], 1.5)
+   1400, 'century', ARRAY['kc.eastasia.tang_cultural_sphere']::text[], 1.5, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.eastasia.sphere_geo', '東アジア文化圏の広がり', 'geo', 1, 600,
-   1000, 'century', ARRAY['kc.eastasia.tang_cultural_sphere']::text[], 1.3)
+   1000, 'century', ARRAY['kc.eastasia.tang_cultural_sphere']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.innerasia.steppe_geo', '遊牧国家が興亡した地域', 'geo', 1, -200,
-   900, 'century', ARRAY['kc.innerasia.nomad_vs_oasis']::text[], 1.3)
+   900, 'century', ARRAY['kc.innerasia.nomad_vs_oasis']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.innerasia.nomad_military', '遊牧国家の軍事的な強さの理由', 'distinction', 1, -200,
-   1200, 'century', ARRAY['kc.innerasia.nomad_vs_oasis']::text[], 1.2)
+   1200, 'century', ARRAY['kc.innerasia.nomad_vs_oasis']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.trade.two_directions', '西へ伝わったものと東へ伝わったもの', 'distinction', 1, -100,
-   1400, 'century', ARRAY['kc.trade.three_routes_geo']::text[], 1.3)
+   1400, 'century', ARRAY['kc.trade.three_routes_geo']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.trade.paper_westward', '製紙法が西へ伝わった経緯', 'causal', 1, 751,
-   1150, 'exact', ARRAY['kc.trade.sogdian_role']::text[], 1.2)
+   1150, 'exact', ARRAY['kc.trade.sogdian_role']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.byzantine_longevity', 'ビザンツ帝国が1000年続いた要因', 'causal', 1, 476,
-   1453, 'exact', ARRAY['kc.euro.byzantine_institutions']::text[], 1.4)
+   1453, 'exact', ARRAY['kc.euro.byzantine_institutions']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.russia_order', 'ロシアが自立するまでの順序', 'chronology', 1, 882,
-   1480, 'exact', ARRAY['kc.euro.slav_division_geo']::text[], 1.3)
+   1480, 'exact', ARRAY['kc.euro.slav_division_geo']::text[], 1.3, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.monastery_vs_church', '修道院と司教座教会の役割の違い', 'distinction', 1, 500,
-   1200, 'century', ARRAY['kc.euro.feudal_two_layers']::text[], 1.2)
+   1200, 'century', ARRAY['kc.euro.feudal_two_layers']::text[], 1.2, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
-INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight) VALUES
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
+INSERT INTO kc (id, label, kind, era_id, year_from, year_to, year_precision, prereq_ids, exam_weight, retired) VALUES
   ('kc.euro.church_power', '教会が世俗の権力を持った因果', 'causal', 1, 800,
-   1200, 'century', ARRAY['kc.euro.feudal_two_layers']::text[], 1.4)
+   1200, 'century', ARRAY['kc.euro.feudal_two_layers']::text[], 1.4, false)
   ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, kind = EXCLUDED.kind, era_id = EXCLUDED.era_id,
     year_from = EXCLUDED.year_from, year_to = EXCLUDED.year_to, year_precision = EXCLUDED.year_precision,
-    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight;
+    prereq_ids = EXCLUDED.prereq_ids, exam_weight = EXCLUDED.exam_weight, retired = EXCLUDED.retired;
 
 -- KC と節の対応
 INSERT INTO kc_syllabus_unit (kc_id, unit_id) VALUES ('kc.orient.mesopotamia_dynasty_order', 'wh.2.1.1') ON CONFLICT DO NOTHING;

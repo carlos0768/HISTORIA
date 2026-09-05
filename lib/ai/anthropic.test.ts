@@ -197,6 +197,49 @@ describe('生成（教材）', () => {
   const call = (p: ReturnType<typeof createAnthropicProvider>, maxOut = 16_000) =>
     p.generate({ prompt: genPrompt, schema: materialJsonSchema(), maxOutputTokens: maxOut })
 
+  /**
+   * ★ **公式の一覧を試験に写す。**
+   *
+   *   https://platform.claude.com/docs/en/build-with-claude/structured-outputs
+   *   （SDK の `OutputConfig.format` の JSDoc が指している）に、通らないものが
+   *   明記されている。数値の制約・文字列の制約・minItems 以外の配列制約。
+   *
+   *   ★ 2026-09-04、これを**往復で潰そうとして2回失敗した**。API は 400 を
+   *     1件ずつしか返さないので「名指しされていない＝通っている」は成り立たない。
+   *     `minItems` を直したら次に `maxItems` が出た。**一覧を読んで一度に直す。**
+   */
+  it('サポート外の制約を送らない（公式の一覧どおり）', async () => {
+    const cap: { params?: Record<string, unknown> } = {}
+    await call(provider(genReply(validMaterial()), cap))
+    const sent = JSON.stringify((cap.params!.output_config as { format: { schema: unknown } }).format.schema)
+
+    for (const k of ['minimum', 'maximum', 'multipleOf', 'minLength', 'maxLength', 'maxItems']) {
+      expect(sent, `${k} は通らないと明記されている`).not.toContain(`"${k}"`)
+    }
+
+    // minItems は 0 か 1 だけ通る。1 に丸める（0 にすると空配列を素通りさせる）
+    const mins = [...sent.matchAll(/"minItems":(\d+)/g)].map(m => Number(m[1]))
+    expect(mins.length, 'minItems が1つも無いと、この試験は何も見ていない').toBeGreaterThan(0)
+    expect(mins.every(n => n === 1), `1 以外の minItems が残っている: ${mins.join(', ')}`).toBe(true)
+
+    // ★ 落としすぎない。enum と additionalProperties:false は通ると明記されており、
+    //   落とすと四択の key や claim の kind が自由文字列になってしまう
+    expect(sent).toContain('"enum"')
+    expect(sent).toContain('"additionalProperties":false')
+  })
+
+  it('検証の側も同じ変換を通す（片方だけ落ちるのを防ぐ）', async () => {
+    const cap: { params?: Record<string, unknown> } = {}
+    const p = createAnthropicProvider({
+      apiKey: 'K', model: 'claude-sonnet-5',
+      client: fakeClient(okReply([{ index: 0, status: 'ok' }, { index: 1, status: 'ok' }]), cap),
+    })
+    await p.verify(claims, 400)
+    const sent = JSON.stringify((cap.params!.output_config as { format: { schema: unknown } }).format.schema)
+    const mins = [...sent.matchAll(/"minItems":(\d+)/g)].map(m => Number(m[1]))
+    expect(mins.every(n => n <= 1)).toBe(true)
+  })
+
   it('構造化出力・adaptive thinking・max_tokens を送る', async () => {
     const cap: { params?: Record<string, unknown> } = {}
     await call(provider(genReply(validMaterial()), cap))

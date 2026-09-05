@@ -4,7 +4,7 @@ import { createTestDb, TEST_DB_URL } from '@/lib/db/test-helper'
 import { seedMasters, seedKc, SEED_DIR } from '@/scripts/db/seed'
 import { createClient, type AiConfig } from '@/lib/ai/client'
 import { ensureBudgetRow, budgetStatus, periodOf } from '@/lib/ai/budget'
-import { generateMaterial, paramsHash, MATERIAL_MAX_OUTPUT_TOKENS, VERIFY_MAX_OUTPUT_TOKENS } from './generate'
+import { generateMaterial, paramsHash, pendingUnits, MATERIAL_MAX_OUTPUT_TOKENS, VERIFY_MAX_OUTPUT_TOKENS } from './generate'
 import { MAX_CHARS } from '@/lib/ai/schema'
 import { machineCheck, extractYear, matchRate } from './factcheck'
 import { createUser } from '@/lib/loop/fixture'
@@ -37,6 +37,20 @@ describe('出力トークンの上限', () => {
     expect(MATERIAL_MAX_OUTPUT_TOKENS).toBeGreaterThan(12_168)
   })
 
+  /**
+   * ★ 中身の最大構成に**思考のぶんを足した**余地があること。
+   *   2026-09-04、16,000 では `gh.1.1.1` が stop_reason: max_tokens で落ちた。
+   *   claude-api の資料でも 16,384 は Opus 5 の試行の 15% を打ち切るとされる。
+   *   上げてもコストは増えない（settle は実測の usage で確定する）。
+   */
+  it('中身の最大構成の2倍以上ある（思考トークンもこの予算から出る）', () => {
+    const contentMax = 15_100   // 本文4,500字＋FC14枚＋四択10問＋claims40件
+    expect(MATERIAL_MAX_OUTPUT_TOKENS).toBeGreaterThan(16_000)
+    expect(MATERIAL_MAX_OUTPUT_TOKENS).toBeGreaterThanOrEqual(contentMax * 2)
+    // Opus 5 の天井は 128K。超えると 400 になる
+    expect(MATERIAL_MAX_OUTPUT_TOKENS).toBeLessThanOrEqual(128_000)
+  })
+
   it('受け入れ範囲の最大構成でも収まる', () => {
     // docs/08 §3.3 の 12,168 は 本文3,500字 / FC12枚 / 四択8問 / claims20件 の構成
     const base = 12_168
@@ -48,9 +62,23 @@ describe('出力トークンの上限', () => {
     expect(MATERIAL_MAX_OUTPUT_TOKENS).toBeGreaterThanOrEqual(base + extra)
   })
 
-  it('検証の上限が claims 最大40件の判定を収められる', () => {
-    // 1件あたり index + status + 理由およそ60字
-    expect(VERIFY_MAX_OUTPUT_TOKENS).toBeGreaterThanOrEqual(40 * 90)
+  /**
+   * ★ **「答えの長さ」で決めてはいけない。**
+   *
+   *   2026-09-04、実鍵で `finishReason=MAX_TOKENS` を踏んだ。判定そのものは
+   *   claims 40件でも 3,600 トークン程度で、実際に投げたのは 20件前後。
+   *   それでも 4,000 で足りなかった。`gemini-3.1-pro-preview` は
+   *   **思考トークンをこの予算から使う**ため、判定を書き始める前に尽きる。
+   *
+   *   上げてもコストはほぼ増えない（settle は実測の usage で確定する）。
+   */
+  it('検証の上限が、判定の長さだけでなく思考のぶんも見込んである', () => {
+    // 判定そのもの: 1件あたり index + status + 理由およそ60字 × 40件
+    const answerOnly = 40 * 90
+    expect(VERIFY_MAX_OUTPUT_TOKENS).toBeGreaterThanOrEqual(answerOnly)
+    // ★ 実測で 4,000 では足りなかった。答えの長さの数倍を確保する
+    expect(VERIFY_MAX_OUTPUT_TOKENS).toBeGreaterThan(4_000)
+    expect(VERIFY_MAX_OUTPUT_TOKENS).toBeGreaterThanOrEqual(answerOnly * 4)
   })
 })
 
@@ -186,6 +214,78 @@ dbSuite('生成パイプライン（実DB）', () => {
     expect(r.status).toBe('ready')
     const p = await db<{ provider: string }[]>`SELECT provider FROM material`
     expect(p[0]!.provider).toBe('fake:anthropic')   // 画面に警告が出る側
+  })
+
+  /**
+   * ★ **一括生成の再開はこの一覧に乗っている。**
+   *
+   *   75本の生成は約4時間・約 ¥3,900 かかる。途中で止めて続きを流せることが
+   *   要る（`scripts/db/generate-remote.ts`）。ここが間違うと、済んだ単元を
+   *   もう一度作って**払い直す**か、未生成の単元を飛ばして穴を残す。
+   */
+  describe('一括生成の対象', () => {
+    it('KC を持つ単元だけを挙げる', async () => {
+      const all = await pendingUnits(db)
+      expect(all.length).toBeGreaterThan(0)
+      expect(all.every(u => u.kcs > 0)).toBe(true)
+      // 並びが決まっていること。再開のたびに順序が変わると追いづらい
+      expect(all.map(u => u.id)).toEqual([...all.map(u => u.id)].sort())
+    })
+
+    it('ready を作った単元は外れる（払い直さない）', async () => {
+      const before = await pendingUnits(db)
+      expect(before.some(u => u.id === UNIT)).toBe(true)
+      await generateMaterial(db, createClient(cfg), { userId, unitId: UNIT, now: NOW })
+      const after = await pendingUnits(db)
+      expect(after.some(u => u.id === UNIT)).toBe(false)
+      expect(after.length).toBe(before.length - 1)
+    })
+
+    /**
+     * ★ blocked も外す。事実確認で誤りが見つかった教材は**作者の判断待ち**であって、
+     *   黙って作り直す（＝もう一度課金する）ものではない。
+     */
+    it('blocked になった単元も外れる（黙って作り直さない）', async () => {
+      const bad = createClient(cfg, { wrongClaims: ['ウェストファリア条約は1658年'] })
+      const r = await generateMaterial(db, bad, { userId, unitId: UNIT, now: NOW })
+      expect(r.status).toBe('blocked')
+      const after = await pendingUnits(db)
+      expect(after.some(u => u.id === UNIT)).toBe(false)
+    })
+
+    /**
+     * ★ **範囲外にした KC しか無い単元へ課金しない。**
+     *
+     *   2026-09-04 に歴史総合の日本史分野を範囲外にした（docs/02 §6.1）。
+     *   `kcsForUnits` / `unitTree` / `redact.ts` / 診断はどれも `NOT retired` を
+     *   見ていたのに、**この一覧だけが見ていなかった**。そのまま流せば、
+     *   誰も読まない教材9本に約 ¥470 を払うところだった。
+     */
+    it('範囲外にした KC しか無い単元は挙げない', async () => {
+      expect((await pendingUnits(db)).some(u => u.id === UNIT)).toBe(true)
+      await db`UPDATE kc SET retired = true
+                WHERE id IN (SELECT kc_id FROM kc_syllabus_unit WHERE unit_id = ${UNIT})`
+      expect((await pendingUnits(db)).some(u => u.id === UNIT)).toBe(false)
+      await db`UPDATE kc SET retired = false`
+      expect((await pendingUnits(db)).some(u => u.id === UNIT)).toBe(true)
+    })
+
+    it('KC の数は範囲内のものだけを数える（見込み額がずれる）', async () => {
+      const [first] = await db<{ kc_id: string }[]>`
+        SELECT kc_id FROM kc_syllabus_unit WHERE unit_id = ${UNIT} ORDER BY kc_id LIMIT 1`
+      const before = (await pendingUnits(db)).find(u => u.id === UNIT)!.kcs
+      await db`UPDATE kc SET retired = true WHERE id = ${first!.kc_id}`
+      const after = (await pendingUnits(db)).find(u => u.id === UNIT)!.kcs
+      expect(after).toBe(before - 1)
+      await db`UPDATE kc SET retired = false`
+    })
+
+    it('プロンプトの版が違えば、また対象になる（作り直しが要るため）', async () => {
+      await generateMaterial(db, createClient(cfg), { userId, unitId: UNIT, now: NOW })
+      expect((await pendingUnits(db)).some(u => u.id === UNIT)).toBe(false)
+      // 版を上げたら、その版では未生成に戻る
+      expect((await pendingUnits(db, 'material_v3')).some(u => u.id === UNIT)).toBe(true)
+    })
   })
 
   it('ready なら item が factcheck 承認で出題可能になる', async () => {

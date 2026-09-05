@@ -108,7 +108,14 @@ export type Today = {
 }
 
 export async function todaysPlan(db: Sql, userId: string, now: Date, maxDaily = DEFAULT_MAX_DAILY): Promise<Today> {
-  const rows = await loadCandidates(db, userId)
+  // 候補と今日の解答数は互いに依存しない。遠隔DBへの往復を直列にしない。
+  const [rows, done] = await Promise.all([
+    loadCandidates(db, userId),
+    db<{ n: string }[]>`
+      SELECT count(DISTINCT ik.kc_id) AS n
+        FROM response r JOIN item_kc ik ON ik.item_id = r.item_id
+       WHERE r.user_id = ${userId} AND date(r.answered_at) = date(${now})`,
+  ])
   const candidates = rows.map(r => toCandidate(r, now))
   const scheduled: ScheduledKc[] = candidates.map(c => ({
     kcId: c.kcId, card: c.card, status: c.status, earliestDeadline: c.earliestDeadline,
@@ -118,10 +125,6 @@ export async function todaysPlan(db: Sql, userId: string, now: Date, maxDaily = 
   // 今日すでに解いた KC を数える。
   // これを引かないと、解いた分だけ新しい KC が補充され続けて
   // 「今日やること」が 0 に到達せず、1日の終わりが定義できない。
-  const done = await db<{ n: string }[]>`
-    SELECT count(DISTINCT ik.kc_id) AS n
-      FROM response r JOIN item_kc ik ON ik.item_id = r.item_id
-     WHERE r.user_id = ${userId} AND date(r.answered_at) = date(${now})`
   const doneToday = Number(done[0]?.n ?? 0)
 
   // 復習はノルマの外で必ず出し、新規学習だけをノルマの残りに絞る
@@ -151,66 +154,104 @@ export type DrillProgress = {
   materialsTotal: number
 }
 
-export async function drillProgressList(db: Sql, userId: string, now: Date): Promise<DrillProgress[]> {
-  const drills = await db<{ id: string; title: string; deadline: Date }[]>`
-    SELECT id, title, deadline::timestamptz AS deadline FROM drill
-     WHERE user_id = ${userId} AND status = 'active' ORDER BY deadline`
+export async function drillProgressList(
+  db: Sql,
+  userId: string,
+  now: Date,
+  onlyDrillId?: string,
+): Promise<DrillProgress[]> {
+  const only = onlyDrillId ? db`AND d.id = ${onlyDrillId}` : db``
 
-  const out: DrillProgress[] = []
-  for (const d of drills) {
-    const rows = await db<Row[]>`
-      WITH k AS (SELECT kc_id FROM drill_kc WHERE drill_id = ${d.id})
-      SELECT k.kc_id, kc.label AS kc_label, ${d.deadline}::timestamptz AS earliest_deadline,
+  // 以前は「一覧1回 + 特訓ごとにKC1回・教材1回」を直列で実行していた。
+  // 遠隔DBでは特訓数に比例して遷移が遅くなるため、全件を3本の並列問い合わせで集める。
+  const [drills, kcRows, materialRows] = await Promise.all([
+    db<{ id: string; title: string; deadline: Date }[]>`
+      SELECT d.id, d.title, d.deadline::timestamptz AS deadline
+        FROM drill d
+       WHERE d.user_id = ${userId} AND d.status = 'active' ${only}
+       ORDER BY d.deadline`,
+    db<(Row & { drill_id: string })[]>`
+      WITH evidence AS (
+        SELECT ik.kc_id,
+               count(DISTINCT date(r.answered_at)) FILTER (WHERE r.correct)::int
+                 AS distinct_correct_days,
+               bool_or(r.correct AND i.format <> 'flashcard')
+                 AS has_non_flashcard_correct
+          FROM response r
+          JOIN item i ON i.id = r.item_id
+          JOIN item_kc ik ON ik.item_id = r.item_id
+         WHERE r.user_id = ${userId}
+         GROUP BY ik.kc_id
+      )
+      SELECT d.id AS drill_id, dk.kc_id, kc.label AS kc_label,
+             d.deadline::timestamptz AS earliest_deadline,
              s.p_know, s.theta, s.n_eff, s.n_obs, s.last_seen_at,
              c.n, c.ef, c.interval_days, c.due_at, c.lapses, c.suspended, c.last_review_at,
              false AS is_misconception,
-             (SELECT count(DISTINCT date(r.answered_at))
-                FROM response r JOIN item_kc ik ON ik.item_id = r.item_id
-               WHERE r.user_id = ${userId} AND ik.kc_id = k.kc_id AND r.correct)::int
-               AS distinct_correct_days,
-             EXISTS (SELECT 1 FROM response r
-                       JOIN item_kc ik ON ik.item_id = r.item_id
-                       JOIN item i ON i.id = r.item_id
-                      WHERE r.user_id = ${userId} AND ik.kc_id = k.kc_id AND r.correct
-                        AND i.format <> 'flashcard')
-               AS has_non_flashcard_correct
-        FROM k
-        JOIN kc ON kc.id = k.kc_id
-        LEFT JOIN user_kc_state s ON s.user_id = ${userId} AND s.kc_id = k.kc_id
-        LEFT JOIN kc_card       c ON c.user_id = ${userId} AND c.kc_id = k.kc_id`
-
-    const statuses = rows.map(r => toCandidate(r, now).status)
-    const progress = drillProgress(statuses)
-    // 読了は「その教材の全セクションに material_read があること」とする。
-    // material_read は material ではなく material_section を参照している。
-    const mat = await db<{ total: string; read: string }[]>`
-      SELECT count(*) AS total,
-             count(*) FILTER (
-               -- ★ 節が1つも無い教材を読了と数えない。
-               --   NOT EXISTS (未読の節) は**空集合に対して真**になるので、
-               --   節を持たない教材が「全部読んだ」と判定されていた。
-               --   本番の ready な教材は必ず節を持つが、
-               --   生成が途中で落ちた行や手で入れた行で読了 100% と出る（実測）。
+             coalesce(e.distinct_correct_days, 0) AS distinct_correct_days,
+             coalesce(e.has_non_flashcard_correct, false) AS has_non_flashcard_correct
+        FROM drill d
+        JOIN drill_kc dk ON dk.drill_id = d.id
+        JOIN kc ON kc.id = dk.kc_id
+        LEFT JOIN evidence e ON e.kc_id = dk.kc_id
+        LEFT JOIN user_kc_state s ON s.user_id = ${userId} AND s.kc_id = dk.kc_id
+        LEFT JOIN kc_card c ON c.user_id = ${userId} AND c.kc_id = dk.kc_id
+       WHERE d.user_id = ${userId} AND d.status = 'active' ${only}
+       ORDER BY d.deadline, d.id, dk.kc_id`,
+    db<{ drill_id: string; total: string; read: string }[]>`
+      SELECT d.id AS drill_id,
+             count(m.id) AS total,
+             count(m.id) FILTER (
                WHERE EXISTS (SELECT 1 FROM material_section s WHERE s.material_id = m.id)
                  AND NOT EXISTS (
                    SELECT 1 FROM material_section s
                     WHERE s.material_id = m.id
-                      AND NOT EXISTS (SELECT 1 FROM material_read mr
-                                       WHERE mr.section_id = s.id AND mr.user_id = ${userId}
-                                         AND mr.dwell_ms >= ${requiredDwellExpr(db)})
-                 )) AS read
-        FROM material m
-       WHERE (m.user_id = ${userId} OR m.user_id IS NULL) AND m.status = 'ready'
-         AND m.unit_id IN (SELECT unit_id FROM drill_unit WHERE drill_id = ${d.id})`
+                      AND NOT EXISTS (
+                        SELECT 1 FROM material_read mr
+                         WHERE mr.section_id = s.id AND mr.user_id = ${userId}
+                           AND mr.dwell_ms >= ${requiredDwellExpr(db)}
+                      )
+                 )
+             ) AS read
+        FROM drill d
+        LEFT JOIN drill_unit du ON du.drill_id = d.id
+        LEFT JOIN material m ON m.unit_id = du.unit_id
+         AND (m.user_id = ${userId} OR m.user_id IS NULL) AND m.status = 'ready'
+       WHERE d.user_id = ${userId} AND d.status = 'active' ${only}
+       GROUP BY d.id`,
+  ])
 
-    out.push({
-      drillId: d.id, title: d.title, deadline: d.deadline,
-      progress, state: drillState(progress, d.deadline, now),
-      masteredCount: statuses.filter(s => s === 'mastered').length,
-      totalKc: statuses.length,
-      materialsRead: Number(mat[0]?.read ?? 0),
-      materialsTotal: Number(mat[0]?.total ?? 0),
-    })
+  const kcsByDrill = new Map<string, Row[]>()
+  for (const row of kcRows) {
+    const rows = kcsByDrill.get(row.drill_id)
+    if (rows) rows.push(row)
+    else kcsByDrill.set(row.drill_id, [row])
   }
-  return out
+  const materialsByDrill = new Map(materialRows.map(row => [row.drill_id, row]))
+
+  return drills.map(d => {
+    const statuses = (kcsByDrill.get(d.id) ?? []).map(row => toCandidate(row, now).status)
+    const progress = drillProgress(statuses)
+    const material = materialsByDrill.get(d.id)
+    return {
+      drillId: d.id,
+      title: d.title,
+      deadline: d.deadline,
+      progress,
+      state: drillState(progress, d.deadline, now),
+      masteredCount: statuses.filter(status => status === 'mastered').length,
+      totalKc: statuses.length,
+      materialsRead: Number(material?.read ?? 0),
+      materialsTotal: Number(material?.total ?? 0),
+    }
+  })
+}
+
+export async function drillProgressFor(
+  db: Sql,
+  userId: string,
+  drillId: string,
+  now: Date,
+): Promise<DrillProgress | null> {
+  return (await drillProgressList(db, userId, now, drillId))[0] ?? null
 }

@@ -22,30 +22,56 @@ import { machineCheck, type MachineCheckResult } from './factcheck'
 /**
  * 教材1本の出力トークン上限。遮断器の見積りの分母になる（docs/08 §7.1・§3.3）。
  *
- * ★ ここは「実際に出うる最大」でなければならない。理由が2つある。
- *   1. 足りないと finishReason が MAX_TOKENS になり、gemini.ts が例外を投げて
- *      生成が毎回失敗する。12,000 は docs/08 §3.3 自身の見積り 12,168 を下回っていた
- *   2. 遮断器の不変条件（settled + reserved <= cap）は、この値が本当の天井である
- *      ことに依存している。天井でない値を入れると保証が崩れる
+ * ★ **思考（thinking）トークンがここに含まれる。「答えの長さ」で決めてはいけない。**
  *
- * 上げてもコストは増えない。settle は実測の usage で確定するためである
- * （reserve が大きくなるぶん同時実行の余裕が減るだけ）。
+ *   2026-09-04、`gh.1.1.1` の生成が `stop_reason: max_tokens` で落ちた。
+ *   成功した `wh.4.1.3` の出力は 10,601〜11,204 トークンで、
+ *   中身の上限（本文4,500字＋FC14枚＋四択10問＋claims40件 ≈ 15,100）にも
+ *   届いていない。**足りなかったのは思考のぶんである。**
  *
- * 内訳（docs/08 §3.3 の 12,168 を、受け入れ範囲の最大構成まで伸ばしたもの）:
- *   本文 3,500 → 4,500字（docs/07 §2 の上限）  +約1,000
- *   フラッシュカード 12 → 14枚                  +約120
- *   四択 8 → 10問                               +約600
- *   claims 20 → 40件（スキーマの上限）          +約1,200
- *   合計 約15,100 に余裕を足して 16,000
+ *   claude-api の資料にも明記がある — 16,384 の上限は Anthropic 自身の計測で
+ *   **Opus 5 の試行の 15% を打ち切った**。`max_tokens` は調整つまみではなく
+ *   非常停止であり、**低く置くと課金だけして何も得られない**。
+ *
+ *   検証側（VERIFY_MAX_OUTPUT_TOKENS）で同じ誤りを直した直後に、
+ *   生成側へ同じ直しを当てていなかった。**上限を答えの長さから決める癖**が
+ *   2箇所にあった、というのがこの一件である。
+ *
+ * ★ 上げてもコストはほぼ増えない。settle は実測の usage で確定する
+ *   （reserve が大きくなるぶん同時実行の余裕が減るだけ）。
+ *   Opus 5 の天井は 128K なので 32,000 は十分内側である。
+ *   ストリームで受けているので、16K 超で HTTP がタイムアウトする問題も無い
+ *   （`lib/ai/anthropic.ts` の generate）。
+ *
+ * ★ **打ち切られた生成は、こちらの元帳に載らないのに課金される。**
+ *   例外が飛ぶと guarded が予約を release するので ai_spend には残らないが、
+ *   モデルは 16,000 トークン書いており Anthropic はそれを課金する。
+ *   上限を上げるのは、その静かな出血を止めることでもある（docs/14 M37）。
  */
-export const MATERIAL_MAX_OUTPUT_TOKENS = 16_000
+export const MATERIAL_MAX_OUTPUT_TOKENS = 32_000
 
 /**
  * 検証の出力トークン上限。
- * claims 最大40件 × (index + status + 理由およそ60字) ≈ 3,600。余裕を足して 4,000。
- * 1,500 では24件を超えたあたりで打ち切られ、検証が失敗する。
+ *
+ * ★ **思考（thinking）トークンがここに含まれる。** 2026-09-04 に実鍵で回して
+ *   `finishReason=MAX_TOKENS` で落ちた。判定そのものは
+ *   claims 最大40件 × (index + status + 理由およそ60字) ≈ 3,600 に収まるはずで、
+ *   実際に投げたのは 20件前後だった。**それでも 4,000 で足りなかった。**
+ *
+ *   `gemini-3.1-pro-preview` は思考する。判定の JSON を書き始める前に
+ *   予算を使い切ると、1文字も出ないまま打ち切られる。
+ *   **「答えの長さ」で上限を決めてはいけない。**
+ *
+ * ★ 上げてもコストはほぼ増えない。settle は実測の usage で確定する
+ *   （reserve が大きくなるぶん同時実行の余裕が減るだけ）。生成側の
+ *   MATERIAL_MAX_OUTPUT_TOKENS と同じ 16,000 まで引き上げ、
+ *   思考の余地を十分に取る。
+ *
+ * ★ 実測が出たら見直す。思考が毎回1万トークン使うなら、検証の原価は
+ *   docs/08 §3.4 の見積り（全75節で約300円）を大きく超える。
+ *   そのときは検証を Flash 系に落とすか、思考を抑える設定を探す（M36）。
  */
-export const VERIFY_MAX_OUTPUT_TOKENS = 4_000
+export const VERIFY_MAX_OUTPUT_TOKENS = 16_000
 /** 文字数が範囲外だったときの作り直し回数。無料枠を無限に食わせない */
 export const MAX_LENGTH_RETRIES = 1
 
@@ -53,6 +79,47 @@ export type GenerateOutcome =
   | { status: 'ready'; materialId: string; chars: number; itemCount: number; check: MachineCheckResult }
   | { status: 'blocked'; materialId: string; reason: string; check: MachineCheckResult }
   | { status: 'failed'; reason: string }
+
+/**
+ * まだ共有教材を作っていない単元。**一括生成の対象**である。
+ *
+ * ★ ready だけでなく **blocked も除く**。事実確認で誤りが見つかった教材は
+ *   作者の判断待ちであって、黙って作り直す（＝もう一度課金する）ものではない。
+ *   作り直すときは `generateMaterial` の `force` を使う。
+ *
+ * ★ **これが再開の仕組みそのものである。** 75本の生成は4時間かかるので、
+ *   途中で止めて続きを流せることが要る。「済んだものを除いた一覧」を
+ *   ここ1箇所に持ち、道具の側で数え直さない。
+ *
+ * ★ KC を持たない単元は対象外（教材の材料が無いため）。
+ *   docs/08 §3.4 の分母はこの条件で数えたものである。
+ *
+ * ★ **retired の KC は数えない。** 範囲外にした KC しか無い単元へ教材を作ると、
+ *   誰も読まない教材に1本あたり約50円を払うことになる。
+ *   `kcsForUnits` / `unitTree` / `redact.ts` / 診断はいずれも `NOT retired` を
+ *   見ているのに、ここだけ見ていなかった。2026-09-04 に歴史総合の日本史分野を
+ *   範囲外にしたとき、**この関数だけが 75 単元のまま**で、外したはずの9単元へ
+ *   課金するところだった（docs/02 §6.1）。
+ */
+export async function pendingUnits(
+  db: Sql,
+  promptVersion = MATERIAL_PROMPT_VERSION,
+): Promise<Array<{ id: string; label: string; kcs: number }>> {
+  const rows = await db<{ id: string; label: string; kcs: string }[]>`
+    SELECT s.id, s.label, count(*) AS kcs
+      FROM syllabus_unit s
+      JOIN kc_syllabus_unit ku ON ku.unit_id = s.id
+      JOIN kc k ON k.id = ku.kc_id AND NOT k.retired
+     WHERE NOT EXISTS (
+       SELECT 1 FROM material m
+        WHERE m.unit_id = s.id AND m.user_id IS NULL
+          AND m.prompt_version = ${promptVersion}
+          AND m.status IN ('ready', 'blocked')
+     )
+     GROUP BY s.id, s.label
+     ORDER BY s.id`
+  return rows.map(r => ({ id: r.id, label: r.label, kcs: Number(r.kcs) }))
+}
 
 /** 同じ (user, unit, プロンプト版) の再実行を冪等にする鍵（docs/08 §4） */
 export function paramsHash(unitId: string, promptVersion: string, kcIds: string[]): string {

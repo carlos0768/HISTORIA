@@ -84,6 +84,7 @@ for (const [k, lim] of Object.entries(LIMIT)) {
 
 // ---- 3〜7 ----
 const ids = new Set(kc.map(k => k.id));
+const unitSubject = new Map(syllabus.map(u => [u.id, u.subject]));
 for (const k of kc) {
   // 3. unit_id は節（level=3）に限る
   if (!leafUnits.has(k.unit_id)) fail(`3: unit_id が節として存在しない: ${k.id} → "${k.unit_id}"`);
@@ -118,6 +119,33 @@ for (const k of kc) {
 
   // 8. 投入前は approve 列が全て埋まっていること
   if (STRICT && !['○', '×'].includes(k.approve)) fail(`8: approve が未記入または不正: ${k.id} = "${k.approve}"`);
+}
+
+// ---- 8b. 範囲外にした KC（retired）----
+//
+// ★ retired は「行を消さずに範囲から外す」ための列である（docs/02 §6.1）。
+//   消してしまうと item_kc / response / kc_region の外部キーが道連れになり、
+//   一度でも解いた記録まで失う。
+const retiredIds = new Set(kc.filter(k => k.retired).map(k => k.id));
+for (const k of kc) {
+  if (!k.retired) continue;
+  // 8b-1. 外してよいのは歴史総合だけ。世界史探究の KC を外したら、それは事故である
+  const subject = unitSubject.get(k.unit_id);
+  if (subject !== 'general_history') {
+    fail(`8b: 歴史総合以外の KC を範囲外にしている: ${k.id}（${k.unit_id} = ${subject}）`);
+  }
+}
+for (const k of kc) {
+  // 8b-2. 残す KC が、外した KC を前提にしていないこと。
+  //   ★ 前提が永久に出題されないと、その KC は永久に「前提未習」のまま止まる。
+  //   prereq_ids はいま読まれていないので、壊れても画面には何も出ない。
+  //   だから CSV の時点で落とす。
+  if (k.retired) continue;
+  for (const pr of (k.prereq_ids ? k.prereq_ids.split(';').map(x => x.trim()).filter(Boolean) : [])) {
+    if (retiredIds.has(pr)) {
+      fail(`8b: 範囲内の KC が、範囲外にした KC を前提にしている: ${k.id} → "${pr}"`);
+    }
+  }
 }
 
 // ---- 5b. prereq の循環 ----
@@ -404,6 +432,13 @@ for (const k of KINDS) console.log(`  ${k.padEnd(12)} ${String(count[k]).padStar
 const covered = new Set(kc.map(k => k.unit_id));
 const uncovered = [...leafUnits].filter(u => !covered.has(u));
 console.log(`KC を持つ節: ${covered.size} / ${leafUnits.size}（未着手 ${uncovered.length}）`);
+
+// ★ 教材を作るのはここに出る節だけである（lib/pipeline/generate.ts の pendingUnits）。
+//   1本あたり約50円かかるので、分母がずれていたらそのまま金額がずれる。
+const live = kc.filter(k => !k.retired);
+const liveUnits = new Set(live.map(k => k.unit_id));
+console.log(`範囲外にした KC: ${kc.length - live.length} / ${kc.length}`
+  + `（残り ${live.length}。教材を作る節 ${liveUnits.size}）`);
 
 // ★ 警告は落とさない。包含はしばしば正しい（「ポエニ戦争」と「第1回ポエニ戦争」）。
 //   落とすと正しい正典を消す方向に働くので、目に入れるだけにする。

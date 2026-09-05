@@ -2,10 +2,8 @@ import Link from 'next/link'
 import { tryDb } from '@/lib/db/optional'
 import { currentUserId } from '@/lib/auth/dal'
 import { todaysPlan, drillProgressList } from '@/lib/loop/today'
-import { drillMaterials } from '@/lib/loop/material'
 import { streak } from '@/lib/loop/records'
-import { UnitMaterials } from './units'
-import { Screen, Card, TwoBars, Alert, Empty, StatusChip } from '@/components/ui'
+import { Screen, Card, TwoBars, Alert, Empty } from '@/components/ui'
 import { NotReady } from '@/components/not-ready'
 import { FakeNotice } from '@/components/fake-warning'
 import { readConfig } from '@/lib/ai/client'
@@ -64,8 +62,6 @@ export default async function Home() {
     drillProgressList(db, userId, now),
     streak(db, userId, now),
   ])
-  // 特訓ごとに、範囲の単元と教材の状態を引く（生成中・配信不可を隠さない）
-  const materials = await Promise.all(drills.map(d => drillMaterials(db, userId, d.drillId)))
 
   // ★ 作る前に言う。鍵が無いと resolveProvider が黙ってフェイクに落ちるので、
   //   作ってから気づくと、でたらめな本文を読んだあとになる
@@ -114,39 +110,19 @@ export default async function Home() {
             <p className="lv-caption">教科書の章立てから範囲を選ぶと、今日やることが決まります。</p>
           </Empty>
         )}
-        {drills.map((d, di) => {
-          const daysLeft = Math.ceil((d.deadline.getTime() - now.getTime()) / 86_400_000)
-          return (
-            <Card key={d.drillId}>
-              <p className="lv-heading">
-                {d.state === 'overdue'
-                  ? `締切を過ぎています — ${d.title}`
-                  : `あと${daysLeft}日で「${d.title}」を仕上げよう`}
-              </p>
-              <TwoBars
-                masteredCount={d.masteredCount} totalKc={d.totalKc}
-                materialsRead={d.materialsRead} materialsTotal={d.materialsTotal}
-              />
-              {d.state === 'overdue' && <p className="lv-caption">新しい締切を設定しますか？</p>}
-              <UnitMaterials units={materials[di] ?? []} />
-            </Card>
-          )
-        })}
+        {drills.map(d => (
+          <Card key={d.drillId}>
+            <p className="lv-heading">{d.title}</p>
+            <TwoBars
+              masteredCount={d.masteredCount} totalKc={d.totalKc}
+              materialsRead={d.materialsRead} materialsTotal={d.materialsTotal}
+            />
+            <Link className="lv-btn lv-btn--primary lv-btn--block" href={`/drills/${d.drillId}`}>
+              勉強する
+            </Link>
+          </Card>
+        ))}
       </div>
-
-      {plan.queue.length > 0 && (
-        <div>
-          <span className="lv-label">今日の内訳</span>
-          <div className="lv-list">
-            {plan.queue.slice(0, 8).map(q => (
-              <div key={q.kcId} className="lv-list__row">
-                <span className="lv-list__value">{q.label ?? q.kcId}</span>
-                <StatusChip status={q.status} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </Screen>
   )
 }

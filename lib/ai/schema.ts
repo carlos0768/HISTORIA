@@ -128,6 +128,91 @@ export function toGeminiSchema(schema: unknown): unknown {
   return out
 }
 
+/**
+ * Anthropic の構造化出力（`output_config.format.schema`）が受け付ける形に直す。
+ *
+ * ★ **公式ドキュメントに一覧がある。** SDK の `OutputConfig.format` の JSDoc が
+ *   指している https://platform.claude.com/docs/en/build-with-claude/structured-outputs
+ *   に、通るものと通らないものが明記されている。**推測しない。**
+ *
+ *   通らないと書かれているもの:
+ *     - 数値の制約         minimum / maximum / multipleOf
+ *     - 文字列の制約       minLength / maxLength
+ *     - 配列の制約         minItems の 0・1 以外を含め、minItems 以外すべて（maxItems も）
+ *     - additionalProperties が false 以外
+ *     - 再帰スキーマ、enum の中の複合型、外部 $ref
+ *
+ *   通ると書かれているもの: 基本型 / enum / const / anyOf・allOf / $ref・$defs /
+ *   default / required / additionalProperties: false / 文字列の format /
+ *   minItems（0 か 1 のみ）
+ *
+ * ★ **2回、往復で潰そうとして失敗した**（2026-09-04）。API は 400 を1件ずつしか
+ *   返さないので、「名指しされていない＝通っている」は成り立たない。実際
+ *   `minItems` を直したら次は `maxItems` が出た（req_011CeiPWeKkAjSeaPDzHB2z9 →
+ *   req_011CeiQ1eGqAYF6NH2DywA8Y）。**一覧が読める場所を先に探すこと。**
+ *
+ * ★ **落としても正しさは失われない。** 件数・長さ・範囲の契約は応答を
+ *   `MaterialOutput`（zod）で検証するときに効く。スキーマは「守らせるための助言」
+ *   であって保証ではない、という `toGeminiSchema` と同じ立場である。
+ *
+ * ★ **`minItems` は 0 ではなく 1 に丸める。**「空配列は認めない」は通る範囲で残す。
+ *   0 にすると空の教材が API 側の検査を素通りする。
+ */
+const ANTHROPIC_UNSUPPORTED = new Set([
+  'minimum', 'maximum', 'multipleOf',   // 数値の制約
+  'minLength', 'maxLength',             // 文字列の制約
+  'maxItems',                           // 配列の制約（minItems だけが例外）
+])
+
+export function toAnthropicSchema(schema: unknown): unknown {
+  if (Array.isArray(schema)) return schema.map(toAnthropicSchema)
+  if (schema === null || typeof schema !== 'object') return schema
+
+  const out: Record<string, unknown> = {}
+  for (const [k, v] of Object.entries(schema as Record<string, unknown>)) {
+    if (ANTHROPIC_UNSUPPORTED.has(k)) continue
+    if (k === 'minItems' && typeof v === 'number' && v > 1) {
+      out[k] = 1
+      continue
+    }
+    out[k] = toAnthropicSchema(v)
+  }
+  return out
+}
+
+/**
+ * 応答を `MaterialOutput` に通す。**上限を超えた配列は切り詰めてから検査する。**
+ *
+ * ★ なぜ要るか（2026-09-04）。Anthropic の構造化出力は `maxItems` を受け付けないので
+ *   送っていない（`toAnthropicSchema`）。`wh.4.1.3` の1本では件数がすべて指示どおりに
+ *   収まったので「プロンプトの指示だけで守られる」と結論したが、**n=1 からの一般化**
+ *   だった。`gh.2.1.1` はフラッシュカードを15枚出し、
+ *   `flashcards: Too big: expected array to have <=14 items` で丸ごと落ちた。
+ *
+ * ★ 切り詰めるのは**上限のある配列だけ**。「14枚以内」と頼んで15枚返ったなら、
+ *   先頭14枚を採るのが元の意図そのものである。余りを捨てても中身は損なわれない。
+ *
+ * ★ **`sections` と `choices` は切り詰めない。** どちらも「ちょうど7」「ちょうど4」で、
+ *   多い場合は構造の誤りである。とくに `choices` を削ると `answer_key` が
+ *   消えた選択肢を指しうる — **正解の無い設問**ができる。数が合わないなら落とす。
+ *
+ * ★ 下限は救えない。10枚と頼んで8枚しか返らなければ作り直すしかない。
+ *   ここで水増しすると、検証していない中身が混ざる。
+ */
+const MAX_ITEMS = { flashcards: 14, mcqs: 10, claims: 40 } as const
+
+export function parseMaterialOutput(raw: unknown): ReturnType<typeof MaterialOutput.safeParse> {
+  if (raw !== null && typeof raw === 'object' && !Array.isArray(raw)) {
+    const o = { ...(raw as Record<string, unknown>) }
+    for (const [key, max] of Object.entries(MAX_ITEMS)) {
+      const v = o[key]
+      if (Array.isArray(v) && v.length > max) o[key] = v.slice(0, max)
+    }
+    return MaterialOutput.safeParse(o)
+  }
+  return MaterialOutput.safeParse(raw)
+}
+
 /** 教材本文の文字数。docs/07 §2 の目標 3,500字に対する実測用 */
 export function bodyCharCount(m: MaterialOutput): number {
   return m.sections.reduce((n, s) => n + s.body_md.length, 0)

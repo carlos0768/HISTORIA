@@ -125,17 +125,40 @@ const priceOf = (model: string): Price =>
 /**
  * 鍵があれば実物、無ければフェイクにする。
  * フェイクは実物と同じ型・同じ制約で動くので、鍵が無くても閉ループは最後まで通る。
+ *
+ * ★ **モデルは呼び出し側から渡す。ベンダーから決めない。**
+ *   2026-09-04 まで、ここは `gemini → cfg.genModel` / `anthropic → cfg.verifyModel` と
+ *   固定していた。旧構成（生成=Gemini / 検証=Anthropic）では正しかったが、
+ *   向きを入れ替えると**ちょうど裏返しになる**:
+ *
+ *     生成（anthropic）に verifyModel = 'gemini-3.x'   → Anthropic が 400
+ *     検証（gemini）に   genModel     = 'claude-opus-5' → /models/claude-opus-5 で 404
+ *
+ *   質が悪いのは、その 404 が「モデル id が間違っている」（M35）と**区別できない**こと。
+ *   鍵でもモデル名でもなく配線の誤りなので、そちらを疑うと永久に直らない。
+ *
+ *   `assertConfig` の食い違い検査もここは守れない。あちらが見るのは
+ *   「設定どうしが揃っているか」であって、**設定を実物へ配る途中で入れ替わること**
+ *   ではないためである。
  */
-function resolveProvider(name: string, cfg: AiConfig, fake: FakeOptions = {}): Provider {
+function resolveProvider(
+  name: string,
+  /** その役割で使うモデル。genProvider には genModel、verifyProvider には verifyModel */
+  model: string,
+  cfg: AiConfig,
+  fake: FakeOptions = {},
+): Provider {
   if (name === 'gemini' && cfg.geminiApiKey) {
     return createGeminiProvider({
-      apiKey: cfg.geminiApiKey, model: cfg.genModel, embedModel: cfg.embedModel,
+      apiKey: cfg.geminiApiKey, model, embedModel: cfg.embedModel,
     })
   }
   if (name === 'anthropic' && cfg.anthropicApiKey) {
-    return createAnthropicProvider({ apiKey: cfg.anthropicApiKey, model: cfg.verifyModel })
+    return createAnthropicProvider({ apiKey: cfg.anthropicApiKey, model })
   }
-  return createFakeProvider(name, fake)
+  // ★ フェイクにも model を渡す。渡さないと結果が `gemini-fake` としか名乗らず、
+  //   配線の誤りが鍵の無い試験から見えなくなる（fake.ts の注記）
+  return createFakeProvider(name, fake, model)
 }
 
 export type GenerateCall = {
@@ -171,10 +194,25 @@ export type Client = {
   embed(a: EmbedCall): Promise<{ vectors: number[][]; model: string }>
 }
 
-export function createClient(cfg: AiConfig = readConfig(), fake: FakeOptions = {}): Client {
+export type ClientOverrides = {
+  /**
+   * 生成プロバイダを差し替える。手で書いた教材を流し込むときに使う
+   * （`lib/ai/authored.ts`）。
+   *
+   * ★ **検証側は差し替えられない。** 生成と検証を別系統に分けることが
+   *   docs/08 §5 の5層の土台であり、両方を差し替えられる口を開ければ
+   *   自己検証への退化を型で止められなくなる。
+   */
+  gen?: Provider
+}
+
+export function createClient(
+  cfg: AiConfig = readConfig(), fake: FakeOptions = {}, overrides: ClientOverrides = {},
+): Client {
   assertConfig(cfg)
-  const gen = resolveProvider(cfg.genProvider, cfg, fake)
-  const ver = resolveProvider(cfg.verifyProvider, cfg, fake)
+  // 役割とモデルを対にして渡す。ここがずれると 404 / 400 になる（resolveProvider の注記）
+  const gen = overrides.gen ?? resolveProvider(cfg.genProvider, cfg.genModel, cfg, fake)
+  const ver = resolveProvider(cfg.verifyProvider, cfg.verifyModel, cfg, fake)
   const usingFake = !cfg.geminiApiKey || !cfg.anthropicApiKey
 
   /**
@@ -185,9 +223,16 @@ export function createClient(cfg: AiConfig = readConfig(), fake: FakeOptions = {
    *   生成と検証のどちらであれ Gemini の側を使い、支出もその名前で記録する。
    *   どちらも Gemini でなければ生成側に落とす（フェイクなら通り、本物なら投げる）。
    */
+  // ★ 差し替えた生成プロバイダを埋め込みの候補にしない。あれは実物のベンダー
+  //   クライアントではなく、埋め込みを持たない（`lib/ai/authored.ts`）。
+  //   ここを見落とすと **GEN_PROVIDER=gemini のときだけ実行時に落ちる**という、
+  //   設定次第で壊れるいちばん見つけにくい壊れ方をする。
   const [emb, embedProvider] =
-    cfg.genProvider === 'gemini' ? [gen, cfg.genProvider]
+    overrides.gen === undefined && cfg.genProvider === 'gemini' ? [gen, cfg.genProvider]
     : cfg.verifyProvider === 'gemini' ? [ver, cfg.verifyProvider]
+    // ★ 最後の受け皿でも差し替えた生成側は選ばない。どちらも Gemini でないなら
+    //   埋め込みは作れないので、実物（検証側）に落として本物の理由で落とす
+    : overrides.gen !== undefined ? [ver, cfg.verifyProvider]
     : [gen, cfg.genProvider]
 
   /** 予約 → 呼び出し → 確定。失敗したら解放する */
@@ -243,7 +288,23 @@ export function createClient(cfg: AiConfig = readConfig(), fake: FakeOptions = {
       )
     },
 
+    /** 送り先は createClient の `emb` で決めてある（役割ではなく「できるほう」） */
     async embed(a: EmbedCall) {
+      /**
+       * ★ どちらも Gemini でないなら、予算を予約する前に落とす。
+       *   `emb` は生成側に落ちる作りなので、このまま進むと
+       *   予約 → anthropic.ts の例外 → 解放、と DB を2往復してから同じ結果になる。
+       *   設定の誤りは設定の言葉で言うほうが直せる。
+       *
+       *   ★ ただしフェイクは通す。鍵が無い状態で閉ループを最後まで回せることは
+       *     この抽象層の目的そのものである（lib/ai/fake.ts）。
+       */
+      if (embedProvider !== 'gemini' && !emb.name.startsWith('fake:')) {
+        throw new Error(
+          '埋め込みは Gemini でしか作れません（docs/09 §6）。'
+          + `いまの設定は 生成=${cfg.genProvider} / 検証=${cfg.verifyProvider} で、どちらも gemini ではありません。`,
+        )
+      }
       const maxIn = Math.ceil(a.texts.join('').length / 1.5)
       const out = await guarded(
         a.db, a.now, cfg.embedModel, embedProvider, 'embed', maxIn, 0, null,
