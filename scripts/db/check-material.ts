@@ -121,5 +121,58 @@ for (const unitId of files) {
   }
 }
 
+/**
+ * ---- 単元をまたいだ本文の混入 ----
+ *
+ * ★ **他のどの検査でも捕まらない壊れ方である。** スキーマも字数も KC も年号も
+ *   すべて正しいまま、§6 だけが別の単元の本文になっている、が成立する。
+ *   2026-09-05、複数のエージェントが同じ作業ディレクトリを使ったために実際に起きた
+ *   （満洲事変の §6 に大西洋三角貿易の本文が入った）。書いた本人が気づいて直したが、
+ *   **気づかなければそのまま配信されていた。**
+ *
+ * ★ 1本ずつ検査していては見つからない。**全部を突き合わせて初めて分かる**ので、
+ *   単元を指定して呼んだときは飛ばす。
+ */
+if (only.length === 0 && files.length > 1) {
+  console.log('\n═══ 単元をまたいだ混入')
+  const all = files.flatMap(unitId => {
+    const m = parseMaterialOutput(
+      JSON.parse(readFileSync(join(AUTHORED_DIR, `${unitId}.json`), 'utf8')))
+    return m.success
+      ? m.data.sections.map(s => ({ unitId, ord: s.ord, heading: s.heading, body: s.body_md }))
+      : []
+  })
+  let dup = 0
+  for (let i = 0; i < all.length; i++) {
+    for (let j = i + 1; j < all.length; j++) {
+      const a = all[i]!, b = all[j]!
+      if (a.unitId === b.unitId) continue
+      if (similar(a.body, b.body) > 0.55) {
+        dup++
+        console.log(`  ⚠ ${a.unitId} §${a.ord}「${a.heading}」 ↔ ${b.unitId} §${b.ord}「${b.heading}」`)
+      }
+    }
+  }
+  if (dup === 0) console.log('  ✓ ありません')
+  else bad += dup
+}
+
 console.log(`\n${files.length} 件中 ${bad} 件に問題があります。`)
 process.exit(bad === 0 ? 0 : 1)
+
+/**
+ * 2つの本文の似ている度合い。3-gram の Jaccard 係数。
+ * ★ 完全一致では捕まらない。混入した本文は前後を少し直されていることがある
+ */
+function similar(a: string, b: string): number {
+  const grams = (s: string) => {
+    const g = new Set<string>()
+    for (let i = 0; i + 3 <= s.length; i++) g.add(s.slice(i, i + 3))
+    return g
+  }
+  const ga = grams(a.slice(0, 1500)), gb = grams(b.slice(0, 1500))
+  if (ga.size === 0 || gb.size === 0) return 0
+  let inter = 0
+  for (const g of ga) if (gb.has(g)) inter++
+  return inter / (ga.size + gb.size - inter)
+}

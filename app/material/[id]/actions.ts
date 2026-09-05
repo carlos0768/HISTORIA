@@ -7,7 +7,7 @@ import { recordRead, type ReadResult } from '@/lib/loop/material'
 import { reportContent, type ReportTarget } from '@/lib/loop/report'
 import { recordView, retrievalAfterVideo, type RetrievalItem } from '@/lib/loop/video'
 import { submitAnswer } from '@/lib/loop/answer'
-import { createClient } from '@/lib/ai/client'
+import { createClient, type Client } from '@/lib/ai/client'
 import { BudgetExceededError } from '@/lib/ai/budget'
 import { assertNoIdentifiers } from '@/lib/ai/redact'
 import { parseQuery, research, embedCoverage, type ResearchResponse } from '@/lib/loop/research'
@@ -150,11 +150,32 @@ export async function researchTextbook(rawQuery: string): Promise<ResearchRespon
 
   const db = sql()
   const now = new Date()
-  const client = createClient()
   let vector: number[] | null = null
   let note: string | null = null
 
-  if (client.embedProviderName.startsWith('fake')) {
+  /**
+   * ★ **設定の誤りで画面を落とさない。**
+   *   `createClient` は `assertConfig` を呼び、環境変数の組み合わせが
+   *   おかしいと例外を投げる（生成と検証が同じプロバイダ／モデル id と
+   *   プロバイダの食い違い）。ここはそれを受けていなかったので、
+   *   **Vercel の環境変数を1つ間違えるだけで「うまくいきませんでした」**になり、
+   *   しかも理由がどこにも出なかった。
+   *
+   *   この関数の他の失敗（鍵が無い・pgvector が無い・予算上限・埋め込みの失敗）は
+   *   すべて「語の一致だけで引く」に落として note で理由を出している。
+   *   設定の誤りだけが致命的である理由は無い。同じ扱いにする。
+   */
+  let client: Client | null = null
+  try {
+    client = createClient()
+  } catch (e) {
+    note = `AI の設定が正しくないため、語の一致だけで引いています（${
+      e instanceof Error ? e.message : String(e)}）`
+  }
+
+  if (client === null) {
+    // note は設定済み。埋め込みは作らない
+  } else if (client.embedProviderName.startsWith('fake')) {
     note = 'AI の鍵が無いため、語の一致だけで引いています。'
   } else if (process.env.PGVECTOR === 'off') {
     note = 'このデータベースには pgvector が無いため、語の一致だけで引いています。'
