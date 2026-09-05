@@ -7,7 +7,7 @@ import { NotReady } from '@/components/not-ready'
 
 export const dynamic = 'force-dynamic'
 
-/** 章ごとの文章を選んで読む、余計な集計を置かない教科書。 */
+/** 国・地域ごとに、古い年代から文章を選んで読む教科書。 */
 export default async function Textbook() {
   const db = tryDb()
   const userId = await currentUserId()
@@ -23,10 +23,11 @@ export default async function Textbook() {
       {chapters.length === 0 ? (
         <Empty>
           <p className="lv-body">まだ読める文章がありません。</p>
-          <p className="lv-caption">特訓を作ると、完成した文章が章ごとに並びます。</p>
+          <p className="lv-caption">特訓を作ると、完成した文章が国・地域ごとの年代順に並びます。</p>
         </Empty>
       ) : (
         <div className="hs-textbook">
+          <p className="lv-caption">国・地域ごとに、古い年代から並んでいます。年代未登録の教材は各一覧の最後に表示します。</p>
           {chapters.map(chapter => (
             <section className="hs-textbook__chapter" key={chapter.id}>
               <h2 className="lv-heading">{chapter.label}</h2>
