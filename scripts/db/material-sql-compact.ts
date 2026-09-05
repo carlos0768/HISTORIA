@@ -64,7 +64,12 @@ const DATA = lit(JSON.stringify(payload))
 //   載せると転送量が倍になる（教材1本で 28KB → 53KB になった）
 const UNITS = units.map(u => lit(u)).join(', ')
 
-process.stdout.write(`-- 1. 同じ単元で配信中の共有教材を退ける
+process.stdout.write(`BEGIN;
+
+-- 1. 同じ単元で配信中の共有教材を退ける
+-- ★ BEGIN 〜 COMMIT で包む（material-sql.ts と同じ）。**遠隔から送るときに効く。**
+--   包まないと、転送が途中で切れたときに1文目だけが通り、その単元は
+--   「退けたが新しい版は入っていない」＝配信が消えた状態で残る。
 UPDATE material SET status = 'superseded'
  WHERE status = 'ready' AND user_id IS NULL AND unit_id IN (${UNITS});
 
@@ -145,4 +150,6 @@ ckc AS (
 SELECT (SELECT count(*) FROM ins) AS materials,
        (SELECT count(*) FROM sec) AS sections, (SELECT count(*) FROM q) AS mcqs,
        (SELECT count(*) FROM c) AS cards;
+
+COMMIT;
 `)
