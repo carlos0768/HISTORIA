@@ -1,8 +1,9 @@
 /**
  * 版図マスタ — 国家の領域の移り変わりを、現在の国の集合で近似する
  *
- * ★★ ここは暫定である。★★
+ * ★★ countries による塗りは暫定である。★★
  *   lib/map/regions.ts と同じく、現在の国境で歴史上の版図を近似しているにすぎない。
+ *   `geo` を付けた段階だけ、historical-basemaps の境界ポリゴン（lib/map/territory-geo/）で塗る。
  *   「オスマン帝国 1683 年」を「ハンガリー・セルビア・…の現在の国土」で塗るので、
  *   国の一部しか含まなかった場合も国ごと塗られる。学習用の模式図であり、
  *   境界線の正確さを示すものではない（画面にもそう書く）。
@@ -24,6 +25,13 @@ export type TerritorySnapshot = {
   countries: readonly string[]
   /** 近似の注意（「北部のみ」等） */
   note?: string
+  /**
+   * 本物の境界データ（historical-basemaps）。付いている段階だけ境界ポリゴンで塗り、
+   * 無い段階は countries で現在の国に近似する。
+   * year はデータ側の年（lib/map/historical-years.ts にある年）で、段階の年と一致しなくてよい。
+   * names は一致させる NAME（by='SUBJECTO' なら宗主国名でも合わせる）。
+   */
+  geo?: { year: number; names: readonly string[]; by?: 'NAME' | 'SUBJECTO' }
 }
 
 export type Polity = {
@@ -179,7 +187,8 @@ export const POLITIES: readonly Polity[] = [
       note: 'ウクライナは南岸。アラビア半島は沿岸' },
     { year: 1683, label: '第2次ウィーン包囲（最大版図）',
       countries: [C.turkey, ...BALKANS, C.hungary, C.romania, C.moldova, C.ukraine, C.croatia, C.slovenia, C.cyprus,
-                  ...LEVANT, C.iraq, C.egypt, C.libya, C.tunisia, C.algeria, ...ARABIA] },
+                  ...LEVANT, C.iraq, C.egypt, C.libya, C.tunisia, C.algeria, ...ARABIA],
+      geo: { year: 1700, names: ['Ottoman Empire'] } },
     { year: 1718, label: 'パッサロヴィッツ条約（ハンガリーを失う）',
       countries: [C.turkey, ...BALKANS, C.romania, C.moldova, C.ukraine, C.cyprus,
                   ...LEVANT, C.iraq, C.egypt, C.libya, C.tunisia, C.algeria, ...ARABIA] },
@@ -188,9 +197,11 @@ export const POLITIES: readonly Polity[] = [
       note: 'アルジェリアは 1830 年にフランスへ' },
     { year: 1878, label: 'ベルリン条約（バルカン諸国が独立）',
       countries: [C.turkey, C.macedonia, C.albania, C.greece, ...LEVANT, C.iraq, C.egypt, C.libya, ...ARABIA],
-      note: 'キプロスはイギリスの管理下、エジプトは自治' },
+      note: 'キプロスはイギリスの管理下、エジプトは自治（境界データでは属国のエジプトを含めない）',
+      geo: { year: 1880, names: ['Ottoman Empire'] } },
     { year: 1913, label: 'バルカン戦争後（ヨーロッパ領をほぼ失う）',
-      countries: [C.turkey, ...LEVANT, C.iraq, C.saudi, C.yemen] },
+      countries: [C.turkey, ...LEVANT, C.iraq, C.saudi, C.yemen],
+      geo: { year: 1914, names: ['Ottoman Empire'] } },
     { year: 1923, label: '滅亡（トルコ共和国へ）', countries: [] },
   ]),
 

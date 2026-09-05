@@ -324,6 +324,13 @@ body { margin: 0; background: var(--lv-canvas); }
 .hs-timeline__row--active .hs-research__meta,
 .hs-timeline__row--active .lv-caption { color: var(--lv-ink); }
 
+/* 版図の境界データ（historical-basemaps）。国土の上に半透明で置き、国境は上から描く */
+.lv-map__territory {
+  fill: var(--lv-map-highlight); fill-opacity: .6; stroke: var(--lv-map-stroke); stroke-width: .7;
+  stroke-linejoin: round; pointer-events: none;
+}
+.lv-map__territory--lost { fill: var(--lv-map-select); fill-opacity: .65; stroke-dasharray: 2 1.5; }
+
 /* 版図の再生 */
 .hs-territory { display: flex; flex-direction: column; gap: var(--lv-space-3); }
 .hs-territory__bar { display: flex; gap: var(--lv-space-2); align-items: center; flex-wrap: wrap; }

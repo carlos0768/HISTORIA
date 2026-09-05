@@ -24,6 +24,9 @@
     "db:dev-seed": "tsx scripts/db/dev-seed.ts",
     "db:diagnostic-coverage": "tsx scripts/db/diagnostic-coverage.ts",
     "db:embed-index": "tsx scripts/db/embed-index.ts",
+    "map:basemap": "node scripts/map/build-basemap.mjs",
+    "map:fetch": "node scripts/map/fetch-historical.mjs",
+    "map:territories": "tsx scripts/map/build-territories.mjs",
     "seed:validate": "node seed/validate.mjs"
   },
   "dependencies": {

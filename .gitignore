@@ -9,3 +9,7 @@ next-env.d.ts
 
 # レビュー用1枚もの（scripts/db/review-sheet.ts で作り直せる。641KB を版に残さない）
 /seed/out/
+
+# 版図の元データ（historical-basemaps の GeoJSON、1本 1.5MB）。scripts/map/fetch-historical.mjs で取り直せる。
+# 版に入れるのは派生物（lib/map/territory-geo/*.ts）だけ
+/scripts/map/data/
