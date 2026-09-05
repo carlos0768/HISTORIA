@@ -1,0 +1,27 @@
+{
+  "id": "story.columbus-first-voyage",
+  "title": "コロンブスの第1回航海",
+  "summary": "1492年の出航から西インド諸島への到達、1493年の帰還までを航路に沿って追う。",
+  "unitId": "wh.3.5.1",
+  "kind": "journey",
+  "heroYear": 1492,
+  "examWeight": 3,
+  "eventIds": [
+    "ae.columbus.palos_departure",
+    "ae.columbus.canary_stop",
+    "ae.columbus.atlantic_crossing",
+    "ae.columbus.guanahani_arrival",
+    "ae.columbus.cuba_arrival",
+    "ae.columbus.hispaniola",
+    "ae.columbus.return_palos"
+  ],
+  "steps": [
+    {"id":"as.columbus.1","eventId":"ae.columbus.palos_departure","ord":1,"title":"パロスを出港","narration":"3隻の船で西回り航路の探索へ出発した。","durationMs":3200},
+    {"id":"as.columbus.2","eventId":"ae.columbus.canary_stop","ord":2,"title":"カナリア諸島に寄港","narration":"補給と修理を終え、大西洋横断へ備えた。","durationMs":3000},
+    {"id":"as.columbus.3","eventId":"ae.columbus.atlantic_crossing","ord":3,"title":"大西洋を西航","narration":"貿易風を利用しながら約5週間、西へ進んだ。","durationMs":3600},
+    {"id":"as.columbus.4","eventId":"ae.columbus.guanahani_arrival","ord":4,"title":"グアナハニ島に到達","narration":"10月12日、バハマ諸島の島へ上陸した。到達島の比定には複数説がある。","durationMs":4200},
+    {"id":"as.columbus.5","eventId":"ae.columbus.cuba_arrival","ord":5,"title":"キューバ島へ","narration":"アジア沿岸だと考えながら、キューバ島を探索した。","durationMs":3200},
+    {"id":"as.columbus.6","eventId":"ae.columbus.hispaniola","ord":6,"title":"イスパニョーラ島を探索","narration":"サンタ・マリア号の座礁後、ラ・ナビダードを築いた。","durationMs":3600},
+    {"id":"as.columbus.7","eventId":"ae.columbus.return_palos","ord":7,"title":"パロスへ帰還","narration":"1493年3月15日、パロス港に戻って第1回航海を終えた。","durationMs":3600}
+  ]
+}

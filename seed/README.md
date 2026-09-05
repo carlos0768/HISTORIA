@@ -177,7 +177,8 @@ Supabase のダッシュボード → SQL Editor に、この順で貼る。
 | # | 貼るもの | 中身 |
 |---|---|---|
 | 1 | `seed/sql/04_phase3.sql` | 後から足した表（`push_subscription`・`ops_log`）と列（`app_user.remind_hour`）。何度流しても同じ |
-| 2 | `seed/sql/03_rls.sql` | RLS とポリシーを貼り直す。**新しい表もここで覆われる**ので、必ず 04 のあとに流す |
+| 2 | `seed/sql/05_atlas.sql` | 歴史地球儀の7表・RLS・読み取り権限。既存DBにだけ流す |
+| 3 | `seed/sql/03_rls.sql` | RLS とポリシーを貼り直す。**新しい表もここで覆われる**ので、必ず 04・05 のあとに流す |
 
 `docs/schema.sql` に手を加えなくてよいのは、Supabase には pgvector があり
 `auth.uid()` も実在するためである（ローカル用の置換も shim も要らない）。

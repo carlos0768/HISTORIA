@@ -41,7 +41,7 @@ export type TabKey = typeof TABS[number]['key'] | 'settings' | typeof DESK[numbe
 export const DESK = [
   { key: 'library', href: '/library', label: '教材の一覧' },
   { key: 'timeline', href: '/timeline', label: '年表と地図' },
-  { key: 'map', href: '/map', label: '地図' },
+  { key: 'map', href: '/map', label: '歴史地球儀' },
 ] as const
 
 /**
@@ -54,7 +54,7 @@ export const DESK = [
  *   モバイルでは**そもそも並べない**ので、中身の描画費用もかからない。
  */
 export function Screen({
-  title, children, tab, aside, trailing,
+  title, children, tab, aside, trailing, layout = 'reading',
 }: {
   title: string
   children: ReactNode
@@ -62,6 +62,8 @@ export function Screen({
   aside?: ReactNode
   /** 見出しの右端に置くもの（連続日数など）。docs/11-ux.md §7 */
   trailing?: ReactNode
+  /** 読書幅を外して道具面を広く使う画面。現在は歴史地球儀だけ。 */
+  layout?: 'reading' | 'workspace'
 }) {
   if (!tab) {
     return (
@@ -72,7 +74,7 @@ export function Screen({
     )
   }
   return (
-    <div className="lv-root hs-screen hs-shell">
+    <div className={`lv-root hs-screen hs-shell${layout === 'workspace' ? ' hs-shell--workspace' : ''}`}>
       <nav className="hs-shell__side" aria-label="メニュー">
         <span className="hs-side__label">学習</span>
         {TABS.map(t => (

@@ -25,7 +25,7 @@ BEGIN;
 -- ---- 1. ビューを「問い合わせた本人の権限」で評価させる ----
 ALTER VIEW v_weakness_evidence SET (security_invoker = true);
 
--- ---- 2. public の全ての表で RLS を有効にする（44 表）----
+-- ---- 2. public の全ての表で RLS を有効にする（51 表）----
 ALTER TABLE app_user             ENABLE ROW LEVEL SECURITY;
 ALTER TABLE drill                ENABLE ROW LEVEL SECURITY;
 ALTER TABLE drill_kc             ENABLE ROW LEVEL SECURITY;
@@ -59,6 +59,13 @@ ALTER TABLE kc                   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE kc_region            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE kc_syllabus_unit     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE canon_event          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE atlas_source         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE atlas_event          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE atlas_event_source   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE atlas_event_unit     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE atlas_event_kc       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE atlas_story          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE atlas_story_step     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE video                ENABLE ROW LEVEL SECURITY;
 ALTER TABLE video_kc             ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invite_code          ENABLE ROW LEVEL SECURITY;
@@ -71,7 +78,7 @@ ALTER TABLE past_exam_element    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE past_exam_kc         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE evidence_claim       ENABLE ROW LEVEL SECURITY;
 
--- ---- 3. ポリシーを貼り直す（35 本）----
+-- ---- 3. ポリシーを貼り直す（42 本）----
 -- ★ ポリシーには CREATE OR REPLACE も IF NOT EXISTS も無い。
 --   DROP IF EXISTS → CREATE が、何度流しても同じにする唯一の書き方である。
 
@@ -210,6 +217,27 @@ CREATE POLICY kc_syllabus_unit_select  ON kc_syllabus_unit  FOR SELECT TO authen
 DROP POLICY IF EXISTS canon_event_select ON canon_event;
 CREATE POLICY canon_event_select       ON canon_event       FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS atlas_source_select ON atlas_source;
+CREATE POLICY atlas_source_select      ON atlas_source      FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS atlas_event_select ON atlas_event;
+CREATE POLICY atlas_event_select       ON atlas_event       FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS atlas_event_source_select ON atlas_event_source;
+CREATE POLICY atlas_event_source_select ON atlas_event_source FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS atlas_event_unit_select ON atlas_event_unit;
+CREATE POLICY atlas_event_unit_select  ON atlas_event_unit  FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS atlas_event_kc_select ON atlas_event_kc;
+CREATE POLICY atlas_event_kc_select    ON atlas_event_kc    FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS atlas_story_select ON atlas_story;
+CREATE POLICY atlas_story_select       ON atlas_story       FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS atlas_story_step_select ON atlas_story_step;
+CREATE POLICY atlas_story_step_select  ON atlas_story_step  FOR SELECT TO authenticated USING (true);
+
 DROP POLICY IF EXISTS video_select ON video;
 CREATE POLICY video_select             ON video             FOR SELECT TO authenticated USING (true);
 
@@ -225,7 +253,7 @@ CREATE POLICY evidence_claim_select ON evidence_claim
 COMMIT;
 
 -- ---- 確認 ----
--- rls_無効な表 が 0、ポリシー本数 が 35 になっていれば当たっている。
+-- rls_無効な表 が 0、ポリシー本数 が 42 になっていれば当たっている。
 SELECT
   (SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
     WHERE n.nspname = 'public' AND c.relkind = 'r' AND NOT c.relrowsecurity) AS rls_無効な表,

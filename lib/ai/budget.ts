@@ -17,7 +17,9 @@ export const JPY_PER_USD = 160
 /** 未知の課金項目（キャッシュ/推論トークン等）への安全余裕。M24 で実測する */
 export const SAFETY_MARGIN = 1.05
 
-export type Purpose = 'generate' | 'factcheck' | 'judge' | 'diagnostic' | 'embed' | 'scope_parse'
+export type Purpose =
+  | 'generate' | 'factcheck' | 'judge' | 'diagnostic' | 'embed' | 'scope_parse'
+  | 'atlas_generate' | 'atlas_verify'
 
 /** USD / MTok */
 export type Price = { inputPerMTok: number; outputPerMTok: number }

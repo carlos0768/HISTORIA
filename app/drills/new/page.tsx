@@ -13,7 +13,7 @@ function defaultDeadline(): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(d)
 }
 
-export default async function NewDrill() {
+export default async function NewDrill({ searchParams }: { searchParams: Promise<{ unit?: string | string[] }> }) {
   const db = tryDb()
   const userId = await currentUserId()
 
@@ -26,9 +26,11 @@ export default async function NewDrill() {
   }
 
   const tree = await unitTree(db)
+  const { unit } = await searchParams
+  const initialUnitId = typeof unit === 'string' && /^[a-z0-9.]+$/.test(unit) ? unit : undefined
   return (
     <Screen title="範囲を選ぶ" tab="drills">
-      <RangePicker tree={tree} defaultDeadline={defaultDeadline()} />
+      <RangePicker tree={tree} defaultDeadline={defaultDeadline()} initialUnitId={initialUnitId} />
     </Screen>
   )
 }

@@ -17,9 +17,9 @@ import { PASTE_LIMIT_KB, deployGuidance } from './dump-sql'
 describe('docs/schema.sql の解析', () => {
   const shapes = schemaShape()
 
-  it('44 表を全部拾う', () => {
-    expect(shapes).toHaveLength(44)
-    expect(new Set(shapes.map(s => s.table)).size).toBe(44)
+  it('51 表を全部拾う', () => {
+    expect(shapes).toHaveLength(51)
+    expect(new Set(shapes.map(s => s.table)).size).toBe(51)
   })
 
   it('どの表も列が1つ以上ある', () => {
@@ -64,7 +64,7 @@ describe('docs/schema.sql の解析', () => {
     const sql = readFileSync('docs/schema.sql', 'utf8')
     const total = (sql.match(/^CREATE TABLE /gim) ?? []).length
     const guarded = (sql.match(/^CREATE TABLE IF NOT EXISTS /gim) ?? []).length
-    expect(total).toBe(44)
+    expect(total).toBe(51)
     expect(guarded, '既存DBには seed/sql/04_phase3.sql を使う。schema.sql は仕様書のまま').toBe(0)
   })
 })
