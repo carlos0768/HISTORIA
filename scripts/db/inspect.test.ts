@@ -156,6 +156,8 @@ dbSuite('実DBを読む', () => {
     expect(r.missingTables).toEqual([])
     expect(r.missingColumns).toEqual([])
     expect(r.verdict).toBe('complete')
+    // ★ docs/schema.sql の表の数。歴史地球儀の atlas_* 7表が入って 44 → 51。
+    //   固定値にしてあるのは、表が増えたことに誰も気づかないまま進むのを防ぐためである。
     expect(r.expectedTables).toBe(51)
   })
 
