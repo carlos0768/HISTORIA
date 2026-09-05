@@ -30,16 +30,17 @@ export default async function Drills() {
   }
 
   const now = new Date()
-  const drills = await drillProgressList(db, userId, now)
-
-  // ★ 「受けられません」と書いた画面へ送るくらいなら、ここで出さない。
-  //   docs/11 §9 が「行き止まりを作らない」としているのは、タブに限った話ではない。
-  //   直近の確認テストの開始時刻だけ引いて、待ち時間はその場で示す。
-  const lastTests = await db<{ drill_id: string; started_at: Date }[]>`
-    SELECT DISTINCT ON (drill_id) drill_id, started_at
-      FROM check_test
-     WHERE user_id = ${userId} AND finished_at IS NOT NULL
-     ORDER BY drill_id, started_at DESC`
+  // 進捗と確認テスト履歴は独立しているため、遠隔DBへ並列で問い合わせる。
+  const [drills, lastTests] = await Promise.all([
+    drillProgressList(db, userId, now),
+    // ★ 「受けられません」と書いた画面へ送るくらいなら、ここで出さない。
+    //   直近の確認テストの開始時刻だけ引いて、待ち時間はその場で示す。
+    db<{ drill_id: string; started_at: Date }[]>`
+      SELECT DISTINCT ON (drill_id) drill_id, started_at
+        FROM check_test
+       WHERE user_id = ${userId} AND finished_at IS NOT NULL
+       ORDER BY drill_id, started_at DESC`,
+  ])
   const lastTestAt = new Map(lastTests.map(t => [t.drill_id, t.started_at]))
 
   const aside = (
@@ -78,6 +79,9 @@ export default async function Drills() {
                   masteredCount={d.masteredCount} totalKc={d.totalKc}
                   materialsRead={d.materialsRead} materialsTotal={d.materialsTotal}
                 />
+                <Link className="lv-btn lv-btn--primary lv-btn--block" href={`/drills/${d.drillId}`}>
+                  勉強する
+                </Link>
                 {ready ? (
                   <Link className="lv-btn lv-btn--block" href={`/checktest/${d.drillId}`}>
                     確認テストを受ける

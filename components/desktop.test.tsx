@@ -12,8 +12,7 @@ import { clampView, zoomAt, MIN_ZOOM, MAX_ZOOM } from './map-workspace'
  * デスクトップの部品（docs/06-desktop.md）
  *
  * ★ 守りたい一線は2つある。
- *   1. **モバイルの見た目を変えないこと。** フッタは3タブのままで、
- *      デスクトップ専用の画面はそこに混ざらない。
+ *   1. モバイルのフッタにデスクトップ専用の画面を混ぜないこと。
  *   2. **⌘K が入力欄の中で発火しないこと。** 書きかけを消してパレットが開くのは事故である。
  */
 
@@ -365,16 +364,15 @@ describe('⌘K の置き場所', () => {
   })
 })
 
-describe('モバイルを変えていないこと', () => {
-  /** ★ components/nav.test.ts と対になる防壁。デスクトップの画面をタブに混ぜない */
-  it('タブは3つのまま', () => {
-    expect(TABS).toHaveLength(3)
-    expect(TABS.map(t => t.href)).toEqual(['/', '/drills', '/records'])
+describe('モバイルナビゲーション', () => {
+  it('検索を含む4つのタブがある', () => {
+    expect(TABS).toHaveLength(4)
+    expect(TABS.map(t => t.href)).toEqual(['/', '/drills', '/textbook', '/research'])
   })
 
   /**
    * ★ ここは型でも守られている。`TABS.map(t => t.href)` の型は
-   *   `'/' | '/drills' | '/records'` に固定されるので、DESK の href を
+   *   `'/' | '/drills' | '/textbook' | '/research'` に固定されるので、DESK の href を
    *   `Set.has()` に渡すと **tsc が落ちる**（重なりが無いことの証明になる）。
    *   実行時にも見ておくのは、どちらかを `string[]` に緩めたときのためである。
    */

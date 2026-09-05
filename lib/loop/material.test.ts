@@ -282,6 +282,14 @@ dbSuite('教材の閲覧と読了（実DB）', () => {
       expect(rows[0]!.unitLabel).toBeTruthy()
     })
 
+    it('他人の特訓IDから単元を見られない', async () => {
+      const { drillId } = await createDrill(db, {
+        userId, title: '古代オリエント', unitIds: [UNIT], deadline: DEADLINE,
+      })
+      const other = await createUser(db, NOW)
+      expect(await drillMaterials(db, other, drillId)).toEqual([])
+    })
+
     it('配信できる教材があれば ready と読了数を返す', async () => {
       const { drillId } = await createDrill(db, {
         userId, title: '古代オリエント', unitIds: [UNIT], deadline: DEADLINE,

@@ -39,7 +39,7 @@ export default async function Research({
   const { q = '' } = await searchParams
 
   if (!db || !userId) {
-    return <Screen title="調べる" tab="research"><NotReady /></Screen>
+    return <Screen title="検索" tab="research"><NotReady /></Screen>
   }
 
   const result = q.trim() === '' ? null : await runResearch(db, q, { userId })
@@ -49,7 +49,7 @@ export default async function Research({
     : []
 
   return (
-    <Screen title="調べる" tab="research">
+    <Screen title="検索" tab="research">
       <Card>
         <span className="lv-label">語を入れて調べる</span>
         <form className="hs-report__row" method="get">

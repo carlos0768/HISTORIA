@@ -23,7 +23,7 @@ export default function Offline() {
           電波が戻ると、いつもどおり使えます。
         </p>
         <p className="lv-caption">
-          読んだことのある教材と、最後に見た記録は、オフラインでも開けます。
+          読んだことのある教材と、最後に見た教科書は、オフラインでも開けます。
           出題だけは電波が要ります（採点をサーバーで行うため、
           正解を端末に置かない設計にしています）。
         </p>
@@ -31,7 +31,7 @@ export default function Offline() {
 
       <Card>
         <span className="lv-label">いま開けるもの</span>
-        <Link className="lv-btn lv-btn--block" href="/records">記録を見る</Link>
+        <Link className="lv-btn lv-btn--block" href="/textbook">教科書を見る</Link>
         <Link className="lv-btn lv-btn--block" href="/">もう一度ためす</Link>
       </Card>
     </Screen>

@@ -168,7 +168,7 @@ function load(): Harness {
   }
 }
 
-const pages = (h: Harness) => [...(h.caches.store.get('historia-pages-v1')?.keys() ?? [])]
+const pages = (h: Harness) => [...(h.caches.store.get('historia-pages-v2')?.keys() ?? [])]
 
 describe('Service Worker', () => {
   let sw: Harness
@@ -202,7 +202,7 @@ describe('Service Worker', () => {
     /** ★ 通信できなくても、保存済みの出題を出さない。/offline に落とす */
     it('オフラインの /study は保存済みを出さず /offline に落とす', async () => {
       // 先に無理やり保存させても
-      const c = await sw.caches.api.open('historia-pages-v1')
+      const c = await sw.caches.api.open('historia-pages-v2')
       await c.put(req('/study'), res('出題の残骸'))
       sw.offline()
       const r = await sw.handle(req('/study'))
@@ -221,9 +221,9 @@ describe('Service Worker', () => {
       expect(r!.body).toBe('教材の本文')
     })
 
-    it('/records は保存する', async () => {
-      await sw.handle(req('/records'))
-      expect(pages(sw)).toEqual([`${ORIGIN}/records`])
+    it('/textbook は保存する', async () => {
+      await sw.handle(req('/textbook'))
+      expect(pages(sw)).toEqual([`${ORIGIN}/textbook`])
     })
 
     /**
@@ -308,7 +308,7 @@ describe('Service Worker', () => {
     it('個人の内容の消去では消えない（アプリの部品なので消す理由がない）', async () => {
       await sw.handle(req('/_next/static/chunks/x.js', { mode: 'no-cors' }))
       await sw.message({ type: 'purge' })
-      expect([...(sw.caches.store.get('historia-static-v1')?.keys() ?? [])]).toHaveLength(1)
+      expect([...(sw.caches.store.get('historia-static-v2')?.keys() ?? [])]).toHaveLength(1)
     })
   })
 
@@ -381,7 +381,7 @@ describe('Service Worker', () => {
 
   describe('通知を押したとき', () => {
     it('開いている窓があればそれを使う（同じ画面を何枚も開かない）', async () => {
-      sw.openWindows([`${ORIGIN}/records`])
+      sw.openWindows([`${ORIGIN}/textbook`])
       await sw.notificationClick({ url: '/study' })
       expect(sw.navigated).toEqual(['/study'])
       expect(sw.opened).toEqual([])
