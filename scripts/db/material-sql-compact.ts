@@ -73,13 +73,19 @@ WITH input AS (SELECT ${DATA}::jsonb AS d),
 src AS (SELECT e.* FROM input, jsonb_array_elements(input.d) AS e(v)),
 ins AS (
   INSERT INTO material (id, user_id, unit_id, title, provider, model, prompt_version,
-                        status, input_tokens, output_tokens, generated_at, human_edit_log)
+                        status, input_tokens, output_tokens, generated_at, human_edit_log,
+                        supersedes_id)
   SELECT gen_random_uuid(), NULL, v->>'unit_id', v->>'title', 'authored', 'claude-code',
          ${lit(MATERIAL_PROMPT_VERSION)}, 'ready', 0, 0, now(),
          jsonb_build_array(jsonb_build_object(
            'at', now()::text, 'by', 'author', 'action', 'seed_authored_material',
            'note', ${lit('層3（別系統モデルによる二次照合）を実施していない。作者の判断で配信する')},
-           'source', 'seed/material', 'sha256_12', v->>'sha', 'chars', (v->>'chars')::int))
+           'source', 'seed/material', 'sha256_12', v->>'sha', 'chars', (v->>'chars')::int)),
+         -- ★ 1文目で退けた版を控える。material-sql.ts と同じ規則にする。
+         --   経路によって来歴が欠けると、入れ替わりを追えなくなる
+         (SELECT m2.id FROM material m2
+           WHERE m2.unit_id = v->>'unit_id' AND m2.user_id IS NULL AND m2.status = 'superseded'
+           ORDER BY m2.generated_at DESC, m2.id DESC LIMIT 1)
     FROM src
   RETURNING id, unit_id),
 sec AS (

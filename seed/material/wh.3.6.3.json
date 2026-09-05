@@ -457,35 +457,15 @@
       "section_ord": 3
     },
     {
-      "kind": "event",
-      "text": "ウェストファリア条約により、神聖ローマ帝国内の諸侯にほぼ完全な主権が認められました。",
-      "subject": "ウェストファリア条約",
-      "section_ord": 3
-    },
-    {
       "kind": "person",
       "text": "ホッブズはリヴァイアサンで絶対王政を理論面から支えました。",
       "subject": "ホッブズ",
       "section_ord": 3
     },
     {
-      "kind": "year",
-      "text": "ホッブズのリヴァイアサンは1651年に刊行されました。",
-      "subject": "ホッブズのリヴァイアサン",
-      "year_from": 1651,
-      "section_ord": 3
-    },
-    {
       "kind": "causal",
       "text": "ナントの王令の廃止によって、ユグノーが国外へ流出し経済に打撃を与えました。",
       "subject": "ナントの王令の廃止",
-      "section_ord": 3
-    },
-    {
-      "kind": "year",
-      "text": "ナントの王令は1685年に廃止されました。",
-      "subject": "ナントの王令の廃止",
-      "year_from": 1685,
       "section_ord": 3
     },
     {
@@ -500,29 +480,6 @@
       "text": "オランダ東インド会社は1602年に設立され、世界初の株式会社とされます。",
       "subject": "オランダ東インド会社の設立",
       "year_from": 1602,
-      "section_ord": 3
-    },
-    {
-      "kind": "year",
-      "text": "航海法は1651年に制定されました。",
-      "subject": "航海法",
-      "year_from": 1651,
-      "section_ord": 3
-    },
-    {
-      "kind": "year",
-      "text": "イギリス・オランダ戦争は1652年から1674年まで3次にわたって起こりました。",
-      "subject": "イギリス・オランダ戦争",
-      "year_from": 1652,
-      "year_to": 1674,
-      "section_ord": 3
-    },
-    {
-      "kind": "year",
-      "text": "スペイン継承戦争は1701年から1713年まで続きました。",
-      "subject": "スペイン継承戦争",
-      "year_from": 1701,
-      "year_to": 1713,
       "section_ord": 3
     },
     {
@@ -545,13 +502,6 @@
       "subject": "北方戦争",
       "year_from": 1700,
       "year_to": 1721,
-      "section_ord": 3
-    },
-    {
-      "kind": "year",
-      "text": "ニスタット条約は1721年に結ばれ、バルト海の覇権がロシアへ移りました。",
-      "subject": "ニスタット条約",
-      "year_from": 1721,
       "section_ord": 3
     },
     {
@@ -608,13 +558,6 @@
     },
     {
       "kind": "year",
-      "text": "責任内閣制は1721年にウォルポールのもとで成立しました。",
-      "subject": "責任内閣制の成立",
-      "year_from": 1721,
-      "section_ord": 3
-    },
-    {
-      "kind": "year",
       "text": "第2次ウィーン包囲は1683年に行われ、失敗に終わりました。",
       "subject": "第2次ウィーン包囲",
       "year_from": 1683,
@@ -625,13 +568,6 @@
       "text": "ネルチンスク条約は1689年に結ばれ、清とロシアの国境を定めました。",
       "subject": "ネルチンスク条約",
       "year_from": 1689,
-      "section_ord": 4
-    },
-    {
-      "kind": "year",
-      "text": "レパントの海戦は1571年に起こりました。",
-      "subject": "レパントの海戦",
-      "year_from": 1571,
       "section_ord": 4
     },
     {

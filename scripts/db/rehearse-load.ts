@@ -16,9 +16,11 @@
  * ★ 本番には触れない。接続先は TEST_DATABASE_URL の隣に作る使い捨ての DB だけ。
  */
 import { execFileSync } from 'node:child_process'
+import { readdirSync } from 'node:fs'
 import postgres from 'postgres'
 import { applySchema } from './schema'
 import { seedMasters, seedKc, SEED_DIR } from './seed'
+import { AUTHORED_DIR } from '@/lib/ai/authored'
 import { materialView } from '@/lib/loop/material'
 import { materialLibrary } from '@/lib/loop/library'
 
@@ -45,8 +47,16 @@ await db`
   VALUES (${USER}, '予行演習', '2008-12-08', true, 'x@example.com', now(), 'v1', now())`
 
 /** material-sql.ts を呼ぶ。id は毎回ランダムなので、呼ぶたびに別の版になる */
+// ★ 投入器は2本ある（1行ずつ入れる material-sql.ts と、jsonb でまとめる
+//   material-sql-compact.ts）。**両方をここで試せるようにする。**
+//   片方だけ演習すると、もう片方に来歴の欠けが残る（実際に残っていた）。
+const GEN = process.argv.includes('--compact')
+  ? 'scripts/db/material-sql-compact.ts' : 'scripts/db/material-sql.ts'
+// compact 版は単元を明示しないと動かない（既定で全部ではない）ので、ここで並べる
+const UNITS = readdirSync(AUTHORED_DIR).filter(f => f.endsWith('.json'))
+  .map(f => f.replace(/\.json$/, '')).sort()
 const gen = () =>
-  execFileSync('npx', ['tsx', 'scripts/db/material-sql.ts', '--user', USER],
+  execFileSync('npx', ['tsx', GEN, '--user', USER, ...UNITS],
     { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] })
 
 // ★ 生成される SQL は BEGIN 〜 COMMIT で包まれている（全部入るか全部入らないか）。
