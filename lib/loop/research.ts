@@ -23,6 +23,7 @@
 import type { Sql } from 'postgres'
 import type { Client } from '@/lib/ai/client'
 import { EMBED_DIMENSIONS } from '@/lib/ai/gemini'
+import type { PolityMatch } from './territory-search'
 
 export type HitKind = 'kc' | 'event' | 'section'
 
@@ -70,6 +71,8 @@ export type ResearchResponse =
       sections: ResearchHit[]
       /** 出来事（正典）と知識項目（KC）。節の理解を助ける関連 */
       hits: ResearchHit[]
+      /** 版図（国家）。先頭が主、残りが候補。無ければ空 */
+      polities: PolityMatch[]
     }
   | { ok: false; error: string }
 

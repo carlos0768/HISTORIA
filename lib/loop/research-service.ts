@@ -20,6 +20,7 @@ import { createClient, type Client } from '@/lib/ai/client'
 import { BudgetExceededError } from '@/lib/ai/budget'
 import { assertNoIdentifiers } from '@/lib/ai/redact'
 import { parseQuery, research, embedCoverage, type ResearchResponse } from './research'
+import { polityVectors, rankPolities, pickPolities } from './territory-search'
 
 export async function runResearch(
   db: Sql,
@@ -59,6 +60,14 @@ export async function runResearch(
   const { sections, hits } = await research(db, { query, vector, userId: opts.userId ?? null })
   const mode = vector === null ? 'text' : 'hybrid'
 
+  // ★ 版図（国家）も同じベクトルで引く。国家の埋め込みはプロセス内に一度だけ作る。
+  //   作れなければ語の一致だけに落とし、検索そのものは止めない
+  let vectors: number[][] | null = null
+  if (vector !== null) {
+    try { vectors = await polityVectors(db, client, now) } catch { vectors = null }
+  }
+  const polities = pickPolities(rankPolities(query, vectors === null ? null : vector, vectors))
+
   // ベクトルは作れたのに近傍が1件も無い＝索引がまだ空。黙って「語の一致だけ」の顔をしない
   if (mode === 'hybrid' && [...sections, ...hits].every(h => h.similarity === null)) {
     const c = await embedCoverage(db)
@@ -67,5 +76,5 @@ export async function runResearch(
     }
   }
 
-  return { ok: true, query, mode, note, sections, hits }
+  return { ok: true, query, mode, note, sections, hits, polities }
 }
