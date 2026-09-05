@@ -244,6 +244,8 @@ dbSuite('教材の中の「調べる」（実DB）', () => {
     expect(r.mode).toBe('text')
     expect(r.note).toMatch(/鍵が無い/)
     expect(r.hits.map(h => h.id)).toEqual(['kc.islam.umayyad_vs_abbasid', 'ce.umayyad'])
+    // 版図も語の一致で当たる（鍵が無いので近さは無い）
+    expect(r.polities[0]).toMatchObject({ id: 'umayyad', textMatch: true, similarity: null })
   })
 
   it('入口: 空や長すぎる語は理由つきで断る', async () => {

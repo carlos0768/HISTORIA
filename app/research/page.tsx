@@ -6,11 +6,15 @@ import { NotReady } from '@/components/not-ready'
 import { ResearchResults } from '@/components/research-results'
 import { runResearch } from '@/lib/loop/research-service'
 import { QUERY_MAX_CHARS } from '@/lib/loop/research'
+import { polityById } from '@/lib/map/territories'
+import { TerritoryPanel } from '@/components/territory-player'
 
 export const dynamic = 'force-dynamic'
 
 /** 最初に押せる語。空の画面に「何を入れればよいか」を示す */
 const EXAMPLES = ['アッバース朝', 'ハンムラビ法典', '宗教改革', 'アヘン戦争', '冷戦'] as const
+/** 版図の例。国名を入れると版図の再生が出ることを示す */
+const TERRITORY_EXAMPLES = ['オスマン帝国', 'ローマ帝国', 'モンゴル帝国', '大英帝国'] as const
 
 /**
  * 調べる（docs/11-ux.md §4.1）
@@ -39,6 +43,10 @@ export default async function Research({
   }
 
   const result = q.trim() === '' ? null : await runResearch(db, q, { userId })
+  // ★ 版図（国家）は runResearch が同じベクトルで引いている。先頭が主、残りが候補
+  const polities = result?.ok
+    ? result.polities.flatMap(m => { const p = polityById(m.id); return p ? [{ polity: p, match: m }] : [] })
+    : []
 
   return (
     <Screen title="調べる" tab="research">
@@ -52,18 +60,33 @@ export default async function Research({
         </form>
         <p className="lv-caption">
           教科書（生成した教材の本文）から該当する節を引き、関連する出来事と知識項目（KC）も並べて、
-          地域を地図に、年代を年表に置きます。
+          地域を地図に、年代を年表に置きます。国名を入れると、その国の版図の移り変わりを再生できます。
           意味の近い項目を引くため、入れた語だけを Google（Gemini API）へ送ります。
           氏名などの個人の情報は入れないでください。
         </p>
         {result === null && (
-          <div className="lv-chips">
-            {EXAMPLES.map(e => (
-              <Link key={e} className="lv-chip" href={`/research?q=${encodeURIComponent(e)}`}>{e}</Link>
-            ))}
-          </div>
+          <>
+            <div className="lv-chips">
+              {EXAMPLES.map(e => (
+                <Link key={e} className="lv-chip" href={`/research?q=${encodeURIComponent(e)}`}>{e}</Link>
+              ))}
+            </div>
+            <span className="lv-label">版図を見る</span>
+            <div className="lv-chips">
+              {TERRITORY_EXAMPLES.map(e => (
+                <Link key={e} className="lv-chip lv-chip--marker" href={`/research?q=${encodeURIComponent(e)}`}>{e}</Link>
+              ))}
+            </div>
+          </>
         )}
       </Card>
+
+      {/* 版図。国名が当たったときだけ。検索の結果より先に出す（国名で来た人はこれを見に来ている） */}
+      {polities.length > 0 && (
+        <Card>
+          <TerritoryPanel items={polities} />
+        </Card>
+      )}
 
       {result && (
         <div className="hs-research">
