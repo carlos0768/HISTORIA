@@ -41,20 +41,30 @@ async function readOnlyStore() {
 /**
  * ログインしている利用者を返す。していなければ null。
  *
- * ★ getSession() ではなく getUser() を使う。
+ * ★ getSession() ではなく getClaims() を使う。
  *   getSession() は cookie を読むだけで署名を検証しないため、サーバー側で信用してはいけない。
- *   getUser() は認証サーバーに問い合わせて確かめる。
+ *   getClaims() は JWT の署名を公開鍵（JWKS）で検証してから claims を返す。
+ *
+ * ★ getUser() から getClaims() に替えた理由は速さである。
+ *   getUser() は**画面を描くたび・Server Action を呼ぶたび**に認証サーバーへ往復していた。
+ *   proxy.ts でも同じ往復をしていたので、1 回の遷移で 2 往復、
+ *   出題では 1 問答えるごとに 1 往復ぶん待たされていた。
+ *   getClaims() は署名をその場で検証する。JWKS は @supabase/auth-js が
+ *   プロセス全体で 10 分キャッシュするので、往復は 10 分に 1 回で済む。
+ *   鍵が対称（旧来の HS256）なら getUser() に自動で落ちるので、正しさは変わらない。
  *
  * ★ React の cache() で1回の描画のあいだ記憶する。
- *   1画面から何度呼んでも認証サーバーへの往復は1回で済む。
+ *   1画面から何度呼んでも検証は1回で済む。
  */
 export const verifySession = cache(async (): Promise<Session | null> => {
   const env = authEnv()
   if (!env) return null              // 環境変数が無い＝認証を使わない構成
   const supabase = createAuthClient(env, await readOnlyStore())
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data.user) return null
-  return { userId: data.user.id, email: data.user.email ?? null }
+  const { data, error } = await supabase.auth.getClaims()
+  if (error || !data) return null
+  const { sub, email } = data.claims
+  if (typeof sub !== 'string' || sub === '') return null
+  return { userId: sub, email: typeof email === 'string' ? email : null }
 })
 
 /**
