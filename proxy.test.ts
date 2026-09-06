@@ -12,9 +12,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
-const getUser = vi.fn()
+const getClaims = vi.fn()
 vi.mock('@supabase/ssr', () => ({
-  createServerClient: () => ({ auth: { getUser } }),
+  createServerClient: () => ({ auth: { getClaims } }),
 }))
 
 // vi.mock は巻き上げられるので、この import で差し替え済みのものが入る
@@ -22,12 +22,12 @@ const { default: proxy } = await import('./proxy')
 
 const req = (path: string) => new NextRequest(`https://historia.example${path}`)
 
-const loggedIn = () => getUser.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
-const loggedOut = () => getUser.mockResolvedValue({ data: { user: null }, error: null })
+const loggedIn = () => getClaims.mockResolvedValue({ data: { claims: { sub: 'u1' } }, error: null })
+const loggedOut = () => getClaims.mockResolvedValue({ data: null, error: null })
 
 describe('proxy（未認証の遮断）', () => {
   beforeEach(() => {
-    getUser.mockReset()
+    getClaims.mockReset()
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://project.supabase.co')
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon-key')
   })
@@ -60,7 +60,7 @@ describe('proxy（未認証の遮断）', () => {
         const res = await proxy(req(path))
         expect(res.status).toBe(200)
         // 素通りさせる経路では認証サーバーに問い合わせない（無駄な往復をしない）
-        expect(getUser).not.toHaveBeenCalled()
+        expect(getClaims).not.toHaveBeenCalled()
       })
 
     it('/auth/callback?code=… のような下位経路も開ける', async () => {
@@ -87,7 +87,7 @@ describe('proxy（未認証の遮断）', () => {
       //   DB も鍵も無い Vercel のプレビューが全ページ 404 になり、意匠を確認できない
       const res = await proxy(req('/study'))
       expect(res.status).toBe(200)
-      expect(getUser).not.toHaveBeenCalled()
+      expect(getClaims).not.toHaveBeenCalled()
     })
   })
 

@@ -26,6 +26,17 @@ export default async function Home() {
 
   const now = new Date()
 
+  // ★ 診断の有無と本文の問い合わせは互いに依存しない。まとめて1往復で引く。
+  //   「診断が無ければ本文は要らない」と直列にしていたが、診断済みの人（常連）が
+  //   毎回 1 往復ぶん余計に待つことになる。未診断の人が使わない結果を引く費用は、
+  //   特訓が無いので空の結果が返るだけで、ほぼ無い。
+  const [tookDiagnostic, plan, drills, days] = await Promise.all([
+    hasDiagnostic(db, userId),
+    todaysPlan(db, userId, now, DEFAULT_MAX_DAILY),
+    drillProgressList(db, userId, now),
+    streak(db, userId, now),
+  ])
+
   /**
    * ★ 診断が未了なら、ホームは診断の導線だけを出す（docs/11-ux.md:80）。
    *   弱点は確認テストから生まれ、確認テストは特訓の中にあり、特訓の教材は
@@ -36,7 +47,7 @@ export default async function Home() {
    * ★ ただし**素通りできる**ようにする。共有プールが未承認だと診断は始められず、
    *   そこで足止めすると特訓も教材も使えなくなる。
    */
-  if (!await hasDiagnostic(db, userId)) {
+  if (!tookDiagnostic) {
     return (
       <Screen title="HISTORIA" tab="home">
         <Card>
@@ -56,12 +67,6 @@ export default async function Home() {
       </Screen>
     )
   }
-
-  const [plan, drills, days] = await Promise.all([
-    todaysPlan(db, userId, now, DEFAULT_MAX_DAILY),
-    drillProgressList(db, userId, now),
-    streak(db, userId, now),
-  ])
 
   // ★ 作る前に言う。鍵が無いと resolveProvider が黙ってフェイクに落ちるので、
   //   作ってから気づくと、でたらめな本文を読んだあとになる
