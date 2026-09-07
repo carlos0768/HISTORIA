@@ -20,6 +20,7 @@ import { parseMaterialOutput } from '@/lib/ai/schema'
 import { AUTHORED_DIR } from '@/lib/ai/authored'
 import { MATERIAL_PROMPT_VERSION } from '@/lib/ai/prompt'
 import { GUESS } from '@/lib/domain/params'
+import { bodyTextLength } from '@/lib/domain/markup'
 
 const argv = process.argv.slice(2)
 const at = argv.indexOf('--user')
@@ -44,8 +45,10 @@ const payload = units.map(unitId => {
     unit_id: unitId,
     title: m.title,
     sha: createHash('sha256').update(text).digest('hex').slice(0, 12),
-    chars: m.sections.reduce((n, s) => n + s.body_md.length, 0),
-    sections: m.sections.map(s => ({ ord: s.ord, heading: s.heading, body: s.body_md, kcs: s.kc_ids })),
+    chars: m.sections.reduce((n, s) => n + bodyTextLength(s.body_md), 0),
+    // ★ 字数は JS 側で数えて渡す。SQL の length() はマークの記号まで数える
+    sections: m.sections.map(s => ({ ord: s.ord, heading: s.heading, body: s.body_md,
+                                     chars: bodyTextLength(s.body_md), kcs: s.kc_ids })),
     mcqs: m.mcqs.map(q => ({ stem: q.stem, choices: q.choices, answer: q.answer_key,
                              expl: q.explanation, kcs: q.kc_ids })),
     cards: m.flashcards.map(f => ({ front: f.front, back: f.back, kcs: f.kc_ids })),
@@ -96,7 +99,7 @@ ins AS (
 sec AS (
   INSERT INTO material_section (id, material_id, ord, heading, body_md, char_count)
   SELECT gen_random_uuid(), ins.id, (s->>'ord')::smallint, s->>'heading', s->>'body',
-         length(s->>'body')
+         (s->>'chars')::int
     FROM src JOIN ins ON ins.unit_id = src.v->>'unit_id',
          jsonb_array_elements(src.v->'sections') AS s
   RETURNING id, material_id, ord),

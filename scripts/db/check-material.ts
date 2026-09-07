@@ -17,6 +17,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { parseMaterialOutput } from '@/lib/ai/schema'
 import { AUTHORED_DIR } from '@/lib/ai/authored'
+import { bodyTextLength, importantMarkProblems, IMPORTANT_RE } from '@/lib/domain/markup'
 import { readCsv } from './csv'
 import { SEED_DIR } from './seed'
 
@@ -55,17 +56,24 @@ for (const unitId of files) {
   }
   const m = parsed.data
 
-  // ---- 字数 ----
-  const chars = m.sections.map(s => s.body_md.length)
+  // ---- 字数（重要箇所のマーク `==` は数えない。lib/domain/markup.ts） ----
+  const chars = m.sections.map(s => bodyTextLength(s.body_md))
   const total = chars.reduce((a, b) => a + b, 0)
   m.sections.forEach((s, i) => {
     const [lo, hi] = SECTION_RANGE[i]!
-    if (s.body_md.length < lo || s.body_md.length > hi) {
-      problems.push(`§${s.ord} が ${s.body_md.length}字（${lo}〜${hi}）`)
+    if (chars[i]! < lo || chars[i]! > hi) {
+      problems.push(`§${s.ord} が ${chars[i]}字（${lo}〜${hi}）`)
     }
   })
   if (total < TOTAL_RANGE[0] || total > TOTAL_RANGE[1]) {
     problems.push(`合計 ${total}字（${TOTAL_RANGE[0]}〜${TOTAL_RANGE[1]}）`)
+  }
+
+  // ---- 重要箇所のマーク ----
+  // ★ 解釈できない `==` は画面にそのまま出る。投入前にここで落とす
+  const marks = m.sections.map(s => [...s.body_md.matchAll(IMPORTANT_RE)].length)
+  for (const s of m.sections) {
+    for (const p of importantMarkProblems(s.body_md)) problems.push(`§${s.ord} のマーク: ${p}`)
   }
 
   // ---- KC が実在し、その単元のものか ----
@@ -107,6 +115,7 @@ for (const unitId of files) {
   // ---- 出力 ----
   console.log(`  題       : ${m.title}（${m.title.length}字）`)
   console.log(`  本文     : ${total}字  [${chars.join(' / ')}]`)
+  console.log(`  マーク   : ${marks.reduce((a, b) => a + b, 0)}箇所  [${marks.join(' / ')}]`)
   console.log(`  内訳     : フラッシュカード ${m.flashcards.length} / 四択 ${m.mcqs.length} / claims ${m.claims.length}`)
   const kinds = m.claims.reduce<Record<string, number>>((a, c) => ({ ...a, [c.kind]: (a[c.kind] ?? 0) + 1 }), {})
   console.log(`  claims   : ${Object.entries(kinds).map(([k, v]) => `${k} ${v}`).join(' / ')}`)

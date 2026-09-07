@@ -27,6 +27,7 @@ import { parseMaterialOutput } from '@/lib/ai/schema'
 import { AUTHORED_DIR } from '@/lib/ai/authored'
 import { MATERIAL_PROMPT_VERSION } from '@/lib/ai/prompt'
 import { GUESS } from '@/lib/domain/params'
+import { bodyTextLength } from '@/lib/domain/markup'
 
 const argv = process.argv.slice(2)
 const at = argv.indexOf('--user')
@@ -66,7 +67,7 @@ for (const unitId of files) {
   }
   const m = parsed.data
   const materialId = randomUUID()
-  const chars = m.sections.reduce((n, s) => n + s.body_md.length, 0)
+  const chars = m.sections.reduce((n, s) => n + bodyTextLength(s.body_md), 0)
 
   // ★ 来歴。now() を SQL 側で入れたいので jsonb_build_object で組む
   const NOTE = '層3（別系統モデルによる二次照合）を実施していない。作者の判断で配信する'
@@ -104,7 +105,7 @@ for (const unitId of files) {
     const sectionId = randomUUID()
     say(`INSERT INTO material_section (id, material_id, ord, heading, body_md, char_count)`)
     say(`  VALUES (${lit(sectionId)}, ${lit(materialId)}, ${s.ord}, ${lit(s.heading)},`)
-    say(`          ${lit(s.body_md)}, ${s.body_md.length});`)
+    say(`          ${lit(s.body_md)}, ${bodyTextLength(s.body_md)});`)
     for (const kcId of s.kc_ids) {
       say(`INSERT INTO material_section_kc (section_id, kc_id) VALUES (${lit(sectionId)}, ${lit(kcId)})`)
       say(`  ON CONFLICT DO NOTHING;`)
