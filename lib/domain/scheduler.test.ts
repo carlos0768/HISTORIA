@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  repsLeft, remainingReps, dailyPlan, dailyQueue, priority, urgency,
+  repsLeft, remainingReps, dailyPlan, dailyQueue, drillQueue, priority, urgency,
   drillProgress, drillState, overlapRatio, daysBetween,
   DEFAULT_MAX_DAILY, DRILL_COMPLETE_PROGRESS,
   type ScheduledKc, type QueueCandidate,
@@ -274,5 +274,58 @@ describe('daysBetween', () => {
     expect(daysBetween(T0, day(5))).toBe(5)
     expect(daysBetween(T0, new Date(T0.getTime() + 5 * DAY + 3600_000))).toBe(5)
     expect(daysBetween(day(5), T0)).toBe(-5)
+  })
+})
+
+describe('特訓の練習キュー（一問一答＝四択）', () => {
+  const cand = (id: string, o: Partial<QueueCandidate> = {}): QueueCandidate => ({
+    kcId: id, card: card({ dueAt: day(-1) }), status: 'unknown', earliestDeadline: day(30),
+    mastery: 0.3, isMisconception: false, isNew: false, ...o,
+  })
+
+  it('due の復習と新規が先、まだ due でない KC は due_at の近い順で後ろに並ぶ', () => {
+    const q = drillQueue([
+      cand('later-far', { card: card({ dueAt: day(9) }) }),
+      cand('later-near', { card: card({ dueAt: day(2) }) }),
+      cand('fresh', { card: newKcCard(T0), isNew: true }),
+      cand('due', { card: card({ dueAt: day(-3) }) }),
+    ], T0, 10)
+    const ids = q.map(c => c.kcId)
+    expect(ids.slice(0, 2).sort()).toEqual(['due', 'fresh'])
+    expect(ids.slice(2)).toEqual(['later-near', 'later-far'])
+  })
+
+  it('due の中では誤概念・締切・弱さの priority 順（§4.2 と同じ重み）', () => {
+    const q = drillQueue([
+      cand('plain'),
+      cand('miscon', { isMisconception: true }),
+      cand('weak', { mastery: 0.05 }),
+    ], T0, 10)
+    expect(q.map(c => c.kcId)).toEqual(['miscon', 'weak', 'plain'])
+  })
+
+  it('suspended（leech）は due でも先取りでも出さない（04b §7）', () => {
+    const q = drillQueue([
+      cand('leech-due', { card: card({ dueAt: day(-1), suspended: true }) }),
+      cand('leech-later', { card: card({ dueAt: day(5), suspended: true }) }),
+      cand('ok'),
+    ], T0, 10)
+    expect(q.map(c => c.kcId)).toEqual(['ok'])
+  })
+
+  it('上限で打ち切る。打ち切られるのは後ろの先取り分から', () => {
+    const q = drillQueue([
+      cand('later', { card: card({ dueAt: day(4) }) }),
+      cand('due-a'),
+      cand('due-b'),
+    ], T0, 2)
+    expect(q.map(c => c.kcId).sort()).toEqual(['due-a', 'due-b'])
+  })
+
+  it('同点なら kcId で決定的に並ぶ', () => {
+    const a = drillQueue([cand('b'), cand('a'), cand('c')], T0, 10).map(c => c.kcId)
+    const b = drillQueue([cand('c'), cand('a'), cand('b')], T0, 10).map(c => c.kcId)
+    expect(a).toEqual(['a', 'b', 'c'])
+    expect(b).toEqual(a)
   })
 })

@@ -358,14 +358,51 @@ body { margin: 0; background: var(--lv-canvas); }
 
 /* ---- 特訓の学習方法とカード学習 ---- */
 .hs-study-modes,
-.hs-study-session,
-.hs-flashcard { display: flex; flex-direction: column; gap: var(--lv-space-3); }
-.hs-flashcard__answer {
-  padding: var(--lv-space-3) 0;
-  border-top: var(--lv-hairline); border-bottom: var(--lv-hairline);
-}
-.hs-flashcard__answer > * { margin: 0; }
+.hs-study-session { display: flex; flex-direction: column; gap: var(--lv-space-3); }
 .hs-rating-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--lv-space-2); }
+.hs-fc__note { margin: 0; text-align: center; color: var(--lv-muted); }
+.hs-quiz__stem { margin: 0; }
+
+/* ---- フラッシュカード（めくるカード） ----
+   表に問題、裏に答え。タップで Y 軸に回転する。
+   ★ 表裏は同じグリッドのセルに重ねる。absolute で重ねると高さが決まらず、
+     長い問題文が枠から溢れる。grid-area を揃えれば高い方の面に合わせて伸びる。
+   ★ 色はトークンだけ。裏面は台紙色にして「面が変わった」ことを塗りで伝える。 */
+.hs-fc {
+  perspective: 1200px;
+  width: 100%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+.hs-fc__inner {
+  display: grid;
+  width: 100%;
+  min-height: 260px;
+  transform-style: preserve-3d;
+  transition: transform .45s cubic-bezier(.2, .7, .2, 1);
+}
+.hs-fc--flipped .hs-fc__inner { transform: rotateY(180deg); }
+.hs-fc--loading .hs-fc__inner { opacity: .7; }
+.hs-fc__face {
+  grid-area: 1 / 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--lv-space-3);
+  box-sizing: border-box;
+  padding: var(--lv-space-6) var(--lv-space-4);
+  border: var(--lv-border); border-radius: var(--lv-radius);
+  background: var(--lv-paper); color: var(--lv-ink);
+  text-align: center;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+}
+.hs-fc__face--back { transform: rotateY(180deg); background: var(--lv-canvas); }
+.hs-fc__text { margin: 0; font: var(--lv-text-title); overflow-wrap: anywhere; }
+.hs-fc__hint { font: var(--lv-text-caption); color: var(--lv-muted); }
+.hs-fc:hover .hs-fc__face--front { background: var(--lv-canvas); }
+.hs-fc:focus-visible .hs-fc__face { outline: 2px solid var(--lv-accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .hs-fc__inner { transition: none; }
+}
 
 /* ---- 教科書。章と文章だけを静かに並べ、集計用のカードにはしない ---- */
 .hs-textbook { display: flex; flex-direction: column; gap: var(--lv-space-6); }
