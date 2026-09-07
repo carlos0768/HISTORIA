@@ -2,7 +2,8 @@
  * 教材本文の最小限の描画
  *
  * 生成物の body_md は「小見出し・段落・箇条書き・強調」しか使わない（prompts/material_v1.md）。
- * そのぶんだけを React 要素として組み立てる。
+ * それに HISTORIA が足した「重要箇所のマーク」`==語句==` を加えたぶんだけを
+ * React 要素として組み立てる（docs/07 §2.1、lib/domain/markup.ts）。
  *
  * ★ dangerouslySetInnerHTML を使わない。モデルの出力を HTML として解釈させない。
  *   解釈しなければ、注入されようがない（docs/12 §6）。
@@ -10,13 +11,24 @@
  */
 import type { ReactNode } from 'react'
 
-/** **強調** だけを拾う。入れ子は考えない */
+/**
+ * **強調** と ==重要== だけを拾う。入れ子は考えない。
+ * ★ `==` の中に改行や `=` は許さない。閉じ忘れを行の終わりまで赤くしないため
+ */
+const INLINE_RE = /(\*\*[^*]+\*\*|==[^=\n]+==)/g
+
 function inline(text: string, keyPrefix: string): ReactNode[] {
-  return text.split(/(\*\*[^*]+\*\*)/g).filter(s => s !== '').map((part, i) =>
-    part.startsWith('**') && part.endsWith('**') && part.length > 4
-      ? <strong key={`${keyPrefix}-${i}`}>{part.slice(2, -2)}</strong>
-      : <span key={`${keyPrefix}-${i}`}>{part}</span>,
-  )
+  return text.split(INLINE_RE).filter(s => s !== '').map((part, i) => {
+    const key = `${keyPrefix}-${i}`
+    if (part.length > 4 && part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={key}>{part.slice(2, -2)}</strong>
+    }
+    if (part.length > 4 && part.startsWith('==') && part.endsWith('==')) {
+      // 朱の文字。色は app/globals.css の .hs-important
+      return <mark key={key} className="hs-important">{part.slice(2, -2)}</mark>
+    }
+    return <span key={key}>{part}</span>
+  })
 }
 
 export function Markdown({ source }: { source: string }) {

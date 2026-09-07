@@ -388,6 +388,9 @@ body { margin: 0; background: var(--lv-canvas); }
 .hs-prose { display: flex; flex-direction: column; gap: var(--lv-space-3); }
 .hs-prose .lv-body { margin: 0; }
 .hs-prose__list { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+/* 重要箇所（body_md の ==語句==）。朱を文字色に使うときは --lv-accent-ink（docs/11b §2.1）。
+   <mark> の既定の黄色い下地は使わない。蛍光は1画面1箇所の約束がある（同 §2.1） */
+.hs-prose .hs-important { background: none; color: var(--lv-accent-ink); font-weight: inherit; }
 
 
 /* ---- 誤りの報告（docs/08 §5 層4） ---- */

@@ -17,6 +17,7 @@ import {
   MaterialOutput, materialJsonSchema, bodyCharCount, isCharCountOutOfRange, MIN_CHARS, MAX_CHARS,
 } from '@/lib/ai/schema'
 import { guessRateFor } from '@/lib/loop/answer'
+import { bodyTextLength } from '@/lib/domain/markup'
 import { machineCheck, type MachineCheckResult } from './factcheck'
 
 /**
@@ -441,7 +442,7 @@ export async function generateMaterial(
       const sectionId = randomUUID()
       await tx`
         INSERT INTO material_section (id, material_id, ord, heading, body_md, char_count)
-        VALUES (${sectionId}, ${materialId}, ${s.ord}, ${s.heading}, ${s.body_md}, ${s.body_md.length})`
+        VALUES (${sectionId}, ${materialId}, ${s.ord}, ${s.heading}, ${s.body_md}, ${bodyTextLength(s.body_md)})`
       for (const kcId of s.kc_ids) {
         await tx`INSERT INTO material_section_kc (section_id, kc_id) VALUES (${sectionId}, ${kcId})
                  ON CONFLICT DO NOTHING`
