@@ -4,10 +4,13 @@
      <link rel="stylesheet" href="litverse.css">
      <link rel="stylesheet" href="historia-overrides.css">
 
-   目的は2つだけ。
+   目的は3つ。
      A. WCAG 2.1 AA を満たすための最小限の色の付け替え（§1）
      B. HISTORIA 固有のコンポーネント追加（§2）
-   Litverse の意匠（紙・墨・朱・蛍光／等幅／影とグラデーション禁止／4ptグリッド）は変更しない。
+     C. 面の重なり順を伝えるための立体（§3）
+   Litverse の意匠（紙・墨・朱・蛍光／等幅／4ptグリッド）は変更しない。
+   §3 は「影の禁止」だけを読み替える。使う色は墨の透明度違いだけで、
+   配色も比率も文字も動かさない。根拠は §3 の冒頭と docs/11b-design-system.md §2.5。
    根拠と実測値は docs/11b-design-system.md を参照。
    ============================================================ */
 
@@ -80,6 +83,34 @@
     transition-duration: .01ms !important;
   }
 }
+
+/* A-10. リンクの hover 色を「ボタンの形をしたリンク」に持ち込ませない。
+   litverse.css の `.lv-root a:hover { color: var(--lv-accent-press) }` は (0,2,1)、
+   A-1 の `.lv-btn--primary:hover { color: var(--lv-ink) }` は (0,2,0) で、
+   **リンク側が勝つ**。その結果、実測で次のようになっていた。
+
+     <a class="lv-btn lv-btn--primary"> に hover
+       面 = 朱(押下) #DC5A28 ／ 文字 = 朱(押下) #DC5A28  → **1:1（文字が消える）**
+     <a class="lv-btn lv-btn--marker"> に hover   → 2.87:1（AA不合格）
+     <a class="lv-btn"> に hover                  → 3.01:1（AA不合格）
+
+   ホームの「はじめる」も特訓の「勉強する」も <a> なので、画面で最も押させたい
+   ボタンが、指を乗せた瞬間に文字だけ消えていた。ボタンの形をしたリンクは
+   本文中のリンクではないので、hover でも文字は墨のままにする。
+   11b-design-system.md §2.3 の「リンクは下線のみ。色を変えない」とも一致する。 */
+.lv-root a.lv-btn:hover,
+.lv-root a.lv-chip:hover,
+.lv-root a.hs-choice:hover { color: var(--lv-ink); }
+.lv-root a.lv-btn--primary:hover { color: var(--lv-ink); }
+
+/* A-11. ボタンの形をしたリンクの下線を外す。
+   枠・塗り・（§3 の）縁の厚みで既に「押せる」と言えており、その上の下線は
+   情報を足さずに文字を読みにくくするだけである。app/globals.css が
+   サイドバーとタブバーに同じ判断を先に入れている（そこの注記を参照）。
+   本文中のリンクの下線は残す。外すのはボタン・チップ・選択肢だけ。 */
+.lv-root a.lv-btn,
+.lv-root a.lv-chip,
+.lv-root a.hs-choice { text-decoration: none; }
 
 /* A-9. 全幅ボタンが画面から溢れるのを止める。
    .lv-btn は padding 14px 20px と 1.5px の枠を持つが box-sizing の指定が無く、
@@ -172,3 +203,179 @@
   font: 400 12px/1.7 var(--lv-font-ja); color: var(--lv-ink);
 }
 .hs-alert__title { font: 600 12px/1.7 var(--lv-font-ja); color: var(--lv-accent-ink); }
+
+
+/* H-8. 素の入力欄（絞り込みフォームの input / select）。
+   ★ `.lv-input` は 13 箇所で使われているのに、litverse.css・この上書き層・
+     app/globals.css のどこにも定義が無かった。ブラウザ既定のまま描かれており、
+     書体も高さも枠も周りと揃っていない（教材の一覧・年表・設定・管理）。
+   ★ `.lv-field` を当て直すのではなく別に定義する。`.lv-field` は
+     「1行に1つ置く欄」で width:100% を持つため、横に並べる絞り込みには使えない。
+     意匠だけを揃え、寸法は置かれた場所に任せる。
+   ★ min-width:0 を入れる。`.hs-report__row` は flex で、input の既定の
+     最小幅（size 属性由来。実測 170px 前後）に阻まれて縮まず、
+     年表の4欄が 375px の画面から溢れていた。 */
+.lv-input {
+  box-sizing: border-box; min-width: 0; min-height: var(--lv-touch);
+  padding: 10px 12px;
+  border: var(--lv-hairline); border-radius: var(--lv-radius);
+  background: var(--lv-paper); color: var(--lv-ink);
+  font: 400 13px/1.4 var(--lv-font-ja);
+}
+.lv-input::placeholder { color: var(--lv-sub); }
+.lv-input:disabled { background: var(--lv-canvas); color: var(--lv-sub); cursor: not-allowed; }
+
+/* ---------- 3. 立体（elevation） ---------- */
+/* 決定の変更（2026-09-07）。11b-design-system.md §2.1 の
+   「禁止: 影・グラデーション」を、次のとおり読み替える。
+
+     禁止のまま … 装飾のための影（枠の代わりに使う大きなぼかし影）、
+       面を塗るグラデーション、第三の彩度色。
+     許す … **面の重なり順を伝えるためだけ**の影。
+       色は墨(#171512)の透明度違いに限り、新しい色は1つも増やさない。
+
+   理由。罫線だけで全ての境界を作ると、押せるもの・書き込む欄・ただの区切りが
+   同じ 1px の線になり、見ただけでは区別が付かない。罫線は「ここで切れる」は
+   言えるが「これは手前にある」を言えない。層を1段与えると、その区別を
+   文字や色を足さずに済ませられる。紙・墨・朱・蛍光の比率は変わらない。
+
+   迷わないために物理の約束を1つだけ置く。ここから外れる影は書かない。
+
+     押せるもの   → 出っ張る（縁の厚み ＋ 接地影）。押すと 1px 沈む
+     書き込むもの → 凹む（内側の影）
+     面・板       → 浮く（接地影だけ。縁の厚みは持たない ＝ 押せない）
+     行・セル     → 平ら（罫線のまま。ここに影を足すと縞になって読めない）
+
+   段は3つまで。増やすと「どちらが手前か」が言えなくなる。 */
+
+:root {
+  /* 影の濃さ。すべて墨の透明度違いで、色は増やしていない */
+  --lv-shade-1: color-mix(in srgb, var(--lv-ink) 8%, transparent);
+  --lv-shade-2: color-mix(in srgb, var(--lv-ink) 13%, transparent);
+  --lv-shade-3: color-mix(in srgb, var(--lv-ink) 20%, transparent);
+  /* 紙の上端が受ける光。面の「厚み」を 1px だけ示す */
+  --lv-sheen: rgb(255 255 255 / .5);
+
+  /* 面の高さ。1=紙の上の紙 / 2=手前の板 / 3=画面に浮くもの */
+  --lv-lift-1: 0 1px 1px var(--lv-shade-1), 0 3px 6px -3px var(--lv-shade-2);
+  --lv-lift-2: 0 1px 2px var(--lv-shade-1), 0 8px 16px -8px var(--lv-shade-3);
+  --lv-lift-3: 0 2px 6px var(--lv-shade-2), 0 22px 40px -16px var(--lv-shade-3);
+
+  /* 押せるものの縁の厚み（活字キーの側面）。
+     押下時は厚みを 1px に縮めると同時に本体を 1px 下げる。合計 2px は
+     変わらないので、底は机に着いたまま天面だけが沈む。実物の鍵盤と同じ。 */
+  --lv-edge: 0 2px 0 var(--lv-shade-3);
+  --lv-edge-press: 0 1px 0 var(--lv-shade-3);
+  --lv-press-shift: 1px;
+
+  /* 書き込む欄の凹み */
+  --lv-well: inset 0 2px 3px -1px var(--lv-shade-2), inset 0 1px 0 var(--lv-shade-1);
+
+  /* 塗りを持つ面の天面。透明な面では見えないので足しても害が無い */
+  --lv-face: inset 0 1px 0 var(--lv-sheen);
+
+  /* 高さが変わるときの時間。A-8 が reduced-motion で 0 にする */
+  --lv-lift-ease: 120ms cubic-bezier(.2, 0, .2, 1);
+}
+
+/* E-1. 押せるもの ------------------------------------------------ */
+/* ★ 押せる印を持つのは**実際に押せるもの**だけにする。
+     litverse.css の .lv-chip は cursor:pointer を既定で持つが、
+     教材ビューアの見出しラベル（reader.tsx の <span class="lv-chip">）のように
+     押せない使い方もある。要素で絞り、span には高さを与えない。
+   ★ 沈み込みは transform で作る。margin/padding を動かすと行送りが揺れる。 */
+.lv-btn,
+a.lv-chip, button.lv-chip,
+.hs-choice {
+  box-shadow: var(--lv-edge), var(--lv-lift-1);
+  transition: box-shadow var(--lv-lift-ease), transform var(--lv-lift-ease),
+              background-color var(--lv-lift-ease);
+}
+
+/* 塗りのあるボタンの側面には、その色の押下用の階調を使う。
+   朱の側面は朱(押下)、蛍光の側面は蛍光(押下)。既存トークンで足りる。 */
+.lv-btn--primary { box-shadow: var(--lv-face), 0 2px 0 var(--lv-accent-press), var(--lv-lift-1); }
+.lv-btn--marker  { box-shadow: var(--lv-face), 0 2px 0 var(--lv-marker-press), var(--lv-lift-1); }
+
+/* ★ 浮き上がりはポインタのある機械にだけ出す。触る画面では :hover が
+     指を離したあとも残り、押したものが浮いたまま貼り付く。 */
+@media (hover: hover) {
+  .lv-btn:hover, a.lv-chip:hover, button.lv-chip:hover, .hs-choice:hover {
+    box-shadow: var(--lv-edge), var(--lv-lift-2);
+  }
+  .lv-btn--primary:hover { box-shadow: var(--lv-face), 0 2px 0 var(--lv-accent-press), var(--lv-lift-2); }
+  .lv-btn--marker:hover  { box-shadow: var(--lv-face), 0 2px 0 var(--lv-marker-press), var(--lv-lift-2); }
+}
+
+.lv-btn:active, a.lv-chip:active, button.lv-chip:active, .hs-choice:active {
+  transform: translateY(var(--lv-press-shift));
+  box-shadow: var(--lv-edge-press);
+}
+.lv-btn--primary:active { box-shadow: var(--lv-face), 0 1px 0 var(--lv-accent-press); }
+.lv-btn--marker:active  { box-shadow: var(--lv-face), 0 1px 0 var(--lv-marker-press); }
+
+/* ★ 押せないものは平らにする。色（鼠の枠・台紙の面）だけでなく高さでも言う。
+     :hover / :active より**後に**置く。同じ詳細度なので、後勝ちで
+     どの状態でも高さを持たない。 */
+.lv-btn[disabled], .lv-btn--disabled,
+button.lv-chip[disabled],
+.hs-choice[disabled] { box-shadow: none; transform: none; }
+
+/* 判定の済んだ選択肢は押せないが「結果の面」として手前に置く。
+   縁の厚み（＝押せる印）は持たせない。 */
+.hs-choice--correct, .hs-choice--wrong,
+.hs-choice--correct[disabled], .hs-choice--wrong[disabled] {
+  box-shadow: var(--lv-face), var(--lv-lift-1); transform: none;
+}
+
+/* E-2. 書き込むもの ---------------------------------------------- */
+/* 凹ませる。押せるものと向きが逆なので、見ただけで役割が分かれる。 */
+.lv-field, .lv-input { box-shadow: var(--lv-well); }
+/* ★ 焦点時も凹みは残す。ここで平らにすると入力中だけ欄が消えて見える。
+     A-6 の focus-visible リングは outline なので影とは独立に出る。 */
+.lv-field:focus, .lv-input:focus { box-shadow: var(--lv-well); }
+.lv-input:disabled { box-shadow: none; }
+.lv-check__box { box-shadow: var(--lv-well); }
+.lv-check__box--on { box-shadow: var(--lv-face), 0 1px 0 var(--lv-accent-press); }
+
+/* E-3. 面・板 ---------------------------------------------------- */
+/* 接地影だけを持つ。縁の厚みは持たない。 */
+.lv-card { box-shadow: var(--lv-face), var(--lv-lift-1); }
+.lv-promo { box-shadow: var(--lv-face), var(--lv-lift-2); }
+.hs-alert, .hs-video, .hs-empty { box-shadow: var(--lv-lift-1); }
+
+/* 画面の上端・下端に貼り付く帯。中身がこの裏を通り抜けるので、
+   影の**向き**だけで「どちらが手前か」を言う。
+   ★ 実線の影は足さない。両者とも既に 1px の罫線を持っており、
+     重ねると二重線になる。ぼかした分だけを置く。 */
+.lv-navbar { box-shadow: 0 6px 12px -8px var(--lv-shade-2); }
+.lv-tabbar { box-shadow: 0 -8px 18px -10px var(--lv-shade-2); }
+.hs-status { box-shadow: 0 1px 1px var(--lv-shade-1); }
+.hs-status--unknown { box-shadow: none; }   /* 未測定は「まだ何も無い」。浮かせない */
+
+/* E-4. 計器 ------------------------------------------------------ */
+/* 溝は凹み、溜まった分は出っ張る。 */
+.hs-mastery__track { box-shadow: var(--lv-well); }
+.hs-mastery__fill { box-shadow: inset 0 1px 0 rgb(255 255 255 / .16); }
+.lv-player__track { box-shadow: var(--lv-well); }
+.lv-player__knob { box-shadow: 0 1px 2px var(--lv-shade-3); }
+.lv-player__play, .hs-video__play {
+  box-shadow: var(--lv-face), var(--lv-edge), var(--lv-lift-2);
+  transition: box-shadow var(--lv-lift-ease), transform var(--lv-lift-ease);
+}
+.lv-player__play:active, .hs-video__play:active {
+  transform: translateY(var(--lv-press-shift)); box-shadow: var(--lv-edge-press);
+}
+
+/* E-5. 平らのままにするもの -------------------------------------- */
+/* ここに影を入れると行が縞になり、一覧が読めなくなる。
+   宣言しないのではなく打ち消しておく（将来まとめて影を掛けても崩れない）。 */
+.lv-list__row, .lv-meta__row, .lv-tabbar__item, .lv-divider { box-shadow: none; }
+
+/* E-6. 印刷 ------------------------------------------------------ */
+/* 紙に出すと影はインクの無駄で、罫線だけが要る。 */
+@media print {
+  /* ★ .lv-root 自身も含める。画面の紙（.hs-screen）は .lv-root を兼ねており、
+       子孫セレクタだけでは自分の影が残る。 */
+  .lv-root, .lv-root *, .lv-root *::before, .lv-root *::after { box-shadow: none !important; }
+}

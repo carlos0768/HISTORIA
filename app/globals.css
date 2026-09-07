@@ -61,6 +61,11 @@ body { margin: 0; background: var(--lv-canvas); }
     padding-bottom: env(safe-area-inset-bottom);
     background: var(--lv-paper);
   }
+  /* ★ 画面が 480px より広いとき（タブレット・横向き）は左右に台紙が見える。
+       そこで初めて「台紙の上に置かれた1枚の紙」として読める。
+       ちょうど 480px のときは影が見えないだけで、害は無い。
+       overrides §3 の E-3 と同じ扱い（面は浮く・縁の厚みは持たない）。 */
+  .hs-screen { box-shadow: var(--lv-lift-2); }
 }
 
 @media (min-width: 1024px) {
@@ -72,11 +77,17 @@ body { margin: 0; background: var(--lv-canvas); }
     align-items: stretch;
   }
   /* ★ box-sizing を明示する。設計系の 240 / 320 は**枠と余白を含んだ**幅である。
-     content-box のままだと資料面が 353px になり、12列グリッドの割りが崩れる（実測）。 */
+     content-box のままだと資料面が 353px になり、12列グリッドの割りが崩れる（実測）。
+   ★ 左右の帯は台紙（--lv-canvas）で塗る。トークンの定義そのものが「外側」であり、
+     三分割の左右はまさに本体の外側である。本体だけが紙のまま残るので、
+     罫線を1本も足さずに本体が手前へ出る。
+     墨 on 台紙 = 14.44:1、補助 on 台紙 = 5.57:1 でどちらも AA を満たす
+     （11b-design-system.md §3.1 の実測表と同じ式で計算した）。 */
   .hs-shell__side {
     display: flex; flex-direction: column;
     box-sizing: border-box; flex: 0 0 240px; width: 240px;
     border-right: var(--lv-hairline);
+    background: var(--lv-canvas);
   }
   .hs-shell__aside {
     display: flex; flex-direction: column;
@@ -84,6 +95,13 @@ body { margin: 0; background: var(--lv-canvas); }
     border-left: var(--lv-hairline);
     padding: var(--lv-space-6) var(--lv-space-4);
     gap: var(--lv-space-4);
+    background: var(--lv-canvas);
+  }
+  /* 本体は紙。左右より 1段手前にあることを、色と影の両方で言う */
+  .hs-shell__main {
+    background: var(--lv-paper);
+    box-shadow: 0 0 24px -10px var(--lv-shade-2);
+    z-index: 1;   /* 影を隣の帯の上に出す。z-index が無いと帯に隠れる */
   }
   /* ポインタ前提の調整（設計系の表）。タップ領域 44→32・本文 14→15・見出し 22→26 */
   .hs-shell {
@@ -135,16 +153,20 @@ body { margin: 0; background: var(--lv-canvas); }
   display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px;
   align-items: center;
 }
+/* 探す・選ぶ・年を打つ欄。書き込むものなので凹ませる（overrides §3 の E-2） */
 .hs-atlas-search, .hs-atlas-select, .hs-atlas-year {
   min-height: 44px; box-sizing: border-box;
   border: 1px solid var(--atlas-ink); border-radius: 5px;
   background: color-mix(in srgb, var(--atlas-paper) 94%, transparent);
+  box-shadow: var(--lv-well);
 }
 .hs-atlas-search { display: flex; align-items: center; gap: 10px; padding: 0 13px; }
 .hs-atlas-search > span:first-child { font: 700 24px/1 var(--lv-font-en); transform: rotate(-18deg); }
 .hs-atlas-search input { min-width: 0; width: 100%; border: 0; outline: 0; background: transparent; }
 .hs-atlas-search input::placeholder { color: var(--lv-muted); }
-.hs-atlas-segment { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--atlas-ink); border-radius: 5px; overflow: hidden; }
+/* ★ 帯そのものを1枚のキーとして持ち上げる。中のボタンに個別の影を掛けない
+     （overflow:hidden で切られる上に、隣り合う影が縞になる）。 */
+.hs-atlas-segment { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--atlas-ink); border-radius: 5px; overflow: hidden; box-shadow: var(--lv-face), var(--lv-edge), var(--lv-lift-1); }
 .hs-atlas-segment button { min-width: 70px; min-height: 42px; padding: 0 14px; border: 0; background: transparent; }
 .hs-atlas-segment button + button { border-left: 1px solid var(--atlas-ink); }
 .hs-atlas-segment .is-active { background: var(--atlas-accent); color: var(--atlas-paper); font-weight: 700; }
@@ -178,26 +200,45 @@ body { margin: 0; background: var(--lv-canvas); }
 .hs-atlas-playback, .hs-atlas-yearrail {
   border: 1px solid var(--atlas-ink); border-radius: 5px; padding: 10px 12px;
   background: rgb(252 246 232 / .86);
+  box-shadow: var(--lv-face), var(--lv-lift-1);
 }
 .hs-atlas-playback__buttons { display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 9px; }
-.hs-atlas-playback__buttons button { min-height: 40px; border: 1px solid var(--atlas-ink); border-radius: 4px; background: transparent; }
-.hs-atlas-playback__buttons .is-primary { background: var(--atlas-accent); color: var(--atlas-paper); font-weight: 700; }
+.hs-atlas-playback__buttons button {
+  min-height: 40px; border: 1px solid var(--atlas-ink); border-radius: 4px; background: transparent;
+  box-shadow: var(--lv-edge), var(--lv-lift-1);
+  transition: box-shadow var(--lv-lift-ease), transform var(--lv-lift-ease);
+}
+.hs-atlas-playback__buttons button:active { transform: translateY(var(--lv-press-shift)); box-shadow: var(--lv-edge-press); }
+.hs-atlas-playback__buttons .is-primary {
+  background: var(--atlas-accent); color: var(--atlas-paper); font-weight: 700;
+  box-shadow: var(--lv-face), 0 2px 0 var(--lv-accent-press), var(--lv-lift-1);
+}
+.hs-atlas-playback__buttons .is-primary:active { box-shadow: var(--lv-face), 0 1px 0 var(--lv-accent-press); }
+/* 押せないものは平ら。詳細度 (0,2,1) で .is-primary (0,2,0) にも勝つ */
+.hs-atlas-playback__buttons button:disabled { box-shadow: none; transform: none; }
 .hs-atlas-scrub { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; margin-top: 10px; }
 .hs-atlas-scrub input, .hs-atlas-yearrail input { width: 100%; accent-color: var(--atlas-accent); }
 .hs-atlas-scrub span { font: 700 11px/1 var(--lv-font-en); }
 .hs-atlas-now { display: flex; align-items: center; gap: 12px; margin: 8px 0 0; padding-top: 8px; border-top: 1px solid var(--atlas-ink); }
 .hs-atlas-now mark { padding: 3px 7px; background: var(--atlas-marker); color: var(--atlas-ink); font-weight: 700; white-space: nowrap; }
 
-.hs-atlas__detail { border: 1px solid var(--atlas-ink); border-radius: 5px; min-width: 0; overflow: hidden; align-self: start; }
+.hs-atlas__detail { border: 1px solid var(--atlas-ink); border-radius: 5px; min-width: 0; overflow: hidden; align-self: start; box-shadow: var(--lv-face), var(--lv-lift-1); }
 .hs-atlas-evidence { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; padding: 14px; border-bottom: 1px solid var(--atlas-ink); }
 .hs-atlas-evidence div { display: flex; align-items: center; gap: 10px; }
 .hs-atlas-evidence strong { color: var(--atlas-accent); font-size: 17px; }
 .hs-atlas-evidence strong.is-low { padding: 3px 6px; border: 1px dashed var(--atlas-accent); font-size: 12px; }
 .hs-atlas-evidence__links { justify-self: end; flex-wrap: wrap; justify-content: flex-end; }
 .lv-root .hs-atlas-evidence__links a,
-.lv-root .hs-atlas-year-heading a { border: 1px solid var(--atlas-ink); border-radius: 4px; padding: 4px 9px; color: var(--atlas-ink); text-decoration: none; white-space: nowrap; }
+.lv-root .hs-atlas-year-heading a {
+  border: 1px solid var(--atlas-ink); border-radius: 4px; padding: 4px 9px;
+  color: var(--atlas-ink); text-decoration: none; white-space: nowrap;
+  box-shadow: var(--lv-edge), var(--lv-lift-1);
+  transition: box-shadow var(--lv-lift-ease), transform var(--lv-lift-ease);
+}
+.lv-root .hs-atlas-evidence__links a:active,
+.lv-root .hs-atlas-year-heading a:active { transform: translateY(var(--lv-press-shift)); box-shadow: var(--lv-edge-press); }
 .hs-atlas-evidence p { grid-column: 1 / -1; margin: 0; color: var(--atlas-muted); font-size: 11px; line-height: 1.7; }
-.hs-atlas-switches { display: grid; grid-template-columns: repeat(3, 1fr); margin: 12px; border: 1px solid var(--atlas-ink); border-radius: 4px; overflow: hidden; }
+.hs-atlas-switches { display: grid; grid-template-columns: repeat(3, 1fr); margin: 12px; border: 1px solid var(--atlas-ink); border-radius: 4px; overflow: hidden; box-shadow: var(--lv-face), var(--lv-edge), var(--lv-lift-1); }
 .hs-atlas-switches button { min-height: 40px; padding: 0 4px; border: 0; background: transparent; }
 .hs-atlas-switches button + button { border-left: 1px solid var(--atlas-ink); }
 .hs-atlas-switches .is-active { background: var(--atlas-canvas); font-weight: 700; }
@@ -229,7 +270,7 @@ body { margin: 0; background: var(--lv-canvas); }
 .lv-root .hs-atlas-source a { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; color: var(--atlas-ink); text-decoration: none; border-top: 1px solid var(--atlas-muted); }
 .hs-atlas-source a strong { font-size: 10px; }
 .hs-atlas-source a span, .hs-atlas-source p { margin: 0; color: var(--atlas-muted); font-size: 9px; line-height: 1.65; }
-.lv-root .hs-atlas-learn { display: block; padding: 13px; border-top: 1px solid var(--atlas-ink); background: var(--atlas-marker); color: var(--atlas-ink); text-align: center; text-decoration: none; font-weight: 700; }
+.lv-root .hs-atlas-learn { display: block; padding: 13px; border-top: 1px solid var(--atlas-ink); background: var(--atlas-marker); color: var(--atlas-ink); text-align: center; text-decoration: none; font-weight: 700; box-shadow: var(--lv-face); }
 .hs-atlas-yearrail > div:first-child { display: flex; justify-content: space-between; align-items: center; }
 .hs-atlas-yearrail > div:first-child strong { font: 700 18px/1 var(--lv-font-en); }
 .hs-atlas-yearrail > div:first-child span { color: var(--atlas-muted); }
@@ -238,7 +279,7 @@ body { margin: 0; background: var(--lv-canvas); }
 .hs-atlas-loading { display: grid; place-items: center; gap: 14px; min-height: 65vh; color: var(--atlas-muted); }
 .hs-atlas-loading__globe { width: 96px; height: 96px; border: 1px solid var(--atlas-ink); border-radius: 50%; background: repeating-linear-gradient(90deg, transparent 0 23px, rgb(23 21 18 / .12) 24px 25px); animation: hs-atlas-spin 1.8s linear infinite; }
 @keyframes hs-atlas-spin { to { transform: rotate(360deg); } }
-.hs-atlas-error { border: 1px dashed var(--atlas-accent); padding: 18px; }
+.hs-atlas-error { border: 1px dashed var(--atlas-accent); padding: 18px; box-shadow: var(--lv-lift-1); }
 
 @media (min-width: 760px) and (max-width: 1023px) {
   .hs-screen.hs-shell--workspace { max-width: 960px; }
@@ -259,12 +300,14 @@ body { margin: 0; background: var(--lv-canvas); }
   .hs-atlas-globe__hint { display: none; }
   .hs-atlas-playback__buttons button { font-size: 12px; }
   .hs-atlas__detail { display: contents; }
-  .hs-atlas-evidence { order: 1; border: 1px solid var(--atlas-ink); border-radius: 5px; }
+  /* ★ 根拠欄が display:contents になり、中身がそれぞれ独立した面として並ぶ。
+       枠を持つようになった分だけ、面としての高さも与える。 */
+  .hs-atlas-evidence { order: 1; border: 1px solid var(--atlas-ink); border-radius: 5px; box-shadow: var(--lv-face), var(--lv-lift-1); }
   .hs-atlas-switches { order: 2; margin: 0; }
   .hs-atlas-note { order: 3; margin: -8px 0 0; }
-  .hs-atlas-steps { order: 4; border: 1px solid var(--atlas-ink); border-radius: 5px; padding: 10px; }
-  .hs-atlas-source { order: 5; border: 1px solid var(--atlas-ink); border-radius: 5px; }
-  .lv-root .hs-atlas-learn { order: 6; border: 1px solid var(--atlas-ink); border-radius: 5px; }
+  .hs-atlas-steps { order: 4; border: 1px solid var(--atlas-ink); border-radius: 5px; padding: 10px; box-shadow: var(--lv-face), var(--lv-lift-1); }
+  .hs-atlas-source { order: 5; border: 1px solid var(--atlas-ink); border-radius: 5px; box-shadow: var(--lv-face), var(--lv-lift-1); }
+  .lv-root .hs-atlas-learn { order: 6; border: 1px solid var(--atlas-ink); border-radius: 5px; box-shadow: var(--lv-face), var(--lv-lift-1); }
   .hs-atlas-steps button strong, .hs-atlas-event-row strong { font-size: 12px; }
 }
 
@@ -277,7 +320,11 @@ body { margin: 0; background: var(--lv-canvas); }
   padding: 16px 18px 10px;
   font: 700 10px/1 var(--lv-font-en);
   letter-spacing: .24em; text-transform: uppercase;
-  color: var(--lv-muted);
+  /* ★ 鼠ではなく補助を使う。鼠 on 台紙 = 3.12:1 で本文基準に届かない
+       （鼠 on 紙でも 3.65:1 で足りず、overrides の A-2 が同じ理由で
+       .lv-label を補助に付け替えている。この見出しだけ漏れていた）。
+       補助 on 台紙 = 5.57:1。 */
+  color: var(--lv-sub);
 }
 /* ★ 下線を外す。.lv-root a は本文中のリンクを想定して下線を引くが、
    ナビの項目全てに下線が付くと「押せる」の情報量がゼロになり、ただ読みにくい。
@@ -292,7 +339,10 @@ body { margin: 0; background: var(--lv-canvas); }
   font: 400 13px/1.5 var(--lv-font-ja);
   color: var(--lv-ink);
 }
-.hs-side__item:hover { background: var(--lv-canvas); }
+/* ★ hover は紙へ**明るくする**。帯そのものが台紙になったので、
+     従来の「台紙を敷く」では色が同じになり、hover が見えなくなる。
+     指した項目が手前へ出る向きになり、選択中の朱とも取り違えない。 */
+.hs-side__item:hover { background: var(--lv-paper); }
 
 /* ★ 選択中は朱の塗り＋**墨**の字。設計系（.dc.html）は朱の上に紙色を載せているが、
    紙 on 朱 = 2.70:1 で AA に届かない。overrides の A-1 が .lv-btn--primary で
@@ -301,6 +351,8 @@ body { margin: 0; background: var(--lv-canvas); }
 .lv-root .hs-side__item--active {
   background: var(--lv-accent); color: var(--lv-ink); font-weight: 600;
   border-top: var(--lv-hairline); border-bottom: var(--lv-hairline);
+  /* 台紙の帯から 1段持ち上げる。今どこに居るかが色に頼らず分かる */
+  box-shadow: var(--lv-face), var(--lv-lift-1);
 }
 .lv-root .hs-side__item--active:hover { background: var(--lv-accent); color: var(--lv-ink); }
 
@@ -381,6 +433,8 @@ body { margin: 0; background: var(--lv-canvas); }
 .hs-route-loading__line {
   display: block; width: 100%; height: 12px;
   border: var(--lv-hairline); background: var(--lv-canvas);
+  /* まだ何も乗っていない溝として凹ませる（overrides §3 の E-2 と同じ向き） */
+  box-shadow: var(--lv-well);
 }
 .hs-route-loading__line--short { width: 62%; }
 
@@ -406,19 +460,30 @@ body { margin: 0; background: var(--lv-canvas); }
   display: flex; flex-direction: column; gap: var(--lv-space-2);
   padding: var(--lv-space-3); border: var(--lv-hairline); border-radius: var(--lv-radius-sm);
   background: var(--lv-paper);
+  box-shadow: var(--lv-face), var(--lv-lift-1);
 }
 .hs-report__text {
-  width: 100%; padding: 8px; border: var(--lv-hairline); border-radius: var(--lv-radius-sm);
+  width: 100%; box-sizing: border-box;
+  padding: 8px; border: var(--lv-hairline); border-radius: var(--lv-radius-sm);
   background: var(--lv-paper); color: var(--lv-ink);
   font: 400 13px/1.7 var(--lv-font-ja); resize: vertical;
+  box-shadow: var(--lv-well);   /* 書き込む欄は凹ませる */
 }
-.hs-report__row { display: flex; gap: var(--lv-space-2); }
-.hs-report__row > * { flex: 1; }
+/* ★ 折り返しを許す。この行は報告の2ボタンだけでなく、教材の一覧と年表の
+     絞り込みフォームにも使われている。年表は input が4つあり、狭い画面で
+     一列に詰めると欄が読めない幅まで潰れる。140px を下限に折り返す。
+     720px の本体では4欄とも1行に収まるので、広い画面の見た目は変わらない。 */
+.hs-report__row { display: flex; gap: var(--lv-space-2); flex-wrap: wrap; }
+.hs-report__row > * { flex: 1 1 140px; }
 
 /* ---- 資料テーブル（docs/06-desktop.md 03） ---- */
 /* ★ 横溢れは自前で受ける。画面ごと横スクロールさせない（.hs-screen が
      overflow-wrap: anywhere なので、表だけは別に面倒を見る必要がある）。 */
-.hs-table__scroll { overflow-x: auto; border: var(--lv-hairline); border-radius: var(--lv-radius-sm); }
+/* 表そのものが1枚の面。行（セル）は平らのままにする（overrides §3 の E-5） */
+.hs-table__scroll {
+  overflow-x: auto; border: var(--lv-hairline); border-radius: var(--lv-radius-sm);
+  box-shadow: var(--lv-face), var(--lv-lift-1);
+}
 .hs-table { width: 100%; border-collapse: collapse; background: var(--lv-paper); }
 .hs-table__caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 
@@ -462,12 +527,15 @@ body { margin: 0; background: var(--lv-canvas); }
   border-radius: var(--lv-radius-sm);
   overflow: hidden;
   display: flex; flex-direction: column;
+  /* 画面の上に浮く唯一のもの。3段目を使うのはここと同種のものだけに限る */
+  box-shadow: var(--lv-face), var(--lv-lift-3);
 }
 .hs-palette__input {
   width: 100%; box-sizing: border-box;
   padding: 14px 16px; border: 0; border-bottom: var(--lv-hairline);
   background: var(--lv-paper); color: var(--lv-ink);
   font: 400 15px/1.4 var(--lv-font-ja);
+  box-shadow: var(--lv-well);   /* 書き込む欄は凹ませる */
 }
 .hs-palette__input:focus { outline: none; }
 .hs-palette__list { list-style: none; margin: 0; padding: 0; max-height: 46vh; overflow-y: auto; }
@@ -493,6 +561,8 @@ body { margin: 0; background: var(--lv-canvas); }
 .hs-kbd {
   border: var(--lv-hairline); border-radius: 4px; padding: 3px 6px;
   background: var(--lv-canvas); font: 400 11px/1 var(--lv-font-en);
+  /* 押す物の絵なので、押す物と同じ縁の厚みを持たせる */
+  box-shadow: var(--lv-face), var(--lv-edge);
 }
 
 /* ---- 地図ワークスペース（docs/06-desktop.md 04） ---- */
@@ -502,6 +572,7 @@ body { margin: 0; background: var(--lv-canvas); }
   background: var(--lv-paper); overflow: hidden;
   touch-action: none;   /* パンを自前で扱う。ブラウザのスクロールと取り合わない */
   cursor: grab;
+  box-shadow: var(--lv-face), var(--lv-lift-1);
 }
 .hs-mapws__stage--dragging { cursor: grabbing; }
 .hs-mapws__stage svg { display: block; width: 100%; height: auto; }
@@ -571,6 +642,7 @@ body { margin: 0; background: var(--lv-canvas); }
 .hs-chrono__svg {
   display: block; width: 100%; min-width: 640px; height: auto;
   border: var(--lv-hairline); border-radius: var(--lv-radius-sm); background: var(--lv-paper);
+  box-shadow: var(--lv-lift-1);
 }
 .hs-chrono { overflow-x: auto; }
 .hs-chrono__period { fill: var(--lv-canvas); stroke: var(--lv-ink); stroke-width: 0.5; }
@@ -617,4 +689,7 @@ body { margin: 0; background: var(--lv-canvas); }
   margin-top: var(--lv-space-3); padding: var(--lv-space-3);
   border: var(--lv-hairline); border-radius: var(--lv-radius-sm);
   background: var(--lv-canvas);
+  /* ★ ここだけは**浮かせず凹ませる**。動画の面に彫り込まれた欄として見せると、
+       本文の続きではなく「この動画についての設問」だと分かる。 */
+  box-shadow: inset 0 2px 4px -2px var(--lv-shade-2);
 }
