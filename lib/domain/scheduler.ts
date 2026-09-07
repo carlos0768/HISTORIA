@@ -167,6 +167,38 @@ export function dailyQueue(
 }
 
 /**
+ * 特訓ひとつの練習キュー（一問一答＝四択）。
+ *
+ * 「今日やること」と違い、学習者が特訓を選んで**自分から**練習しに来ている。
+ * だから due が来ていない KC も後ろに並べて、練習を止めない。
+ * ただし順序は SM-2 に従う。
+ *
+ *   1. due になった復習と新規学習を priority 順（§4.2 と同じ重み）
+ *   2. まだ due でない KC を due_at の近い順
+ *
+ * leech（suspended）はここでも出さない（04b §7）。
+ * ★ 復習を先頭に置く理由は dailyQueue と同じ。SM-2 が「今日思い出さないと忘れる」
+ *   と言っている分を、まだ覚えている KC の後ろに回すと間隔反復が壊れる。
+ */
+export function drillQueue(candidates: QueueCandidate[], today: Date, limit: number): QueueCandidate[] {
+  const live = candidates.filter(c => !c.card.suspended)
+  const byPriority = (a: QueueCandidate, b: QueueCandidate) => {
+    const d = priority(b, today) - priority(a, today)
+    return d !== 0 ? d : a.kcId.localeCompare(b.kcId)
+  }
+  const isDue = (c: QueueCandidate) => c.isNew || c.card.dueAt.getTime() <= today.getTime()
+
+  const due = live.filter(isDue).sort(byPriority)
+  const later = live
+    .filter(c => !isDue(c))
+    .sort((a, b) => {
+      const d = a.card.dueAt.getTime() - b.card.dueAt.getTime()
+      return d !== 0 ? d : a.kcId.localeCompare(b.kcId)
+    })
+  return [...due, ...later].slice(0, Math.max(0, limit))
+}
+
+/**
  * 特訓の進捗率（§6）。
  *
  * 「教材を読んだ」は分子に入れない。読んだだけで100%になるなら、このアプリは

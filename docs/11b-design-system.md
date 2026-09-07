@@ -195,6 +195,7 @@ Litverse は読書アプリの語彙で作られている。HISTORIA の機能�
 | `hs-mastery` | 習熟度バー（罫線＋塗り＋数値） | `04-weakness-engine.md` §2 |
 | `hs-status` | 弱点の状態バッジ（unknown / weak / shaky / mastered） | 同上 |
 | `hs-choice` | 四択の選択肢（44px以上・正誤は色＋記号） | `06-assessment.md` §1 |
+| `hs-fc` | フラッシュカード（表に問題・裏に答え。タップで裏返す。裏面は台紙色） | `11-ux.md` §3 |
 | `hs-progress` | 教材のセクション進捗 | `11-ux.md` §4 |
 | `hs-video` | 動画の2クリック埋め込み | `09b-video.md` §5.1 |
 | `hs-empty` | 空状態（罫線の枠と一文のみ。イラストを使わない） | `11-ux.md` §2 |
