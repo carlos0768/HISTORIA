@@ -1,9 +1,30 @@
 import 'server-only'
-import { cache } from 'react'
-import type { AtlasConfidence } from './schema'
+import type { AtlasBundleV1, AtlasConfidence } from './schema'
 import { readAtlasBundle } from './files'
 
-export const loadAtlasBundle = cache(readAtlasBundle)
+/**
+ * 地図の束（出来事 3,500 件・4MB の ndjson）を**プロセスで1回だけ**読む。
+ *
+ * ★ 以前は React の cache() で包んでいたが、あれは1回の描画のあいだしか記憶しない。
+ *   /map を開くたび・/api/atlas を叩くたびに 4MB を読み直して zod で検証し直していたので、
+ *   歴史地球儀への遷移だけが目に見えて遅かった。
+ *   seed/atlas はビルドに含まれる静的な資料で、実行中に変わらない。
+ *   Promise を保持することで、同時に来た要求も 1 回の読み込みを待ち合わせる。
+ *
+ * ★ 失敗は記憶しない。読めなかった Promise を持ち続けると、
+ *   一時的な I/O の失敗がプロセスの寿命のあいだ全ての要求を巻き込む。
+ */
+let bundle: Promise<AtlasBundleV1> | null = null
+
+export function loadAtlasBundle(): Promise<AtlasBundleV1> {
+  if (!bundle) {
+    bundle = readAtlasBundle().catch(error => {
+      bundle = null
+      throw error
+    })
+  }
+  return bundle
+}
 
 export type AtlasEventQuery = {
   q?: string

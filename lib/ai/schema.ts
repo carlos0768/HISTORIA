@@ -11,6 +11,7 @@
  *   応答は必ずこちら側で検証してから使う（docs/13 の判定手順）。
  */
 import { z } from 'zod'
+import { bodyTextLength } from '@/lib/domain/markup'
 
 export const CHOICE_KEYS = ['a', 'b', 'c', 'd'] as const
 
@@ -213,9 +214,12 @@ export function parseMaterialOutput(raw: unknown): ReturnType<typeof MaterialOut
   return MaterialOutput.safeParse(raw)
 }
 
-/** 教材本文の文字数。docs/07 §2 の目標 3,500字に対する実測用 */
+/**
+ * 教材本文の文字数。docs/07 §2 の目標 3,500字に対する実測用
+ * ★ 重要箇所のマーク `==語句==` の記号は数えない（lib/domain/markup.ts）
+ */
 export function bodyCharCount(m: MaterialOutput): number {
-  return m.sections.reduce((n, s) => n + s.body_md.length, 0)
+  return m.sections.reduce((n, s) => n + bodyTextLength(s.body_md), 0)
 }
 
 export const TARGET_CHARS = 3500

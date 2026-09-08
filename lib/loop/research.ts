@@ -20,6 +20,7 @@
  * ★ 個人の情報は一切混ざらない。kc と canon_event は全員が同じものを読む
  *   （RLS で SELECT が全員に開いている）。user_id はここに要らない。
  */
+import { stripImportant } from '@/lib/domain/markup'
 import type { Sql } from 'postgres'
 import type { Client } from '@/lib/ai/client'
 import { EMBED_DIMENSIONS } from '@/lib/ai/gemini'
@@ -139,9 +140,9 @@ export function rankHits(hits: readonly ResearchHit[]): ResearchHit[] {
   })
 }
 
-/** Markdown の記法（見出し・強調・箇条書き）を落として素の文にする */
+/** Markdown の記法（見出し・強調・箇条書き・重要箇所のマーク）を落として素の文にする */
 export function plainText(md: string): string {
-  return md
+  return stripImportant(md)
     .replace(/^#{1,6}\s+/gm, '')
     .replace(/\*\*([^*]+)\*\*/g, '$1')
     .replace(/^\s*[-*]\s+/gm, '')

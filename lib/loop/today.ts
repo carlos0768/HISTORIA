@@ -7,7 +7,7 @@
  */
 import type { Sql } from 'postgres'
 import { dailyQueue, dailyPlan, drillProgress, drillState, DEFAULT_MAX_DAILY,
-         type QueueCandidate, type ScheduledKc } from '@/lib/domain/scheduler'
+         drillQueue, type QueueCandidate, type ScheduledKc } from '@/lib/domain/scheduler'
 import { mastery, masteryStatus, type KcState, type MasteryStatus } from '@/lib/domain/weakness'
 import { newKcCard, type KcCard } from '@/lib/domain/sm2'
 import { requiredDwellExpr } from './material'
@@ -36,13 +36,21 @@ type Row = {
 /**
  * active な特訓の KC を union で1本に集める（§5.1）。
  * 各特訓が独立にノルマを出すと合計が1日8時間になるため、キューは1本にする。
+ *
+ * onlyDrillId を渡すと、その特訓の KC だけに絞る（特訓ごとの練習画面用）。
+ * ★ 絞っても earliest_deadline は**全 active 特訓**の最短で取る。同じ KC が
+ *   別の特訓にも入っているなら、締切の都合はそちらが決めるからである。
  */
-async function loadCandidates(db: Sql, userId: string): Promise<Row[]> {
+async function loadCandidates(db: Sql, userId: string, onlyDrillId?: string): Promise<Row[]> {
+  const only = onlyDrillId
+    ? db`AND EXISTS (SELECT 1 FROM drill_kc x
+                      WHERE x.drill_id = ${onlyDrillId} AND x.kc_id = dk.kc_id)`
+    : db``
   return db<Row[]>`
     WITH active_kc AS (
       SELECT dk.kc_id, min(d.deadline)::timestamptz AS earliest_deadline
         FROM drill d JOIN drill_kc dk ON dk.drill_id = d.id
-       WHERE d.user_id = ${userId} AND d.status = 'active'
+       WHERE d.user_id = ${userId} AND d.status = 'active' ${only}
        GROUP BY dk.kc_id
     )
     SELECT a.kc_id, kc.label AS kc_label, a.earliest_deadline,
@@ -139,6 +147,17 @@ export async function todaysPlan(db: Sql, userId: string, now: Date, maxDaily = 
     need: plan.need,
     daysLeft: plan.daysLeft,
   }
+}
+
+/**
+ * 特訓ひとつの練習キュー（一問一答＝四択）。SM-2 の due 順に KC を並べる。
+ * 呼び出し側はこの順で KC ごとに設問を1つ選ぶ。
+ */
+export async function drillPracticeQueue(
+  db: Sql, userId: string, drillId: string, now: Date, limit: number,
+): Promise<QueueCandidate[]> {
+  const rows = await loadCandidates(db, userId, drillId)
+  return drillQueue(rows.map(r => toCandidate(r, now)), now, limit)
 }
 
 export type DrillProgress = {

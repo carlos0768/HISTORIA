@@ -37,8 +37,19 @@ const isPublic = (path: string): boolean =>
  *   重い確認を入れると全体が遅くなる（Next の作法書 §Authorization）。
  *   本当の防御は lib/auth/dal.ts が担う。
  *
+ * ★ getUser() ではなく getClaims() を使う。
+ *   getUser() は**遷移のたびに**認証サーバーへ往復していた（Vercel と Supabase が
+ *   別の地域にあると 1 往復 150ms 前後）。しかも直後の描画で lib/auth/dal.ts が
+ *   もう一度同じ往復をするので、どの画面も開く前に 2 往復ぶん待たされていた。
+ *   getClaims() は JWT の署名を公開鍵（JWKS）でその場で検証する。JWKS は
+ *   @supabase/auth-js がプロセス全体で 10 分キャッシュするので、往復は
+ *   10 分に 1 回で済む。鍵が対称（旧来の HS256）なら getUser() に自動で落ちるので、
+ *   どちらの構成でも正しさは変わらない。
+ *
  * ★ ただし session の更新はここでしかできない。@supabase/ssr が
  *   「更新した token を書き戻せる場所が無いと、突然ログアウトする」と警告している。
+ *   getClaims() も内部で getSession() を通るので、期限切れの token は
+ *   ここで更新され、setAll から cookie に書き戻される。
  */
 async function authorize(req: NextRequest, res: NextResponse): Promise<boolean> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -56,8 +67,8 @@ async function authorize(req: NextRequest, res: NextResponse): Promise<boolean> 
       },
     },
   })
-  const { data } = await supabase.auth.getUser()
-  return data.user !== null
+  const { data } = await supabase.auth.getClaims()
+  return data !== null
 }
 
 export default async function proxy(req: NextRequest) {
