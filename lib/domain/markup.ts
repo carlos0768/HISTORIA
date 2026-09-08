@@ -15,8 +15,18 @@
  *   ここを通す。3箇所目を作らない。
  */
 
-/** `==語句==`。空・改行またぎ・`=` の入れ子は解釈しない（そのまま文字として出る） */
+/** `==単語==`。空・改行またぎ・`=` の入れ子は解釈しない（そのまま文字として出る） */
 export const IMPORTANT_RE = /==([^=\n]+)==/g
+
+/**
+ * マークできる長さの上限。
+ *
+ * ★ **囲むのは単語であって文ではない。** 最初に全66節へ付けたとき、
+ *   マークの中央値が18字・21字超が810件と、説明の文を丸ごと赤くしてしまった。
+ *   受験生が赤で見たいのは用語・人名・王朝名・条約名・制度名・地名・年号である。
+ *   文を赤くすると、どの語を覚えればよいのかがかえって分からなくなる。
+ */
+export const MAX_IMPORTANT_CHARS = 15
 
 /** マークの記号だけを落とす。中の語句は残る */
 export function stripImportant(md: string): string {
@@ -41,6 +51,9 @@ export function importantMarkProblems(md: string): string[] {
   if (/===/.test(md)) problems.push('=== がある（マークが隣接している）')
   for (const m of md.matchAll(IMPORTANT_RE)) {
     const inner = m[1]!
+    if (inner.length > MAX_IMPORTANT_CHARS) {
+      problems.push(`「${inner.slice(0, 20)}」が ${inner.length}字。単語ではなく文・句である（上限 ${MAX_IMPORTANT_CHARS}字）`)
+    }
     const boldInside = (inner.match(/\*\*/g) ?? []).length
     const boldBefore = (md.slice(0, m.index).match(/\*\*/g) ?? []).length
     if (boldInside % 2 === 1 || boldBefore % 2 === 1) {

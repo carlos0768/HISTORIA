@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bodyTextLength, importantMarkProblems, stripImportant } from './markup'
+import { MAX_IMPORTANT_CHARS, bodyTextLength, importantMarkProblems, stripImportant } from './markup'
 
 describe('重要箇所のマーク ==語句==', () => {
   it('記号だけを落とし、語句は残す', () => {
@@ -14,6 +14,11 @@ describe('重要箇所のマーク ==語句==', () => {
     expect(bodyTextLength('==重要==')).toBe(2)
     expect(bodyTextLength('**強調**')).toBe(6)
     expect(bodyTextLength('あ'.repeat(250) + '==い==')).toBe(251)
+  })
+  it('文・句は長さで落とす（囲むのは単語である）', () => {
+    expect(importantMarkProblems('==ウェストファリア条約==')).toEqual([])
+    expect(importantMarkProblems(`==${'あ'.repeat(MAX_IMPORTANT_CHARS + 1)}==`))
+      .toContainEqual(expect.stringContaining('単語ではなく文・句'))
   })
   it('付け方の誤りを列挙する', () => {
     expect(importantMarkProblems('==正しい==と**強調**')).toEqual([])
