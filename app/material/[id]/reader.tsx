@@ -12,6 +12,7 @@ import { markRead, report, watchVideo, videoRetrieval, answerRetrieval } from '.
 import { ReportButton } from '@/components/report-button'
 import { VideoEmbed } from '@/components/video-embed'
 import type { VideoCard } from '@/lib/loop/video'
+import { researchHref, type LinkedTerm } from '@/lib/domain/term-link'
 
 export type SectionProps = {
   id: string
@@ -28,6 +29,8 @@ export type SectionProps = {
   estimatedMs: number
   /** このセクションの理解を助ける動画。最大2件（docs/09b §7） */
   videos: VideoCard[]
+  /** 本文に出てくる人物・出来事。本文の中でリンクになる（docs/11 §4.2） */
+  terms: LinkedTerm[]
 }
 
 const mmss = (ms: number) => {
@@ -144,7 +147,7 @@ function SectionPane({
             </div>
           ) : (
             <div>
-              <Markdown source={section.bodyMd} />
+              <Markdown source={section.bodyMd} terms={section.terms} />
             </div>
           )}
 
@@ -153,11 +156,12 @@ function SectionPane({
             <WorldMap highlight={section.geoRegionIds} />
           )}
 
-          {/* この節で扱う知識項目 */}
+          {/* この節で扱う知識項目。押すと「調べる」でその語を引く（docs/11 §4.2）。
+              飾りの札にしない ― 本文のリンクと同じ引き先へ、同じ1つの入口で行く */}
           {section.kcLabels.length > 0 && (
             <div className="lv-chips">
               {section.kcLabels.map(l => (
-                <span key={l} className="lv-chip">{l}</span>
+                <Link key={l} className="lv-chip" href={researchHref(l)}>{l}</Link>
               ))}
             </div>
           )}
@@ -229,6 +233,18 @@ export function Reader({
   )
 
   const section = sections[i]
+
+  // ★ 開いている節を URL（?s=<ord>）に写す。本文のリンクで「調べる」へ行って戻ってきたとき、
+  //   同じ節に戻れるようにするため。履歴は積まない（戻るボタンで節を1つずつ遡らせない）。
+  //   既に同じ値なら触らない（StrictMode の二重実行でも書き換えは1回で済む）
+  useEffect(() => {
+    if (!section) return
+    const url = new URL(window.location.href)
+    if (url.searchParams.get('s') === String(section.ord)) return
+    url.searchParams.set('s', String(section.ord))
+    window.history.replaceState(window.history.state, '', url)
+  }, [section])
+
   if (!section) {
     return (
       <div className="hs-empty">

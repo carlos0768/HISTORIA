@@ -442,6 +442,18 @@ body { margin: 0; background: var(--lv-canvas); }
 .hs-prose { display: flex; flex-direction: column; gap: var(--lv-space-3); }
 .hs-prose .lv-body { margin: 0; }
 .hs-prose__list { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+/* ---- 本文の人物・出来事のリンク（docs/11 §4.2） ---- */
+/* ★ 1節に10個ほど入るので、通常のリンク（実線の下線）だと本文が線だらけになる。
+     点線＋鼠の下線で「引ける語」と分かる程度に留め、字は墨のまま
+     （11b §2.3「リンクは下線のみ。色を変えない」）。hover と focus で下線だけ実線・墨にする。 */
+.lv-root .hs-term {
+  color: var(--lv-ink);
+  text-decoration: underline dotted var(--lv-muted);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.lv-root .hs-term:hover,
+.lv-root .hs-term:focus-visible { color: var(--lv-ink); text-decoration: underline solid var(--lv-ink); }
 
 
 /* ---- 誤りの報告（docs/08 §5 層4） ---- */

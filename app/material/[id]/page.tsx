@@ -8,6 +8,7 @@ import { NotReady } from '@/components/not-ready'
 import { FakeWarning } from '@/components/fake-warning'
 import { Reader } from './reader'
 import { videosForKcs, MAX_PER_SECTION } from '@/lib/loop/video'
+import { termLinker } from '@/lib/loop/terms'
 
 export const dynamic = 'force-dynamic'
 
@@ -66,17 +67,23 @@ export default async function MaterialPage({
 
   // ★ 動画はサーバー側で引く。Reader はクライアント境界なので DB を触らせない。
   //   伏せたセクションには出さない（本文が無いのに「理解を助ける動画」は成立しない）。
-  const videos = await Promise.all(
-    m.sections.map(s => (s.hidden || s.kcIds.length === 0)
-      ? Promise.resolve([])
-      : videosForKcs(db, s.kcIds, MAX_PER_SECTION)),
-  )
+  const [videos, linker] = await Promise.all([
+    Promise.all(
+      m.sections.map(s => (s.hidden || s.kcIds.length === 0)
+        ? Promise.resolve([])
+        : videosForKcs(db, s.kcIds, MAX_PER_SECTION)),
+    ),
+    // ★ 本文の人物・出来事へのリンク（docs/11 §4.2）も サーバーで決める。
+    //   正典は約2,000表記あるので、本文で見つかった語だけを画面に渡す
+    termLinker(db),
+  ])
   const sections = m.sections.map((s, i) => ({
     id: s.id, ord: s.ord, heading: s.heading, bodyMd: s.bodyMd,
     charCount: s.charCount, hidden: s.hidden, hiddenReason: s.hiddenReason,
     kcLabels: s.kcLabels, geoRegionIds: s.geoRegionIds,
     read: s.read, requiredMs: s.requiredMs, estimatedMs: s.estimatedMs,
     videos: videos[i] ?? [],
+    terms: s.hidden ? [] : linker.find(s.bodyMd),
   }))
 
   return (
