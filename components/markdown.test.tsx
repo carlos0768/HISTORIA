@@ -87,15 +87,19 @@ describe('人物・出来事のリンク', () => {
 
     const links = [...container.querySelectorAll('a.hs-term')]
     expect(links.map(a => a.textContent)).toEqual(['ハンムラビ', 'ハンムラビ法典', 'キュロス大王'])
+    // 飛び先は日本語版 Wikipedia。別名で出ていても正典の label（＝記事名）で引く
     expect(links.map(a => a.getAttribute('href'))).toEqual([
-      '/research?q=%E3%83%8F%E3%83%B3%E3%83%A0%E3%83%A9%E3%83%93',
-      '/research?q=%E3%83%8F%E3%83%B3%E3%83%A0%E3%83%A9%E3%83%93%E6%B3%95%E5%85%B8',
-      '/research?q=%E3%82%AD%E3%83%A5%E3%83%AD%E3%82%B92%E4%B8%96',
+      'https://ja.wikipedia.org/wiki/Special:Search?search=%E3%83%8F%E3%83%B3%E3%83%A0%E3%83%A9%E3%83%93&go=Go',
+      'https://ja.wikipedia.org/wiki/Special:Search?search=%E3%83%8F%E3%83%B3%E3%83%A0%E3%83%A9%E3%83%93%E6%B3%95%E5%85%B8&go=Go',
+      'https://ja.wikipedia.org/wiki/Special:Search?search=%E3%82%AD%E3%83%A5%E3%83%AD%E3%82%B92%E4%B8%96&go=Go',
     ])
+    // 別のタブで開く。読んでいた節と滞在時間の計測を切らないため
+    expect(links.every(a => a.getAttribute('target') === '_blank')).toBe(true)
+    expect(links.every(a => a.getAttribute('rel') === 'noreferrer')).toBe(true)
     // 種別は class と title で分かる
     expect(links[0]!.className).toContain('hs-term--person')
     expect(links[1]!.className).toContain('hs-term--event')
-    expect(links[2]!.getAttribute('title')).toBe('人物「キュロス2世」を調べる')
+    expect(links[2]!.getAttribute('title')).toBe('人物「キュロス2世」を Wikipedia で開く（新しいタブ）')
     // 強調の中のリンクは強調のまま
     expect(container.querySelector('strong a.hs-term')?.textContent).toBe('ハンムラビ法典')
   })

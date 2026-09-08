@@ -12,6 +12,7 @@ import {
   type AtlasEvent, type AtlasPosition, type AtlasStory,
 } from '@/lib/atlas/schema'
 import { isFrontFacing, targetRotation } from '@/lib/atlas/geo'
+import { wikipediaHref as wikipediaUrl } from '@/lib/domain/term-link'
 
 export type AtlasCountries = Feature<Geometry, GeoJsonProperties>[]
 type FeatureFlags = { route: boolean; point: boolean; area: boolean }
@@ -36,9 +37,13 @@ function primaryPosition(event: AtlasEvent): AtlasPosition | null {
   return null
 }
 
-/** 固有記事が無い出来事もあるため、完全一致なら記事へ、無ければ検索結果へ送る。 */
+/**
+ * 固有記事が無い出来事もあるため、完全一致なら記事へ、無ければ検索結果へ送る。
+ * ★ URL の組み立ては lib/domain/term-link.ts の1つに寄せた（教材本文の語も同じ先へ飛ぶ）。
+ *   ここは「出来事から label を取り出す」だけを受け持つ。
+ */
 export function wikipediaHref(event: Pick<AtlasEvent, 'label'>): string {
-  return `https://ja.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(event.label)}&go=Go`
+  return wikipediaUrl(event.label)
 }
 
 function countryId(feature: Feature<Geometry, GeoJsonProperties>): string {

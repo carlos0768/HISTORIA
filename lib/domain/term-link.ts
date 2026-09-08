@@ -159,5 +159,17 @@ export function createLinker(terms: readonly Term[]): Linker {
   return { segment, find }
 }
 
-/** 「調べる」へのリンク先。ページ側（app/research）と同じ `?q=` を使う */
+/**
+ * 本文の語から飛ぶ先。**日本語版 Wikipedia の記事**である。
+ *
+ * ★ `Special:Search` に `go=Go` を付ける。記事名が一致すればそのまま**記事へ飛び**、
+ *   一致しなければ Wikipedia の検索結果に落ちる。行き止まり（存在しない記事の 404）を作らない。
+ *   正典の label には「アッカドのメソポタミア統一」のように記事名ではない説明的な名前があり、
+ *   `/wiki/<label>` を直に組み立てると、その手の語が軒並み赤リンクになる。
+ * ★ 定義はここ1つ。歴史地球儀（components/atlas/atlas-workspace.tsx）も同じものを使う。
+ */
+export const wikipediaHref = (label: string) =>
+  `https://ja.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(label)}&go=Go`
+
+/** 「調べる」へのリンク先。ページ側（app/research）と同じ `?q=` を使う。KC の札が使う */
 export const researchHref = (label: string) => `/research?q=${encodeURIComponent(label)}`

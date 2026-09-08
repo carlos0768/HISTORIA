@@ -10,9 +10,12 @@
  * ★ 解釈できない記法はそのまま文字として出す。黙って消さない。
  *
  * 人物・出来事のリンク（docs/11-ux.md §4.2）:
- * `terms` に渡された語（正典に当たった人物と出来事）を本文の中で見つけ、「調べる」への
- * リンクにする。どの語を渡すかはサーバー（lib/loop/terms.ts）が全語彙で決め、
- * ここは渡された語を同じ規則（lib/domain/term-link.ts）で切って <a> にするだけである。
+ * `terms` に渡された語（正典に当たった人物と出来事）を本文の中で見つけ、
+ * **日本語版 Wikipedia のその記事**へのリンクにする。どの語を渡すかはサーバー
+ * （lib/loop/terms.ts）が全語彙で決め、ここは渡された語を同じ規則
+ * （lib/domain/term-link.ts）で切って <a> にするだけである。
+ * ★ 別のタブで開く。同じタブで出て行くと、読んでいた節と滞在時間の計測（docs/11「読了判定」）が
+ *   そこで途切れる。調べ物は読書の脇道であって、読書を中断させるものではない。
  * ★ 1つの語は本文の中で**初出だけ**リンクにする。10回出る語を10回リンクにすると
  *   本文が線だらけになり、どこを押せばよいかがかえって分からなくなる。
  * ★ リンクは本文の意味を変えない。文字はそのまま、押せるようになるだけである。
@@ -20,8 +23,7 @@
  *   朱の語をリンクにしても朱のままである。
  */
 import type { ReactNode } from 'react'
-import Link from 'next/link'
-import { createLinker, researchHref, type LinkedTerm, type Linker } from '@/lib/domain/term-link'
+import { createLinker, wikipediaHref, type LinkedTerm, type Linker } from '@/lib/domain/term-link'
 
 /**
  * **強調** と ==重要== だけを拾う。入れ子は考えない。
@@ -36,14 +38,18 @@ function linked(text: string, linker: Linker | null, seen: Set<string>, keyPrefi
   if (!linker) return [<span key={keyPrefix}>{text}</span>]
   return linker.segment(text, seen).map((s, i) =>
     s.term ? (
-      <Link
+      // ★ 外部サイトなので next/link ではなく素の <a>。rel は noreferrer まで付ける
+      //   （どの教材を読んでいたかを Wikipedia へ知らせない）
+      <a
         key={`${keyPrefix}-${i}`}
         className={`hs-term hs-term--${s.term.kind}`}
-        href={researchHref(s.term.label)}
-        title={`${KIND_LABEL[s.term.kind]}「${s.term.label}」を調べる`}
+        href={wikipediaHref(s.term.label)}
+        target="_blank"
+        rel="noreferrer"
+        title={`${KIND_LABEL[s.term.kind]}「${s.term.label}」を Wikipedia で開く（新しいタブ）`}
       >
         {s.text}
-      </Link>
+      </a>
     ) : (
       <span key={`${keyPrefix}-${i}`}>{s.text}</span>
     ),
