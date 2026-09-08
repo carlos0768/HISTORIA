@@ -41,6 +41,12 @@ describe('重要箇所のマーク ==語句==', () => {
     expect([...el.querySelectorAll('mark')].map(m => m.textContent)).toEqual(['要', '礫石器', '火'])
     expect(el.querySelectorAll('li')).toHaveLength(2)
   })
+  it('用語の中の = を壊さない（ローマ=カトリックなど）', () => {
+    const el = render('==ローマ=カトリック==と==東方正教会==の分裂')
+    expect([...el.querySelectorAll('mark')].map(m => m.textContent))
+      .toEqual(['ローマ=カトリック', '東方正教会'])
+    expect(el.textContent).toBe('ローマ=カトリックと東方正教会の分裂')
+  })
   it('強調と並んでも互いを壊さない', () => {
     const el = render('**強調**と==重要==を同じ行に')
     expect(el.querySelector('strong')?.textContent).toBe('強調')
@@ -51,9 +57,9 @@ describe('重要箇所のマーク ==語句==', () => {
     expect(el.querySelectorAll('mark')).toHaveLength(0)
     expect(el.textContent).toBe('==閉じていない' + '====')
   })
-  it('=== は内側だけをマークにし、余った = は文字として残す（lib/domain/markup.ts と同じ解釈）', () => {
+  it('=== は内側の = ごとマークにし、余った = は文字として残す（lib/domain/markup.ts と同じ解釈）', () => {
     const el = render('===あ===')
-    expect(el.querySelector('mark')?.textContent).toBe('あ')
+    expect(el.querySelector('mark')?.textContent).toBe('=あ')
     expect(el.textContent).toBe('=あ=')
   })
   it('HTML として解釈しない', () => {

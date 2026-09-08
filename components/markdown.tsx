@@ -13,9 +13,10 @@ import type { ReactNode } from 'react'
 
 /**
  * **強調** と ==重要== だけを拾う。入れ子は考えない。
- * ★ `==` の中に改行や `=` は許さない。閉じ忘れを行の終わりまで赤くしないため
+ * ★ `==` の中に改行は許さない（閉じ忘れを行の終わりまで赤くしないため）。
+ *   単独の `=` は許す（ローマ=カトリックなど、`=` を含む用語のため。lib/domain/markup.ts）
  */
-const INLINE_RE = /(\*\*[^*]+\*\*|==[^=\n]+==)/g
+const INLINE_RE = /(\*\*[^*]+\*\*|==(?:[^=\n]|=(?!=))+==)/g
 
 function inline(text: string, keyPrefix: string): ReactNode[] {
   return text.split(INLINE_RE).filter(s => s !== '').map((part, i) => {
@@ -23,7 +24,7 @@ function inline(text: string, keyPrefix: string): ReactNode[] {
     if (part.length > 4 && part.startsWith('**') && part.endsWith('**')) {
       return <strong key={key}>{part.slice(2, -2)}</strong>
     }
-    if (part.length > 4 && part.startsWith('==') && part.endsWith('==')) {
+    if (part.length > 4 && part.startsWith('==') && part.endsWith('==') && !part.slice(2, -2).includes('==')) {
       // 朱の文字。色は app/globals.css の .hs-important
       return <mark key={key} className="hs-important">{part.slice(2, -2)}</mark>
     }
