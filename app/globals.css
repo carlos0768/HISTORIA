@@ -429,6 +429,24 @@ body { margin: 0; background: var(--lv-canvas); }
    <mark> の既定の黄色い下地は使わない。蛍光は1画面1箇所の約束がある（同 §2.1） */
 .hs-prose .hs-important { background: none; color: var(--lv-accent-ink); font-weight: inherit; }
 
+/* ---- 本文の人物・出来事のリンク（docs/11 §4.2） ---- */
+/* ★ 1節に10個ほど入るので、通常のリンク（実線の下線）だと本文が線だらけになる。
+     点線＋鼠の下線で「引ける語」と分かる程度に留める（11b §2.3）。
+   ★ 字の色は **継承する**。`.lv-root a` の墨で塗ると、重要箇所（朱）の中にある語を
+     リンクにした瞬間に朱が消え、マークが意味を失う。地の文では親から墨を継ぐので
+     見た目は変わらない。hover と焦点でも色は変えず、下線だけを実線・濃くする。 */
+.lv-root .hs-term {
+  color: inherit;
+  text-decoration: underline dotted var(--lv-muted);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.lv-root .hs-term:hover,
+.lv-root .hs-term:focus-visible {
+  color: inherit;
+  text-decoration: underline solid currentColor;
+}
+
 
 /* ---- 誤りの報告（docs/08 §5 層4） ---- */
 /* ★ 目立たせない。朱は主要ボタンの色なので使わず、字だけの控えめな導線にする。

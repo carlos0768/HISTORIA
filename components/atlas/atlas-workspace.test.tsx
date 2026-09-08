@@ -99,10 +99,17 @@ describe('歴史地球儀の物語検索', () => {
 
     await act(async () => {
       container.querySelector<HTMLButtonElement>('.hs-atlas-steps li button')!.click()
-      await new Promise(resolve => setTimeout(resolve, 30))
     })
 
-    expect(Number(ocean.getAttribute('r'))).toBeCloseTo(414)
+    // ズームは requestAnimationFrame の中で1度だけ 1.38 に上げる（落ち着いた値であって
+    // 途中の駒ではない）。固定の待ち時間で測ると、試験機が混んでいる回だけ 300 のまま落ちて、
+    // 実装は何も壊れていないのに赤くなる。値そのものを待つ。確かめる中身は変えない。
+    // ★ act の中では確かめない。React は act を抜けるときに描画を流すので、
+    //   act の内側で測ると、いつまでも古い値を見ることになる
+    await vi.waitFor(async () => {
+      await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)) })
+      expect(Number(ocean.getAttribute('r'))).toBeCloseTo(414)
+    })
     const link = container.querySelector<HTMLAnchorElement>('.hs-atlas-evidence__links a')!
     expect(link.textContent).toContain('Wikipedia')
     expect(link.href).toBe(wikipediaHref(eventsOf(columbus)[0]!))
