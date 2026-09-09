@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import { readCsv, list } from '@/scripts/db/csv'
 import { SEED_DIR } from '@/scripts/db/seed'
-import { boundaryOk, createLinker, researchHref, type Term } from './term-link'
+import { boundaryOk, createLinker, researchHref, wikipediaHref, type Term } from './term-link'
 
 const T = (kind: Term['kind'], label: string, ...aliases: string[]): Term => ({ kind, label, aliases })
 
@@ -102,7 +102,17 @@ describe('本文の語のリンク（docs/11 §4.2）', () => {
     expect(l.find(long)).toEqual([])
   })
 
-  it('リンク先は /research?q= で、語を URL に符号化する', () => {
+  it('本文の語のリンク先は日本語版 Wikipedia。記事名が一致すればそのまま記事へ飛ぶ（go=Go）', () => {
+    expect(wikipediaHref('アッバース朝')).toBe(
+      'https://ja.wikipedia.org/wiki/Special:Search?search=%E3%82%A2%E3%83%83%E3%83%90%E3%83%BC%E3%82%B9%E6%9C%9D&go=Go',
+    )
+    // 記事名ではない説明的な label でも行き止まりにしない（Wikipedia の検索結果に落ちる）
+    expect(wikipediaHref('アッカドのメソポタミア統一')).toContain('ja.wikipedia.org')
+    // & や ? を含む語で URL が壊れない
+    expect(wikipediaHref('A&B?')).toBe('https://ja.wikipedia.org/wiki/Special:Search?search=A%26B%3F&go=Go')
+  })
+
+  it('KC の札は今までどおり内部の「調べる」へ行く（KC は Wikipedia の記事ではない）', () => {
     expect(researchHref('アッバース朝')).toBe('/research?q=%E3%82%A2%E3%83%83%E3%83%90%E3%83%BC%E3%82%B9%E6%9C%9D')
   })
 })
