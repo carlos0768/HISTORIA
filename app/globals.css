@@ -396,12 +396,22 @@ body { margin: 0; background: var(--lv-canvas); }
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
 }
 .hs-fc__face--back { transform: rotateY(180deg); background: var(--lv-canvas); }
+/* 次のカードは「新しく配られた札」として現れる。
+   ★ 戻す回転は描かない。描くと、中身が次のカードに入れ替わったあとの札が
+     裏から表へ回るので、次のカードの答えの面が先に見えてしまう。
+     札は flashcards.tsx の key={card.id} ごと作り直され、
+     ここでは現れ方だけを整える（回転ではなく淡い立ち上がり）。
+   ★ opacity は __inner ではなく面に置く。__inner は preserve-3d と
+     hs-fc--loading の opacity を持っており、どちらとも喧嘩させない。 */
+.hs-fc__face { animation: hs-fc-deal .2s ease-out; }
+@keyframes hs-fc-deal { from { opacity: 0; } to { opacity: 1; } }
 .hs-fc__text { margin: 0; font: var(--lv-text-title); overflow-wrap: anywhere; }
 .hs-fc__hint { font: var(--lv-text-caption); color: var(--lv-muted); }
 .hs-fc:hover .hs-fc__face--front { background: var(--lv-canvas); }
 .hs-fc:focus-visible .hs-fc__face { outline: 2px solid var(--lv-accent); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   .hs-fc__inner { transition: none; }
+  .hs-fc__face { animation: none; }
 }
 
 /* ---- 教科書。章と文章だけを静かに並べ、集計用のカードにはしない ---- */

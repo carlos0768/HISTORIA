@@ -24,6 +24,8 @@ type Rating = typeof RATINGS[number]['value']
  *   同梱しない（docs/12 §6.1）。めくった時刻はそのまま msSinceReveal の起点になり、
  *   800ms 未満の「わかった／余裕」はサーバー側で q=3 に丸められる。
  * ★ 一度めくったカードは何度でも表裏を行き来できる。起点は最初にめくった時刻のまま。
+ * ★ 次のカードは必ず**表から**始まる。裏返したまま覚え具合を選んで先へ進むので、
+ *   カードの札そのものを作り直して「新しい札が出てきた」形にする（key={card.id}）。
  */
 export function Flashcards({ cards, drillId }: { cards: DrillCard[]; drillId: string }) {
   const [index, setIndex] = useState(0)
@@ -108,7 +110,20 @@ export function Flashcards({ cards, drillId }: { cards: DrillCard[]; drillId: st
         <span className="hs-progress__label">{index + 1} / {cards.length}</span>
       </div>
 
+      {/*
+        ★ key に card.id を置くのは表示の都合ではなく**仕様**である。これが無いと
+          札の要素が使い回され、次のカードへ進んだ瞬間に
+
+            ・中身は次のカードに入れ替わっている（index が進んでいる）
+            ・けれど hs-fc--flipped が外れる過程を CSS が 0.45 秒かけて描く
+
+          という状態になり、**次のカードの答えの面が裏返りながら正面を向く**。
+          つまり答えを見る前に答えの面を見せてしまう。key を変えると React は
+          この要素を捨てて作り直すので、新しい札は最初から表のまま静止して現れ、
+          回転は一度も起きない。
+      */}
       <div
+        key={card.id}
         className={`hs-fc${flipped ? ' hs-fc--flipped' : ''}${pending && answer === null ? ' hs-fc--loading' : ''}`}
         role="button"
         tabIndex={0}
